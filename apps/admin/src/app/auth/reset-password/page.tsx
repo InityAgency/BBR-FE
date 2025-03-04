@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input"
 // Importing Lucide icons for "Show/Hide" password functionality
 import { Eye, EyeOff } from "lucide-react"
 
-// Zod schema for password validation
-export const FormSchema = z.object({
+// Move the schema inside the component or to a separate file
+const formSchema = z.object({
   newPassword: z.string()
     .min(8, { message: "Password must be at least 8 characters long" })
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
@@ -29,8 +29,8 @@ export const FormSchema = z.object({
 })
 
 export default function ResetPasswordPage() {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       newPassword: "",
       confirmPassword: "",
@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: z.infer<typeof formSchema>) {
     toast.success("Your password has been reset successfully.")
     router.push('/dashboard')
   }
