@@ -1,84 +1,78 @@
-# Turborepo starter
+# BastBranded Residences - Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a **Next.js monorepo** using **TurboRepo**, containing the **web** and **admin** applications for **BastBranded Residences**.
 
-## Using this example
+## 📂 Project Structure
 
-Run the following command:
+```
+bbr-fe/                # Root monorepo directory
+│── apps/              # Applications
+│   ├── web/           # Web application (Next.js + SCSS)
+│   ├── admin/         # Admin panel (Next.js + ShadCN UI)
+│── packages/          # Shared packages (if needed in the future)
+│── node_modules/      # PNPM dependencies
+│── .turbo/            # TurboRepo cache
+│── pnpm-workspace.yaml # PNPM Workspaces configuration
+│── turbo.json         # TurboRepo configuration
+│── package.json       # Root package.json for the monorepo
+│── README.md          # Documentation
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Install Dependencies
+Since we use **PNPM**, install all dependencies from the root directory:
 
 ```sh
-npx create-turbo@latest
+pnpm install
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
+### 2️⃣ Running the Applications
+#### Run **web** and **admin** applications simultaneously:
+```sh
+pnpm turbo run dev --parallel
 ```
-cd my-turborepo
-pnpm build
+🔹 **Web** application → `http://localhost:3000`  
+🔹 **Admin** application → `http://localhost:3001`  
+
+#### Run only the web application
+```sh
+pnpm run dev --filter=web
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
+#### Run only the admin application
+```sh
+pnpm run dev --filter=admin
 ```
 
-### Remote Caching
+---
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## ⚙️ Configuration
+- **Monorepo powered by [TurboRepo](https://turbo.build/)**
+- **Frontend uses Next.js (App Router)**
+- **Admin panel is built with [ShadCN UI](https://ui.shadcn.com/)**
+- **PNPM is the package manager**
+- **TailwindCSS is configured for both applications**
+- **SCSS is used for the web application**
+- **Admin panel is permanently in dark mode**
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+---
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## 🔗 Deployment
+Deployment is **not yet set up**, but it will likely be done using **Vercel** or **Docker** in the future.
 
-```
-cd my-turborepo
-npx turbo login
-```
+---
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 📌 Additional Information
+📌 **Contact the team for API documentation and `.env` configuration.**  
+📌 **Use a feature branch strategy (`feature/feature-name`) when working on new features.**  
+📌 **Follow best practices and coding standards for Next.js and TurboRepo.**  
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+---
 
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+💡 **This `README.md` provides clear guidance for new developers joining the project.**  
+🚀 **Let me know if you need any modifications!** 😊
