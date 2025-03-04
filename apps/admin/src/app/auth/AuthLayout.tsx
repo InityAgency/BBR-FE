@@ -2,6 +2,8 @@
 
 import React from "react";
 import { ReactNode } from "react";
+import Image from 'next/image'
+
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -25,7 +27,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         </div>
         </div>
         <div className="relative hidden bg-muted lg:block m-6 rounded-xl overflow-hidden">
-        <img
+        <Image 
             src="/login.png"
             alt="Image"
             className="absolute inset-0 h-full w-full object-cover"

@@ -1,5 +1,6 @@
 "use client"
 import AuthLayout from "../AuthLayout"
+import Link from 'next/link'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -83,12 +84,12 @@ export default function LoginPage() {
               <FormItem className="grid gap-2">
                 <div className="flex justify-between">
                   <FormLabel>Password</FormLabel>
-                  <a
+                  <Link 
                     href="/auth/reset-password-request"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <FormControl>
                   <div className="relative">
