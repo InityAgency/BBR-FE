@@ -2,8 +2,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import { Button } from "@/components/ui/button";
+import AdminLayout from "../../AdminLayout";
 
-export default function DashboardPage() {
+
+export default function ResidencesPending() {
   const router = useRouter();
 
   useEffect(() => {
@@ -15,9 +17,9 @@ export default function DashboardPage() {
   }, [router]);
 
   return (
-    <div>
-      <h1>Welcome to the Dashboard!</h1>
+    <AdminLayout>
+      <h1>Welcome to the Residences Panding!</h1>
       <p>Only logged-in users can see this page.</p>
-    </div>
+    </AdminLayout>
   );
 }
