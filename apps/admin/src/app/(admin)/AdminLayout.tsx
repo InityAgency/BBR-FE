@@ -24,15 +24,27 @@ interface AuthLayoutProps {
 const breadcrumbTitles: Record<string, string> = {
   dashboard: "Dashboard",
   residences: "Residences",
-  create: "Add New Residence",
   pending: "Pending Activations",
   brands: "Brands",
   "user-management": "User Management",
 };
 
-const formatBreadcrumb = (segment: string) => {
+const createTitles: Record<string, string> = {
+  residences: "Add New Residence",
+  brands: "Add New Brand",
+  "user-management": "Add New User",
+};
+
+
+const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]) => {
+  if (segment === "create" && index > 0) {
+    const parentSegment = pathSegments[index - 1]; 
+    return createTitles[parentSegment] || `Add New ${breadcrumbTitles[parentSegment] || parentSegment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}`;
+  }
+
   return breadcrumbTitles[segment] || segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
+
 
 const AdminLayout = ({ children }: AuthLayoutProps) => {
   const pathname = usePathname();
@@ -45,13 +57,13 @@ const AdminLayout = ({ children }: AuthLayoutProps) => {
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Separator orientation="vertical"/>
             <Breadcrumb>
               <BreadcrumbList>
                 {pathSegments.map((segment, index) => {
                   const href = "/" + pathSegments.slice(0, index + 1).join("/");
                   const isLast = index === pathSegments.length - 1;
-                  const formattedSegment = formatBreadcrumb(segment);
+                  const formattedSegment = formatBreadcrumb(segment, index, pathSegments);
 
                   return (
                     <React.Fragment key={href}>

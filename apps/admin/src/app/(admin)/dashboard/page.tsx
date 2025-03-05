@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import { Button } from "@/components/ui/button";
 import AdminLayout from "../AdminLayout";
+import PageHeader from "@/components/admin/Headers/PageHeader";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -17,8 +18,7 @@ export default function DashboardPage() {
 
   return (
     <AdminLayout>
-      <h1>Welcome to the Dashboard!</h1>
-      <p>Only logged-in users can see this page.</p>
+      <PageHeader title="Dashboard" />
     </AdminLayout>
   );
 }

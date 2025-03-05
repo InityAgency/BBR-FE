@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import { Button } from "@/components/ui/button";
 import AdminLayout from "../AdminLayout";
-
+import PageHeader from "@/components/admin/Headers/PageHeader";
 
 export default function RankingPage() {
   const router = useRouter();
@@ -18,8 +18,7 @@ export default function RankingPage() {
 
   return (
     <AdminLayout>
-      <h1>Welcome to the Ranking!</h1>
-      <p>Only logged-in users can see this page.</p>
+      <PageHeader title="Rankings" />
     </AdminLayout>
   );
 }

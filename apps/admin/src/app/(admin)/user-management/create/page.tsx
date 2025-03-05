@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 
-export default function ResidencesCreate() {
+export default function BrandsCreate() {
   const router = useRouter();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function ResidencesCreate() {
 
   return (
     <AdminLayout>
-      <PageHeader title="Add new residence" />
+      <PageHeader title="Add new user" />
     </AdminLayout>
   );
 }

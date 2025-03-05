@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import AdminLayout from "../AdminLayout";
 
+import PageHeader from "@/components/admin/Headers/PageHeader";
 
 export default function ResidencesPage() {
   const router = useRouter();
@@ -18,8 +19,7 @@ export default function ResidencesPage() {
 
   return (
     <AdminLayout>
-      <h1>Welcome to the Residences!</h1>
-      <p>Only logged-in users can see this page.</p>
+      <PageHeader title="Residences" count={117} buttonText="Add new residence" buttonUrl="/residences/create" />
     </AdminLayout>
   );
 }
