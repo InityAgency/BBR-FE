@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -17,7 +18,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-interface AuthLayoutProps {
+interface AdminLayoutProps {
   children: ReactNode;
 }
 
@@ -35,7 +36,6 @@ const createTitles: Record<string, string> = {
   "user-management": "Add New User",
 };
 
-
 const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]) => {
   if (segment === "create" && index > 0) {
     const parentSegment = pathSegments[index - 1]; 
@@ -45,8 +45,7 @@ const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]
   return breadcrumbTitles[segment] || segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-
-const AdminLayout = ({ children }: AuthLayoutProps) => {
+const AdminLayout = ({ children }: AdminLayoutProps) => {
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter((segment) => segment);
 

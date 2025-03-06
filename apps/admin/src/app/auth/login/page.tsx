@@ -47,8 +47,7 @@ export default function LoginPage() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    localStorage.setItem("userLoggedIn", "true"); //remove in production
-    document.cookie = "userLoggedIn=true; path=/; secure; samesite=strict"; 
+    document.cookie = "userLoggedIn=true; path=/; secure; SameSite=Strict";
     toast.success("Login successful")
     router.push('/dashboard')
   }

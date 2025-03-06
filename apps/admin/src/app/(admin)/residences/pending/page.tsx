@@ -7,16 +7,6 @@ import PageHeader from "@/components/admin/Headers/PageHeader";
 
 
 export default function ResidencesPending() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn");
-
-    if (!isLoggedIn) {
-      router.push("/auth/login");
-    }
-  }, [router]);
-
   return (
     <AdminLayout>
       <PageHeader title="Pending Activations" count={117} />
