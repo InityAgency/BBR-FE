@@ -28,5 +28,17 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.scrollbar-gutter-stable': {
+          'scrollbar-gutter': 'stable',
+        },
+        '.scrollbar-gutter-stable-both': {
+          'scrollbar-gutter': 'stable both-edges',
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 };

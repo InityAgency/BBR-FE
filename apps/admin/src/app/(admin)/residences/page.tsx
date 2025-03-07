@@ -1,6 +1,8 @@
 import AdminLayout from "../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 
+import { ResidencesTable } from "@/components/admin/Residences/ResidencesTable";
+
 export default function ResidencesPage() {
   return (
     <AdminLayout>
@@ -11,6 +13,7 @@ export default function ResidencesPage() {
         buttonUrl="/residences/create" 
       />
 
+      <ResidencesTable />
     </AdminLayout>
   );
 }
