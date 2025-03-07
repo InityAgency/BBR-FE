@@ -47,11 +47,14 @@ export default function LoginPage() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    document.cookie = "userLoggedIn=true; path=/; secure; SameSite=Strict";
+    // Remove the secure flag for local development
+    document.cookie = "userLoggedIn=true; path=/; SameSite=Strict";
+    
+    // Or use Next.js recommended cookie setting
+    // You might want to use a library like js-cookie or Next.js cookies API
     toast.success("Login successful")
     router.push('/dashboard')
   }
-
   return (
     <AuthLayout>
       <Form {...form}>
