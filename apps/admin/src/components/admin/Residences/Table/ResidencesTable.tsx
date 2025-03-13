@@ -35,7 +35,17 @@ export function ResidencesTable() {
     data: residencesData,
     columns: enhancedColumns,
     initialSorting: [{ id: "createdAt", desc: true }],
-    globalFilterFn: fuzzyFilter,
+    globalFilterFn: (row, columnId, value, addMeta) => {
+      // Koristimo našu univerzalnu funkciju
+      const result = fuzzyFilter(row, columnId, value, addMeta);
+      
+      // Dodatno proveravamo ID polje eksplicitno
+      const id = row.original.id || "";
+      const searchValue = String(value).toLowerCase();
+      
+      // Vraćamo true ako je univerzalna pretraga uspela ILI ako ID sadrži traženi tekst
+      return result || id.toLowerCase().includes(searchValue);
+    },
     initialPageSize: 12,
   });
 

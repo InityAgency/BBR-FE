@@ -14,7 +14,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+
+import { ArrowLeft } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -41,6 +44,10 @@ export default function ResetPasswordRequestPage() {
     <AuthLayout>
       <Form {...form}>
         <div className="flex flex-col items-start gap-2 mb-6">
+          <Link href="/auth/login" className="text-balance text-sm font-medium text-primary-foreground flex items-center gap-1 hover:text-primary transition-all mb-3">
+            <ArrowLeft width={22} height={22}/>
+            Login
+          </Link>
           <h1 className="text-2xl font-bold">Reset Your Password</h1>
           <p className="text-balance text-sm text-muted-foreground">
             Enter your email below to receive a password reset link.

@@ -30,6 +30,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { title } from "process"
 
 const data = {
   user: {
@@ -54,8 +55,12 @@ const data = {
           url: "/residences/pending",
         },
         {
-          title: "Add new residence",
-          url: "/residences/create",
+          title: "Claim Requests",
+          url: "/residences/claim-requests",
+        },
+        {
+          title: "Units Management",
+          url: "/residences/units",
         },
       ],
     },
@@ -68,6 +73,12 @@ const data = {
       title: "Brands",
       url: "/brands",
       icon: Sparkle,
+      items: [
+        {
+          title: "Pending Activations",
+          url: "/brands/pending",
+        }
+      ]
     },
     {
       title: "User Management",

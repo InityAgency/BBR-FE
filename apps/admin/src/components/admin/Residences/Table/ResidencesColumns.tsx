@@ -22,9 +22,11 @@ const renderNameCell = (value: string, id: string) => (
     <a href={`/residences/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
       {value}
     </a>
+    <div className="text-xs text-muted-foreground truncate">
+      {id}
+    </div>
   </div>
 );
-
 const renderLocationCell = (location: string) => {
   const parts = location.split(", ");
   const city = parts[0];
