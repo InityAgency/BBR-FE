@@ -13,6 +13,7 @@ import { Brand } from "../../../../app/types/models/Brand";
 import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { BrandsActions } from "./BrandsActions";
+import { BrandsCardList } from "../Cards/BrandsCardList";
 
 // Popravka za kolone da koriste BrandsActions
 const enhancedColumns = columns.map(column => {
@@ -92,11 +93,16 @@ export function BrandsTable() {
         setTypeSearchValue={setTypeSearchValue}
       />
 
-      {/* Tabela */}
-      <BaseTable 
-        table={table}
-        getRowClassName={getRowClassName}
-      />
+      {/* Kartice za mobilni prikaz */}
+      <BrandsCardList brands={table.getRowModel().rows.map(row => row.original)} />
+
+      {/* Tabela za desktop prikaz */}
+      <div className="hidden lg:block">
+        <BaseTable 
+          table={table}
+          getRowClassName={getRowClassName}
+        />
+      </div>
 
       {/* Paginacija */}
       <TablePagination table={table} />

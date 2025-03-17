@@ -111,38 +111,42 @@ const AuthService = {
    * Logout user - modified to ignore API errors
    */
   async logout(): Promise<void> {
-    // Signal that we're in logout process
-    if (typeof setLoggingOut === 'function') {
-      setLoggingOut(true);
-    }
-    
-    // First clear all local auth data
-    this.clearAuthData();
-    
     try {
-      // Then try to call the logout endpoint, but don't wait for it
-      // We'll use a fire-and-forget approach
-      apiClient.post(
-        API_ENDPOINTS.AUTH.LOGOUT, 
-        {}, 
-        { 
-          withCredentials: true,
-          timeout: 3000,
-          validateStatus: () => true 
-        }
-      ).catch(() => {
-        // Ignore all errors during logout
-      });
-      
-      return Promise.resolve();
-    } catch {
-      // Ignore all errors
-      return Promise.resolve();
-    } finally {
-      // Reset logging out flag after a short delay
+      // Set logout flag immediately
       if (typeof setLoggingOut === 'function') {
-        setTimeout(() => setLoggingOut(false), 500);
+        setLoggingOut(true);
       }
+      
+      // Clear all local auth data immediately
+      this.clearAuthData();
+      
+      // Force redirect to login without any parameters
+      window.location.href = '/auth/login';
+      
+      // Try to call logout API in the background
+      setTimeout(() => {
+        apiClient.post(
+          API_ENDPOINTS.AUTH.LOGOUT, 
+          {}, 
+          { 
+            withCredentials: true,
+            timeout: 1000,
+            validateStatus: () => true
+          }
+        ).catch(() => {
+          // Completely ignore any errors
+        }).finally(() => {
+          // Reset logout flag after API call
+          if (typeof setLoggingOut === 'function') {
+            setLoggingOut(false);
+          }
+        });
+      }, 100);
+
+      return Promise.resolve();
+    } catch (error) {
+      // Ignore any errors and resolve anyway
+      return Promise.resolve();
     }
   },
 

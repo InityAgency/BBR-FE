@@ -13,6 +13,7 @@ import { Residence } from "../../../../app/types/models/Residence";
 import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { ResidencesActions } from "./ResidencesActions";
+import { ResidencesCardList } from "../Cards/ResidencesCardList";
 
 // Popravka za kolone da koriste ResidencesActions
 const enhancedColumns = columns.map(column => {
@@ -25,7 +26,7 @@ const enhancedColumns = columns.map(column => {
   return column;
 });
 
-export function ResidencesTable() {
+export const ResidencesTable = () => {
   // Koristimo generički hook za tabelu
   const {
     table,
@@ -67,17 +68,8 @@ export function ResidencesTable() {
     statusAccessor: "status",
   });
 
-  // Helper funkcije za stilizovanje redova i ćelija
-  const getRowClassName = (row: any) => {
-    const status = row.original.status;
-    if (status === "Deleted") return "opacity-60";
-    if (status === "Draft") return "opacity-80";
-    return "";
-  };
-
   return (
     <div className="w-full">
-      {/* Filteri */}
       <ResidencesFilters
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
@@ -92,16 +84,19 @@ export function ResidencesTable() {
         setLocationSearchValue={setLocationSearchValue}
       />
 
-      {/* Tabela */}
-      <BaseTable 
-        table={table}
-        getRowClassName={getRowClassName}
-      />
+      <div className="block lg:hidden">
+        <ResidencesCardList 
+          residences={table.getRowModel().rows.map(row => row.original)} 
+        />
+      </div>
 
-      {/* Paginacija */}
+      <div className="hidden lg:block">
+        <BaseTable table={table} />
+      </div>
+
       <TablePagination table={table} />
     </div>
   );
-}
+};
 
 export default ResidencesTable;

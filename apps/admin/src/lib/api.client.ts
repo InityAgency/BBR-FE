@@ -69,9 +69,9 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    // Skip error handling if we're logging out
+    // Completely skip ALL error handling during logout
     if (isLoggingOut) {
-      return Promise.reject(createAuthError('Logout in progress'));
+      return Promise.resolve({ data: null });
     }
 
     // Handle network errors
@@ -85,20 +85,19 @@ apiClient.interceptors.response.use(
     const { status, data } = error.response;
     let errorMessage = (data as any)?.message || 'An error occurred';
 
-    // Special handling for 401
-    if (status === 401) {
+    // Special handling for 401 - but ONLY if we're not logging out
+    if (status === 401 && !isLoggingOut) {
       clearAuthData();
       
       const currentPath = window.location.pathname;
-      // Only show session expired message if we're not on login page and not logging out
-      if (!currentPath.includes('/auth/login') && !isLoggingOut) {
-        errorMessage = 'Your session has expired. Please log in again.';
-        setTimeout(() => {
-          window.location.href = '/auth/login?error=session_expired';
-        }, 100);
+      if (!currentPath.includes('/auth/login')) {
+        // Prevent any redirects if we're in the process of logging out
+        if (!isLoggingOut) {
+          errorMessage = 'Your session has expired. Please log in again.';
+          window.location.href = '/auth/login';
+        }
       } else {
-        // Don't show any error message during logout
-        return Promise.reject(createAuthError(''));
+        errorMessage = 'Invalid credentials';
       }
     }
 
