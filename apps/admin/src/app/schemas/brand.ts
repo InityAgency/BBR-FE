@@ -33,6 +33,8 @@ export const brandSchema = z.object({
     required_error: "Brand logo is required"
   }), // Will be File in the frontend, but required for API
   featuredImage: z.any().optional(), // Will be File in the frontend, but optional for API
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 // Return type for the schema

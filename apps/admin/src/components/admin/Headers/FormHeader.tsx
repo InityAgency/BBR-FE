@@ -13,6 +13,8 @@ interface FormHeaderProps {
   discardButtonText?: string;
   isSubmitting?: boolean;
   extraButtons?: React.ReactNode;
+  customButtons?: React.ReactNode;
+  hideDefaultButtons?: boolean;
 }
 
 const FormHeader: React.FC<FormHeaderProps> = ({ 
@@ -26,36 +28,52 @@ const FormHeader: React.FC<FormHeaderProps> = ({
   discardButtonText = "Discard",
   isSubmitting = false,
   extraButtons,
+  customButtons,
+  hideDefaultButtons = false,
 }) => {
+
   return (
     <div className="flex items-center justify-between pb-6 flex-wrap gap-4">
       <div className="flex flex-col">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold">{title}</h1>
-          {titleContent}
-          {titleActions}
+          {titleContent && (
+            <div className="flex items-center">
+              {titleContent}
+            </div>
+          )}
+          {titleActions && (
+            <div className="flex items-center">
+              {titleActions}
+            </div>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2">
         {extraButtons}
-        {onDiscard && (
-          <Button 
-            className="cursor-pointer transition-colors"
-            variant="outline" 
-            onClick={onDiscard}
-            disabled={isSubmitting}
-          >
-            {discardButtonText}
-          </Button>
-        )}
-        {onSave && (
-          <Button 
-            className="cursor-pointer transition-colors"
-            onClick={onSave}
-            disabled={saveButtonDisabled || isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : saveButtonText}
-          </Button>
+        {customButtons}
+        {!hideDefaultButtons && (
+          <>
+            {onDiscard && (
+              <Button 
+                className="cursor-pointer transition-colors"
+                variant="outline" 
+                onClick={onDiscard}
+                disabled={isSubmitting}
+              >
+                {discardButtonText}
+              </Button>
+            )}
+            {onSave && (
+              <Button 
+                className="cursor-pointer transition-colors"
+                onClick={onSave}
+                disabled={saveButtonDisabled || isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : saveButtonText}
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>

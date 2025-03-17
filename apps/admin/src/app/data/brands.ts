@@ -8,14 +8,16 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 3,
     updatedAt: "Mar 04, 2025, 07:21 PM",
-    status: "Pending",
+    createdAt: "Jan 01, 2024, 00:00 AM",
+    status: "Pending"
   },
   {
     id: "0020",
-    name: "Cipriani",
+    name: "Cipriani", 
     type: "Luxury Hotel Resort",
     numberOfResidences: 12,
     updatedAt: "Mar 04, 2025, 07:21 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -24,6 +26,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 5,
     updatedAt: "Mar 04, 2025, 07:21 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -32,6 +35,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 1,
     updatedAt: "Mar 04, 2025, 07:21 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -40,6 +44,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 8,
     updatedAt: "Mar 01, 2025, 10:30 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -48,6 +53,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 6,
     updatedAt: "Mar 02, 2025, 12:15 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -56,6 +62,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 4,
     updatedAt: "Mar 03, 2025, 09:45 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Pending",
   },
   {
@@ -64,6 +71,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 3,
     updatedAt: "Mar 02, 2025, 11:30 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -72,6 +80,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 2,
     updatedAt: "Mar 01, 2025, 02:20 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Draft",
   },
   {
@@ -80,6 +89,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 5,
     updatedAt: "Mar 03, 2025, 03:45 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -88,6 +98,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 7,
     updatedAt: "Mar 04, 2025, 01:10 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -96,6 +107,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 2,
     updatedAt: "Mar 02, 2025, 05:30 PM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Deleted",
   },
   {
@@ -104,6 +116,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 4,
     updatedAt: "Mar 01, 2025, 09:20 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   },
   {
@@ -112,6 +125,7 @@ export const brandsData: Brand[] = [
     type: "Fashion and Lifestyle",
     numberOfResidences: 1,
     updatedAt: "Mar 03, 2025, 10:15 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Draft",
   },
   {
@@ -120,6 +134,7 @@ export const brandsData: Brand[] = [
     type: "Luxury Hotel Resort",
     numberOfResidences: 3,
     updatedAt: "Mar 04, 2025, 11:45 AM",
+    createdAt: "Jan 01, 2024, 00:00 AM",
     status: "Active",
   }
 ];
