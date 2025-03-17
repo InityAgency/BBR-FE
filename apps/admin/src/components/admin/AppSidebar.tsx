@@ -75,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   
   // Default user data to fall back on if auth context user is not available
   const userData = {
-    name: user?.name || "BBR Admin",
+    name: user?.fullName || "BBR Admin",
     email: user?.email || "admin@example.com",
     avatar: user?.avatar || "/avatars/shadcn.jpg",
   };
