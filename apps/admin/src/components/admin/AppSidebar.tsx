@@ -3,15 +3,6 @@
 import * as React from "react"
 import Image from "next/image"
 import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
   LayoutPanelLeft,
   Building2,
   Award,
@@ -27,68 +18,68 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { title } from "process"
+import { useAuth } from "@/contexts/AuthContext"
 
-const data = {
-  user: {
-    name: "BBR Admin",
-    email: "admin@example.com",
-    avatar: "/avatars/shadcn.jpg",
+const navItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutPanelLeft,
   },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutPanelLeft,
-      isActive: true,
-    },
-    {
-      title: "Residences",
-      url: "/residences",
-      icon: Building2,
-      items: [
-        {
-          title: "Pending Activations",
-          url: "/residences/pending",
-        },
-        {
-          title: "Claim Requests",
-          url: "/residences/claim-requests",
-        },
-        {
-          title: "Units Management",
-          url: "/residences/units",
-        },
-      ],
-    },
-    {
-      title: "Rankings",
-      url: "/rankings",
-      icon: Award,
-    },
-    {
-      title: "Brands",
-      url: "/brands",
-      icon: Sparkle,
-      items: [
-        {
-          title: "Pending Activations",
-          url: "/brands/pending",
-        }
-      ]
-    },
-    {
-      title: "User Management",
-      url: "/user-management",
-      icon: UsersRound,
-    },
-  ],
-}
+  {
+    title: "Residences",
+    url: "/residences",
+    icon: Building2,
+    items: [
+      {
+        title: "Pending Activations",
+        url: "/residences/pending",
+      },
+      {
+        title: "Claim Requests",
+        url: "/residences/claim-requests",
+      },
+      {
+        title: "Units Management",
+        url: "/residences/units",
+      },
+    ],
+  },
+  {
+    title: "Rankings",
+    url: "/rankings",
+    icon: Award,
+  },
+  {
+    title: "Brands",
+    url: "/brands",
+    icon: Sparkle,
+    items: [
+      {
+        title: "Pending Activations",
+        url: "/brands/pending",
+      }
+    ]
+  },
+  {
+    title: "User Management",
+    url: "/user-management",
+    icon: UsersRound,
+  },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+  
+  // Default user data to fall back on if auth context user is not available
+  const userData = {
+    name: user?.name || "BBR Admin",
+    email: user?.email || "admin@example.com",
+    avatar: user?.avatar || "/avatars/shadcn.jpg",
+  };
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -101,10 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -1,7 +1,10 @@
+// apps/admin/src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/contexts/AuthContext";
+import SessionRecovery from "@/components/admin/SessionRecovery";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,10 +32,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-        <ThemeProvider>
-          {children}
-          <Toaster position="top-center" visibleToasts={9} richColors closeButton theme="dark" />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <SessionRecovery />
+            {children}
+            <Toaster position="top-center" visibleToasts={9} richColors closeButton theme="dark" />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

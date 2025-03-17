@@ -1,20 +1,25 @@
 "use client"
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import AuthService from "@/services/auth.service";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn");
-
-    if (isLoggedIn) {
-      router.push("/dashboard"); 
-    } else {
-      router.push("/auth/login"); 
+    // Wait for auth state to be determined
+    if (!isLoading) {
+      // Redirect based on auth status
+      if (isAuthenticated) {
+        router.push("/dashboard");
+      } else {
+        router.push("/auth/login");
+      }
     }
-  }, [router]);
+  }, [router, isAuthenticated, isLoading]);
 
-  return null; 
+  // Show nothing during the redirect
+  return null;
 }

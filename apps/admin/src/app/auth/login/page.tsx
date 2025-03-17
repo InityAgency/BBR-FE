@@ -1,18 +1,18 @@
+// apps/admin/src/app/auth/login/page.tsx
 "use client"
+
+import { useEffect, useState } from "react";
 import AuthLayout from "../AuthLayout"
 import Link from 'next/link'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-// Importing Lucide icons
-import { Eye, EyeOff } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -21,22 +21,18 @@ const FormSchema = z.object({
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
-    .regex(/[0-9]/, { message: "Password must contain at least one number." }),
-})
+});
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("userLoggedIn"); 
-
-    if (isLoggedIn) {
-      router.push("/dashboard"); 
-    }
-  }, [router]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const errorParam = searchParams.get('error');
+  
+  const { adminLogin, isLoading } = useAuth();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -44,26 +40,59 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
-  })
+  });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // Remove the secure flag for local development
-    document.cookie = "userLoggedIn=true; path=/; SameSite=Strict";
+  // Check for URL error parameters
+  useEffect(() => {
+    if (errorParam) {
+      switch (errorParam) {
+        case 'session_expired':
+          setErrorMessage('Your session has expired. Please log in again.');
+          break;
+        case 'permission':
+          setErrorMessage('You do not have permission to access the admin panel.');
+          break;
+        default:
+          setErrorMessage('An error occurred. Please try again.');
+      }
+    }
+  }, [errorParam]);
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // Reset error state
+    setErrorMessage(null);
+    form.clearErrors();
     
-    // Or use Next.js recommended cookie setting
-    // You might want to use a library like js-cookie or Next.js cookies API
-    toast.success("Login successful")
-    router.push('/dashboard')
+    try {
+      await adminLogin(data.email, data.password, callbackUrl);
+      console.log("Login successful, redirecting to:", callbackUrl);
+    } catch (error: any) {
+      console.error('Login submission error:', error);
+      
+      // Set form field errors
+      if (error.name === 'AuthError') {
+        form.setError('email', { message: ' ' });
+        form.setError('password', { message: ' ' });
+      }
+      
+      // Set error message if not already handled
+      if (!errorMessage) {
+        setErrorMessage(error.message || 'Failed to login. Please check your credentials.');
+      }
+    }
   }
+
   return (
     <AuthLayout>
       <Form {...form}>
         <div className="flex flex-col items-start gap-2 mb-6">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
+          <h1 className="text-2xl font-bold">Login to BBR Admin</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Enter your email below to login to your account
+            Enter your admin credentials to access the dashboard
           </p>
         </div>
+      
+        
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
@@ -72,7 +101,12 @@ export default function LoginPage() {
               <FormItem className="grid gap-2">
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email@example.com" {...field} />
+                  <Input 
+                    placeholder="email@example.com" 
+                    {...field} 
+                    disabled={isLoading}
+                    className={form.formState.errors.email ? "border-destructive" : ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -99,16 +133,19 @@ export default function LoginPage() {
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••"
                       {...field}
+                      disabled={isLoading}
+                      className={form.formState.errors.password ? "border-destructive" : ""}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm"
+                      disabled={isLoading}
                     >
                       {showPassword ? (
-                        <EyeOff size={20} />  // EyeOff icon from Lucide for hiding password
+                        <EyeOff size={20} />
                       ) : (
-                        <Eye size={20} />  // Eye icon from Lucide for showing password
+                        <Eye size={20} />
                       )}
                     </button>
                   </div>
@@ -118,8 +155,19 @@ export default function LoginPage() {
             )}
           />
 
-          <Button type="submit" className="cursor-pointer transition-all w-full">
-            Login
+          <Button 
+            type="submit" 
+            className="cursor-pointer transition-all w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
           </Button>
         </form>
       </Form>

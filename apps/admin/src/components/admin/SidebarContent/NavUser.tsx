@@ -29,7 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 export function NavUser({
   user,
@@ -41,14 +41,13 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const router = useRouter()
+  const { logout } = useAuth();
 
-  function handleLogout() {
-    document.cookie = "userLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    router.push("/auth/login"); 
+  const handleLogout = async () => {
+    await logout();
+    // Redirect happens in the auth context
   }
   
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
