@@ -17,6 +17,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { brandsData } from "@/app/data/brands";
+import { Brand } from "@/app/types/models/Brand";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -37,9 +39,23 @@ const createTitles: Record<string, string> = {
 };
 
 const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]) => {
+  // Handle create pages
   if (segment === "create" && index > 0) {
     const parentSegment = pathSegments[index - 1]; 
     return createTitles[parentSegment] || `Add New ${breadcrumbTitles[parentSegment] || parentSegment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}`;
+  }
+
+  // Handle edit pages for brands
+  if (segment === "edit" && pathSegments[index - 2] === "brands") {
+    const brandId = pathSegments[index - 1];
+    const brand = brandsData.find((b: Brand) => b.id === brandId);
+    return brand ? `Edit ${brand.name}` : "Edit Brand";
+  }
+
+  // Handle brand IDs in the path
+  if (index > 0 && pathSegments[index - 1] === "brands" && segment.match(/^\d+$/)) {
+    const brand = brandsData.find((b: Brand) => b.id === segment);
+    return brand ? brand.name : segment;
   }
 
   return breadcrumbTitles[segment] || segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());

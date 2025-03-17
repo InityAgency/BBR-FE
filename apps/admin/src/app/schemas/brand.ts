@@ -1,5 +1,6 @@
 // app/schemas/brand.ts
 import { z } from "zod";
+import { BrandStatus, BrandType } from "../types/models/Brand";
 
 // Brand types from the existing brand model
 export const brandTypes = [
@@ -9,12 +10,23 @@ export const brandTypes = [
   "Commercial"
 ] as const;
 
+// Brand statuses
+export const brandStatuses: BrandStatus[] = [
+  "Active",
+  "Pending",
+  "Deleted",
+  "Draft"
+];
+
 // Base schema for brand details
 export const brandSchema = z.object({
   name: z.string().min(2, "Brand name must be at least 2 characters").nonempty("Brand name is required"),
   description: z.string().optional(),
   type: z.enum(brandTypes as unknown as [string, ...string[]], {
     required_error: "Brand type is required"
+  }),
+  status: z.enum(brandStatuses as unknown as [string, ...string[]], {
+    required_error: "Brand status is required"
   }),
   // For images, we handle them as nullable when submitting
   logo: z.any({
@@ -31,4 +43,5 @@ export const initialBrandValues: Partial<BrandFormValues> = {
   name: "",
   description: "",
   type: undefined,
+  status: "Draft",
 };

@@ -22,7 +22,7 @@ export function ResidencesActions({ row }: ResidencesActionsProps) {
     },
     {
       label: "Archive",
-      icon: <Archive className="h-4 w-4" />,
+      icon: <Archive className="h-4 w-4 text-red-500" />,
       className: "text-red-500",
       onClick: (residence: Residence) => {
         // Ovde bi se nalazila logika za arhiviranje

@@ -4,29 +4,40 @@ import { Button } from "@/components/ui/button";
 
 interface FormHeaderProps {
   title: string;
+  titleContent?: React.ReactNode;
+  titleActions?: React.ReactNode;
   onSave?: () => void;
   onDiscard?: () => void;
   saveButtonText?: string;
   saveButtonDisabled?: boolean;
   discardButtonText?: string;
   isSubmitting?: boolean;
+  extraButtons?: React.ReactNode;
 }
 
 const FormHeader: React.FC<FormHeaderProps> = ({ 
   title, 
+  titleContent,
+  titleActions,
   onSave, 
   onDiscard, 
   saveButtonText = "Save",
   saveButtonDisabled = false,
   discardButtonText = "Discard",
   isSubmitting = false,
+  extraButtons,
 }) => {
   return (
-    <div className="flex items-center justify-between pb-6">
+    <div className="flex items-center justify-between pb-6 flex-wrap gap-4">
       <div className="flex flex-col">
-        <h1 className="text-2xl font-semibold">{title}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">{title}</h1>
+          {titleContent}
+          {titleActions}
+        </div>
       </div>
       <div className="flex items-center gap-2">
+        {extraButtons}
         {onDiscard && (
           <Button 
             className="cursor-pointer transition-colors"

@@ -41,7 +41,7 @@ const DiscardModal: React.FC<DiscardModalProps> = ({
           <AlertDialogCancel className="transition-colors cursor-pointer">{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-red-900/55 text-red-300 hover:bg-destructive/90 transition-colors cursor-pointer"
+            className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer"
           >
             {confirmText}
           </AlertDialogAction>

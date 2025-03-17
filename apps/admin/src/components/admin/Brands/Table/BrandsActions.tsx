@@ -12,7 +12,6 @@ interface BrandsActionsProps {
 }
 
 export function BrandsActions({ row }: BrandsActionsProps) {
-  // Definišemo akcije specifične za brendove
   const actions: TableAction[] = [
     {
       label: "View details",
@@ -23,10 +22,9 @@ export function BrandsActions({ row }: BrandsActionsProps) {
     },
     {
       label: "Archive",
-      icon: <Archive className="h-4 w-4" />,
+      icon: <Archive className="h-4 w-4 text-red-500" />,
       className: "text-red-500",
       onClick: (brand: Brand) => {
-        // Ovde bi se nalazila logika za arhiviranje
         console.log(`Archiving brand: ${brand.id}`);
       }
     }
