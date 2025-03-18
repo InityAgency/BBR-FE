@@ -152,13 +152,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
-      // Set user to null first to immediately update UI
-      setUser(null);
-      
-      // Call logout which won't wait for the API
+      // Call logout and wait for API call to complete
       await AuthService.logout();
       
-      // Redirect to login page without error parameter
+      // Set user to null to update UI
+      setUser(null);
+      
+      // Redirect to login page
       router.push('/auth/login');
     } catch (error) {
       // Only log in development

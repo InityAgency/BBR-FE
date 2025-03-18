@@ -117,36 +117,39 @@ const AuthService = {
         setLoggingOut(true);
       }
       
-      // Clear all local auth data immediately
+      try {
+
+        await apiClient.post(
+          API_ENDPOINTS.AUTH.LOGOUT, 
+          {}, 
+          { 
+            withCredentials: true,
+            timeout: 5000,
+            validateStatus: () => true
+          }
+        );
+      } catch (error) {
+        // Ignorišemo greške sa API-ja ali beležimo ih u razvoju
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('Logout API error:', error);
+        }
+      }
+      
+      // Clear all local auth data
       this.clearAuthData();
       
       // Force redirect to login without any parameters
       window.location.href = '/auth/login';
       
-      // Try to call logout API in the background
-      setTimeout(() => {
-        apiClient.post(
-          API_ENDPOINTS.AUTH.LOGOUT, 
-          {}, 
-          { 
-            withCredentials: true,
-            timeout: 1000,
-            validateStatus: () => true
-          }
-        ).catch(() => {
-          // Completely ignore any errors
-        }).finally(() => {
-          // Reset logout flag after API call
-          if (typeof setLoggingOut === 'function') {
-            setLoggingOut(false);
-          }
-        });
-      }, 100);
-
       return Promise.resolve();
     } catch (error) {
       // Ignore any errors and resolve anyway
       return Promise.resolve();
+    } finally {
+      // Reset logout flag
+      if (typeof setLoggingOut === 'function') {
+        setLoggingOut(false);
+      }
     }
   },
 
