@@ -121,11 +121,11 @@ export const ResidenceCard: React.FC<ResidenceCardProps> = ({ residence }) => {
         <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div>
             <div className="text-xs">Created</div>
-            <div>{residence.createdAt}</div>
+            <div className="text-white mt-1">{residence.createdAt}</div>
           </div>
           <div>
             <div className="text-xs">Updated</div>
-            <div>{residence.updatedAt}</div>
+            <div className="text-white mt-1">{residence.updatedAt}</div>
           </div>
         </div>
       </CardContent>
