@@ -1,4 +1,4 @@
-import { FilterFn } from "@tanstack/react-table";
+import { FilterFn, FilterMeta } from "@tanstack/react-table";
 
 // Univerzalna funkcija za globalno pretraživanje preko više polja
 export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -35,6 +35,44 @@ export const multiSelectFilter: FilterFn<any> = (row, columnId, filterValue) => 
     // Proveravamo da li je vrednost u redu uključena u niz izabranih vrednosti
     // Ovo je OR logika (selektovan je bilo koji od izabranih filtera)
     return values.includes(rowValue);
+  } catch (e) {
+    // Ako kolona ne postoji, vrati false
+    return false;
+  }
+};
+
+// Prošireni filter meta interfejs za ugneždena polja
+interface NestedFilterMeta extends FilterMeta {
+  nestedField?: string;
+}
+
+// Filter za ugneždena polja (nested fields) kao što je role.name
+export const nestedFieldFilter: FilterFn<any> = (row, columnId, filterValue, addMeta) => {
+  const values = filterValue as string[];
+  if (!values || values.length === 0) return true;
+  
+  try {
+    const rowValue = row.getValue(columnId);
+    
+    // Ako je vrednost primitivnog tipa
+    if (typeof rowValue === 'string') {
+      return values.includes(rowValue);
+    }
+    
+    // Ako je vrednost objekat (npr. { name: 'admin' })
+    if (rowValue && typeof rowValue === 'object') {
+      // Definisanje ugneždenog polja koje treba koristiti za filtriranje
+      const meta = addMeta as unknown as NestedFilterMeta;
+      const nestedField = meta?.nestedField || 'name';
+      
+      // Safe access to property using indexing with string
+      if (nestedField in rowValue) {
+        const nestedValue = rowValue[nestedField as keyof typeof rowValue];
+        return typeof nestedValue === 'string' && values.includes(nestedValue);
+      }
+    }
+    
+    return false;
   } catch (e) {
     // Ako kolona ne postoji, vrati false
     return false;

@@ -1,10 +1,17 @@
-import AdminLayout from "../AdminLayout";
+import React from "react";
 import PageHeader from "@/components/admin/Headers/PageHeader";
+import { UsersTable } from "@/components/admin/Users/Table/UsersTable";
+import AdminLayout from "../AdminLayout";
 
-export default function UserManagmentPage() {
+export default function UserManagementPage() {
   return (
     <AdminLayout>
-      <PageHeader title="User Management" count={10} buttonText="Add new user" buttonUrl="/user-management/create"/>
+      <PageHeader 
+        title="User Management"
+        buttonText="Add New User"
+        buttonUrl="/user-management/create"
+      />
+      <UsersTable />
     </AdminLayout>
   );
 }

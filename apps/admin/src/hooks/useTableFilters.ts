@@ -2,13 +2,15 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Table } from "@tanstack/react-table";
-import { multiSelectFilter } from "@/lib/tableFilters";
+import { multiSelectFilter, nestedFieldFilter } from "@/lib/tableFilters";
 
 interface UseTableFiltersProps<TData> {
   table: Table<TData>;
   data: TData[];
   locationAccessor?: keyof TData;
   statusAccessor?: keyof TData;
+  useNestedFilter?: boolean;
+  nestedField?: string;
 }
 
 export function useTableFilters<TData>({
@@ -16,6 +18,8 @@ export function useTableFilters<TData>({
   data,
   locationAccessor,
   statusAccessor,
+  useNestedFilter = false,
+  nestedField = 'name'
 }: UseTableFiltersProps<TData>) {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [locationSearchValue, setLocationSearchValue] = useState("");
@@ -24,9 +28,23 @@ export function useTableFilters<TData>({
   // Izdvajamo jedinstvene lokacije iz podataka
   const uniqueLocations = useMemo(() => {
     if (!locationAccessor) return [];
-    const locations = data.map(item => item[locationAccessor] as unknown as string);
-    return [...new Set(locations)].sort();
-  }, [data, locationAccessor]);
+    
+    // Ako koristimo ugneždeno polje, pristupamo mu na odgovarajući način
+    if (useNestedFilter) {
+      const locations = data.map(item => {
+        const value = item[locationAccessor];
+        if (value && typeof value === 'object' && nestedField in (value as object)) {
+          return (value as any)[nestedField];
+        }
+        return undefined;
+      }).filter(Boolean) as string[];
+      
+      return [...new Set(locations)].sort();
+    } else {
+      const locations = data.map(item => item[locationAccessor] as unknown as string);
+      return [...new Set(locations)].sort();
+    }
+  }, [data, locationAccessor, useNestedFilter, nestedField]);
 
   // Izdvajamo jedinstvene statuse iz podataka
   const uniqueStatuses = useMemo(() => {
@@ -50,7 +68,17 @@ export function useTableFilters<TData>({
       
       if (locationColumn) {
         // Postavljamo funkciju filtera eksplicitno 
-        locationColumn.columnDef.filterFn = multiSelectFilter;
+        locationColumn.columnDef.filterFn = useNestedFilter 
+          ? nestedFieldFilter 
+          : multiSelectFilter;
+        
+        // Ako koristimo nested filter, dodajemo meta podatke
+        if (useNestedFilter) {
+          locationColumn.columnDef.meta = {
+            ...locationColumn.columnDef.meta,
+            nestedField
+          };
+        }
         
         if (selectedLocations.length > 0) {
           locationColumn.setFilterValue(selectedLocations);
@@ -59,7 +87,7 @@ export function useTableFilters<TData>({
         }
       }
     }
-  }, [selectedLocations, table, locationAccessor]);
+  }, [selectedLocations, table, locationAccessor, useNestedFilter, nestedField]);
 
   // Primenjujemo filtere po statusu
   useEffect(() => {
