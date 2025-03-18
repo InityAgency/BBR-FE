@@ -4,13 +4,12 @@ import { notFound } from "next/navigation";
 import { brandsData } from "@/app/data/brands";
 
 interface BrandEditPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function BrandEditPage({ params }: BrandEditPageProps) {
-  const brand = brandsData.find((b) => b.id === params.id);
+export default async function BrandEditPage({ params }: BrandEditPageProps) {
+  const resolvedParams = await params;
+  const brand = brandsData.find((b) => b.id === resolvedParams.id);
 
   if (!brand) {
     notFound();
