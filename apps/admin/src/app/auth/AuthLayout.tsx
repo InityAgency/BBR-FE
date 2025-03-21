@@ -3,7 +3,6 @@
 import React from "react";
 import { ReactNode } from "react";
 import Image from 'next/image'
-import { Link } from "lucide-react";
 
 
 interface AuthLayoutProps {

@@ -17,8 +17,6 @@ const UnsavedChangesWarning: React.FC<UnsavedChangesWarningProps> = ({
   hasUnsavedChanges,
   message = "You have unsaved changes. Are you sure you want to leave this page?",
 }) => {
-  const router = useRouter();
-  const pathname = usePathname();
 
   // Handle browser window/tab close
   useEffect(() => {

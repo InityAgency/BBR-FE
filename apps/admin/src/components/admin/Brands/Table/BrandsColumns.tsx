@@ -21,9 +21,7 @@ const renderNameCell = (value: string, id: string) => (
     </div>
 );
 
-const renderIdCell = (id: string) => (
-  <div className="text-muted-foreground">{id}</div>
-);
+
 
 const renderTypeCell = (type: string) => (
   <div className="max-w-[180px] truncate" title={type}>

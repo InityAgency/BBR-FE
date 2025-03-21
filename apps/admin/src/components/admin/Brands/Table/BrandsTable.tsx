@@ -1,7 +1,7 @@
 // components/admin/Brands/Table/BrandsTable.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
@@ -26,7 +26,11 @@ const enhancedColumns = columns.map(column => {
   return column;
 });
 
-export function BrandsTable() {
+interface BrandsTableProps {
+  initialStatusFilter?: string | null;
+}
+
+export function BrandsTable({ initialStatusFilter }: BrandsTableProps) {
   // Koristimo generički hook za tabelu
   const {
     table,
@@ -67,6 +71,16 @@ export function BrandsTable() {
     locationAccessor: "type",
     statusAccessor: "status",
   });
+
+  // Primeni inicijalni filter za status ako postoji
+  useEffect(() => {
+    if (initialStatusFilter) {
+      // Proveri da li inicijalni status postoji među opcijama
+      if (uniqueStatuses.includes(initialStatusFilter)) {
+        setSelectedStatuses([initialStatusFilter]);
+      }
+    }
+  }, [initialStatusFilter, uniqueStatuses, setSelectedStatuses]);
 
   // Helper funkcije za stilizovanje redova i ćelija
   const getRowClassName = (row: any) => {

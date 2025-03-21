@@ -45,18 +45,13 @@ import DiscardModal from "@/components/admin/Modals/DiscardModal";
 import { useDiscardWarning } from "@/hooks/useDiscardWarning";
 import ImageUpload from "@/components/admin/Forms/ImageUpload";
 import { 
-  userSchema, 
   createUserSchema, 
   updateUserSchema, 
   userRoles, 
-  userStatuses, 
   UserFormValues, 
-  CreateUserFormValues,
-  UpdateUserFormValues,
   initialUserValues 
 } from "@/app/schemas/user";
-import { User } from "@/app/types/models/User";
-import { Eye, EyeOff, Wand2, Check, X, Trash2, CircleMinus, Mail } from "lucide-react";
+import { Eye, EyeOff, Wand2, X, CircleMinus, Mail } from "lucide-react";
 
 const getStatusBadgeStyle = (status: string) => {
   switch(status) {

@@ -8,7 +8,6 @@ import {
   Award,
   UsersRound,
   Sparkle,
-  MessageCircle,
   Star,
   Contact,
 } from "lucide-react"
@@ -24,6 +23,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
+import { brandsData } from "@/app/data/brands"
+
+// Brojanje brendova sa statusom "Pending"
+const pendingBrandsCount = brandsData.filter(brand => brand.status === "Pending").length;
 
 const navItems = [
   {
@@ -72,7 +75,8 @@ const navItems = [
     items: [
       {
         title: "Pending Activations",
-        url: "/brands/pending",
+        url: "/brands?status=Pending",
+        badge: pendingBrandsCount,
       }
     ]
   },

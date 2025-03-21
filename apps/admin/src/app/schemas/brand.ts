@@ -1,6 +1,6 @@
 // app/schemas/brand.ts
 import { z } from "zod";
-import { BrandStatus, BrandType } from "../types/models/Brand";
+import { BrandStatus } from "../types/models/Brand";
 
 // Brand types from the existing brand model
 export const brandTypes = [

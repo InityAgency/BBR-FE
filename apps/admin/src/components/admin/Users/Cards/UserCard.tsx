@@ -5,8 +5,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UsersActions } from "../Table/UsersActions";
 import { User } from "@/app/types/models/User";
-import { BrandsActions } from "../../Brands/Table/BrandsActions";
-
 interface UserCardProps {
   user: User;
 }

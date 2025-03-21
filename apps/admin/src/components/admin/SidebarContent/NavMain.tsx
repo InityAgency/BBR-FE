@@ -17,6 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
 
 export function NavMain({
   items,
@@ -30,6 +31,7 @@ export function NavMain({
       title: string;
       url: string;
       isActive?: boolean;
+      badge?: number;
     }[];
   }[];
 }) {
@@ -65,8 +67,13 @@ export function NavMain({
                           return (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton asChild isActive={isSubActive}>
-                                <a href={subItem.url}>
+                                <a href={subItem.url} className="flex justify-between items-center">
                                   <span>{subItem.title}</span>
+                                  {subItem.badge !== undefined && subItem.badge > 0 && (
+                                    <Badge variant="secondary" className="ml-2 h-5 w-5 px-0 flex items-center justify-center text-xs">
+                                      {subItem.badge}
+                                    </Badge>
+                                  )}
                                 </a>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>

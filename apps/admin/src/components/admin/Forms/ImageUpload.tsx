@@ -2,7 +2,7 @@
 import React, { useState, useRef, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-
+import Image from "next/image";
 interface ImageUploadProps {
   label?: string;
   description?: string;
@@ -17,8 +17,6 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
-  label,
-  description,
   maxSize = 5, // default 5MB
   supportedFormats = ["JPG", "JPEG", "PNG"],
   aspectRatio,
@@ -120,10 +118,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       
       {preview ? (
         <div className={`relative border rounded-md overflow-hidden ${error ? 'border-destructive' : ''}`}>
-          <img 
+          <Image
             src={preview} 
             alt="Preview" 
             className="w-full h-auto object-contain max-h-[200px]"
+            width={200}
+            height={200}
           />
           <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 transition-opacity">
             <div className="flex gap-2">

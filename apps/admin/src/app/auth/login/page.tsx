@@ -32,7 +32,6 @@ export default function LoginPage() {
   const errorParam = searchParams.get('error');
   
   const { adminLogin, isLoading } = useAuth();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

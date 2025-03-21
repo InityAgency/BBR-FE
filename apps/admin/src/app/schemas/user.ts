@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserRole, UserStatus } from "../types/models/User";
+import { UserStatus } from "../types/models/User";
 
 // User roles (može biti prošireno prema potrebama aplikacije)
 export const userRoles = [

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Row } from "@tanstack/react-table";
-import { Eye, Lock, Pencil, CircleMinus } from "lucide-react";
+import { Lock, Pencil, CircleMinus } from "lucide-react";
 import { TableActions, TableAction } from "@/components/admin/Table/TableActions";
 import { User } from "@/app/types/models/User";
 import { toast } from "sonner";

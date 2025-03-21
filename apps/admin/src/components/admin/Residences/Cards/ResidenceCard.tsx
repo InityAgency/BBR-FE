@@ -2,17 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Residence } from "@/app/types/models/Residence";
 import { ResidencesActions } from "../Table/ResidencesActions";
-import { Button } from "@/components/ui/button";
-import { Eye, Archive, MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 interface ResidenceCardProps {
   residence: Residence;
 }

@@ -8,7 +8,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { TableFilters } from "@/components/admin/Table/TableFilters";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandInput, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
-import { Residence } from "../../../../app/types/models/Residence";
 
 interface ResidencesFiltersProps {
   globalFilter: string;
@@ -31,7 +30,6 @@ export function ResidencesFilters({
   setSelectedLocations,
   selectedStatuses,
   setSelectedStatuses,
-  uniqueLocations,
   uniqueStatuses,
   filteredLocations,
   locationSearchValue,

@@ -35,14 +35,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-
 import FormHeader from "@/components/admin/Headers/FormHeader";
 import ImageUpload from "@/components/admin/Forms/ImageUpload";
 import UnsavedChangesWarning from "../../Forms/UnsavedChangesWarning";
 import DiscardModal from "@/components/admin/Modals/DiscardModal";
 import { useDiscardWarning } from "@/hooks/useDiscardWarning";
-import { brandSchema, brandTypes, brandStatuses, BrandFormValues, initialBrandValues } from "@/app/schemas/brand";
+import { brandSchema, brandTypes, BrandFormValues, initialBrandValues } from "@/app/schemas/brand";
 import { Check, Trash2, X } from "lucide-react";
 
 const getStatusBadgeStyle = (status: string) => {

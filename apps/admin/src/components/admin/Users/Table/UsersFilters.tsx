@@ -30,7 +30,6 @@ export function UsersFilters({
   setSelectedRoles,
   selectedStatuses,
   setSelectedStatuses,
-  uniqueRoles,
   uniqueStatuses,
   filteredRoles,
   roleSearchValue,

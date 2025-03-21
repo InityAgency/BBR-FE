@@ -9,7 +9,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { TableFilters } from "@/components/admin/Table/TableFilters";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandInput, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
-import { Brand } from "../../../../app/types/models/Brand";
 
 interface BrandsFiltersProps {
   globalFilter: string;
@@ -32,7 +31,6 @@ export function BrandsFilters({
   setSelectedTypes,
   selectedStatuses,
   setSelectedStatuses,
-  uniqueTypes,
   uniqueStatuses,
   filteredTypes,
   typeSearchValue,

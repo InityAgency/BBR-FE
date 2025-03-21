@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Calendar, Star, Trophy } from "lucide-react";
+import { Building2, Calendar,Trophy } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import AdminLayout from "../../AdminLayout";

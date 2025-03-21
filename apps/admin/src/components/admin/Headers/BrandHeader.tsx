@@ -11,7 +11,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { Brand } from "@/app/types/models/Brand";
 import { ConfirmationModal } from "@/components/admin/Modals/ConfirmationModal";
