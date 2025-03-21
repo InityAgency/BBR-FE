@@ -1,10 +1,10 @@
 import AdminLayout from "../../AdminLayout";
-import PageHeader from "@/components/admin/Headers/PageHeader";
+import UserForm from "@/components/admin/Users/Forms/UserForm";
 
-export default function BrandsCreate() {
+export default function UsersCreate() {
   return (
     <AdminLayout>
-      <PageHeader title="Add new user" />
+       <UserForm />
     </AdminLayout>
   );
 }

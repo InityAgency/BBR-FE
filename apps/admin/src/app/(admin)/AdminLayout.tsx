@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/admin/AppSidebar";
 import {
@@ -52,10 +51,20 @@ const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]
     return brand ? `Edit ${brand.name}` : "Edit Brand";
   }
 
+  // Handle edit pages for users
+  if (segment === "edit" && pathSegments[index - 2] === "user-management") {
+    return "Edit User";
+  }
+
   // Handle brand IDs in the path
   if (index > 0 && pathSegments[index - 1] === "brands" && segment.match(/^\d+$/)) {
     const brand = brandsData.find((b: Brand) => b.id === segment);
     return brand ? brand.name : segment;
+  }
+
+  // Handle user IDs in the path
+  if (index > 0 && pathSegments[index - 1] === "user-management" && segment.match(/[0-9a-f-]+$/i)) {
+    return "User";
   }
 
   return breadcrumbTitles[segment] || segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -64,6 +73,16 @@ const formatBreadcrumb = (segment: string, index: number, pathSegments: string[]
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter((segment) => segment);
+
+  // Funkcija koja određuje da li segment treba da se prikaže u breadcrumb-u
+  const shouldShowSegment = (segment: string, index: number, segments: string[]) => {
+    // Ako smo na putanji za uređivanje korisnika, sakrijemo srednji segment (userId)
+    if (segments[index + 1] === "edit" && segments[index - 1] === "user-management") {
+      return false;
+    }
+    
+    return true;
+  };
 
   return (
     <SidebarProvider>
@@ -75,24 +94,33 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             <Separator orientation="vertical"/>
             <Breadcrumb>
               <BreadcrumbList>
-                {pathSegments.map((segment, index) => {
-                  const href = "/" + pathSegments.slice(0, index + 1).join("/");
-                  const isLast = index === pathSegments.length - 1;
-                  const formattedSegment = formatBreadcrumb(segment, index, pathSegments);
+                {pathSegments
+                  .filter((segment, index) => shouldShowSegment(segment, index, pathSegments))
+                  .map((segment, index, filteredSegments) => {
+                    // Računamo originalnu putanju do ovog segmenta
+                    // Za svaki filtrirani segment, moramo naći njegovu originalnu poziciju
+                    let originalIndex = 0;
+                    for (let i = 0; i <= index; i++) {
+                      originalIndex = pathSegments.indexOf(filteredSegments[i], originalIndex) + 1;
+                    }
+                    const href = "/" + pathSegments.slice(0, originalIndex).join("/");
+                    
+                    const isLast = index === filteredSegments.length - 1;
+                    const formattedSegment = formatBreadcrumb(segment, pathSegments.indexOf(segment), pathSegments);
 
-                  return (
-                    <React.Fragment key={href}>
-                      <BreadcrumbItem>
-                        {isLast ? (
-                          <BreadcrumbPage>{formattedSegment}</BreadcrumbPage>
-                        ) : (
-                          <BreadcrumbLink href={href}>{formattedSegment}</BreadcrumbLink>
-                        )}
-                      </BreadcrumbItem>
-                      {!isLast && <BreadcrumbSeparator />}
-                    </React.Fragment>
-                  );
-                })}
+                    return (
+                      <React.Fragment key={href}>
+                        <BreadcrumbItem>
+                          {isLast ? (
+                            <BreadcrumbPage>{formattedSegment}</BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink href={href}>{formattedSegment}</BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                        {!isLast && <BreadcrumbSeparator />}
+                      </React.Fragment>
+                    );
+                  })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

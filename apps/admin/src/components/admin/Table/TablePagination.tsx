@@ -1,3 +1,4 @@
+// src/components/admin/Table/TablePagination.tsx
 "use client";
 
 import React from "react";
@@ -6,9 +7,10 @@ import { useTablePagination } from "@/hooks/useTablePagination";
 
 interface TablePaginationProps {
   table: any; // TanStack table
+  totalCount?: number; // Add this to support API total count
 }
 
-export function TablePagination({ table }: TablePaginationProps) {
+export function TablePagination({ table, totalCount }: TablePaginationProps) {
   const {
     pageIndex,
     startRow,
@@ -22,10 +24,16 @@ export function TablePagination({ table }: TablePaginationProps) {
     goToPage
   } = useTablePagination({ table });
 
+  // Use API total count if provided, otherwise use local data count
+  const displayTotalRows = totalCount !== undefined ? totalCount : totalRows;
+  const displayPageCount = totalCount !== undefined 
+    ? Math.ceil(totalCount / table.getState().pagination.pageSize) 
+    : pageCount;
+
   return (
     <div className="flex items-center justify-between py-4">
       <div className="text-sm text-muted-foreground">
-        Showing {startRow} to {endRow} | of {totalRows} results
+        Showing {startRow} to {endRow} | of {displayTotalRows} results
       </div>
       <div className="flex items-center space-x-2">
         <Button
@@ -39,10 +47,10 @@ export function TablePagination({ table }: TablePaginationProps) {
         </Button>
         {/* Numerisana paginacija */}
         <div className="flex items-center gap-1">
-          {Array.from({ length: pageCount }, (_, i) => {
+          {Array.from({ length: displayPageCount }, (_, i) => {
             // Za veliki broj stranica, prikazujemo samo relevantne
             const currentPage = pageIndex;
-            const totalPages = pageCount;
+            const totalPages = displayPageCount;
             
             // Uvek prikazujemo prvu i poslednju stranicu
             // Inače prikazujemo trenutnu stranicu +/- 1 stranicu

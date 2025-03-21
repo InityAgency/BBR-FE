@@ -4,7 +4,7 @@
  */
 
 // API base URL
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://3.70.188.114';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bbrapi.inity.space';
 
 // API version
 export const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
@@ -19,7 +19,8 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
   },
   USER: {
-    PROFILE: '/user/profile'
+    PROFILE: '/user/profile',
+    USERS: '/users'
   }
 };
 

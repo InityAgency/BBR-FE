@@ -47,7 +47,7 @@ export function UsersFilters({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-10">
-              <UserRound className="h-4 w-4 mr-2" />
+              <UserRound className="h-4 w-4" />
               Roles
               {selectedRoles.length > 0 && (
                 <>
@@ -110,7 +110,7 @@ export function UsersFilters({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-10">
-              <CircleDashed className="h-4 w-4 mr-2" />
+              <CircleDashed className="h-4 w-4" />
               Status
               {selectedStatuses.length > 0 && (
                 <>

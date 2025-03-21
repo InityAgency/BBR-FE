@@ -18,6 +18,7 @@ export interface TableAction {
   icon?: React.ReactNode;
   onClick: (row: any) => void;
   className?: string;
+  variant?: "default" | "destructive";
 }
 
 interface TableActionsProps {
@@ -68,10 +69,10 @@ export function TableActions({
             <DropdownMenuItem 
               key={index} 
               onClick={() => action.onClick(row.original)}
-              className={action.className}
+              className={`${action.className || ""} cursor-pointer`}
             >
               {action.icon && (
-                <span className="mr-2">{action.icon}</span>
+                <span className="mr-0">{action.icon}</span>
               )}
               {action.label}
             </DropdownMenuItem>

@@ -11,7 +11,7 @@ import { User } from "@/app/types/models/User";
 // Helper funkcije za renderovanje ćelija
 const renderNameCell = (value: string, id: string) => (
   <div className="max-w-[200px]">
-    <a href={`/user-management/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
+    <a href={`/user-management/${id}/edit`} className="font-medium text-foreground hover:underline truncate block" title={value}>
       {value}
     </a>
     <div className="text-xs text-muted-foreground truncate">
@@ -54,18 +54,18 @@ const renderStatusCell = (status: string) => {
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300";
       break;
-    case "Pending":
+    case "Invited":
       badgeVariant = "secondary";
       badgeClass = "bg-yellow-900/55 text-yellow-300";
       break;
-    case "Blocked":
+    case "Suspended":
       badgeVariant = "destructive";
       badgeClass = "bg-red-900/55 text-red-300";
       break;
-    case "Deleted":
-      badgeVariant = "outline";
-      badgeClass = "bg-gray-900/80 text-gray-300";
-      break;
+    // case "Deleted":
+    //   badgeVariant = "outline";
+    //   badgeClass = "bg-gray-900/80 text-gray-300";
+    //   break;
   }
   
   return <Badge variant={badgeVariant} className={badgeClass}>{status}</Badge>;
@@ -211,4 +211,4 @@ export const columns: ColumnDef<User>[] = [
       width: "w-[80px]"
     }
   },
-]; 
+];

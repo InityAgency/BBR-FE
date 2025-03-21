@@ -26,9 +26,9 @@ export function UserCard({ user }: UserCardProps) {
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch(status) {
       case "Active": return "default";
-      case "Pending": return "secondary";
-      case "Blocked": return "destructive";
-      case "Deleted": return "outline";
+      case "Invited": return "secondary";
+      case "Suspended": return "destructive";
+      // case "Deleted": return "outline";
       default: return "default";
     }
   };

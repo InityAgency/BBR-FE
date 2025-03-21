@@ -8,6 +8,9 @@ import {
   Award,
   UsersRound,
   Sparkle,
+  MessageCircle,
+  Star,
+  Contact,
 } from "lucide-react"
 
 import { NavMain } from "@/components/admin/SidebarContent/NavMain"
@@ -51,6 +54,16 @@ const navItems = [
     title: "Rankings",
     url: "/rankings",
     icon: Award,
+  },
+  {
+    title: "Leads",
+    url: "/leads",
+    icon: Contact,
+  },
+  {
+    title: "Reviews",
+    url: "/reviews",
+    icon: Star,
   },
   {
     title: "Brands",

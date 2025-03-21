@@ -37,7 +37,7 @@ export const usersData: User[] = [
     company: "Tech Solutions",
     role: {
       id: "8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f",
-      name: "moderator"
+      name: "developer"
     },
     status: "Active",
     createdAt: "2023-05-10T14:22:18.456Z",
@@ -51,9 +51,9 @@ export const usersData: User[] = [
     company: "Global Enterprises",
     role: {
       id: "2d3e4f5a-6b7c-8d9e-0a1b-2c3d4e5f6a7b",
-      name: "user"
+      name: "buyer"
     },
-    status: "Pending",
+    status: "Invited",
     createdAt: "2023-06-05T08:17:42.789Z",
     updatedAt: "2023-06-05T08:17:42.789Z",
   },
@@ -65,7 +65,7 @@ export const usersData: User[] = [
     company: "Creative Designs",
     role: {
       id: "8a9b0c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d",
-      name: "moderator"
+      name: "developer"
     },
     status: "Active",
     createdAt: "2023-02-18T13:45:29.123Z",
@@ -81,7 +81,7 @@ export const usersData: User[] = [
       id: "4f5a6b7c-8d9e-0a1b-2c3d-4e5f6a7b8c9d",
       name: "admin"
     },
-    status: "Blocked",
+    status: "Suspended",
     createdAt: "2023-03-30T09:12:54.789Z",
     updatedAt: "2023-09-07T15:33:21.234Z",
   },
@@ -93,9 +93,9 @@ export const usersData: User[] = [
     company: "Smart Solutions",
     role: {
       id: "6c7d8e9f-0a1b-2c3d-4e5f-6a7b8c9d0e1f",
-      name: "user"
+      name: "buyer"
     },
-    status: "Pending",
+    status: "Invited",
     createdAt: "2023-07-14T16:38:05.456Z",
     updatedAt: "2023-07-14T16:38:05.456Z",
   },
@@ -107,9 +107,9 @@ export const usersData: User[] = [
     company: "Innovation Labs",
     role: {
       id: "2e3f4a5b-6c7d-8e9f-0a1b-2c3d4e5f6a7b",
-      name: "moderator"
+      name: "developer"
     },
-    status: "Deleted",
+    status: "Suspended",
     createdAt: "2023-01-25T11:27:36.789Z",
     updatedAt: "2023-10-15T09:48:57.123Z",
   },
@@ -121,7 +121,7 @@ export const usersData: User[] = [
     company: "Eco Friendly Corp",
     role: {
       id: "8d9e0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
-      name: "user"
+      name: "buyer"
     },
     status: "Active",
     createdAt: "2023-05-04T14:53:21.123Z",

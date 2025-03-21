@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Brand, BrandStatus, BrandType } from "@/app/types/models/Brand";
 import { brandsData } from "@/app/data/brands";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ResidencesTable from "@/components/admin/Residences/Table/ResidencesTable";
 
 export default function BrandsSingle() {
   const router = useRouter();
@@ -117,21 +118,7 @@ export default function BrandsSingle() {
   );
   
   const renderResidencesTab = () => (
-    <div className="grid grid-cols-1 gap-6">
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Residences</h2>
-            <button className="text-sm text-primary hover:underline">
-              Add New Residence
-            </button>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            No residences found for this brand.
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <ResidencesTable />
   );
 
   return (

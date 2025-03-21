@@ -135,3 +135,14 @@
   border-radius: 0.815rem;
   background-color: #fff;
 }
+
+.hover-red-label:hover {
+  color: oklch(.704 .191 22.216) !important;
+}
+
+.hover-red-label:hover {
+  color: oklch(.704 .191 22.216) !important;
+}
+span[data-slot="switch-thumb"]{
+  background-color: #fff !important;
+}

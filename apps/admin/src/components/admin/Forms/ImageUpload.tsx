@@ -57,13 +57,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const file = e.target.files?.[0];
     
     if (!file) {
-      setPreview(null);
-      if (onChange) onChange(null);
-      
-      if (required) {
-        setError("This field is required");
-        if (onValidation) onValidation(false);
-      }
+      // Ako korisnik klikne Cancel, ne radimo ništa - zadržavamo postojeću sliku
+      // Ne pozivamo onChange sa null vrednost da ne bi obrisali postojeću sliku
       return;
     }
     

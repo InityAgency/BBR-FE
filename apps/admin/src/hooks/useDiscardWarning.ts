@@ -21,13 +21,18 @@ export const useDiscardWarning = ({
   // Function to call when user tries to navigate away
   const handleNavigation = useCallback(
     (url: string) => {
+      // Only show the warning modal if there are unsaved changes
       if (hasUnsavedChanges) {
+        console.log('useDiscardWarning: Detected unsaved changes, showing modal');
         // Store the URL they want to navigate to
         setPendingUrl(url);
         setShowDiscardModal(true);
-        return false; // Prevent navigation
+        return false; // Prevent navigation until confirmed
       }
-      return true; // Allow navigation
+      
+      console.log('useDiscardWarning: No unsaved changes, navigating directly');
+      // If no unsaved changes, allow navigation immediately
+      return true;
     },
     [hasUnsavedChanges]
   );
@@ -43,6 +48,7 @@ export const useDiscardWarning = ({
     // Navigate to the pending URL if it exists
     if (pendingUrl) {
       router.push(pendingUrl);
+      setPendingUrl(null); // Clear pending URL after navigation
     }
   }, [pendingUrl, router, onDiscard]);
 
@@ -59,11 +65,17 @@ export const useDiscardWarning = ({
   // Custom navigation function that checks for unsaved changes
   const navigateTo = useCallback(
     (url: string) => {
-      if (handleNavigation(url)) {
+      console.log('navigateTo called with URL:', url, 'hasUnsavedChanges:', hasUnsavedChanges);
+      // Only check for unsaved changes if there are any
+      if (hasUnsavedChanges) {
+        handleNavigation(url);
+      } else {
+        // If no unsaved changes, navigate directly
+        console.log('No unsaved changes, navigating directly to:', url);
         router.push(url);
       }
     },
-    [handleNavigation, router]
+    [hasUnsavedChanges, handleNavigation, router]
   );
 
   return {

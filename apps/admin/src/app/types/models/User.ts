@@ -3,7 +3,7 @@ export type UserRole = {
   name: string;
 };
 
-export type UserStatus = "Active" | "Pending" | "Blocked" | "Deleted";
+export type UserStatus = "Active" | "Invited" | "Blocked" | "Suspended";
 
 export interface User {
   id: string;
@@ -11,6 +11,7 @@ export interface User {
   email: string;
   emailVerified: boolean;
   company: string | null;
+  profileImage: string | null;
   role: UserRole;
   status?: UserStatus;
   createdAt: string;

@@ -10,6 +10,7 @@ export default function UserManagementPage() {
         title="User Management"
         buttonText="Add New User"
         buttonUrl="/user-management/create"
+        count={10}
       />
       <UsersTable />
     </AdminLayout>
