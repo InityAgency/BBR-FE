@@ -2,13 +2,11 @@ import UserForm from "@/components/admin/Users/Forms/UserForm";
 import { usersData } from "@/app/data/users";
 import AdminLayout from "../../../AdminLayout";
 
-interface EditUserPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function EditUserPage({ params }: EditUserPageProps) {
+export default function EditUserPage({ 
+  params 
+}: { 
+  params: { id: string }
+}) {
   // U produkciji bismo ovo radili preko API poziva
   const user = usersData.find(user => user.id === params.id);
 

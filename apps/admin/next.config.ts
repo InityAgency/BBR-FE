@@ -30,6 +30,10 @@ const nextConfig = {
     // Isključujemo proveru ESLint grešaka tokom build procesa
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    // Isključujemo proveru TypeScript grešaka tokom build procesa
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

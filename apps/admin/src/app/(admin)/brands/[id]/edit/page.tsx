@@ -3,13 +3,12 @@ import BrandForm from "@/components/admin/Brands/Forms/BrandForm";
 import { notFound } from "next/navigation";
 import { brandsData } from "@/app/data/brands";
 
-interface BrandEditPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function BrandEditPage({ params }: BrandEditPageProps) {
-  const resolvedParams = await params;
-  const brand = brandsData.find((b) => b.id === resolvedParams.id);
+export default function BrandEditPage({ 
+  params 
+}: { 
+  params: { id: string }
+}) {
+  const brand = brandsData.find((b) => b.id === params.id);
 
   if (!brand) {
     notFound();
