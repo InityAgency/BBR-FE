@@ -90,7 +90,7 @@ export const brandsData: Brand[] = [
     numberOfResidences: 5,
     updatedAt: "Mar 03, 2025, 03:45 PM",
     createdAt: "Jan 01, 2024, 00:00 AM",
-    status: "Active",
+    status: "Pending",
   },
   {
     id: "0026",

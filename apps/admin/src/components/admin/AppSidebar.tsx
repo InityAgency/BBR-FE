@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 import { brandsData } from "@/app/data/brands"
-
+import { residencesData } from "@/app/data/residences"
 // Brojanje brendova sa statusom "Pending"
 const pendingBrandsCount = brandsData.filter(brand => brand.status === "Pending").length;
+const pendingResidencesCount = residencesData.filter(residence => residence.status === "Pending").length;
 
 const navItems = [
   {
@@ -41,7 +42,8 @@ const navItems = [
     items: [
       {
         title: "Pending Activations",
-        url: "/residences/pending",
+        url: "/residences?status=Pending",
+        badge: pendingResidencesCount,
       },
       {
         title: "Claim Requests",

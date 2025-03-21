@@ -70,7 +70,10 @@ export function NavMain({
                                 <a href={subItem.url} className="flex justify-between items-center">
                                   <span>{subItem.title}</span>
                                   {subItem.badge !== undefined && subItem.badge > 0 && (
-                                    <Badge variant="secondary" className="ml-2 h-5 w-5 px-0 flex items-center justify-center text-xs">
+                                    <Badge 
+                                      variant="warning" 
+                                      className="ml-2 h-5 w-5 px-0 flex items-center justify-center text-xs"
+                                    >
                                       {subItem.badge}
                                     </Badge>
                                   )}

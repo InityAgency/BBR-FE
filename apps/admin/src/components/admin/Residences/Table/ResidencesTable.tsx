@@ -1,7 +1,7 @@
 // components/admin/Residences/Table/ResidencesTable.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
@@ -26,7 +26,11 @@ const enhancedColumns = columns.map(column => {
   return column;
 });
 
-export const ResidencesTable = () => {
+interface ResidencesTableProps {
+  initialStatusFilter?: string | null;
+}
+
+export const ResidencesTable = ({ initialStatusFilter }: ResidencesTableProps = {}) => {
   // Koristimo generički hook za tabelu
   const {
     table,
@@ -68,6 +72,24 @@ export const ResidencesTable = () => {
     statusAccessor: "status",
   });
 
+  // Primeni inicijalni filter za status ako postoji
+  useEffect(() => {
+    if (initialStatusFilter) {
+      // Proveri da li inicijalni status postoji među opcijama
+      if (uniqueStatuses.includes(initialStatusFilter)) {
+        setSelectedStatuses([initialStatusFilter]);
+      }
+    }
+  }, [initialStatusFilter, uniqueStatuses, setSelectedStatuses]);
+
+  // Helper funkcije za stilizovanje redova i ćelija
+  const getRowClassName = (row: any) => {
+    const status = row.original.status;
+    if (status === "Deleted") return "opacity-60";
+    if (status === "Draft") return "opacity-80";
+    return "";
+  };
+
   return (
     <div className="w-full">
       <ResidencesFilters
@@ -91,7 +113,10 @@ export const ResidencesTable = () => {
       </div>
 
       <div className="hidden lg:block">
-        <BaseTable table={table} />
+        <BaseTable 
+          table={table}
+          getRowClassName={getRowClassName}
+        />
       </div>
 
       <TablePagination table={table} />
