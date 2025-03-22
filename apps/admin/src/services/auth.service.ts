@@ -93,7 +93,7 @@ const AuthService = {
       });
     }
     
-    const allowedRoles = ['admin', 'developer'];
+    const allowedRoles = ['admin'];
     const userRole = userData.role?.name?.toLowerCase() || '';
     
     if (!allowedRoles.includes(userRole)) {

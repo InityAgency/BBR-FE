@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -44,6 +44,7 @@ import UnsavedChangesWarning from "../../Forms/UnsavedChangesWarning";
 import DiscardModal from "@/components/admin/Modals/DiscardModal";
 import { useDiscardWarning } from "@/hooks/useDiscardWarning";
 import ImageUpload from "@/components/admin/Forms/ImageUpload";
+import apiClient from "@/lib/api.client";
 import { 
   createUserSchema, 
   updateUserSchema, 
@@ -53,13 +54,31 @@ import {
 } from "@/app/schemas/user";
 import { Eye, EyeOff, Wand2, X, CircleMinus, Mail } from "lucide-react";
 
+// Tip za role iz API-ja
+interface RoleType {
+  id: string;
+  name: string;
+  formattedName?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Pomoćna funkcija za kapitalizaciju 
+const capitalizeWords = (text: string) => {
+  return text
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const getStatusBadgeStyle = (status: string) => {
-  switch(status) {
-    case "Active":
+  switch(status.toLowerCase()) {
+    case "active":
       return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50";
-    case "Invited":
+    case "invited":
       return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
-    case "Suspended":
+    case "suspended":
       return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
     default:
       return "";
@@ -85,6 +104,10 @@ const UserForm: React.FC<UserFormProps> = ({
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [profileImageValid, setProfileImageValid] = useState(true);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [roles, setRoles] = useState<RoleType[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
+  const rolesInitialized = useRef(false);
+  const isInitialRender = useRef(true);
   
   const form = useForm<UserFormValues>({
     resolver: zodResolver(isEditing ? updateUserSchema : createUserSchema) as any,
@@ -95,9 +118,76 @@ const UserForm: React.FC<UserFormProps> = ({
   // Watch required form fields
   const fullName = form.watch("fullName");
   const email = form.watch("email");
-  const role = form.watch("role");
+  const role = form.watch("role"); // Ovo će biti ID role
   const password = form.watch("password");
   const sendEmail = form.watch("sendEmail");
+  
+  // Izdvojimo funkciju za dobavljanje rola u useCallback
+  const fetchRoles = useCallback(async () => {
+    // Ako su role već učitane ili je već u toku učitavanje, ne radi ništa
+    if (rolesInitialized.current || isLoadingRoles) return;
+    
+    setIsLoadingRoles(true);
+    try {
+      // Označimo da je započeto učitavanje
+      rolesInitialized.current = true;
+      
+      const response = await apiClient.get('/roles', {
+        params: {
+          limit: 20,
+          page: 1
+        }
+      });
+      
+      console.log('Roles fetched:', response.data);
+      
+      // Postavljamo role u state
+      if (response.data.data && Array.isArray(response.data.data)) {
+        // Formatiramo imena rola za prikaz
+        const formattedRoles = response.data.data.map((role: RoleType) => ({
+          ...role,
+          formattedName: capitalizeWords(role.name)
+        }));
+        
+        setRoles(formattedRoles);
+        
+        // Ako je forma za izmenu korisnika
+        if (isEditing) {
+          if (initialData.roleId) {
+            form.setValue("roleId", initialData.roleId, { shouldDirty: false });
+          } else if (initialData.role && formattedRoles.length > 0) {
+            const roleByName = formattedRoles.find(
+              (r: RoleType) => r.name.toLowerCase() === initialData.role?.toLowerCase()
+            );
+            
+            if (roleByName) {
+              form.setValue("roleId", roleByName.id, { shouldDirty: false });
+            }
+          }
+        } else if (formattedRoles.length > 0) {
+          // Kod kreiranja novog korisnika, postavimo prvu rolu sa liste kao podrazumevanu
+          form.setValue("roleId", formattedRoles[0].id, { shouldDirty: false });
+          form.setValue("role", formattedRoles[0].name, { shouldDirty: false });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      toast.error('Greška pri učitavanju korisničkih uloga');
+      // U slučaju greške, resetujemo flag da bismo omogućili ponovno učitavanje
+      rolesInitialized.current = false;
+    } finally {
+      setIsLoadingRoles(false);
+    }
+  }, [form, isEditing, initialData.role, initialData.roleId]);
+  
+  // Učitavamo role samo jednom pri inicijalizaciji komponente
+  useEffect(() => {
+    // Pozivamo funkciju za dobavljanje rola samo pri prvom renderovanju
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      fetchRoles();
+    }
+  }, [fetchRoles]);
 
   useEffect(() => {
     // Ako smo u režimu uređivanja i inicijalni podaci imaju password ili je korisnik već postavio password
@@ -130,13 +220,13 @@ const UserForm: React.FC<UserFormProps> = ({
     
     const emailValid = !!email && /^\S+@\S+\.\S+$/.test(email);
     const nameValid = !!fullName && fullName.trim().length >= 3;
-    const roleValid = !!role && role.trim() !== '';
+    const roleValid = !!form.watch("roleId"); // Proveravamo roleId umesto role
     
     const valid = nameValid && emailValid && roleValid && passwordValid;
     
     setFormIsValid(valid);
     
-  }, [fullName, email, role, password, isEditing, showPasswordField]);
+  }, [fullName, email, form, password, isEditing, showPasswordField]);
 
   // Check if form has unsaved changes
   const hasUnsavedChanges = form.formState.isDirty;
@@ -165,54 +255,91 @@ const UserForm: React.FC<UserFormProps> = ({
       setIsSubmitting(true);
       
       // Double check that all required fields are present
-      if (!data.fullName || !data.email || !data.role || (!isEditing && !data.password)) {
+      if (!data.fullName || !data.email || !data.roleId || (!isEditing && !data.password)) {
         if (!data.fullName) {
           form.setError("fullName", { type: "required", message: "Full name is required" });
         }
         if (!data.email) {
           form.setError("email", { type: "required", message: "Email address is required" });
         }
-        if (!data.role) {
-          form.setError("role", { type: "required", message: "User role is required" });
+        if (!data.roleId) {
+          form.setError("roleId", { type: "required", message: "User role is required" });
         }
         if (!isEditing && !data.password) {
           form.setError("password", { type: "required", message: "Password is required" });
         }
         
-        toast.error("Popunite sva obavezna polja");
+        toast.error("Fill in all required fields");
         return;
       }
       
-      // Priprema podataka za slanje na backend
-      const submitData = { ...data };
-      
-      // Ako smo u režimu uređivanja i password je prazan ili nije prikazano polje za lozinku,
-      // uklonimo ga iz podataka za slanje
-      if (isEditing && (!showPasswordField || !submitData.password || submitData.password.trim() === '')) {
-        delete submitData.password;
+      if (isEditing) {
+        // Ako smo u režimu uređivanja
+        // Priprema podataka za slanje na backend
+        const submitData = { ...data };
         
-        console.log('Sending data without password:', submitData);
+        // Brisanje polja koja ne treba slati na backend
+        delete submitData.role; // Šaljemo samo roleId, ne i tekstualni naziv role
         
-        // Nastavi sa postojećom logikom
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        toast.success("User updated successfully!");
-        form.reset(data);
-        router.push("/user-management");
-        return;
+        // Ako je password prazan ili nije prikazano polje za lozinku, uklonimo ga
+        if (!showPasswordField || !submitData.password || submitData.password.trim() === '') {
+          delete submitData.password;
+        }
+        
+        try {
+          // PUT zahtev za ažuriranje korisnika
+          const response = await apiClient.put(`/users/${initialData.id}`, submitData);
+          console.log('User updated:', response.data);
+          toast.success("User updated successfully!");
+          form.reset(response.data);
+          router.push("/user-management");
+        } catch (error) {
+          console.error("Error updating user:", error);
+          toast.error("An error occurred while updating the user. Please try again.");
+        }
+      } else {
+        // Kreiramo novog korisnika - šaljemo samo neophodna polja
+        const createUserData = {
+          fullName: data.fullName,
+          email: data.email,
+          roleId: data.roleId,
+          password: data.password,
+          sendEmail: data.sendEmail,
+          status: data.status
+        };
+        
+        try {
+          // POST zahtev za kreiranje korisnika
+          const response = await apiClient.post('/users', createUserData);
+          console.log('User created:', response.data);
+          toast.success("User created successfully!");
+          
+          // Ako treba poslati e-mail, to je obično odrađeno na backendu
+          if (createUserData.sendEmail) {
+            toast.success("Email with access credentials has been sent to the user.");
+          }
+          
+          form.reset(initialUserValues);
+          router.push("/user-management");
+        } catch (error: any) {
+          console.error("Error creating user:", error);
+          
+          // Prikazujemo poruku o grešci sa servera ako postoji
+          const errorMessage = error.response?.data?.message || "Something went wrong, please try again.";
+          toast.error(errorMessage);
+          
+          // Ako je greška zbog duplikata email adrese
+          if (error.response?.status === 409) {
+            form.setError("email", { 
+              type: "server", 
+              message: "Email address is already taken. Please use another address." 
+            });
+          }
+        }
       }
-      
-      // Nastavi sa postojećom logikom za ostale slučajeve
-      console.log('Sending data with password:', submitData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success(isEditing ? "User updated successfully!" : "User created successfully!");
-      
-      form.reset(data);
-      
-      router.push("/user-management");
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("An error occurred. Please try again.");
+      toast.error("Something went wrong, please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -415,30 +542,52 @@ const UserForm: React.FC<UserFormProps> = ({
           {/* User Role */}
           <FormField
             control={form.control}
-            name="role"
+            name="roleId"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>User role <span className="text-destructive">*</span></FormLabel>
                 <Select 
                   onValueChange={(value) => {
                     field.onChange(value);
+                    // Pronađi odabranu rolu da bi dobili njen name
+                    const selectedRole = roles.find(role => role.id === value);
+                    if (selectedRole) {
+                      // Postavi i role polje (name) za kompatibilnost
+                      form.setValue("role", selectedRole.name, { shouldDirty: true });
+                    }
                     // Dodatno logovanje za proveru
                     console.log('Role selected:', value);
                   }} 
                   defaultValue={field.value}
                   value={field.value}
+                  disabled={isLoadingRoles}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select user role" />
+                      <SelectValue placeholder={isLoadingRoles ? "Loading roles..." : "Select user role"}>
+                        {field.value && roles.length > 0 && (() => {
+                          const selectedRole = roles.find(role => role.id === field.value);
+                          return selectedRole ? (selectedRole.formattedName || capitalizeWords(selectedRole.name)) : "";
+                        })()}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {userRoles.map((userRole) => (
-                      <SelectItem key={userRole} value={userRole}>
-                        {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {isLoadingRoles ? (
+                      <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                        Loading roles...
+                      </div>
+                    ) : roles.length > 0 ? (
+                      roles.map((userRole) => (
+                        <SelectItem key={userRole.id} value={userRole.id}>
+                          {userRole.formattedName || capitalizeWords(userRole.name)}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                        No roles available
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />

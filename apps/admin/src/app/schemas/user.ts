@@ -18,11 +18,13 @@ export const userStatuses: UserStatus[] = [
 
 // Base schema for common user details
 const baseUserSchema = {
+  id: z.string().optional(),
   fullName: z.string().min(3, "Full name must be at least 3 characters").nonempty("Full name is required"),
   email: z.string().email("Invalid email address").nonempty("Email address is required"),
-  role: z.string({
+  roleId: z.string({
     required_error: "User role is required"
   }),
+  role: z.string().optional(),
   profileImage: z.string().nullable().optional(),
   sendEmail: z.boolean().default(true),
   status: z.enum(userStatuses as unknown as [string, ...string[]]).default("Invited"),
@@ -66,9 +68,10 @@ export type UserFormValues = CreateUserFormValues | UpdateUserFormValues;
 export const initialUserValues: Partial<UserFormValues> = {
   fullName: "",
   email: "",
+  roleId: "",
   role: "",
   password: "",
   profileImage: null,
   sendEmail: true,
-  status: "Invited",
+  status: "",
 };

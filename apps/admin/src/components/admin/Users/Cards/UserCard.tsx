@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UsersActions } from "../Table/UsersActions";
 import { User } from "@/app/types/models/User";
+import { formatDate } from "@/utils/dateFormatter";
+
 interface UserCardProps {
   user: User;
 }
@@ -14,8 +16,11 @@ export function UserCard({ user }: UserCardProps) {
   const getStatusClass = (status: string) => {
     switch(status) {
       case "Active": return "bg-green-900/55 text-green-300";
+      case "Inactive": return "bg-red-900/55 text-red-300";
       case "Pending": return "bg-yellow-900/55 text-yellow-300";
+      case "Invited": return "bg-orange-900/55 text-orange-300";
       case "Blocked": return "bg-red-900/55 text-red-300";
+      case "Suspended": return "bg-red-900/55 text-red-300";
       case "Deleted": return "bg-gray-900/80 text-gray-300";
       default: return "";
     }
@@ -24,21 +29,14 @@ export function UserCard({ user }: UserCardProps) {
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch(status) {
       case "Active": return "default";
+      case "Inactive": return "destructive";
       case "Invited": return "secondary";
+      case "Pending": return "secondary";
+      case "Blocked": return "destructive";
       case "Suspended": return "destructive";
-      // case "Deleted": return "outline";
-      default: return "default";
+      case "Deleted": return "outline";
+      default: return "outline";
     }
-  };
-
-  // Formatiranje datuma
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("sr-Latn", {
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    });
   };
 
   return (

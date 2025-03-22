@@ -20,6 +20,8 @@ interface UseTableProps<TData> {
   initialSorting?: SortingState;
   globalFilterFn?: FilterFn<TData>;
   initialPageSize?: number;
+  manualPagination?: boolean;
+  pageCount?: number;
 }
 
 export function useTable<TData>({
@@ -27,7 +29,9 @@ export function useTable<TData>({
   columns,
   initialSorting = [],
   globalFilterFn,
-  initialPageSize = 12,
+  initialPageSize = 10,
+  manualPagination = false,
+  pageCount = 0,
 }: UseTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -46,6 +50,8 @@ export function useTable<TData>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    manualPagination,
+    pageCount,
     state: {
       sorting,
       columnFilters,

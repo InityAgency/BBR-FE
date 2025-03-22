@@ -11,7 +11,11 @@ export default function EditUserPage({
   const user = usersData.find(user => user.id === params.id);
 
   if (!user) {
-    return <div>Korisnik nije pronađen</div>;
+    return (
+      <AdminLayout>
+        <h1>User not found</h1>
+      </AdminLayout>
+    );
   }
 
   // Mapiranje podataka korisnika u format koji očekuje forma

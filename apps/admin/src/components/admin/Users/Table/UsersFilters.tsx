@@ -108,7 +108,7 @@ export function UsersFilters({
         {/* Status Filter */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-10">
+            <Button variant="outline" className="h-10 ">
               <CircleDashed className="h-4 w-4" />
               Status
               {selectedStatuses.length > 0 && (
@@ -142,12 +142,12 @@ export function UsersFilters({
                       checked={selectedStatuses.includes(status)}
                       className="mr-2 h-4 w-4"
                     />
-                    {status}
+                    <span className="capitalize">{status}</span>
                   </CommandItem>
                 ))}
               </CommandList>
               {selectedStatuses.length > 0 && (
-                <div className="border-t border-border p-2">
+                <div className="border-t border-border p-2  ">
                   <Button
                     variant="outline"
                     size="sm"
@@ -185,7 +185,7 @@ export function UsersFilters({
           {/* Oznake za statuse */}
           {selectedStatuses.map(status => (
             <Badge key={`status-${status}`} variant="secondary" className="px-2 py-1">
-              {status}
+              <span className="capitalize">{status}</span>
               <Button
                 variant="ghost"
                 size="sm"

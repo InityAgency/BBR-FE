@@ -29,6 +29,22 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 
+// Funkcija za dobijanje inicijala iz imena korisnika
+const getInitials = (name: string): string => {
+  // Ako nema imena, vrati BBR kao default
+  if (!name) return "BBR";
+  
+  // Podeli ime na reči i uzmi prvo slovo svake reči (maksimalno 2 slova)
+  const initials = name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('');
+  
+  // Ako nismo uspeli da dobijemo inicijale, vrati BBR
+  return initials || "BBR";
+};
+
 export function NavUser({
   user,
 }: {
@@ -46,6 +62,9 @@ export function NavUser({
     // Redirect happens in the auth context
   }
   
+  // Dobavljanje inicijala korisnika
+  const userInitials = getInitials(user.name);
+  
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -56,8 +75,8 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">BBR</AvatarFallback>
+                {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
+                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -75,8 +94,8 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">BBR</AvatarFallback>
+                  {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
+                  <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>

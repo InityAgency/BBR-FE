@@ -11,7 +11,7 @@ import { User } from "@/app/types/models/User";
 // Helper funkcije za renderovanje ćelija
 const renderNameCell = (value: string, id: string) => (
   <div className="max-w-[200px]">
-    <a href={`/user-management/${id}/edit`} className="font-medium text-foreground hover:underline truncate block" title={value}>
+    <a href={`/user-management/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
       {value}
     </a>
     <div className="text-xs text-muted-foreground truncate">
@@ -49,23 +49,31 @@ const renderStatusCell = (status: string) => {
   let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "default";
   let badgeClass = "";
   
-  switch(status) {
-    case "Active":
+  switch(status.toLowerCase()) {
+    case "active":
       badgeVariant = "default";
-      badgeClass = "bg-green-900/55 text-green-300";
+      badgeClass = "bg-green-900/55 text-green-300 capitalize";
       break;
-    case "Invited":
-      badgeVariant = "secondary";
-      badgeClass = "bg-yellow-900/55 text-yellow-300";
-      break;
-    case "Suspended":
+    case "inactive":
       badgeVariant = "destructive";
-      badgeClass = "bg-red-900/55 text-red-300";
+      badgeClass = "bg-red-900/55 text-red-300 capitalize";
       break;
-    // case "Deleted":
-    //   badgeVariant = "outline";
-    //   badgeClass = "bg-gray-900/80 text-gray-300";
-    //   break;
+    case "invited":
+      badgeVariant = "secondary";
+      badgeClass = "bg-orange-900/55 text-orange-300 capitalize";
+      break;
+    case "suspended":
+    case "blocked":
+      badgeVariant = "destructive";
+      badgeClass = "bg-red-900/55 text-red-300 capitalize";
+      break;
+    case "deleted":
+      badgeVariant = "outline";
+      badgeClass = "bg-gray-900/80 text-gray-300 capitalize";
+      break;
+    default:
+      badgeVariant = "outline";
+      badgeClass = "";
   }
   
   return <Badge variant={badgeVariant} className={badgeClass}>{status}</Badge>;

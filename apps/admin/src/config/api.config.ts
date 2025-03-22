@@ -15,7 +15,7 @@ export const API_TIMEOUT = 15000;
 // API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
+    LOGIN: '/auth/login/admin',
     LOGOUT: '/auth/logout',
   },
   USER: {
