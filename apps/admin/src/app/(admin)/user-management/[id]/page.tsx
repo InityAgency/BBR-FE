@@ -129,7 +129,6 @@ export default function UserDetailsPage() {
       <UserHeader 
         user={user} 
         loading={loading}
-        onStatusChange={handleStatusChange}
         onResendInvitation={handleResendInvitation}
       />
 

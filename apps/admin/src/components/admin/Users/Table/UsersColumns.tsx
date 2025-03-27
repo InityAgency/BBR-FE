@@ -7,23 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { User } from "@/app/types/models/User";
+import { formatDate } from "@/utils/dateFormatter";
 
-// Helper funkcije za renderovanje ćelija
-const renderNameCell = (value: string, id: string) => (
+// Helper functions for rendering cells
+const renderNameCell = (value: string | undefined, id: string) => (
   <div className="max-w-[200px]">
-    <a href={`/user-management/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
-      {value}
+    <a href={`/user-management/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value || "-"}>
+      {value || "-"}
     </a>
     <div className="text-xs text-muted-foreground truncate">
-      {id}
+      {id || "-"}
     </div>
   </div>
 );
 
-const renderEmailCell = (email: string, verified: boolean) => (
+const renderEmailCell = (email: string | undefined, verified: boolean) => (
   <div className="max-w-[200px]">
-    <div className="truncate" title={email}>
-      {email}
+    <div className="truncate" title={email || "-"}>
+      {email || "-"}
     </div>
     {verified ? (
       <div className="text-xs text-green-500">Verified</div>
@@ -33,23 +34,62 @@ const renderEmailCell = (email: string, verified: boolean) => (
   </div>
 );
 
-const renderCompanyCell = (company: string | null) => (
-  <div className="max-w-[180px] truncate" title={company || 'N/A'}>
-    {company || <span className="text-muted-foreground italic">Not specified</span>}
-  </div>
-);
+const renderCompanyCell = (company: any) => {
+  let companyName = "-";
+  
+  if (!company) {
+    companyName = "-";
+  } else if (typeof company === 'string') {
+    companyName = company;
+  } else if (typeof company === 'object') {
+    companyName = company.name || "-";
+  }
+  
+  return (
+    <div className="max-w-[180px] truncate" title={companyName}>
+      {companyName === "-" ? (
+        <span className="text-muted-foreground italic">Not specified</span>
+      ) : (
+        companyName
+      )}
+    </div>
+  );
+};
 
-const renderRoleCell = (role: { id: string, name: string }) => (
-  <div className="max-w-[150px]">
-    <div className="font-medium capitalize">{role.name}</div>
-  </div>
-);
+const renderRoleCell = (role: any) => {
+  let roleName = "-";
+  
+  if (!role) {
+    roleName = "-";
+  } else if (typeof role === 'string') {
+    roleName = role;
+  } else if (typeof role === 'object') {
+    roleName = role.name || "-";
+  }
+  
+  return (
+    <div className="max-w-[150px]">
+      <div className="font-medium capitalize">{roleName}</div>
+    </div>
+  );
+};
 
-const renderStatusCell = (status: string) => {
+const renderDateCell = (dateString: string | undefined) => {
+  if (!dateString) return "-";
+  
+  try {
+    return formatDate(dateString);
+  } catch (error) {
+    console.error("Error formatting date:", error, dateString);
+    return "-";
+  }
+};
+
+const renderStatusCell = (status: string | undefined) => {
   let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "default";
   let badgeClass = "";
   
-  switch(status.toLowerCase()) {
+  switch(status?.toLowerCase()) {
     case "active":
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300 capitalize";
@@ -76,7 +116,7 @@ const renderStatusCell = (status: string) => {
       badgeClass = "";
   }
   
-  return <Badge variant={badgeVariant} className={badgeClass}>{status}</Badge>;
+  return <Badge variant={badgeVariant} className={badgeClass}>{status || "-"}</Badge>;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -189,7 +229,7 @@ export const columns: ColumnDef<User>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="w-[150px]">{row.getValue("createdAt")}</div>,
+    cell: ({ row }) => <div className="w-[150px]">{renderDateCell(row.getValue("createdAt"))}</div>,
     meta: {
       width: "w-[150px]"
     }

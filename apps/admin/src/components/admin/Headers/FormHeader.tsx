@@ -1,6 +1,7 @@
 // components/admin/Headers/FormHeader.tsx
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 interface FormHeaderProps {
   title: string;
@@ -31,6 +32,26 @@ const FormHeader: React.FC<FormHeaderProps> = ({
   customButtons,
   hideDefaultButtons = false,
 }) => {
+  // Debugging log
+  console.log("FormHeader props:", { 
+    title, 
+    onSave: onSave instanceof Function, 
+    onDiscard: onDiscard instanceof Function,
+    saveButtonDisabled,
+    isSubmitting
+  });
+
+  const handleSave = React.useCallback(() => {
+    if (onSave instanceof Function) {
+      onSave();
+    }
+  }, [onSave]);
+
+  const handleDiscard = React.useCallback(() => {
+    if (onDiscard instanceof Function) {
+      onDiscard();
+    }
+  }, [onDiscard]);
 
   return (
     <div className="flex items-center justify-between pb-6 flex-wrap gap-4">
@@ -54,23 +75,32 @@ const FormHeader: React.FC<FormHeaderProps> = ({
         {customButtons}
         {!hideDefaultButtons && (
           <>
-            {onDiscard && (
+            {onDiscard instanceof Function && (
               <Button 
                 className="cursor-pointer transition-colors"
                 variant="outline" 
-                onClick={onDiscard}
+                onClick={handleDiscard}
                 disabled={isSubmitting}
+                type="button"
               >
                 {discardButtonText}
               </Button>
             )}
-            {onSave && (
+            {onSave instanceof Function && (
               <Button 
                 className="cursor-pointer transition-colors"
-                onClick={onSave}
+                onClick={handleSave}
                 disabled={saveButtonDisabled || isSubmitting}
+                type="button"
               >
-                {isSubmitting ? "Saving..." : saveButtonText}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  saveButtonText
+                )}
               </Button>
             )}
           </>

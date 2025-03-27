@@ -1,6 +1,13 @@
 import { FilterFn, FilterMeta } from "@tanstack/react-table";
 
-// Univerzalna funkcija za globalno pretraživanje preko više polja
+/**
+ * Univerzalna funkcija za fuzzy pretragu u tabelama
+ * @param row - Red tabele
+ * @param columnId - ID kolone
+ * @param value - Vrednost za pretragu
+ * @param addMeta - Meta informacije
+ * @returns boolean - Da li red odgovara pretrazi
+ */
 export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const searchValue = String(value).toLowerCase();
   

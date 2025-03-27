@@ -1,19 +1,21 @@
 // components/admin/Brands/Table/BrandsTable.tsx
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
-import { TablePagination } from "@/components/admin/Table/TablePagination";
 import { BrandsFilters } from "./BrandsFilters";
 import { columns } from "./BrandsColumns";
-import { brandsData } from "@/app/data/brands";
 import { Brand } from "../../../../app/types/models/Brand";
 import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { BrandsActions } from "./BrandsActions";
 import { BrandsCardList } from "../Cards/BrandsCardList";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ITEMS_PER_PAGE = 10;
 
 // Popravka za kolone da koriste BrandsActions
 const enhancedColumns = columns.map(column => {
@@ -26,18 +28,92 @@ const enhancedColumns = columns.map(column => {
   return column;
 });
 
+// Skeleton loader za tabelu
+const TableSkeleton = () => {
+  return (
+    <div className="w-full border rounded-md">
+      {/* Skelet za header tabele */}
+      <div className="border-b px-4 py-3 flex">
+        <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+        <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
+      </div>
+      
+      {/* Skelet za redove tabele */}
+      {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
+        <div key={index} className="border-b px-4 py-3 flex items-center">
+            <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+            <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const CardsSkeleton = () => {
+  return (
+    <div className="space-y-4">
+      {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
+        <div key={index} className="border rounded-md p-4 space-y-3">
+          <div className="flex justify-between mt-3">
+            <Skeleton className="h-8 w-32 rounded-md bg-muted/20" />
+            <Skeleton className="h-8 w-20 rounded-md bg-muted/20" />
+          </div>
+          <div className="flex justify-between mt-3 mb-3">
+            <Skeleton className="h-8 w-80 rounded-md bg-muted/20" />
+            <Skeleton className="h-8 w-20 rounded-md bg-muted/20" />
+          </div>
+          <Skeleton className="h-8 w-60 rounded-md bg-muted/20" />
+          <div className="flex items-center space-x-2 mt-4">
+            <Skeleton className="h-8 w-1/2 rounded-md bg-muted/20" />
+            <Skeleton className="h-8 w-1/2 rounded-md bg-muted/20" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 interface BrandsTableProps {
+  brands: Brand[];
+  loading: boolean;
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  goToNextPage: () => void;
+  goToPreviousPage: () => void;
+  goToPage: (page: number) => void;
   initialStatusFilter?: string | null;
 }
 
-export function BrandsTable({ initialStatusFilter }: BrandsTableProps) {
+export function BrandsTable({
+  brands,
+  loading,
+  totalItems,
+  totalPages,
+  currentPage,
+  goToNextPage,
+  goToPreviousPage,
+  goToPage,
+  initialStatusFilter
+}: BrandsTableProps) {
+  const [globalFilter, setGlobalFilter] = useState("");
+
   // Koristimo generički hook za tabelu
   const {
     table,
-    globalFilter,
-    setGlobalFilter,
+    setGlobalFilter: setTableGlobalFilter,
   } = useTable<Brand>({
-    data: brandsData,
+    data: brands,
     columns: enhancedColumns,
     initialSorting: [{ id: "updatedAt", desc: true }],
     globalFilterFn: (row, columnId, value, addMeta) => {
@@ -51,8 +127,15 @@ export function BrandsTable({ initialStatusFilter }: BrandsTableProps) {
       // Vraćamo true ako je univerzalna pretraga uspela ILI ako ID sadrži traženi tekst
       return result || id.toLowerCase().includes(searchValue);
     },
-    initialPageSize: 10,
+    initialPageSize: ITEMS_PER_PAGE,
+    manualPagination: true,
+    pageCount: totalPages,
   });
+
+  // Sinhronizujemo globalFilter sa tabelom
+  React.useEffect(() => {
+    setTableGlobalFilter(globalFilter);
+  }, [globalFilter, setTableGlobalFilter]);
 
   // Koristimo hook za filtere
   const {
@@ -67,7 +150,7 @@ export function BrandsTable({ initialStatusFilter }: BrandsTableProps) {
     filteredLocations: filteredTypes,
   } = useTableFilters<Brand>({
     table,
-    data: brandsData,
+    data: brands,
     locationAccessor: "type",
     statusAccessor: "status",
   });
@@ -108,18 +191,67 @@ export function BrandsTable({ initialStatusFilter }: BrandsTableProps) {
       />
 
       {/* Kartice za mobilni prikaz */}
-      <BrandsCardList brands={table.getRowModel().rows.map(row => row.original)} />
+      <div className="block lg:hidden">
+        {loading ? (
+          <CardsSkeleton />
+        ) : (
+          <BrandsCardList brands={table.getRowModel().rows.map(row => row.original)} />
+        )}
+      </div>
 
       {/* Tabela za desktop prikaz */}
       <div className="hidden lg:block">
-        <BaseTable 
-          table={table}
-          getRowClassName={getRowClassName}
-        />
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          <BaseTable 
+            table={table}
+            getRowClassName={getRowClassName}
+          />
+        )}
       </div>
 
       {/* Paginacija */}
-      <TablePagination table={table} />
+      <div className="flex items-center justify-between py-4">
+        <div className="text-sm text-muted-foreground mb-2 mt-3">
+          Page {currentPage} of {totalPages || 1} | Total brands: {totalItems}
+        </div>
+
+        <div className="flex items-center justify-between py-4">
+          <Button 
+            variant="outline" 
+            onClick={goToPreviousPage} 
+            disabled={currentPage <= 1 || loading}
+            className="mr-2"
+          >
+            Previous
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                size="sm"
+                className="w-8 h-8"
+                onClick={() => goToPage(i + 1)}
+                disabled={loading}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+
+          <Button 
+            variant="outline" 
+            onClick={goToNextPage} 
+            disabled={currentPage >= totalPages || loading}
+            className="ml-2"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

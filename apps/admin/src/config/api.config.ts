@@ -17,10 +17,14 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login/admin',
     LOGOUT: '/auth/logout',
+    REQUEST_RESET_PASSWORD: '/auth/request-reset-password',
+    VERIFY_RESET_PASSWORD: '/auth/verify-otp',
+    RESET_PASSWORD: '/auth/reset-password',
   },
   USER: {
     PROFILE: '/user/profile',
-    USERS: '/users'
+    USERS: '/users',
+    USER_STATUS: (userId: string) => `/users/${userId}/status`
   }
 };
 

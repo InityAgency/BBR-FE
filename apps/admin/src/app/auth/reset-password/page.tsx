@@ -4,11 +4,12 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import AuthService from "@/services/auth.service"
 
 // Importing Lucide icons for "Show/Hide" password functionality
 import { Eye, EyeOff } from "lucide-react"
@@ -16,15 +17,15 @@ import { Eye, EyeOff } from "lucide-react"
 // Move the schema inside the component or to a separate file
 const formSchema = z.object({
   newPassword: z.string()
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" })
-    .regex(/[!@#$%^&*()]/, { message: "Password must contain at least one special character" }),
+    .min(8, { message: "Lozinka mora biti najmanje 8 karaktera dugačka" })
+    .regex(/[A-Z]/, { message: "Lozinka mora sadržati najmanje jedno veliko slovo" })
+    .regex(/[a-z]/, { message: "Lozinka mora sadržati najmanje jedno malo slovo" })
+    .regex(/[0-9]/, { message: "Lozinka mora sadržati najmanje jedan broj" })
+    .regex(/[!@#$%^&*()]/, { message: "Lozinka mora sadržati najmanje jedan specijalni karakter" }),
 
   confirmPassword: z.string()
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
+  message: "Lozinke se ne podudaraju",
   path: ["confirmPassword"]
 })
 
@@ -38,23 +39,49 @@ export default function ResetPasswordPage() {
   })
 
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   // Creating separate state for each password field to handle show/hide independently
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast.success("Your password has been reset successfully.")
-    router.push('/dashboard')
+  // Provera da li postoji resetToken
+  useEffect(() => {
+    const resetToken = localStorage.getItem('resetToken')
+    if (!resetToken) {
+      toast.error("Token za resetovanje nije pronađen. Molimo vas da ponovo pokrenete proces resetovanja lozinke.")
+      router.push('/auth/reset-password-request')
+    }
+  }, [router])
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true)
+      
+      // Poziv API-ja za resetovanje lozinke
+      const success = await AuthService.resetPassword(data.newPassword)
+      
+      if (success) {
+        toast.success("Vaša lozinka je uspešno resetovana.")
+        router.push('/auth/login')
+      } else {
+        toast.error("Neuspelo resetovanje lozinke. Molimo vas da pokušate ponovo.")
+      }
+    } catch (error) {
+      console.error('Greška pri resetovanju lozinke:', error)
+      toast.error(error instanceof Error ? error.message : "Došlo je do greške pri resetovanju lozinke.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <AuthLayout>
       <Form {...form}>
         <div className="flex flex-col items-start gap-2 mb-6">
-          <h1 className="text-2xl font-bold">Reset Your Password</h1>
+          <h1 className="text-2xl font-bold">Resetujte svoju lozinku</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Please enter your new password below.
+            Unesite svoju novu lozinku.
           </p>
         </div>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -64,7 +91,7 @@ export default function ResetPasswordPage() {
             name="newPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>New Password</FormLabel>
+                <FormLabel>Nova lozinka</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -96,7 +123,7 @@ export default function ResetPasswordPage() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>Potvrdite lozinku</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -122,8 +149,12 @@ export default function ResetPasswordPage() {
             )}
           />
 
-          <Button type="submit" className="cursor-pointer transition-all w-full">
-            Reset Password
+          <Button 
+            type="submit" 
+            className="cursor-pointer transition-all w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "Resetovanje..." : "Resetuj lozinku"}
           </Button>
         </form>
       </Form>

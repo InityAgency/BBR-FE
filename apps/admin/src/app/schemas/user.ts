@@ -73,5 +73,5 @@ export const initialUserValues: Partial<UserFormValues> = {
   password: "",
   profileImage: null,
   sendEmail: true,
-  status: "",
+  status: "Invited",
 };

@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputOTP, InputOTPSlot, InputOTPGroup, InputOTPSeparator } from "@/components/ui/input-otp"
+import AuthService from "@/services/auth.service"
+import { useState, useEffect } from "react"
 
 const FormSchema = z.object({
   otp: z.string().min(6, {
-    message: "OTP code must be 6 digits.",
+    message: "OTP kod mora imati 6 cifara.",
   }),
 })
 
@@ -24,13 +26,35 @@ export default function ResetPasswordOtpPage() {
   })
 
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  
+  // Provera da li postoji resetToken
+  useEffect(() => {
+    const resetToken = localStorage.getItem('resetToken')
+    if (!resetToken) {
+      toast.error("Token za resetovanje nije pronađen. Molimo vas da ponovo pokrenete proces resetovanja lozinke.")
+      router.push('/auth/reset-password-request')
+    }
+  }, [router])
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (data.otp === "123456") {
-      toast.success("OTP is valid!")
-      router.push('/auth/reset-password')
-    } else {
-      toast.error("Invalid OTP code. Please try again.")
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      setIsLoading(true)
+      
+      // Poziv API-ja za verifikaciju OTP koda
+      const isVerified = await AuthService.verifyOtp(data.otp)
+      
+      if (isVerified) {
+        toast.success("OTP je uspešno verifikovan!")
+        router.push('/auth/reset-password')
+      } else {
+        toast.error("Nevažeći OTP kod. Molimo vas da pokušate ponovo.")
+      }
+    } catch (error) {
+      console.error('Greška pri verifikaciji OTP koda:', error)
+      toast.error(error instanceof Error ? error.message : "Došlo je do greške pri verifikaciji OTP koda.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -38,9 +62,9 @@ export default function ResetPasswordOtpPage() {
     <AuthLayout>
       <Form {...form}>
         <div className="flex flex-col items-start gap-2 mb-6">
-          <h1 className="text-2xl font-bold">Enter OTP Code</h1>
+          <h1 className="text-2xl font-bold">Unesite OTP kod</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Enter the OTP code sent to your email.
+            Unesite OTP kod koji je poslat na vašu email adresu.
           </p>
         </div>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -49,7 +73,7 @@ export default function ResetPasswordOtpPage() {
             name="otp"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>OTP Code</FormLabel>
+                <FormLabel>OTP kod</FormLabel>
                 <FormControl className="w-full">
                   <InputOTP {...field} maxLength={6} className="w-full">
                     <InputOTPGroup className="w-full">
@@ -69,7 +93,13 @@ export default function ResetPasswordOtpPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">Verify OTP</Button>
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "Verifikacija..." : "Verifikuj OTP"}
+          </Button>
         </form>
       </Form>
     </AuthLayout>

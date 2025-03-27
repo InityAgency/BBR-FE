@@ -32,6 +32,33 @@ interface ApiResponse {
   path: string;
 }
 
+interface RequestResetPasswordResponse {
+  data: {
+    resetToken: string;
+  };
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  path: string;
+}
+
+interface VerifyOtpResponse {
+  data: {
+    verified: boolean;
+  };
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  path: string;
+}
+
+interface ResetPasswordResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  path: string;
+}
+
 // Auth service methods
 const AuthService = {
   /**
@@ -190,6 +217,124 @@ const AuthService = {
     } catch (error) {
       console.error('Error parsing user data:', error);
       return null;
+    }
+  },
+
+  /**
+   * Request password reset
+   */
+  async requestResetPassword(email: string): Promise<string> {
+    try {
+      const response = await apiClient.post<RequestResetPasswordResponse>(
+        API_ENDPOINTS.AUTH.REQUEST_RESET_PASSWORD,
+        { email },
+        { withCredentials: true }
+      );
+      
+      // Čuvamo resetToken u localStorage za korišćenje u sledećem koraku
+      if (response.data?.data?.resetToken) {
+        localStorage.setItem('resetToken', response.data.data.resetToken);
+        return response.data.data.resetToken;
+      }
+      
+      throw new Error('Reset token not received');
+    } catch (error) {
+      if (error instanceof Error) {
+        throw Object.assign(new Error(error.message), {
+          name: 'AuthError',
+          stack: ''
+        });
+      }
+      throw Object.assign(new Error('Password reset request failed'), {
+        name: 'AuthError',
+        stack: ''
+      });
+    }
+  },
+  
+  /**
+   * Verify OTP code
+   */
+  async verifyOtp(otp: string): Promise<boolean> {
+    try {
+      // Dobavljamo resetToken iz localStorage-a
+      const resetToken = localStorage.getItem('resetToken');
+      
+      if (!resetToken) {
+        throw new Error('Reset token not found. Please try resetting your password again.');
+      }
+      
+      const response = await apiClient.post<VerifyOtpResponse>(
+        API_ENDPOINTS.AUTH.VERIFY_RESET_PASSWORD,
+        { 
+          otp,
+          resetToken 
+        },
+        { withCredentials: true }
+      );
+      
+      console.log('OTP verification response:', response);
+      
+      // Proveravamo da li je verifikacija uspešna na osnovu status koda
+      // 200 ili 201 znače uspeh bez obzira na strukturu podataka
+      return response.status === 200 || response.status === 201;
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      if (error instanceof Error) {
+        throw Object.assign(new Error(error.message), {
+          name: 'AuthError',
+          stack: ''
+        });
+      }
+      throw Object.assign(new Error('OTP verification failed'), {
+        name: 'AuthError',
+        stack: ''
+      });
+    }
+  },
+
+  /**
+   * Reset password
+   */
+  async resetPassword(newPassword: string): Promise<boolean> {
+    try {
+      // Dobavljamo resetToken iz localStorage-a
+      const resetToken = localStorage.getItem('resetToken');
+      
+      if (!resetToken) {
+        throw new Error('Reset token not found. Please try resetting your password again.');
+      }
+      
+      const response = await apiClient.post<ResetPasswordResponse>(
+        API_ENDPOINTS.AUTH.RESET_PASSWORD,
+        { 
+          newPassword,
+          resetToken 
+        },
+        { withCredentials: true }
+      );
+      
+      console.log('Reset password response:', response);
+      
+      // Ako je zahtev uspešan, brišemo resetToken iz localStorage-a
+      if (response.status === 200 || response.status === 201) {
+        localStorage.removeItem('resetToken');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      if (error instanceof Error) {
+        throw Object.assign(new Error(error.message), {
+          name: 'AuthError',
+          stack: ''
+        });
+      }
+      throw Object.assign(new Error('Password reset failed'), {
+        name: 'AuthError',
+        stack: ''
+      });
     }
   }
 };

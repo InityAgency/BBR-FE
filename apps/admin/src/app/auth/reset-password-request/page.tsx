@@ -18,6 +18,8 @@ import {
 import { ArrowLeft } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import AuthService from "@/services/auth.service"
+import { useState } from "react"
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -34,10 +36,23 @@ export default function ResetPasswordRequestPage() {
   })
 
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast.success("A password reset link has been sent to your email.")
-    router.push('/auth/reset-password-otp')
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      setIsLoading(true)
+      
+      // Poziv API-ja za resetovanje lozinke
+      await AuthService.requestResetPassword(data.email)
+      
+      toast.success("Link za resetovanje lozinke je poslat na vaš email.")
+      router.push('/auth/reset-password-otp')
+    } catch (error) {
+      console.error('Greška pri resetovanju lozinke:', error)
+      toast.error(error instanceof Error ? error.message : "Došlo je do greške pri resetovanju lozinke.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -68,7 +83,13 @@ export default function ResetPasswordRequestPage() {
             )}
           />
 
-          <Button type="submit" className="cursor-pointer transition-all w-full">Send Reset Link</Button>
+          <Button 
+            type="submit" 
+            className="cursor-pointer transition-all w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "Sending..." : "Send Reset Link"}
+          </Button>
         </form>
       </Form>
     </AuthLayout>

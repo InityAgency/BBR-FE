@@ -61,6 +61,23 @@ const UserService = {
       console.error(`Error fetching user with ID ${id}:`, error);
       throw error;
     }
+  },
+
+  /**
+   * Update user status
+   */
+  async updateUserStatus(userId: string, status: string): Promise<User> {
+    try {
+      const response = await apiClient.patch(
+        API_ENDPOINTS.USER.USER_STATUS(userId),
+        { status },
+        { withCredentials: true }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(`Error updating user status for ID ${userId}:`, error);
+      throw error;
+    }
   }
 };
 

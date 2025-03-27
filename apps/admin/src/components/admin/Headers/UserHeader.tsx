@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/select";
 import FormHeader from "@/components/admin/Headers/FormHeader";
 import { User } from "@/app/types/models/User";
+import UserService from "@/services/user.service";
+
+const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"] as const;
 
 interface UserHeaderProps {
   user?: User | null; 
@@ -25,17 +28,13 @@ interface UserHeaderProps {
 }
 
 const getStatusBadgeStyle = (status: string) => {
-  switch(status?.toLowerCase()) {
-    case "active":
+  switch(status?.toUpperCase()) {
+    case "ACTIVE":
       return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50";
-    case "inactive":
-    case "blocked":
+    case "INACTIVE":
       return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
-    case "invited":
-    case "pending":
+    case "INVITED":
       return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
-    case "deleted":
-      return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
     default:
       return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
   }
@@ -55,7 +54,7 @@ export function UserHeader({
   // Set the initial status once user data is loaded
   useEffect(() => {
     if (user?.status) {
-      setStatus(user.status);
+      setStatus(user.status.toUpperCase());
     }
     setIsLoading(loading);
   }, [user, loading]);
@@ -67,11 +66,18 @@ export function UserHeader({
 
   const handleStatusChange = async (newStatus: string) => {
     try {
-      if (onStatusChange) {
-        await onStatusChange(newStatus);
+      if (!user?.id) {
+        throw new Error("User ID is required");
       }
-      setStatus(newStatus);
-      toast.success(`Status for ${user.fullName} changed to ${newStatus}`);
+      
+      const upperStatus = newStatus.toUpperCase();
+      if (!ALLOWED_STATUSES.includes(upperStatus as typeof ALLOWED_STATUSES[number])) {
+        throw new Error("Invalid status value");
+      }
+      
+      await UserService.updateUserStatus(user.id, upperStatus);
+      setStatus(upperStatus);
+      toast.success(`Status for ${user.fullName} changed to ${upperStatus}`);
     } catch (error) {
       console.error("Error changing status:", error);
       toast.error("Error changing status. Please try again.");
@@ -94,8 +100,7 @@ export function UserHeader({
   };
 
   const renderStatusBadge = () => {
-    const allowedStatuses = ["active","invited", "inactive"];
-    const currentStatus = status.toLowerCase();
+    const currentStatus = status.toUpperCase();
 
     return (
       <div className="flex items-center gap-2">
@@ -107,11 +112,11 @@ export function UserHeader({
             <Badge 
               className={`${getStatusBadgeStyle(currentStatus)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80 capitalize`}
             >
-              {status}
+              {currentStatus}
             </Badge>
           </SelectTrigger>
           <SelectContent>
-            {allowedStatuses.map((statusOption) => (
+            {ALLOWED_STATUSES.map((statusOption) => (
               <SelectItem 
                 key={statusOption} 
                 value={statusOption}
@@ -123,7 +128,7 @@ export function UserHeader({
           </SelectContent>
         </Select>
 
-        {(currentStatus === "invited" || currentStatus === "pending") && (
+        {(currentStatus === "INVITED") && (
           <Button
             variant="outline"
             className="transition-all duration-300"
