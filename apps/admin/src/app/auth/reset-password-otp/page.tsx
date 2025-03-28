@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputOTP, InputOTPSlot, InputOTPGroup, InputOTPSeparator } from "@/components/ui/input-otp"
-import AuthService from "@/services/auth.service"
+import AuthService from "@/lib/services/auth.service"
 import { useState, useEffect } from "react"
 
 const FormSchema = z.object({

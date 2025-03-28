@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AuthService from '@/services/auth.service';
+import { authService } from '@/lib/api/services';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 
@@ -45,9 +45,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        if (AuthService.isLoggedIn()) {
+        if (authService.isLoggedIn()) {
           // Get user from storage
-          const userData = AuthService.getCurrentUser();
+          const userData = authService.getCurrentUser();
           if (userData) {
             setUser(userData);
           } else {
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string, callbackUrl: string = '/dashboard'): Promise<User> => {
     setIsLoading(true);
     try {
-      const userData = await AuthService.login({ email, password });
+      const userData = await authService.login({ email, password });
       setUser(userData);
       
       // Set the cookie for middleware to recognize user is logged in
@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const adminLogin = async (email: string, password: string, callbackUrl: string = '/dashboard'): Promise<User> => {
     setIsLoading(true);
     try {
-      const userData = await AuthService.adminLogin({ email, password });
+      const userData = await authService.adminLogin({ email, password });
       setUser(userData);
       
       // Set the cookie for middleware to recognize user is logged in
@@ -153,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       // Call logout and wait for API call to complete
-      await AuthService.logout();
+      await authService.logout();
       
       // Set user to null to update UI
       setUser(null);

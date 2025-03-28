@@ -18,7 +18,7 @@ import {
 import { ArrowLeft } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import AuthService from "@/services/auth.service"
+import AuthService from "@/lib/services/auth.service"
 import { useState } from "react"
 
 const FormSchema = z.object({

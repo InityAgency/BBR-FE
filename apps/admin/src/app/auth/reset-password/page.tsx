@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import AuthService from "@/services/auth.service"
+import AuthService from "@/lib/services/auth.service"
 
 // Importing Lucide icons for "Show/Hide" password functionality
 import { Eye, EyeOff } from "lucide-react"

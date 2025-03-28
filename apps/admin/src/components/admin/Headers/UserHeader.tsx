@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import FormHeader from "@/components/admin/Headers/FormHeader";
 import { User } from "@/app/types/models/User";
-import UserService from "@/services/user.service";
+import UserService from "@/lib/services/user.service";
 
 const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"] as const;
 

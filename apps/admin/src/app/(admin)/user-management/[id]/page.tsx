@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AdminLayout from "../../AdminLayout";
-import UserService from "@/services/user.service";
+import UserService from "@/lib/services/user.service";
 import { User } from "@/app/types/models/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
