@@ -41,7 +41,13 @@ export function useTableFilters<TData>({
       
       return [...new Set(locations)].sort();
     } else {
-      const locations = data.map(item => item[locationAccessor] as unknown as string);
+      const locations = data.map(item => {
+        const value = item[locationAccessor];
+        if (value && typeof value === 'object' && 'name' in value) {
+          return (value as { name: string }).name;
+        }
+        return value as string;
+      });
       return [...new Set(locations)].sort();
     }
   }, [data, locationAccessor, useNestedFilter, nestedField]);
@@ -56,6 +62,7 @@ export function useTableFilters<TData>({
   // Filtriramo lokacije prema pretrazi
   const filteredLocations = useMemo(() => {
     return uniqueLocations.filter(location => 
+      location && typeof location === 'string' && 
       location.toLowerCase().includes(locationSearchValue.toLowerCase())
     );
   }, [uniqueLocations, locationSearchValue]);
@@ -63,28 +70,38 @@ export function useTableFilters<TData>({
   // Primenjujemo filtere po lokaciji
   useEffect(() => {
     if (locationAccessor) {
-      // Explicitno postavimo filter funkciju pre nego što postavimo vrednost filtera
-      const locationColumn = table.getColumn(locationAccessor as string);
-      
-      if (locationColumn) {
-        // Postavljamo funkciju filtera eksplicitno 
-        locationColumn.columnDef.filterFn = useNestedFilter 
-          ? nestedFieldFilter 
-          : multiSelectFilter;
+      try {
+        // Explicitno postavimo filter funkciju pre nego što postavimo vrednost filtera
+        const locationColumn = table.getColumn(locationAccessor as string);
         
-        // Ako koristimo nested filter, dodajemo meta podatke
-        if (useNestedFilter) {
-          locationColumn.columnDef.meta = {
-            ...locationColumn.columnDef.meta,
-            nestedField
-          };
+        if (locationColumn) {
+          // Postavljamo funkciju filtera eksplicitno 
+          locationColumn.columnDef.filterFn = useNestedFilter 
+            ? nestedFieldFilter 
+            : multiSelectFilter;
+          
+          // Ako koristimo nested filter, dodajemo meta podatke
+          if (useNestedFilter) {
+            locationColumn.columnDef.meta = {
+              ...locationColumn.columnDef.meta,
+              nestedField
+            };
+          } else {
+            // Dodajemo meta podatke za filtriranje po brandType.name
+            locationColumn.columnDef.meta = {
+              ...locationColumn.columnDef.meta,
+              nestedField: 'name'
+            };
+          }
+          
+          if (selectedLocations.length > 0) {
+            locationColumn.setFilterValue(selectedLocations);
+          } else {
+            locationColumn.setFilterValue(undefined);
+          }
         }
-        
-        if (selectedLocations.length > 0) {
-          locationColumn.setFilterValue(selectedLocations);
-        } else {
-          locationColumn.setFilterValue(undefined);
-        }
+      } catch (error) {
+        console.warn(`Column ${String(locationAccessor)} not found in table`);
       }
     }
   }, [selectedLocations, table, locationAccessor, useNestedFilter, nestedField]);
@@ -92,18 +109,22 @@ export function useTableFilters<TData>({
   // Primenjujemo filtere po statusu
   useEffect(() => {
     if (statusAccessor) {
-      // Explicitno postavimo filter funkciju pre nego što postavimo vrednost filtera
-      const statusColumn = table.getColumn(statusAccessor as string);
-      
-      if (statusColumn) {
-        // Postavljamo funkciju filtera eksplicitno
-        statusColumn.columnDef.filterFn = multiSelectFilter;
+      try {
+        // Explicitno postavimo filter funkciju pre nego što postavimo vrednost filtera
+        const statusColumn = table.getColumn(statusAccessor as string);
         
-        if (selectedStatuses.length > 0) {
-          statusColumn.setFilterValue(selectedStatuses);
-        } else {
-          statusColumn.setFilterValue(undefined);
+        if (statusColumn) {
+          // Postavljamo funkciju filtera eksplicitno
+          statusColumn.columnDef.filterFn = multiSelectFilter;
+          
+          if (selectedStatuses.length > 0) {
+            statusColumn.setFilterValue(selectedStatuses);
+          } else {
+            statusColumn.setFilterValue(undefined);
+          }
         }
+      } catch (error) {
+        console.warn(`Column ${String(statusAccessor)} not found in table`);
       }
     }
   }, [selectedStatuses, table, statusAccessor]);

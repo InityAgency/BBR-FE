@@ -112,11 +112,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/brands",
       icon: Sparkle,
       items: [
-        {
-          title: "Pending Activations",
-          url: "/brands?status=Pending",
-          badge: pendingBrandsCount,
-        },
+        // {
+        //   title: "Pending Activations",
+        //   url: "/brands?status=PENDING",
+        //   badge: pendingBrandsCount,
+        // },
         {
           title: "Brand Types",
           url: "/brands/types",

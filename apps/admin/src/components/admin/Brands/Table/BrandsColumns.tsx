@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Brand } from "../../../../app/types/models/Brand";
+import { format } from "date-fns";
 
 // Helper funkcije za renderovanje ćelija
 const renderNameCell = (value: string, id: string) => (
@@ -21,16 +22,14 @@ const renderNameCell = (value: string, id: string) => (
     </div>
 );
 
-
-
-const renderTypeCell = (type: string) => (
-  <div className="max-w-[180px] truncate" title={type}>
-    {type}
+const renderTypeCell = (brandType: any) => (
+  <div className="max-w-[180px] truncate" title={brandType?.name || '-'}>
+    {brandType?.name || '-'}
   </div>
 );
 
-const renderNumberCell = (number: number) => (
-  <div className="text-center">{number}</div>
+const renderNumberCell = (number: number | null | undefined) => (
+  <div className="text-center">{number ?? '-'}</div>
 );
 
 const renderStatusCell = (status: string) => {
@@ -38,19 +37,19 @@ const renderStatusCell = (status: string) => {
   let badgeClass = "";
   
   switch(status) {
-    case "Active":
+    case "ACTIVE":
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300";
       break;
-    case "Pending":
+    case "PENDING":
       badgeVariant = "secondary";
       badgeClass = "bg-yellow-900/55 text-yellow-300";
       break;
-    case "Deleted":
+    case "DELETED":
       badgeVariant = "destructive";
       badgeClass = "bg-red-900/55 text-red-300";
       break;
-    case "Draft":
+    case "DRAFT":
       badgeVariant = "outline";
       badgeClass = "bg-gray-900/80 text-gray-300";
       break;
@@ -58,6 +57,12 @@ const renderStatusCell = (status: string) => {
   
   return <Badge variant={badgeVariant} className={badgeClass}>{status}</Badge>;
 };
+
+const renderDateCell = (date: string) => (
+  <div className="w-[180px]">
+    {date ? format(new Date(date), "dd.MM.yyyy. HH:mm") : "-"}
+  </div>
+);
 
 export const columns: ColumnDef<Brand>[] = [
   {
@@ -107,7 +112,7 @@ export const columns: ColumnDef<Brand>[] = [
     }
   },
   {
-    accessorKey: "type",
+    accessorKey: "brandType",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -118,7 +123,7 @@ export const columns: ColumnDef<Brand>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => renderTypeCell(row.getValue("type")),
+    cell: ({ row }) => renderTypeCell(row.getValue("brandType")),
     meta: {
       width: "w-[180px]"
     }
@@ -141,7 +146,7 @@ export const columns: ColumnDef<Brand>[] = [
     }
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "registeredAt",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -152,7 +157,7 @@ export const columns: ColumnDef<Brand>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="w-[180px]">{row.getValue("updatedAt")}</div>,
+    cell: ({ row }) => renderDateCell(row.getValue("registeredAt")),
     meta: {
       width: "w-[180px]"
     }

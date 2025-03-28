@@ -24,7 +24,7 @@ const nextConfig = {
   },
   transpilePackages: ["ui"],
   images: {
-    domains: ['tailwindui.com', 'images.unsplash.com', 'bbr-bucket.s3.amazonaws.com', 'bbr-bucket.s3.eu-west-2.amazonaws.com'],
+    domains: ['tailwindui.com', 'images.unsplash.com', 'bbr-bucket.s3.amazonaws.com', 'bbr-bucket.s3.eu-west-2.amazonaws.com', 'localhost'],
   },
   eslint: {
     // Isključujemo proveru ESLint grešaka tokom build procesa

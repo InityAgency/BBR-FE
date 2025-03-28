@@ -32,14 +32,6 @@ const FormHeader: React.FC<FormHeaderProps> = ({
   customButtons,
   hideDefaultButtons = false,
 }) => {
-  // Debugging log
-  console.log("FormHeader props:", { 
-    title, 
-    onSave: onSave instanceof Function, 
-    onDiscard: onDiscard instanceof Function,
-    saveButtonDisabled,
-    isSubmitting
-  });
 
   const handleSave = React.useCallback(() => {
     if (onSave instanceof Function) {

@@ -18,11 +18,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 const ITEMS_PER_PAGE = 10;
 
 // Popravka za kolone da koriste BrandsActions
-const enhancedColumns = columns.map(column => {
+const enhancedColumns = (fetchBrands: (page: number) => Promise<void>) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
-      cell: (props: CellContext<Brand, unknown>) => <BrandsActions row={props.row} />
+      cell: (props: CellContext<Brand, unknown>) => <BrandsActions row={props.row} onDelete={fetchBrands} />
     };
   }
   return column;
@@ -93,6 +93,7 @@ interface BrandsTableProps {
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
   initialStatusFilter?: string | null;
+  fetchBrands: (page: number) => Promise<void>;
 }
 
 export function BrandsTable({
@@ -104,7 +105,8 @@ export function BrandsTable({
   goToNextPage,
   goToPreviousPage,
   goToPage,
-  initialStatusFilter
+  initialStatusFilter,
+  fetchBrands
 }: BrandsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -114,8 +116,8 @@ export function BrandsTable({
     setGlobalFilter: setTableGlobalFilter,
   } = useTable<Brand>({
     data: brands,
-    columns: enhancedColumns,
-    initialSorting: [{ id: "updatedAt", desc: true }],
+    columns: enhancedColumns(fetchBrands),
+    initialSorting: [{ id: "registeredAt", desc: true }],
     globalFilterFn: (row, columnId, value, addMeta) => {
       // Koristimo našu univerzalnu funkciju
       const result = fuzzyFilter(row, columnId, value, addMeta);
@@ -151,8 +153,10 @@ export function BrandsTable({
   } = useTableFilters<Brand>({
     table,
     data: brands,
-    locationAccessor: "type",
+    locationAccessor: "brandType",
     statusAccessor: "status",
+    useNestedFilter: true,
+    nestedField: "name"
   });
 
   // Primeni inicijalni filter za status ako postoji
@@ -168,8 +172,8 @@ export function BrandsTable({
   // Helper funkcije za stilizovanje redova i ćelija
   const getRowClassName = (row: any) => {
     const status = row.original.status;
-    if (status === "Deleted") return "opacity-60";
-    if (status === "Draft") return "opacity-80";
+    if (status === "DELETED") return "opacity-60";
+    if (status === "DRAFT") return "opacity-80";
     return "";
   };
 

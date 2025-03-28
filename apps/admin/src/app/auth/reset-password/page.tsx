@@ -17,15 +17,15 @@ import { Eye, EyeOff } from "lucide-react"
 // Move the schema inside the component or to a separate file
 const formSchema = z.object({
   newPassword: z.string()
-    .min(8, { message: "Lozinka mora biti najmanje 8 karaktera dugačka" })
-    .regex(/[A-Z]/, { message: "Lozinka mora sadržati najmanje jedno veliko slovo" })
-    .regex(/[a-z]/, { message: "Lozinka mora sadržati najmanje jedno malo slovo" })
-    .regex(/[0-9]/, { message: "Lozinka mora sadržati najmanje jedan broj" })
-    .regex(/[!@#$%^&*()]/, { message: "Lozinka mora sadržati najmanje jedan specijalni karakter" }),
+    .min(8, { message: "Password must be at least 8 characters long" })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" })
+    .regex(/[!@#$%^&*()]/, { message: "Password must contain at least one special character" }),
 
   confirmPassword: z.string()
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Lozinke se ne podudaraju",
+  message: "Passwords do not match",
   path: ["confirmPassword"]
 })
 
@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     const resetToken = localStorage.getItem('resetToken')
     if (!resetToken) {
-      toast.error("Token za resetovanje nije pronađen. Molimo vas da ponovo pokrenete proces resetovanja lozinke.")
+      toast.error("Reset token not found. Please start the password reset process again.")
       router.push('/auth/reset-password-request')
     }
   }, [router])
@@ -62,14 +62,14 @@ export default function ResetPasswordPage() {
       const success = await AuthService.resetPassword(data.newPassword)
       
       if (success) {
-        toast.success("Vaša lozinka je uspešno resetovana.")
+        toast.success("Your password has been successfully reset.")
         router.push('/auth/login')
       } else {
-        toast.error("Neuspelo resetovanje lozinke. Molimo vas da pokušate ponovo.")
+        toast.error("Failed to reset password. Please try again.")
       }
     } catch (error) {
-      console.error('Greška pri resetovanju lozinke:', error)
-      toast.error(error instanceof Error ? error.message : "Došlo je do greške pri resetovanju lozinke.")
+      console.error('Error resetting password:', error)
+      toast.error(error instanceof Error ? error.message : "An error occurred while resetting the password.")
     } finally {
       setIsLoading(false)
     }
@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
         <div className="flex flex-col items-start gap-2 mb-6">
           <h1 className="text-2xl font-bold">Resetujte svoju lozinku</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Unesite svoju novu lozinku.
+            Enter your new password.
           </p>
         </div>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
             name="newPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nova lozinka</FormLabel>
+                <FormLabel>New password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -123,7 +123,7 @@ export default function ResetPasswordPage() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Potvrdite lozinku</FormLabel>
+                <FormLabel>Confirm password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -154,7 +154,7 @@ export default function ResetPasswordPage() {
             className="cursor-pointer transition-all w-full"
             disabled={isLoading}
           >
-            {isLoading ? "Resetovanje..." : "Resetuj lozinku"}
+            {isLoading ? "Resetting..." : "Reset password"}
           </Button>
         </form>
       </Form>

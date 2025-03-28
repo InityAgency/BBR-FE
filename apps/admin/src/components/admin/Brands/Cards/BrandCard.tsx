@@ -13,19 +13,19 @@ const renderStatusBadge = (status: string) => {
   let badgeClass = "";
   
   switch(status) {
-    case "Active":
+    case "ACTIVE":
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300";
       break;
-    case "Pending":
+    case "PENDING":
       badgeVariant = "secondary";
       badgeClass = "bg-yellow-900/55 text-yellow-300";
       break;
-    case "Deleted":
+    case "DELETED":
       badgeVariant = "destructive";
       badgeClass = "bg-red-900/55 text-red-300";
       break;
-    case "Draft":
+    case "DRAFT":
       badgeVariant = "outline";
       badgeClass = "bg-gray-900/80 text-gray-300";
       break;
@@ -50,22 +50,25 @@ export function BrandCard({ brand }: BrandCardProps) {
               </a>
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5"># {brand.id}</p>
+            {brand.description && (
+              <p className="text-sm text-muted-foreground mt-1">{brand.description}</p>
+            )}
           </div>
         </div>
 
         <div className="space-y-2 ">
           <div className="text-sm mt-3 mb-3 border-b border-border pb-2">
-            <span className="text-white">{brand.type}</span>
+            <span className="text-muted-foreground">{brand.brandType.name}</span>
           </div>
           
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5">
               <Building2 className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{brand.numberOfResidences} residences</span>
+              <span className="font-medium">-</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{brand.updatedAt}</span>
+              <span className="text-muted-foreground">{new Date(brand.registeredAt).toLocaleDateString()}</span>
             </div>
           </div>
         </div>

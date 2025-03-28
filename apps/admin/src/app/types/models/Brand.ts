@@ -1,16 +1,30 @@
 // app/types/models/Brand.ts
 
-export type BrandStatus = "Active" | "Pending" | "Deleted" | "Draft";
-export type BrandType = "Luxury Hotel Resort" | "Fashion and Lifestyle" | "Residential" | "Commercial";
+export type BrandStatus = "ACTIVE" | "PENDING" | "DELETED" | "DRAFT";
 
-export interface Brand {
-  createdAt: string;
+interface BrandType {
   id: string;
   name: string;
-  type: BrandType;
-  description?: string;
-  numberOfResidences: number;
+  createdAt: string;
   updatedAt: string;
+  deletedAt: string | null;
+}
+
+interface Logo {
+  id: string;
+  originalFileName: string;
+  mimeType: string;
+  uploadStatus: string;
+  size: number;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  description?: string;
   status: BrandStatus;
-  logo?: string;
+  registeredAt: string;
+  brandTypeId: string;
+  brandType: BrandType;
+  logo?: Logo;
 }

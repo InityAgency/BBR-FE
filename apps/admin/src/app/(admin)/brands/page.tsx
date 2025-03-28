@@ -110,6 +110,7 @@ export default function BrandsPage() {
         goToPreviousPage={goToPreviousPage}
         goToPage={goToPage}
         initialStatusFilter={searchParams.get("status")}
+        fetchBrands={fetchBrands}
       />
     </AdminLayout>
   );

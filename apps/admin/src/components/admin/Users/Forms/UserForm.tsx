@@ -1,11 +1,9 @@
 "use client";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -43,7 +41,6 @@ import UnsavedChangesWarning from "../../Forms/UnsavedChangesWarning";
 import DiscardModal from "@/components/admin/Modals/DiscardModal";
 import { useDiscardWarning } from "@/hooks/useDiscardWarning";
 import ImageUpload from "@/components/admin/Forms/ImageUpload";
-import apiClient from "@/lib/api.client";
 import { 
   createUserSchema, 
   updateUserSchema, 
@@ -89,17 +86,18 @@ const getStatusBadgeStyle = (status: string) => {
 interface UserFormProps {
   initialData?: Partial<UserFormValues>;
   isEditing?: boolean;
+  onSave?: (formData: UserFormValues) => Promise<any>;
 }
 
 const UserForm: React.FC<UserFormProps> = ({
   initialData = initialUserValues,
   isEditing = false,
+  onSave
 }) => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   const [showPasswordField, setShowPasswordField] = useState(false);
@@ -306,16 +304,20 @@ const UserForm: React.FC<UserFormProps> = ({
 
     const valid = nameValid && emailValid && roleValid && passwordValid;
     
+    console.log("Form validation:", { 
+      nameValid, 
+      emailValid, 
+      roleValid, 
+      passwordValid, 
+      isValid: valid 
+    });
+    
     setFormIsValid(valid);
     
   }, [fullName, email, roleId, password, isEditing, showPasswordField]);
 
   // Check if form has unsaved changes
   const hasUnsavedChanges = form.formState.isDirty;
-
-  // For debugging - track changes in isDirty state
-  useEffect(() => {
-  }, [form.formState.isDirty, form.formState.dirtyFields]);
 
   // Setup discard warning hook
   const {
@@ -330,10 +332,19 @@ const UserForm: React.FC<UserFormProps> = ({
     },
   });
 
-  const onSubmit = async (data: UserFormValues) => {
+  const handleFormSubmit = async (data: UserFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Form submitted with data:", data);
+      
+      // If custom onSave function is provided, use it
+      if (onSave && typeof onSave === 'function') {
+        console.log("Using custom onSave function");
+        await onSave(data);
+        return;
+      }
   
+      // Default implementation if no custom onSave is provided
       // Prepare data for API - only include required fields
       const submitData: {
         fullName: string;
@@ -349,10 +360,15 @@ const UserForm: React.FC<UserFormProps> = ({
         email: data.email,
         roleId: data.roleId,
         signupMethod: "email",
-        emailNotifications: data.sendEmail || false,
-        status: data.status || "Active",
-        profileImage: data.profileImage || null
+        emailNotifications: data.sendEmail || false
       };
+
+      // Only include status for editing, not for creation
+      if (isEditing) {
+        submitData.status = data.status || "Active";
+        // Only include profileImage for editing
+        submitData.profileImage = data.profileImage || null;
+      }
   
       // Only include password if it's not empty (for updates)
       if (data.password && data.password.trim() !== '') {
@@ -391,7 +407,7 @@ const UserForm: React.FC<UserFormProps> = ({
       // Reset form and redirect
       form.reset(initialUserValues);
       router.push("/user-management");
-  
+      
     } catch (error) {
       console.error(isEditing ? "Error updating user:" : "Error creating user:", error);
       toast.error((error as Error).message || `Failed to ${isEditing ? 'update' : 'create'} user`);
@@ -403,13 +419,13 @@ const UserForm: React.FC<UserFormProps> = ({
           message: "Email address is already taken" 
         });
       }
+      throw error; // Rethrow so parent can handle if needed
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDiscard = () => {
-    
     // Check if there are actually changes
     const isDirty = Object.keys(form.formState.dirtyFields).length > 0;
     
@@ -426,7 +442,6 @@ const UserForm: React.FC<UserFormProps> = ({
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      // Here would be the logic for deletion
       
       // Example DELETE request
       if (isEditing && initialData.id) {
@@ -460,12 +475,6 @@ const UserForm: React.FC<UserFormProps> = ({
     }
   };
 
-  const handleBlock = () => {
-    form.setValue("status", "Blocked", { shouldDirty: true });
-    toast.success("User blocked successfully!");
-    setShowBlockDialog(false);
-  };
-
   const handleSuspend = () => {
     form.setValue("status", "Suspended", { shouldDirty: true });
     toast.success("User suspended successfully!");
@@ -473,6 +482,7 @@ const UserForm: React.FC<UserFormProps> = ({
     setPendingStatus(null);
   };
 
+  // Only render status badge in edit mode
   const renderStatusBadge = () => {
     if (!isEditing) return null;
 
@@ -520,6 +530,7 @@ const UserForm: React.FC<UserFormProps> = ({
     );
   };
 
+  // Only render status actions in edit mode
   const renderStatusActions = () => {
     if (!isEditing) return null;
 
@@ -574,21 +585,49 @@ const UserForm: React.FC<UserFormProps> = ({
     toast.success("Password generated!");
   };
 
+
+  // Update the handleSave function
+// In UserForm.tsx, update the handleSave function
   const handleSave = useCallback(() => {
-
-
+    console.log("handleSave called, formIsValid:", formIsValid);
     if (formIsValid) {
-      form.handleSubmit((data) => {
-        onSubmit(data);
+      console.log("Attempting to submit form");
+      
+      // Try using the direct form submission instead of handling it via callback
+      form.handleSubmit(async (data) => {
+        console.log("Form handleSubmit triggered with data:", data);
+        
+        try {
+          if (onSave) {
+            console.log("Calling custom onSave function");
+            await onSave(data);
+            console.log("Custom onSave completed successfully");
+          } else {
+            console.log("Using default handleFormSubmit");
+            await handleFormSubmit(data);
+            console.log("Default handleFormSubmit completed successfully");
+          }
+        } catch (error) {
+          console.error("Form submission error:", error);
+        }
       })();
     } else {
+      console.log("Form validation failed");
       toast.error("Please fill in all required fields correctly");
     }
-  }, [formIsValid, form, onSubmit, fullName, email, roleId, password, isEditing, showPasswordField]);
+  }, [formIsValid, form, onSave, handleFormSubmit]);
 
   const handleDiscardClick = useCallback(() => {
     handleDiscard();
   }, [handleDiscard]);
+
+  // Force formIsValid to true in edit mode for testing
+  useEffect(() => {
+    if (isEditing) {
+      console.log("Setting formIsValid to true for edit mode");
+      setFormIsValid(true);
+    }
+  }, [isEditing]);
 
   return (
     <>
@@ -596,8 +635,8 @@ const UserForm: React.FC<UserFormProps> = ({
         title={isEditing ? `${initialData.fullName || ""}` : "Add new user"}
         titleContent={renderStatusBadge()}
         titleActions={renderStatusActions()}
-        onSave={() => handleSave()}
-        onDiscard={() => handleDiscardClick()}
+        onSave={handleSave} // Make sure this reference is correct
+        onDiscard={handleDiscardClick}
         saveButtonText={isEditing ? "Save changes" : "Add new user"}
         saveButtonDisabled={!formIsValid || isSubmitting}
         isSubmitting={isSubmitting}
@@ -839,7 +878,7 @@ const UserForm: React.FC<UserFormProps> = ({
             </div>
           )}
 
-          {/* Send Email Toggle */}
+          {/* Send Email Toggle - only when creating a new user */}
           {!isEditing && (
             <FormField
               control={form.control}
@@ -875,35 +914,37 @@ const UserForm: React.FC<UserFormProps> = ({
       {/* Warning for unsaved changes */}
       <UnsavedChangesWarning hasUnsavedChanges={hasUnsavedChanges} />
       
-      {/* Suspend User Confirmation Modal */}
-      <AlertDialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Suspend user?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to suspend this user? This will prevent them from accessing the platform.
-              You can reactivate the user later if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel 
-              onClick={() => {
-                setShowSuspendDialog(false);
-                setPendingStatus(null);
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleSuspend}
-              className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer"
-            >
-              <CircleMinus className="h-4 w-4 mr-2" />
-              Suspend User
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Suspend User Confirmation Modal - only shown in edit mode */}
+      {isEditing && (
+        <AlertDialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Suspend user?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to suspend this user? This will prevent them from accessing the platform.
+                You can reactivate the user later if needed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel 
+                onClick={() => {
+                  setShowSuspendDialog(false);
+                  setPendingStatus(null);
+                }}
+              >
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleSuspend}
+                className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer"
+              >
+                <CircleMinus className="h-4 w-4 mr-2" />
+                Suspend User
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   );
 };

@@ -41,15 +41,15 @@ export default function ResetPasswordRequestPage() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       setIsLoading(true)
-      
-      // Poziv API-ja za resetovanje lozinke
+        
+      // API call for password reset
       await AuthService.requestResetPassword(data.email)
       
-      toast.success("Link za resetovanje lozinke je poslat na vaš email.")
+      toast.success("Link for password reset has been sent to your email.")
       router.push('/auth/reset-password-otp')
     } catch (error) {
-      console.error('Greška pri resetovanju lozinke:', error)
-      toast.error(error instanceof Error ? error.message : "Došlo je do greške pri resetovanju lozinke.")
+      console.error('Error resetting password:', error)
+      toast.error(error instanceof Error ? error.message : "An error occurred while resetting the password.")
     } finally {
       setIsLoading(false)
     }

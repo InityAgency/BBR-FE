@@ -40,26 +40,55 @@ import ImageUpload from "@/components/admin/Forms/ImageUpload";
 import UnsavedChangesWarning from "../../Forms/UnsavedChangesWarning";
 import DiscardModal from "@/components/admin/Modals/DiscardModal";
 import { useDiscardWarning } from "@/hooks/useDiscardWarning";
-import { brandSchema, brandTypes, BrandFormValues, initialBrandValues } from "@/app/schemas/brand";
+import { brandSchema, BrandFormValues, initialBrandValues } from "@/app/schemas/brand";
 import { Check, Trash2, X } from "lucide-react";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+
+// Define interface for brand type from API
+interface BrandTypeApiResponse {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Response from media upload
+interface MediaUploadResponse {
+  data: {
+    id: string;
+    url: string;
+  };
+  statusCode: number;
+  message: string;
+}
 
 const getStatusBadgeStyle = (status: string) => {
   switch(status) {
-    case "Active":
+    case "ACTIVE":
       return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50";
-    case "Pending":
+    case "PENDING":
       return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
-    case "Deleted":
-      return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
-    case "Draft":
+    case "DRAFT":
       return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
+    case "DELETED":
+      return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
     default:
       return "";
   }
 };
 
 interface BrandFormProps {
-  initialData?: Partial<BrandFormValues>;
+  initialData?: Partial<BrandFormValues> & { 
+    id?: string;
+    logo?: {
+      id: string;
+      originalFileName: string;
+      mimeType: string;
+      uploadStatus: string;
+      size: number;
+    } | null;
+  };
   isEditing?: boolean;
 }
 
@@ -72,6 +101,10 @@ const BrandForm: React.FC<BrandFormProps> = ({
   const [logoValid, setLogoValid] = useState(initialData?.logo ? true : false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [brandTypeOptions, setBrandTypeOptions] = useState<BrandTypeApiResponse[]>([]);
+  const [loadingBrandTypes, setLoadingBrandTypes] = useState(true);
+  const [logoChanged, setLogoChanged] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandSchema),
@@ -79,21 +112,102 @@ const BrandForm: React.FC<BrandFormProps> = ({
     mode: "onChange", // Validate on change
   });
 
+  // Fetch brand types from API when component mounts
+  useEffect(() => {
+    const fetchBrandTypes = async () => {
+      try {
+        setLoadingBrandTypes(true);
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/brand-types`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch brand types: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.data && Array.isArray(data.data)) {
+          setBrandTypeOptions(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching brand types:', error);
+        toast.error('Failed to load brand types');
+      } finally {
+        setLoadingBrandTypes(false);
+      }
+    };
+
+    fetchBrandTypes();
+  }, []);
+
+  // Fetch and create blob URL for logo when component mounts
+  useEffect(() => {
+    const fetchLogoBlob = async () => {
+      if (!initialData.logo?.id) return;
+      
+      console.log('Fetching logo with ID:', initialData.logo.id);
+      console.log('Logo mime type:', initialData.logo.mimeType);
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/media/${initialData.logo.id}/content`, {
+          credentials: 'include',
+          headers: {
+            'Accept': '*/*',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch logo: ${response.status}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        console.log('Received array buffer size:', arrayBuffer.byteLength);
+        
+        const blob = new Blob([arrayBuffer], { type: initialData.logo.mimeType });
+        console.log('Created blob:', blob);
+        
+        const url = URL.createObjectURL(blob);
+        console.log('Created URL:', url);
+        
+        setLogoUrl(url);
+      } catch (error) {
+        console.error('Error fetching logo:', error);
+        toast.error('Failed to load logo');
+      }
+    };
+
+    fetchLogoBlob();
+
+    // Clean up blob URL when component unmounts
+    return () => {
+      if (logoUrl) {
+        console.log('Cleaning up URL:', logoUrl);
+        URL.revokeObjectURL(logoUrl);
+      }
+    };
+  }, [initialData.logo?.id]);
+
   // Watch required form fields
   const brandName = form.watch("name");
-  const brandType = form.watch("type");
+  const brandTypeId = form.watch("brandTypeId");
   const brandStatus = form.watch("status");
+  const logo = form.watch("logo");
 
   // Determine if the form is valid - all required fields must be filled
   const isFormValid = 
     !!brandName && 
     brandName.trim().length >= 2 && 
-    !!brandType && 
+    !!brandTypeId && 
     !!brandStatus &&
-    logoValid;
-    
+    (isEditing || logoValid); // Logo je obavezan samo pri kreiranju
+
   // Check if form has unsaved changes
-  const hasUnsavedChanges = form.formState.isDirty || form.formState.dirtyFields.logo;
+  const hasUnsavedChanges = form.formState.isDirty || logoChanged;
 
   // Setup discard warning hook
   const {
@@ -108,45 +222,124 @@ const BrandForm: React.FC<BrandFormProps> = ({
     },
   });
 
-  // Zakačimo se na promene vrednosti logo-a u formi
+  // Handle file upload for logo
+  const uploadLogo = async (file: File): Promise<{ id: string, url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/media?type=BRAND`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to upload logo: ${response.status}`);
+      }
+      
+      const data = await response.json() as MediaUploadResponse;
+      return { id: data.data.id, url: data.data.url };
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      throw new Error('Failed to upload logo');
+    }
+  };
+
+  // Monitor logo changes
   useEffect(() => {
-    // Kada se promeni logo u formi, proveravamo da li je validan
-    const logoValue = form.getValues("logo");
-    setLogoValid(!!logoValue);
-  }, [form.watch("logo")]);
+    console.log('Logo changed:', logo);
+    console.log('Initial logo:', initialData.logo);
+    if (logo !== initialData.logo && logo !== undefined) {
+      setLogoChanged(true);
+    }
+  }, [logo, initialData.logo]);
 
   const onSubmit = async (data: BrandFormValues) => {
     try {
       setIsSubmitting(true);
       
       // Double check that all required fields are present
-      if (!data.name || !data.type || !data.logo) {
+      if (!data.name || !data.brandTypeId || (!isEditing && !data.logo && !initialData.logo?.id)) {
         if (!data.name) {
           form.setError("name", { type: "required", message: "Brand name is required" });
         }
-        if (!data.type) {
-          form.setError("type", { type: "required", message: "Brand type is required" });
+        if (!data.brandTypeId) {
+          form.setError("brandTypeId", { type: "required", message: "Brand type is required" });
         }
-        if (!data.logo) {
+        if (!isEditing && !data.logo && !initialData.logo?.id) {
           form.setError("logo", { type: "required", message: "Brand logo is required" });
         }
         
         toast.error("Please fill in all required fields");
+        setIsSubmitting(false);
         return;
       }
       
-      // Here you would normally submit the data to your API
-      console.log("Form data to submit:", data);
+      // Upload logo if changed
+      let logoId = initialData.logo?.id;
       
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (logoChanged && data.logo instanceof File) {
+        try {
+          const uploadResult = await uploadLogo(data.logo);
+          logoId = uploadResult.id;
+        } catch (error) {
+          toast.error("Failed to upload logo");
+          console.error("Logo upload error:", error);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      
+      // Prepare data for API
+      const payload: any = {
+        name: data.name,
+        description: data.description || undefined,
+        brandTypeId: data.brandTypeId,
+        status: data.status
+      };
+
+      // Add logoId only if it exists or was changed
+      if (logoId || logoChanged) {
+        payload.logoId = logoId;
+      }
+      
+      // Add registeredAt for new brands or keep existing for edits
+      if (isEditing) {
+        payload.registeredAt = initialData.registeredAt;
+      } else {
+        payload.status = "ACTIVE";
+        payload.registeredAt = new Date().toISOString().split('T')[0];
+      }
+      
+      console.log("Submitting brand data:", payload);
+      
+      // Submit data to API
+      const url = isEditing 
+        ? `${API_BASE_URL}/api/${API_VERSION}/brands/${initialData.id}`
+        : `${API_BASE_URL}/api/${API_VERSION}/brands`;
+      
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error ${isEditing ? 'updating' : 'creating'} brand`);
+      }
       
       toast.success(isEditing ? "Brand updated successfully!" : "Brand created successfully!");
       router.push("/brands");
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("An error occurred. Please try again.");
-    } finally {
+      console.error('Form submission error:', error);
+      toast.error('Failed to save brand');
       setIsSubmitting(false);
     }
   };
@@ -160,31 +353,63 @@ const BrandForm: React.FC<BrandFormProps> = ({
   };
 
   const handleDelete = async () => {
+    if (!initialData?.id) return;
+    
     try {
-      setIsSubmitting(true);
-      // Ovde bi išla logika za brisanje
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("Brand deleted successfully!");
-      router.push("/brands");
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/brands/${initialData.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete brand: ${response.status}`);
+      }
+
+      toast.success('Brand deleted successfully');
+      router.push('/brands');
+      router.refresh();
     } catch (error) {
-      console.error("Error deleting brand:", error);
-      toast.error("An error occurred while deleting the brand.");
-    } finally {
-      setIsSubmitting(false);
-      setShowDeleteDialog(false);
+      console.error('Error deleting brand:', error);
+      toast.error('Failed to delete brand');
     }
   };
 
   const handleReject = () => {
-    form.setValue("status", "Deleted");
+    form.setValue("status", "Deleted", { shouldDirty: true });
     toast.success("Brand rejected successfully!");
     setShowRejectDialog(false);
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!initialData?.id) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/brands/${initialData.id}/status`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update status: ${response.status}`);
+      }
+
+      form.setValue("status", newStatus, { shouldDirty: true });
+      toast.success(`Brand status updated to ${newStatus}`);
+      router.refresh();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update brand status');
+    }
   };
 
   const renderStatusBadge = () => {
     if (!isEditing) return null;
 
-    const allowedStatuses = ["Active", "Draft"];
+    const allowedStatuses = ["DRAFT", "ACTIVE", "PENDING", "DELETED"];
 
     return (
       <FormField
@@ -192,11 +417,9 @@ const BrandForm: React.FC<BrandFormProps> = ({
         name="status"
         render={({ field }) => (
           <Select 
-            onValueChange={(value) => {
-              field.onChange(value);
-              toast.success(`Brand status updated to ${value}`);
-            }} 
+            onValueChange={handleStatusChange}
             value={field.value}
+            disabled={false}
           >
             <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
               <Badge 
@@ -284,7 +507,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
           onClick={() => setShowDeleteDialog(true)}
           className="cursor-pointer transition-colors"
         >
-          <Trash2 />
+          <Trash2 className="h-4 w-4 mr-2" />
           Delete
         </Button>
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -299,7 +522,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleDelete} className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer">
-                <Trash2 />
+                <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -312,7 +535,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
   return (
     <>
       <FormHeader
-        title={isEditing ? initialData.name || "Edit brand" : "Add new brand"}
+        title={isEditing ? initialData?.name || "Edit brand" : "Add new brand"}
         titleContent={renderStatusBadge()}
         titleActions={renderStatusActions()}
         extraButtons={renderDeleteButton()}
@@ -367,23 +590,25 @@ const BrandForm: React.FC<BrandFormProps> = ({
                 {/* Brand Type */}
                 <FormField
                   control={form.control}
-                  name="type"
+                  name="brandTypeId"
                   render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Brand type <span className="text-destructive">*</span></FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                    <FormItem>
+                      <FormLabel>Brand Type</FormLabel>
+                      <Select
+                        disabled={loadingBrandTypes}
+                        onValueChange={field.onChange}
+                        value={field.value}
                         defaultValue={field.value}
                       >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
+                        <FormControl className="w-full">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select brand type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {brandTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
+                          {brandTypeOptions.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {type.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -412,17 +637,25 @@ const BrandForm: React.FC<BrandFormProps> = ({
                       <div>
                         <ImageUpload
                           onChange={(file) => {
+                            console.log('ImageUpload onChange:', file);
                             field.onChange(file);
                             setLogoValid(!!file);
+                            setLogoChanged(true);
                           }}
-                          value={field.value}
-                          supportedFormats={["JPG", "JPEG", "PNG"]}
+                          value={
+                            field.value instanceof File 
+                              ? field.value 
+                              : logoUrl
+                                ? logoUrl
+                                : null
+                          }
+                          supportedFormats={["JPG", "JPEG", "PNG", "WEBP"]}
                           maxSize={5}
-                          required={true}
+                          required={!isEditing}
                           onValidation={setLogoValid}
                         />
                         <p className="text-xs text-muted-foreground mt-2">
-                          JPG, JPEG and PNG formats are supported<br />
+                          JPG, JPEG, PNG and WEBP formats are supported<br />
                           Max. upload size - 5MB
                         </p>
                       </div>
