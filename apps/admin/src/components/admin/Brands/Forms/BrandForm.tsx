@@ -304,12 +304,9 @@ const BrandForm: React.FC<BrandFormProps> = ({
         payload.logoId = logoId;
       }
       
-      // Add registeredAt for new brands or keep existing for edits
-      if (isEditing) {
-        payload.registeredAt = initialData.registeredAt;
-      } else {
+      // Set status to ACTIVE for new brands
+      if (!isEditing) {
         payload.status = "ACTIVE";
-        payload.registeredAt = new Date().toISOString().split('T')[0];
       }
       
       console.log("Submitting brand data:", payload);
