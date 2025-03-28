@@ -51,7 +51,6 @@ export default function BrandTypesPage() {
       }
       
       const data: BrandTypesApiResponse = await response.json();
-      console.log("Brand Types API Response:", data);
       
       const brandTypesData = data.data || [];
       setBrandTypes(brandTypesData);
@@ -83,9 +82,6 @@ export default function BrandTypesPage() {
 
   // Log the state values after they're set
   useEffect(() => {
-    console.log("Current brandTypes state:", brandTypes);
-    console.log("Loading state:", loading);
-    console.log("Total items:", totalItems);
   }, [brandTypes, loading, totalItems]);
 
   const goToNextPage = () => {

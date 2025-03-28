@@ -49,7 +49,6 @@ export default function BrandsPage() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API error:", errorData);
         throw new Error(`Error fetching brands: ${response.status}`);
       }
       
@@ -59,7 +58,6 @@ export default function BrandsPage() {
       setTotalPages(data.pagination.totalPages);
       setTotalItems(data.pagination.total);
     } catch (error) {
-      console.error("Error fetching brands:", error);
       setBrands([]);
     } finally {
       setLoading(false);

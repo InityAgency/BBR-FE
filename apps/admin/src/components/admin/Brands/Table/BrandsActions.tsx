@@ -23,9 +23,10 @@ import {
 interface BrandsActionsProps {
   row: Row<Brand>;
   onDelete: (page: number) => Promise<void>;
+  currentPage: number;
 }
 
-export function BrandsActions({ row, onDelete }: BrandsActionsProps) {
+export function BrandsActions({ row, onDelete, currentPage }: BrandsActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
 
@@ -41,9 +42,9 @@ export function BrandsActions({ row, onDelete }: BrandsActionsProps) {
       }
 
       toast.success('Brand deleted successfully');
-      await onDelete(1); // Ponovo učitaj prvu stranicu nakon brisanja
+      await onDelete(currentPage); // Osvežavamo trenutnu stranicu nakon brisanja
+      router.refresh(); // Dodatno osvežavanje stranice
     } catch (error) {
-      console.error('Error deleting brand:', error);
       toast.error('Failed to delete brand');
     } finally {
       setShowDeleteDialog(false);

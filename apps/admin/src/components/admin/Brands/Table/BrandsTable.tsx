@@ -18,11 +18,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 const ITEMS_PER_PAGE = 10;
 
 // Popravka za kolone da koriste BrandsActions
-const enhancedColumns = (fetchBrands: (page: number) => Promise<void>) => columns.map(column => {
+const enhancedColumns = (fetchBrands: (page: number) => Promise<void>, currentPage: number) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
-      cell: (props: CellContext<Brand, unknown>) => <BrandsActions row={props.row} onDelete={fetchBrands} />
+      cell: (props: CellContext<Brand, unknown>) => <BrandsActions row={props.row} onDelete={fetchBrands} currentPage={currentPage} />
     };
   }
   return column;
@@ -116,7 +116,7 @@ export function BrandsTable({
     setGlobalFilter: setTableGlobalFilter,
   } = useTable<Brand>({
     data: brands,
-    columns: enhancedColumns(fetchBrands),
+    columns: enhancedColumns(fetchBrands, currentPage),
     initialSorting: [{ id: "registeredAt", desc: true }],
     globalFilterFn: (row, columnId, value, addMeta) => {
       // Koristimo našu univerzalnu funkciju

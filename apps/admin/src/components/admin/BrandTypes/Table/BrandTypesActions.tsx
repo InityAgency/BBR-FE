@@ -51,7 +51,6 @@ export function BrandTypesActions({ row }: BrandTypesActionsProps) {
       toast.success('Brand type deleted successfully');
       router.refresh();
     } catch (error) {
-      console.error('Error deleting brand type:', error);
       toast.error('Failed to delete brand type');
     } finally {
       setShowDeleteDialog(false);

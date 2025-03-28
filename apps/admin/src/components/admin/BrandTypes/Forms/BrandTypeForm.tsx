@@ -79,7 +79,6 @@ export function BrandTypeForm({ initialData, isEdit = false }: BrandTypeFormProp
         payload.description = values.description;
       }
       
-      console.log("Sending payload:", payload);
 
       let url = `${API_BASE_URL}/api/${API_VERSION}/brand-types`;
       let method = "POST";
@@ -110,7 +109,6 @@ export function BrandTypeForm({ initialData, isEdit = false }: BrandTypeFormProp
       
     } catch (err: any) {
       toast.error(err.message || `An error occurred while ${isEdit ? 'updating' : 'creating'} the brand type`);
-      console.error(`Error ${isEdit ? 'updating' : 'creating'} brand type:`, err);
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +153,7 @@ export function BrandTypeForm({ initialData, isEdit = false }: BrandTypeFormProp
                 )}
               />
 
-              {/* <FormField
+              <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
@@ -171,7 +169,7 @@ export function BrandTypeForm({ initialData, isEdit = false }: BrandTypeFormProp
                     <FormMessage />
                   </FormItem>
                 )}
-              /> */}
+              />
             </div>
           </Form>
         </div>

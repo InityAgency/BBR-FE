@@ -104,8 +104,6 @@ export function BrandTypesTable({
 }: BrandTypesTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Dodajemo ispis da vidimo da li se podaci prosleđuju do komponente
-  console.log("BrandTypesTable props:", { brandTypes, loading, totalItems });
 
   // Koristimo generički hook za tabelu
   const {
@@ -132,7 +130,6 @@ export function BrandTypesTable({
 
   // Logujemo redove da vidimo šta se dešava
   useEffect(() => {
-    console.log("Table rows:", table.getRowModel().rows);
   }, [brandTypes, table]);
 
   // Sinhronizujemo globalFilter sa tabelom
