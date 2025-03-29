@@ -13,4 +13,7 @@ export const usersEndpoints = {
   delete: ((params?: EndpointParams) => `/users/${params?.id}`) as EndpointBuilder,
 
   details: ((params?: EndpointParams) => `/users/${params?.id}`) as EndpointBuilder,
+
+  status: ((params?: EndpointParams) => `/users/${params?.id}/status`) as EndpointBuilder,
+
 }; 

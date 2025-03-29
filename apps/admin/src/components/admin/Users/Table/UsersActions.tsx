@@ -4,7 +4,7 @@ import React from "react";
 import { Row } from "@tanstack/react-table";
 import { Lock, Pencil, CircleMinus } from "lucide-react";
 import { TableActions, TableAction } from "@/components/admin/Table/TableActions";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { toast } from "sonner";
 
 interface UsersActionsProps {
@@ -12,32 +12,32 @@ interface UsersActionsProps {
 }
 
 export function UsersActions({ row }: UsersActionsProps) {
-  // Funkcija za simulaciju slanja reset linka
+  // Function to simulate sending reset link
   const handleSendResetLink = (user: User) => {
-    // Ovde bi išla logika za API poziv
+    // Here would be the logic for API call
     console.log(`Sending reset link to user: ${user.id}`);
     
-    // Simuliramo uspešno slanje (kasnije zameniti sa stvarnim API pozivom)
+    // Simulate successful sending (replace with actual API call later)
     setTimeout(() => {
       toast.success(`Password reset link sent to ${user.email || 'user'}`, {
         description: "The user will receive an email with instructions to reset their password.",
         duration: 4000,
       });
-    }, 500); // Kratak timeout da simulira API poziv
+    }, 500); // Short timeout to simulate API call
   };
   
-  // Funkcija za simulaciju suspendovanja korisnika
+  // Function to simulate suspending a user
   const handleSuspendUser = (user: User) => {
-    // Ovde bi išla logika za API poziv
+    // Here would be the logic for API call
     console.log(`Suspending user: ${user.id}`);
     
-    // Simuliramo uspešno suspendovanje (kasnije zameniti sa stvarnim API pozivom)
+    // Simulate successful suspension (replace with actual API call later)
     setTimeout(() => {
       toast.success(`${user.fullName || 'User'} has been suspended`, {
         description: "The user's access to the system has been revoked.",
         duration: 4000,
       });
-    }, 500); // Kratak timeout da simulira API poziv
+    }, 500); // Short timeout to simulate API call
   };
 
   const actions: TableAction[] = [

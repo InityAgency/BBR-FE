@@ -1,60 +1,85 @@
-import { format, parseISO } from 'date-fns';
-import { sr } from 'date-fns/locale';
-
 /**
- * Formatira ISO datum string u čitljiv format
- * 
- * @param dateString ISO datum string (npr. "2025-03-22T18:09:47.813Z")
- * @param formatStr Format za prikaz (opciono)
- * @returns Formatiran datum
+ * Format a date string into a human-readable format
+ * @param dateString An ISO date string
+ * @returns Formatted date string
  */
-export function formatDate(dateString: string, formatStr: string = 'dd.MM.yyyy.'): string {
+export function formatDate(dateString: string | undefined): string {
+  if (!dateString) return "-";
+  
   try {
-    const date = parseISO(dateString);
-    return format(date, formatStr, { locale: sr });
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return dateString;
+    console.error("Error formatting date:", error, dateString);
+    return "-";
   }
 }
 
 /**
- * Formatira ISO datum string sa vremenom
- * 
- * @param dateString ISO datum string
- * @returns Formatiran datum sa vremenom
+ * Format a date string with time into a human-readable format
+ * @param dateString An ISO date string
+ * @returns Formatted date and time string
  */
-export function formatDateTime(dateString: string): string {
+export function formatDateTime(dateString: string | undefined): string {
+  if (!dateString) return "-";
+  
   try {
-    const date = parseISO(dateString);
-    return format(date, 'dd.MM.yyyy. HH:mm', { locale: sr });
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   } catch (error) {
-    console.error('Error formatting date with time:', error);
-    return dateString;
+    console.error("Error formatting date and time:", error, dateString);
+    return "-";
   }
 }
 
 /**
- * Formatira ISO datum string u relativni format (npr. "pre 2 dana")
- * 
- * @param dateString ISO datum string
- * @returns Relativan datum
+ * Format a date string into a relative format (e.g., "2 days ago")
+ * @param dateString An ISO date string
+ * @returns Relative time string
  */
-export function formatRelativeDate(dateString: string): string {
+export function formatRelativeDate(dateString: string | undefined): string {
+  if (!dateString) return "-";
+  
   try {
-    const date = parseISO(dateString);
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    
     const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    // Razlika u danima
-    const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diff === 0) return 'danas';
-    if (diff === 1) return 'juče';
-    if (diff < 7) return `pre ${diff} dana`;
-    
-    return format(date, 'dd.MM.yyyy.', { locale: sr });
+    if (diffDays === 0) {
+      return "Today";
+    } else if (diffDays === 1) {
+      return "Yesterday";
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+    } else {
+      const years = Math.floor(diffDays / 365);
+      return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+    }
   } catch (error) {
-    console.error('Error formatting relative date:', error);
-    return dateString;
+    console.error("Error formatting relative date:", error, dateString);
+    return "-";
   }
-} 
+}

@@ -8,6 +8,8 @@ import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import router from "next/router";
+import { usersService } from "@/lib/api/services/users.service";
+import { User } from "@/lib/api/services/types";
 
 export default function EditUserPage() {
   const params = useParams();
@@ -17,75 +19,40 @@ export default function EditUserPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchUser() {
+    const fetchUser = async () => {
       try {
         setLoading(true);
-        console.log('Fetching user with ID:', userId);
-        
-        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/users/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          credentials: 'include' // This ensures cookies are sent with the request
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            console.log('User not found');
-            throw new Error('User not found');
-          }
-          
-          const errorData = await response.json().catch(() => null);
-          console.error('Error response:', errorData);
-          // Handle structured API error responses
-          const errorMessage = errorData?.message || 
-                              (errorData?.data && errorData.data.message) || 
-                              `HTTP error! status: ${response.status}`;
-          throw new Error(errorMessage);
-        }
-
-        const result = await response.json();
-        console.log('API response:', result);
-        // Extract user data from the response structure
-        const data = result.data || result;
-        
-        // Format the user data for the form based on the exact API response structure
+        const data = await usersService.getUser(userId);
         const formattedData = {
           id: data.id,
           fullName: data.fullName,
           email: data.email,
           roleId: data.role?.id,
           role: data.role?.name,
-          password: "", // Empty for edit
+          password: "",
           sendEmail: data.emailNotifications || false,
-          status: data.status || "Active",
-          profileImage: data.profileImage || null,
-          // Additional fields from the API response
+          status: data.status || "ACTIVE",
+          // profileImage: data.profileImage || null,
           emailVerified: data.emailVerified,
           company: data.company,
           emailNotifications: data.emailNotifications,
           pushNotifications: data.pushNotifications,
           signupMethod: data.signupMethod,
-          // Notification preferences
           notifyBlogs: data.notifyBlogs,
           notifyLatestNews: data.notifyLatestNews,
-          notifyMarketTrends: data.notifyMarketTrends
+          notifyMarketTrends: data.notifyMarketTrends,
         };
-        
         setUserData(formattedData);
         setError(null);
       } catch (err: any) {
-        console.error('Error fetching user:', err);
-        setError(err.message || 'Failed to load user data');
+        console.error("Error fetching user:", err);
+        setError(err.message || "Failed to load user data");
         setUserData(null);
       } finally {
         setLoading(false);
       }
-    }
+    };
+    
 
     if (userId) {
       fetchUser();
@@ -93,68 +60,34 @@ export default function EditUserPage() {
   }, [userId]);
 
   const handleUpdateUser = async (formData: any) => {
-    console.log("handleUpdateUser starting with data:", formData);
     setLoading(true);
-    
+  
     try {
-      // Create your payload
-      const payload = {
+      const payload: Partial<User> = {
         fullName: formData.fullName,
         email: formData.email,
         roleId: formData.roleId,
-        status: formData.status || 'Active',
+        status: formData.status,
+        // profileImage: formData.profileImage,
       };
-      
-      if (formData.password && formData.password.trim() !== '') {
+  
+      if (formData.password?.trim()) {
         (payload as any).password = formData.password;
       }
-      
-      if (formData.profileImage) {
-        (payload as any).profileImage = formData.profileImage;
-      }
-      
-      console.log("Sending API request to:", `${API_BASE_URL}/api/${API_VERSION}/users/${userId}`);
-      console.log("With payload:", payload);
-      
-      // Use the fetch API with explicit options
-      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      
-      console.log("Response received:", response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
-        throw new Error(errorData.message || `Error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log("Update successful:", data);
+  
+      await usersService.updateUser(userId, payload);
+  
       toast.success("User updated successfully");
-      
-      // Navigate back to user list after successful update
-      setTimeout(() => {
-        router.push("/user-management");
-      }, 1500);
-      
-      return data;
-    } catch (error: unknown) {
+      setTimeout(() => router.push("/user-management"), 1500);
+    } catch (error: any) {
       console.error("API error:", error);
-      if (error instanceof Error) {
-        toast.error(error.message || "Failed to update user");
-      } else {
-        toast.error("Failed to update user");
-      }
+      toast.error(error.message || "Failed to update user");
       throw error;
     } finally {
       setLoading(false);
     }
   };
+  
 
   if (loading) {
     return (

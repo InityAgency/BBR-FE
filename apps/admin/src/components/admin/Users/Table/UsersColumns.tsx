@@ -6,7 +6,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { formatDate } from "@/utils/dateFormatter";
 
 // Helper functions for rendering cells
@@ -41,7 +41,7 @@ const renderCompanyCell = (company: any) => {
     companyName = "-";
   } else if (typeof company === 'string') {
     companyName = company;
-  } else if (typeof company === 'object') {
+  } else if (typeof company === 'object' && company !== null && 'name' in company) {
     companyName = company.name || "-";
   }
   
@@ -63,7 +63,7 @@ const renderRoleCell = (role: any) => {
     roleName = "-";
   } else if (typeof role === 'string') {
     roleName = role;
-  } else if (typeof role === 'object') {
+  } else if (typeof role === 'object' && role !== null && 'name' in role) {
     roleName = role.name || "-";
   }
   
@@ -86,37 +86,47 @@ const renderDateCell = (dateString: string | undefined) => {
 };
 
 const renderStatusCell = (status: string | undefined) => {
+  // Normalize status to lowercase for consistent handling
+  const rawStatus = status || "";
+  
   let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "default";
   let badgeClass = "";
   
-  switch(status?.toLowerCase()) {
-    case "active":
+  switch(rawStatus) {
+    case "ACTIVE":
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300 capitalize";
       break;
-    case "inactive":
+    case "INACTIVE":
       badgeVariant = "destructive";
       badgeClass = "bg-red-900/55 text-red-300 capitalize";
       break;
-    case "invited":
+    case "INVITED":
       badgeVariant = "secondary";
       badgeClass = "bg-orange-900/55 text-orange-300 capitalize";
       break;
-    case "suspended":
-    case "blocked":
+    case "PENDING":
+      badgeVariant = "secondary";
+      badgeClass = "bg-yellow-900/55 text-yellow-300 capitalize";
+      break;
+    case "BLOCKED":
       badgeVariant = "destructive";
       badgeClass = "bg-red-900/55 text-red-300 capitalize";
       break;
-    case "deleted":
+    case "SUSPENDED":
+      badgeVariant = "destructive";
+      badgeClass = "bg-red-900/55 text-red-300 capitalize";
+      break;
+    case "DELETED":
       badgeVariant = "outline";
       badgeClass = "bg-gray-900/80 text-gray-300 capitalize";
       break;
     default:
       badgeVariant = "outline";
-      badgeClass = "";
+      badgeClass = "capitalize";
   }
   
-  return <Badge variant={badgeVariant} className={badgeClass}>{status || "-"}</Badge>;
+  return <Badge variant={badgeVariant} className={badgeClass}>{status ? status : "-"}</Badge>;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -258,5 +268,5 @@ export const columns: ColumnDef<User>[] = [
     meta: {
       width: "w-[80px]"
     }
-  },
+  }
 ];

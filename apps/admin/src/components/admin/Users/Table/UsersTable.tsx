@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
 import { UsersFilters } from "./UsersFilters";
 import { columns } from "./UsersColumns";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { fuzzyFilter } from "@/lib/tableFilters";
-import { CellContext } from "@tanstack/react-table";
+import { CellContext, Row } from "@tanstack/react-table";
 import { UsersActions } from "./UsersActions";
 import { UsersCardList } from "../Cards/UsersCardList";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ const enhancedColumns = columns.map(column => {
 const TableSkeleton = () => {
   return (
     <div className="w-full border rounded-md">
-      {/* Skelet za header tabele */}
+      {/* Skeleton for table header */}
       <div className="border-b px-4 py-3 flex">
         <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
         <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
@@ -42,7 +42,7 @@ const TableSkeleton = () => {
         <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
       </div>
       
-      {/* Skelet za redove tabele */}
+      {/* Skeleton for table rows */}
       {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
         <div key={index} className="border-b px-4 py-3 flex items-center">
             <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
@@ -83,32 +83,6 @@ const CardsSkeleton = () => {
   );
 };
 
-const getStatusClass = (status: string) => {
-  switch(status) {
-    case "Active": return "bg-green-900/55 text-green-300";
-    case "Inactive": return "bg-red-900/55 text-red-300";
-    case "Pending": return "bg-yellow-900/55 text-yellow-300";
-    case "Invited": return "bg-orange-900/55 text-orange-300";
-    case "Blocked": return "bg-red-900/55 text-red-300";
-    case "Suspended": return "bg-red-900/55 text-red-300";
-    case "Deleted": return "bg-gray-900/80 text-gray-300";
-    default: return "";
-  }
-};
-
-const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-  switch(status) {
-    case "Active": return "default";
-    case "Inactive": return "destructive";
-    case "Invited": return "secondary";
-    case "Pending": return "secondary";
-    case "Blocked": return "destructive";
-    case "Suspended": return "destructive";
-    case "Deleted": return "outline";
-    default: return "outline";
-  }
-};
-
 interface UsersTableProps {
   users: User[];
   loading: boolean;
@@ -132,7 +106,7 @@ export function UsersTable({
 }: UsersTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Koristimo generički hook za tabelu
+  // Using the generic table hook
   const {
     table,
     setGlobalFilter: setTableGlobalFilter,
@@ -153,7 +127,7 @@ export function UsersTable({
     pageCount: totalPages, 
   });
 
-  // Sinhronizujemo globalFilter sa tabelom
+  // Synchronize globalFilter with the table
   React.useEffect(() => {
     setTableGlobalFilter(globalFilter);
   }, [globalFilter, setTableGlobalFilter]);
@@ -177,15 +151,16 @@ export function UsersTable({
     nestedField: "name" 
   });
 
-  // Helper funkcije za stilizovanje redova
-  const getRowClassName = (row: any) => {
-    const status = row.original.status;
-    if (status === "Suspended") return "opacity-60";
-    if (status === "Deleted") return "opacity-60";
+  // Helper function for styling rows
+  const getRowClassName = (row: Row<User>) => {
+    // Normalize status to lowercase for case-insensitive comparison
+    const status = row.original.status?.toLowerCase();
+    
+    if (status === "INACTIVE") return "opacity-60";
+    if (status === "DELETED") return "opacity-60";
     return "";
   };
   
-
   return (
     <div className="w-full">
       <UsersFilters
@@ -202,7 +177,7 @@ export function UsersTable({
         setRoleSearchValue={setRoleSearchValue}
       />
 
-      {/* Kartice za mobilni prikaz */}
+      {/* Cards for mobile view */}
       <div className="block lg:hidden">
         {loading ? (
           <CardsSkeleton />
@@ -211,7 +186,7 @@ export function UsersTable({
         )}
       </div>
 
-      {/* Tabela za desktop prikaz */}
+      {/* Table for desktop view */}
       <div className="hidden lg:block">
         {loading ? (
           <TableSkeleton />
@@ -265,4 +240,4 @@ export function UsersTable({
       </div>
     </div>
   );
-} 
+}

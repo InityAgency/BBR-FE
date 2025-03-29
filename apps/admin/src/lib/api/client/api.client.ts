@@ -57,6 +57,12 @@ export const api = {
     const response = await apiClient.delete(url);
     return response.data;
   },
+
+  patch: async <T>(endpoint: EndpointBuilder, data?: any, params?: EndpointParams): Promise<ApiResponse<T>> => {
+    const url = endpoint(params);
+    const response = await apiClient.patch(url, data);
+    return response.data;
+  },
 };
 
 export default apiClient; 

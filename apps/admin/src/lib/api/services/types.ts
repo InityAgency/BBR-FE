@@ -4,6 +4,7 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
+  receieveLuxuryInsights: boolean;
   notifyLatestNews: boolean;
   notifyMarketTrends: boolean;
   notifyBlogs: boolean;
@@ -13,17 +14,47 @@ export interface User {
   emailVerified: boolean;
   agreedTerms: boolean;
   status: string;
-  buyer: any | null;
+  buyer: {
+    image_id: string | null;
+    budgetRangeFrom: number | null;
+    budgetRangeTo: number | null;
+    phoneNumber: string | null;
+    preferredContactMethod: string | null;
+    currentLocation: {
+      id: string | null;
+      name: string | null;
+      code: string | null;
+    };
+    preferredResidenceLocation: {
+      id: string | null;
+      name: string | null;
+      code: string | null;
+    };
+  } | null;
   company: {
     id: string;
     name: string;
+    address?: string;
+    phone_number?: string;
+    website?: string;
+    image_id?: string | null;
+    contact_person_avatar_id?: string | null;
+    contact_person_full_name?: string;
+    contact_person_job_title?: string;
+    contact_person_email?: string;
+    contact_person_phone_number?: string;
+    contact_person_phone_number_country_code?: string;
   } | null;
   role: {
     id: string;
     name: string;
   };
-  lifestyles: any | null;
-  unitTypes: any | null;
+  roleId?: string;
+  profileImage?: string | null;
+  unitTypes: Array<{
+    id: string;
+    name: string;
+  }> | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -58,8 +89,14 @@ export interface RegisterData {
 }
 
 export interface ApiResponse<T> {
-  data: T;
+  data: T | T[];
   statusCode: number;
+  pagination: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
   message: string;
   timestamp: string;
   path: string;
@@ -92,13 +129,19 @@ export interface ResetPasswordResponse {
   path: string;
 }
 
-export interface PaginatedResponse<T> {
+export type PaginatedResponse<T> = {
   data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+  pagination: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
+  statusCode?: number;
+  message?: string;
+  timestamp?: string;
+  path?: string;
+};
 
 export interface QueryParams {
   page?: number;

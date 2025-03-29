@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import FormHeader from "@/components/admin/Headers/FormHeader";
 import { User } from "@/app/types/models/User";
-import UserService from "@/lib/services/user.service";
+import { usersService } from "@/lib/api/services";
 
 const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"] as const;
 
@@ -53,11 +53,12 @@ export function UserHeader({
 
   // Set the initial status once user data is loaded
   useEffect(() => {
-    if (user?.status) {
+    if (user?.status && user.status.toUpperCase() !== status) {
       setStatus(user.status.toUpperCase());
     }
     setIsLoading(loading);
   }, [user, loading]);
+  
 
   // Skeleton view for loading state
   if (isLoading || !user) {
@@ -75,7 +76,11 @@ export function UserHeader({
         throw new Error("Invalid status value");
       }
       
-      await UserService.updateUserStatus(user.id, upperStatus);
+      if (!user.id) {
+        throw new Error("User ID is required");
+      }
+
+      await usersService.updateUserStatus(user.id, upperStatus);
       setStatus(upperStatus);
       toast.success(`Status for ${user.fullName} changed to ${upperStatus}`);
     } catch (error) {

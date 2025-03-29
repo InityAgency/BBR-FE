@@ -4,7 +4,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UsersActions } from "../Table/UsersActions";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { formatDate } from "@/utils/dateFormatter";
 
 interface UserCardProps {
@@ -14,27 +14,33 @@ interface UserCardProps {
 export function UserCard({ user }: UserCardProps) {
   // Helper functions for styling
   const getStatusClass = (status: string | undefined) => {
-    switch(status?.toLowerCase()) {
-      case "active": return "bg-green-900/55 text-green-300";
-      case "inactive": return "bg-red-900/55 text-red-300";
-      case "pending": return "bg-yellow-900/55 text-yellow-300";
-      case "invited": return "bg-orange-900/55 text-orange-300";
-      case "blocked": return "bg-red-900/55 text-red-300";
-      case "suspended": return "bg-red-900/55 text-red-300";
-      case "deleted": return "bg-gray-900/80 text-gray-300";
+    // Normalize status for consistent handling regardless of API format
+    const normalizedStatus = status || "";
+    
+    switch(normalizedStatus) {
+      case "ACTIVE": return "bg-green-900/55 text-green-300";
+      case "INACTIVE": return "bg-red-900/55 text-red-300";
+      case "PENDING": return "bg-yellow-900/55 text-yellow-300";
+      case "INVITED": return "bg-orange-900/55 text-orange-300";
+      case "BLOCKED": return "bg-red-900/55 text-red-300";
+      case "SUSPENDED": return "bg-red-900/55 text-red-300";
+      case "DELETED": return "bg-gray-900/80 text-gray-300";
       default: return "";
     }
   };
 
   const getStatusVariant = (status: string | undefined): "default" | "secondary" | "destructive" | "outline" => {
-    switch(status?.toLowerCase()) {
-      case "active": return "default";
-      case "inactive": return "destructive";
-      case "invited": return "secondary";
-      case "pending": return "secondary";
-      case "blocked": return "destructive";
-      case "suspended": return "destructive";
-      case "deleted": return "outline";
+    // Normalize status for consistent handling regardless of API format
+    const normalizedStatus = status || "";
+    
+    switch(normalizedStatus) {
+      case "ACTIVE": return "default";
+      case "INACTIVE": return "destructive";
+      case "INVITED": return "secondary";
+      case "PENDING": return "secondary";
+      case "BLOCKED": return "destructive";
+      case "SUSPENDED": return "destructive";
+      case "DELETED": return "outline";
       default: return "outline";
     }
   };
@@ -52,17 +58,6 @@ export function UserCard({ user }: UserCardProps) {
     }
     
     return "-";
-  };
-
-  // Safely format date with fallback
-  const safelyFormatDate = (date: string | undefined) => {
-    if (!date) return "-";
-    try {
-      return formatDate(date);
-    } catch (error) {
-      console.error("Error formatting date:", error, date);
-      return "-";
-    }
   };
 
   // Safely get company name
@@ -107,7 +102,7 @@ export function UserCard({ user }: UserCardProps) {
             {user.emailVerified ? (
               <Badge variant="outline" className="mt-2 bg-green-900/10 text-green-500 border-green-500">Verified</Badge>
             ) : (
-              <Badge variant="outline" className="mt-2 bg-yellow-900/10 text-yellow-500 border-yellow-500">Not Verified</Badge>
+              <Badge variant="outline" className="mt-2 bg-yellow-900/10 text-yellow-300 border-yellow-500">Not Verified</Badge>
             )}
           </div>
 
@@ -129,13 +124,13 @@ export function UserCard({ user }: UserCardProps) {
             <div>
               <p className="text-sm font-medium text-muted-foreground">Created</p>
               <p className="text-sm text-muted-foreground mt-1 text-white">
-                {safelyFormatDate(user.createdAt)}
+                {formatDate(user.createdAt)}
               </p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
               <p className="text-sm text-muted-foreground mt-1 text-white">
-                {safelyFormatDate(user.updatedAt)}
+                {formatDate(user.updatedAt)}
               </p>
             </div>
           </div>

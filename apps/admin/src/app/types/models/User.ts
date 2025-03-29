@@ -3,7 +3,7 @@ export type UserRole = {
   name: string;
 };
 
-export type UserStatus = "Active" | "Invited" | "Blocked" | "Suspended";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "INVITED" ;
 
 export interface User {
   id: string;

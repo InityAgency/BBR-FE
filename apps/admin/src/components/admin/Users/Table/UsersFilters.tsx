@@ -46,7 +46,7 @@ export function UsersFilters({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-10">
-              <UserRound className="h-4 w-4" />
+              <UserRound className="h-4 w-4 mr-2" />
               Roles
               {selectedRoles.length > 0 && (
                 <>
@@ -71,9 +71,9 @@ export function UsersFilters({
                   <CommandItem
                     key={role}
                     onSelect={() => {
-                      setSelectedRoles((prev: string[]) => {
+                      setSelectedRoles((prev) => {
                         if (prev.includes(role)) {
-                          return prev.filter((item: string) => item !== role);
+                          return prev.filter(item => item !== role);
                         } else {
                           return [...prev, role];
                         }
@@ -108,8 +108,8 @@ export function UsersFilters({
         {/* Status Filter */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-10 ">
-              <CircleDashed className="h-4 w-4" />
+            <Button variant="outline" className="h-10">
+              <CircleDashed className="h-4 w-4 mr-2" />
               Status
               {selectedStatuses.length > 0 && (
                 <>
@@ -129,9 +129,9 @@ export function UsersFilters({
                   <CommandItem
                     key={status}
                     onSelect={() => {
-                      setSelectedStatuses((prev: string[]) => {
+                      setSelectedStatuses((prev) => {
                         if (prev.includes(status)) {
-                          return prev.filter((item: string) => item !== status);
+                          return prev.filter(item => item !== status);
                         } else {
                           return [...prev, status];
                         }
@@ -147,7 +147,7 @@ export function UsersFilters({
                 ))}
               </CommandList>
               {selectedStatuses.length > 0 && (
-                <div className="border-t border-border p-2  ">
+                <div className="border-t border-border p-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -164,10 +164,10 @@ export function UsersFilters({
         </Popover>
       </TableFilters>
 
-      {/* Prikaz aktivnih filtera */}
+      {/* Display active filters */}
       {(selectedRoles.length > 0 || selectedStatuses.length > 0) && (
         <div className="flex gap-2 mb-4 flex-wrap">
-          {/* Oznake za uloge */}
+          {/* Role badges */}
           {selectedRoles.map(role => (
             <Badge key={`role-${role}`} variant="secondary" className="px-2 py-1">
               <span className="capitalize">{role}</span>
@@ -175,14 +175,14 @@ export function UsersFilters({
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedRoles((prev: string[]) => prev.filter((r: string) => r !== role))}
+                onClick={() => setSelectedRoles(prev => prev.filter(r => r !== role))}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           ))}
           
-          {/* Oznake za statuse */}
+          {/* Status badges */}
           {selectedStatuses.map(status => (
             <Badge key={`status-${status}`} variant="secondary" className="px-2 py-1">
               <span className="capitalize">{status}</span>
@@ -190,14 +190,14 @@ export function UsersFilters({
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedStatuses((prev: string[]) => prev.filter((s: string) => s !== status))}
+                onClick={() => setSelectedStatuses(prev => prev.filter(s => s !== status))}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           ))}
           
-          {/* Dugme za brisanje svih filtera */}
+          {/* Clear all button */}
           {(selectedRoles.length > 1 || selectedStatuses.length > 1) && (
             <Button
               variant="ghost"
@@ -215,4 +215,4 @@ export function UsersFilters({
       )}
     </>
   );
-} 
+}

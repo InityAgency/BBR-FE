@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AdminLayout from "../../AdminLayout";
-import UserService from "@/lib/services/user.service";
+import { usersService } from "@/lib/api/services";
 import { User } from "@/app/types/models/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,8 +57,8 @@ export default function UserDetailsPage() {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const userData = await UserService.getUserById(userId);
-        setUser(userData as ExtendedUser);
+        const userData = await usersService.getUser(userId);
+        setUser(userData as unknown as ExtendedUser);
         setError(null);
       } catch (err) {
         console.error("Error fetching user data:", err);

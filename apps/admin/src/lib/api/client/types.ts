@@ -53,6 +53,7 @@ export interface ApiEndpoints {
     update: EndpointBuilder;
     delete: EndpointBuilder;
     details: EndpointBuilder;
+    status: EndpointBuilder;
   };
   brands: {
     list: EndpointBuilder;

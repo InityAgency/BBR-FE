@@ -1,5 +1,5 @@
 import React from "react";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { UserCard } from "./UserCard";
 
 interface UsersCardListProps {

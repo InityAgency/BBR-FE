@@ -50,6 +50,7 @@ import {
 } from "@/app/schemas/user";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { Eye, EyeOff, Wand2, X, CircleMinus, Mail } from "lucide-react";
+import { usersService } from "@/lib/api/services/users.service";
 
 // Type for role from API
 interface RoleType {
@@ -70,18 +71,22 @@ const capitalizeWords = (text: string) => {
     .join(' ');
 };
 
+
+const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"] as const;
+
 const getStatusBadgeStyle = (status: string) => {
-  switch(status?.toLowerCase()) {
-    case "active":
+  switch(status?.toUpperCase()) {
+    case "ACTIVE":
       return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50";
-    case "invited":
-      return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
-    case "suspended":
+    case "INACTIVE":
       return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
+    case "INVITED":
+      return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
     default:
-      return "";
+      return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
   }
 };
+
 
 interface UserFormProps {
   initialData?: Partial<UserFormValues>;
@@ -123,92 +128,54 @@ const UserForm: React.FC<UserFormProps> = ({
   
   // Function to fetch roles using useCallback
   const fetchRoles = useCallback(async () => {
-    // If roles are already loaded or loading is in progress, do nothing
-    if (rolesInitialized.current || isLoadingRoles) return;
+    // Ako je učitavanje u toku, preskačemo
+    if (isLoadingRoles) return;
     
     setIsLoadingRoles(true);
+    rolesInitialized.current = false; // Resetujemo flag da bismo uvek učitali sveže uloge
+    
     try {
-      // First check if we have cached roles in localStorage
-      const cachedRoles = localStorage.getItem('userRolesCache');
-      const cacheTimestamp = localStorage.getItem('userRolesCacheTimestamp');
+      // Direktan API poziv bez keširanja
       
-      // If we have cached roles and cache is not older than 24h (86400000 ms)
-      const cacheIsValid = cachedRoles && cacheTimestamp && 
-                          (Date.now() - parseInt(cacheTimestamp) < 86400000);
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/roles?limit=5&page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
       
-      // If we have valid cached roles, use them instead of API call
-      if (cacheIsValid && cachedRoles) {
-        const parsedRoles = JSON.parse(cachedRoles);
-        
-        // Format role names for display
-        const formattedRoles = parsedRoles.map((role: RoleType) => ({
+      if (!response.ok) {
+        throw new Error(`Failed to fetch roles: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      // Provera da li imamo podatke u očekivanom formatu
+      if (result.data && Array.isArray(result.data)) {
+        // Format uloga za prikaz
+        const formattedRoles = result.data.map((role: RoleType) => ({
           ...role,
           formattedName: capitalizeWords(role.name)
         }));
         
         setRoles(formattedRoles);
         
-        // Set up roles in the form
+        // Postavimo ulogu u formi
         handleFormRoleSetup(formattedRoles);
         
-        // Mark roles as initialized
+        // Označimo da su uloge inicijalizovane
         rolesInitialized.current = true;
       } else {
-        // If we don't have cached roles or they're expired, load them from the server
-        // Mark initialization started
-        rolesInitialized.current = true;
-        
-        try {
-          const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/roles?limit=10&page=1`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Failed to fetch roles: ${response.status}`);
-          }
-          
-          const result = await response.json();
-          
-          // Set roles in the state
-          if (result.data && Array.isArray(result.data)) {
-            // Format role names for display
-            const formattedRoles = result.data.map((role: RoleType) => ({
-              ...role,
-              formattedName: capitalizeWords(role.name)
-            }));
-            
-            // Save roles in localStorage for future use
-            localStorage.setItem('userRolesCache', JSON.stringify(result.data));
-            localStorage.setItem('userRolesCacheTimestamp', Date.now().toString());
-            
-            setRoles(formattedRoles);
-            
-            // Set up roles in the form
-            handleFormRoleSetup(formattedRoles);
-          } else {
-            console.error('API did not return roles in expected format:', result);
-            // If API fails, set mock roles at least
-            setMockRoles();
-          }
-        } catch (error) {
-          console.error('Error when loading roles:', error);
-          toast.error('Error loading user roles');
-          // In case of error, reset the flag to allow re-loading
-          rolesInitialized.current = false;
-          // Set mock roles as a fallback
-          setMockRoles();
-        }
+        console.error('API nije vratio uloge u očekivanom formatu:', result);
+        // Ako API ne uspe, postavimo mock uloge
+        setMockRoles();
       }
     } catch (error) {
-      console.error('Error loading user roles:', error);
-      toast.error('Error loading user roles');
-      // In case of error, reset the flag to allow re-loading
-      rolesInitialized.current = false;
-      // Set mock roles as a fallback
+      console.error('Greška prilikom učitavanja uloga:', error);
+      toast.error('Greška prilikom učitavanja korisničkih uloga');
+      
+      // Postavimo mock uloge kao rezervu
       setMockRoles();
     } finally {
       setIsLoadingRoles(false);
@@ -231,24 +198,37 @@ const UserForm: React.FC<UserFormProps> = ({
   const handleFormRoleSetup = useCallback((formattedRoles: RoleType[]) => {
     if (formattedRoles.length === 0) return;
     
+
+    
     // If editing a user
     if (isEditing) {
       if (initialData.roleId) {
         form.setValue("roleId", initialData.roleId, { shouldDirty: false });
       } else if (initialData.role && formattedRoles.length > 0) {
+        
+        // Try to find role by name, which could be a string or an object
+        let roleName = '';
+        if (typeof initialData.role === 'string') {
+          roleName = initialData.role.toLowerCase();
+        } else if (initialData.role && typeof initialData.role === 'object' && 'name' in initialData.role) {
+          roleName = (initialData.role as any).name.toLowerCase();
+        }
+        
         const roleByName = formattedRoles.find(
-          (r: RoleType) => r.name.toLowerCase() === initialData.role?.toLowerCase()
+          (r: RoleType) => r.name.toLowerCase() === roleName
         );
         
         if (roleByName) {
           form.setValue("roleId", roleByName.id, { shouldDirty: false });
+        } else {
+          form.setValue("roleId", formattedRoles[0].id, { shouldDirty: false });
         }
       }
     } else if (formattedRoles.length > 0) {
       // When creating a new user, set the first role from the list as default
       form.setValue("roleId", formattedRoles[0].id, { shouldDirty: false });
     }
-  }, [form, isEditing, initialData.roleId, initialData.role]);
+  }, [form, isEditing, initialData]);
 
   // Load roles only once at component initialization
   useEffect(() => {
@@ -275,46 +255,29 @@ const UserForm: React.FC<UserFormProps> = ({
     }
   }, [isEditing, initialData.password]);
 
-  // Update validation state whenever form fields change
+  // Ensure formIsValid is always true in edit mode (simplified validation)
   useEffect(() => {
-    // If still in initial loading of role, don't validate
+    if (isEditing) {
+      setFormIsValid(true);
+      return;
+    }
+    
+    // Only perform complex validation in create mode
     if (isInitialRender.current) {
       return;
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     
-    // Different password validation for create vs. edit
-    let passwordValid = true;
-    
-    if (isEditing) {
-      // In edit mode, empty password is valid
-      // If password field is shown and a value is entered, it must meet complexity requirements
-      if (showPasswordField && password && password.trim() !== '') {
-        passwordValid = passwordRegex.test(password);
-      }
-    } else {
-      // In create mode, password is required and must meet complexity requirements
-      passwordValid = !!password && passwordRegex.test(password);
-    }
-    
+    const passwordValid = !!password && passwordRegex.test(password);
     const emailValid = !!email && /^\S+@\S+\.\S+$/.test(email);
     const nameValid = !!fullName && fullName.trim().length >= 3;
     const roleValid = !!roleId;
 
     const valid = nameValid && emailValid && roleValid && passwordValid;
     
-    console.log("Form validation:", { 
-      nameValid, 
-      emailValid, 
-      roleValid, 
-      passwordValid, 
-      isValid: valid 
-    });
-    
     setFormIsValid(valid);
-    
-  }, [fullName, email, roleId, password, isEditing, showPasswordField]);
+  }, [isEditing, fullName, email, roleId, password]);
 
   // Check if form has unsaved changes
   const hasUnsavedChanges = form.formState.isDirty;
@@ -332,15 +295,30 @@ const UserForm: React.FC<UserFormProps> = ({
     },
   });
 
+  // Function to handle navigation
+  const handleNavigation = useCallback(() => {
+    setTimeout(() => {
+      router.push("/user-management");
+    }, 100);
+  }, [router]);
+
   const handleFormSubmit = async (data: UserFormValues) => {
     try {
       setIsSubmitting(true);
-      console.log("Form submitted with data:", data);
       
-      // If custom onSave function is provided, use it
+      // Create a new object without status but preserve type compatibility
+      const dataWithoutStatus: UserFormValues = {
+        ...data,
+        status: data.status // Keep status in the type but it won't be sent to API
+      };
+      
+      // If custom onSave function is provided, use it with filtered data
       if (onSave && typeof onSave === 'function') {
-        console.log("Using custom onSave function");
-        await onSave(data);
+        // Remove status before sending to API
+        const { status, ...apiData } = dataWithoutStatus;
+        await onSave(apiData as UserFormValues);
+        toast.success(isEditing ? "User updated successfully!" : "User created successfully!");
+        handleNavigation();
         return;
       }
   
@@ -350,75 +328,126 @@ const UserForm: React.FC<UserFormProps> = ({
         fullName: string;
         email: string;
         roleId: string;
-        signupMethod: string;
-        emailNotifications: boolean;
+        signupMethod?: string;
+        emailNotifications?: boolean;
         password?: string;
-        status?: string;
         profileImage?: string | null;
       } = {
-        fullName: data.fullName,
-        email: data.email,
-        roleId: data.roleId,
-        signupMethod: "email",
-        emailNotifications: data.sendEmail || false
+        fullName: dataWithoutStatus.fullName,
+        email: dataWithoutStatus.email,
+        roleId: dataWithoutStatus.roleId
       };
-
-      // Only include status for editing, not for creation
+  
+  
       if (isEditing) {
-        submitData.status = data.status || "Active";
-        // Only include profileImage for editing
-        submitData.profileImage = data.profileImage || null;
+        // For editing a user, DO NOT include status
+        // We're already handling status changes separately in the status dropdown onChange
+        
+        // Only include password if explicitly entered
+        if (dataWithoutStatus.password && dataWithoutStatus.password.trim() !== '') {
+          submitData.password = dataWithoutStatus.password;
+        }
+        
+        // Only add profile image if we have one
+        if (dataWithoutStatus.profileImage) {
+          submitData.profileImage = dataWithoutStatus.profileImage;
+        }
+      } else {
+        // For a new user
+        submitData.signupMethod = "email";
+        submitData.emailNotifications = dataWithoutStatus.sendEmail || false;
+        
+        // Password is required for new users
+        if (dataWithoutStatus.password) {
+          submitData.password = dataWithoutStatus.password;
+        } else {
+          throw new Error("Password is required for new users");
+        }
       }
   
-      // Only include password if it's not empty (for updates)
-      if (data.password && data.password.trim() !== '') {
-        submitData.password = data.password;
+  
+      // Direct API call for both cases (creation and update)
+      try {
+        let response;
+        
+        if (isEditing && initialData.id) {
+          // UPDATE USER - use PUT method
+          const url = `${API_BASE_URL}/api/${API_VERSION}/users/${initialData.id}`;
+          
+          response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(submitData),
+            credentials: 'include'
+          });
+          
+        } else {
+          // CREATE USER - use POST method
+          const url = `${API_BASE_URL}/api/${API_VERSION}/users`;
+          
+          response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(submitData),
+            credentials: 'include'
+          });
+          
+          if (submitData.emailNotifications) {
+            toast.success("Email with access credentials has been sent to the user.");
+          }
+        }
+        
+        // Check response
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Error: ${response.status}`);
+        }
+        
+        const responseData = await response.json();
+        
+        toast.success(isEditing ? "User updated successfully!" : "User created successfully!");
+        handleNavigation();
+        
+      } catch (error) {
+        console.error("API request error:", error);
+        throw error;
       }
-  
-      // Determine the API endpoint and method based on isEditing
-      const endpoint = isEditing && initialData.id 
-        ? `${API_BASE_URL}/api/${API_VERSION}/users/${initialData.id}`
-        : `${API_BASE_URL}/api/${API_VERSION}/users`;
-      
-      const method = isEditing ? 'PUT' : 'POST';
-  
-      // Make API call
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(submitData),
-        credentials: 'include'
-      });
-  
-      // Handle response
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error: ${response.status}`);
-      }
-  
-      // Success
-      toast.success(isEditing ? "User updated successfully!" : "User created successfully!");
-      if (!isEditing && submitData.emailNotifications) {
-        toast.success("Email with access credentials has been sent to the user.");
-      }
-      
-      // Reset form and redirect
-      form.reset(initialUserValues);
-      router.push("/user-management");
       
     } catch (error) {
       console.error(isEditing ? "Error updating user:" : "Error creating user:", error);
-      toast.error((error as Error).message || `Failed to ${isEditing ? 'update' : 'create'} user`);
       
-      // Handle duplicate email error
-      if ((error as Error).message?.toLowerCase().includes('email')) {
+      // Enhanced error handling
+      if ((error as any)?.response?.data?.message) {
+        toast.error((error as any).response.data.message);
+      } else if ((error as Error).message) {
+        toast.error((error as Error).message);
+      } else {
+        toast.error(`Failed to ${isEditing ? 'update' : 'create'} user`);
+      }
+      
+      // Handle specific error types
+      const errorMessage = (error as Error).message?.toLowerCase() || '';
+      if (errorMessage.includes('email')) {
         form.setError("email", { 
           type: "server", 
           message: "Email address is already taken" 
         });
+      } else if (errorMessage.includes('role')) {
+        form.setError("roleId", {
+          type: "server",
+          message: "Invalid role selected"
+        });
+      } else if (errorMessage.includes('password')) {
+        form.setError("password", {
+          type: "server",
+          message: "Password does not meet requirements"
+        });
       }
+      
       throw error; // Rethrow so parent can handle if needed
     } finally {
       setIsSubmitting(false);
@@ -434,8 +463,8 @@ const UserForm: React.FC<UserFormProps> = ({
       // Use navigateTo which will automatically show modal
       navigateTo("/user-management");
     } else {
-      // If no changes, directly redirect to user management
-      router.push("/user-management");
+      // If no changes, directly navigate
+      handleNavigation();
     }
   };
 
@@ -476,7 +505,7 @@ const UserForm: React.FC<UserFormProps> = ({
   };
 
   const handleSuspend = () => {
-    form.setValue("status", "Suspended", { shouldDirty: true });
+    form.setValue("status", "SUSPENDED", { shouldDirty: true }); // Changed to uppercase
     toast.success("User suspended successfully!");
     setShowSuspendDialog(false);
     setPendingStatus(null);
@@ -485,41 +514,37 @@ const UserForm: React.FC<UserFormProps> = ({
   // Only render status badge in edit mode
   const renderStatusBadge = () => {
     if (!isEditing) return null;
-
-    const allowedStatuses = userStatuses;
-
+  
     return (
       <FormField
         control={form.control}
         name="status"
         render={({ field }) => (
-          <Select 
-            onValueChange={(value) => {
-              if (value === "Suspended" && field.value !== "Suspended") {
-                // If user tries to suspend, show confirmation modal
-                setPendingStatus(value);
-                setShowSuspendDialog(true);
-              } else {
-                field.onChange(value);
-                toast.success(`User status updated to ${value}`);
+          <Select
+            onValueChange={async (value) => {
+              field.onChange(value);
+              try {
+                if (isEditing && initialData?.id) {
+                  await usersService.updateUserStatus(initialData.id, value);
+                  toast.success(`Status updated to ${value}`);
+                }
+              } catch (error) {
+                console.error("Error updating status:", error);
+                toast.error("Failed to update status.");
               }
-            }} 
+            }}
             value={field.value || ""}
           >
             <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
-              <Badge 
+              <Badge
                 className={`${getStatusBadgeStyle(field.value || "")} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80`}
               >
                 {field.value || ""}
               </Badge>
             </SelectTrigger>
             <SelectContent>
-              {allowedStatuses.map((status) => (
-                <SelectItem 
-                  key={status} 
-                  value={status}
-                  className="text-sm"
-                >
+              {ALLOWED_STATUSES.map((status) => (
+                <SelectItem key={status} value={status} className="text-sm">
                   {status}
                 </SelectItem>
               ))}
@@ -529,13 +554,13 @@ const UserForm: React.FC<UserFormProps> = ({
       />
     );
   };
-
+  
   // Only render status actions in edit mode
   const renderStatusActions = () => {
     if (!isEditing) return null;
 
     // Specific actions for Invited status
-    if (form.watch("status") === "Invited") {
+    if (form.watch("status") === "INVITED") {
       return (
         <Button
           variant="outline"
@@ -585,49 +610,55 @@ const UserForm: React.FC<UserFormProps> = ({
     toast.success("Password generated!");
   };
 
-
-  // Update the handleSave function
-// In UserForm.tsx, update the handleSave function
+  // Enhanced handleSave function with better error recovery
   const handleSave = useCallback(() => {
-    console.log("handleSave called, formIsValid:", formIsValid);
     if (formIsValid) {
-      console.log("Attempting to submit form");
       
-      // Try using the direct form submission instead of handling it via callback
-      form.handleSubmit(async (data) => {
-        console.log("Form handleSubmit triggered with data:", data);
-        
-        try {
-          if (onSave) {
-            console.log("Calling custom onSave function");
-            await onSave(data);
-            console.log("Custom onSave completed successfully");
-          } else {
-            console.log("Using default handleFormSubmit");
-            await handleFormSubmit(data);
-            console.log("Default handleFormSubmit completed successfully");
-          }
-        } catch (error) {
-          console.error("Form submission error:", error);
+      // Get form values
+      const data = form.getValues();
+      
+      // Create a copy to avoid modifying the original data
+      const submitData = { ...data };
+      
+      // Always remove status field regardless of edit mode
+      if (submitData.status !== undefined) {
+        const { status, ...restData } = submitData;
+        Object.assign(submitData, restData);
+      }
+      
+      // Execute validation before continuing
+      form.trigger().then(isValid => {
+        if (isValid || isEditing) { // Always consider edit mode as valid
+          
+          setIsSubmitting(true);
+          
+          // Call handleFormSubmit with the processed data
+          handleFormSubmit(submitData)
+            .then(() => {
+            })
+            .catch(error => {
+              console.error("Form submission error:", error);
+            })
+            .finally(() => {
+              setIsSubmitting(false);
+            });
+        } else {
+          toast.error("Please fill in all required fields correctly");
         }
-      })();
+      }).catch(error => {
+        console.error("Form validation error:", error);
+        toast.error("Form validation failed. Please check your inputs.");
+        setIsSubmitting(false);
+      });
     } else {
-      console.log("Form validation failed");
       toast.error("Please fill in all required fields correctly");
     }
-  }, [formIsValid, form, onSave, handleFormSubmit]);
+  }, [formIsValid, form, isEditing, handleFormSubmit]);
+  
 
   const handleDiscardClick = useCallback(() => {
     handleDiscard();
   }, [handleDiscard]);
-
-  // Force formIsValid to true in edit mode for testing
-  useEffect(() => {
-    if (isEditing) {
-      console.log("Setting formIsValid to true for edit mode");
-      setFormIsValid(true);
-    }
-  }, [isEditing]);
 
   return (
     <>
@@ -677,57 +708,57 @@ const UserForm: React.FC<UserFormProps> = ({
 
           {/* User Role */}
           <FormField
-            control={form.control}
-            name="roleId"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>User role <span className="text-destructive">*</span></FormLabel>
-                <Select 
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    // Find the selected role to get its name
-                    const selectedRole = roles.find(role => role.id === value);
-                    if (selectedRole) {
-                      // Set the role field (name) for compatibility
-                      form.setValue("role", selectedRole.name, { shouldDirty: true });
-                    }
-                  }} 
-                  defaultValue={field.value}
-                  value={field.value || ""}
-                  disabled={isLoadingRoles}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={isLoadingRoles ? "Loading roles..." : "Select user role"}>
-                        {field.value && roles.length > 0 && (() => {
-                          const selectedRole = roles.find(role => role.id === field.value);
-                          return selectedRole ? (selectedRole.formattedName || capitalizeWords(selectedRole.name)) : "";
-                        })()}
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {isLoadingRoles ? (
-                      <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                        Loading roles...
-                      </div>
-                    ) : roles.length > 0 ? (
-                      roles.map((userRole) => (
-                        <SelectItem key={userRole.id} value={userRole.id}>
-                          {userRole.formattedName || capitalizeWords(userRole.name)}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                        No roles available
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          control={form.control}
+          name="roleId"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>User role <span className="text-destructive">*</span></FormLabel>
+              <Select 
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  // Find the selected role to get its name
+                  const selectedRole = roles.find(role => role.id === value);
+                  if (selectedRole) {
+                    // Set the role field (name) for compatibility
+                    form.setValue("role", selectedRole.name, { shouldDirty: true });
+                  }
+                }} 
+                defaultValue={field.value}
+                value={field.value || ""}
+                disabled={isLoadingRoles}
+              >
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={isLoadingRoles ? "Loading roles..." : "Select user role"}>
+                      {field.value && roles.length > 0 && (() => {
+                        const selectedRole = roles.find(role => role.id === field.value);
+                        return selectedRole ? (selectedRole.formattedName || capitalizeWords(selectedRole.name)) : "";
+                      })()}
+                    </SelectValue>
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {isLoadingRoles ? (
+                    <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                      Loading roles...
+                    </div>
+                  ) : roles.length > 0 ? (
+                    roles.map((userRole) => (
+                      <SelectItem key={userRole.id} value={userRole.id}>
+                        {userRole.formattedName || capitalizeWords(userRole.name)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                      No roles available
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
           {/* Password */}
           <div className="flex justify-between items-center mb-4">
@@ -818,64 +849,6 @@ const UserForm: React.FC<UserFormProps> = ({
                 </FormItem>
               )}
             />
-          )}
-
-          {/* Profile Image - only in edit mode */}
-          {isEditing && (
-            <div className="mt-8 mb-4">
-              <h2 className="text-xl font-semibold mb-4">Profile Image</h2>
-              <FormField
-                control={form.control}
-                name="profileImage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div>
-                        <ImageUpload
-                          onChange={(file) => {
-                            if (file) {
-                              // If file is provided, handle it as a File object
-                              if (file instanceof File) {
-                                // For actual implementation, you'd upload the file to your server here
-                                // and then get back a URL to store in the form
-                                const fileReader = new FileReader();
-                                fileReader.onload = (e) => {
-                                  // Store the base64 encoded image or URL in the form
-                                  const imageUrl = e.target?.result as string;
-                                  field.onChange(imageUrl);
-                                  form.setValue("profileImage", imageUrl, { shouldDirty: true });
-                                };
-                                fileReader.readAsDataURL(file);
-                              } else if (typeof file === 'string') {
-                                // If it's already a string (URL), just use it
-                                field.onChange(file);
-                                form.setValue("profileImage", file, { shouldDirty: true });
-                              }
-                            } else {
-                              // If null, reset field
-                              field.onChange(null);
-                              form.setValue("profileImage", null, { shouldDirty: true });
-                            }
-                            setProfileImageValid(true); // Assume validation is always successful
-                          }}
-                          value={field.value}
-                          supportedFormats={["JPG", "JPEG", "PNG"]}
-                          maxSize={5}
-                          aspectRatio="1:1"
-                          onValidation={setProfileImageValid}
-                        />
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Recommended size 500x500 pixels<br />
-                          JPG, JPEG and PNG formats are supported<br />
-                          Max. upload size - 5MB
-                        </p>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
           )}
 
           {/* Send Email Toggle - only when creating a new user */}

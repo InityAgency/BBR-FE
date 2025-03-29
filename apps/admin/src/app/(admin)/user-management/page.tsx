@@ -4,24 +4,9 @@ import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { UsersTable } from "@/components/admin/Users/Table/UsersTable";
 import AdminLayout from "../AdminLayout";
-import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
-import { User } from "@/app/types/models/User";
-
+import { User } from "@/lib/api/services/types";
+import { usersService } from "@/lib/api/services/users.service";
 const ITEMS_PER_PAGE = 10;
-
-interface UsersApiResponse {
-  data: User[];
-  statusCode: number;
-  message: string;
-  pagination: {
-    total: number;
-    totalPages: number;
-    page: number;
-    limit: number;
-  };
-  timestamp: string;
-  path: string;
-}
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -34,27 +19,12 @@ export default function UserManagementPage() {
   const fetchUsers = async (page: number) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/${API_VERSION}/users?limit=${ITEMS_PER_PAGE}&page=${page}`,
-        {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API error:", errorData);
-        throw new Error(`Error fetching users: ${response.status}`);
-      }
-      
-      const data: UsersApiResponse = await response.json();
-      
-      setUsers(data.data);
-      setTotalPages(data.pagination.totalPages);
-      setTotalItems(data.pagination.total);
+      const response = await usersService.getUsers({ limit: ITEMS_PER_PAGE, page });
+     
+      setUsers(response.data); 
+      setTotalPages(response.pagination?.totalPages || 1);  
+      setTotalItems(response.pagination?.total || 0);
+
     } catch (error) {
       console.error("Error fetching users:", error);
       setUsers([]);
@@ -62,6 +32,7 @@ export default function UserManagementPage() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchUsers(currentPage);
