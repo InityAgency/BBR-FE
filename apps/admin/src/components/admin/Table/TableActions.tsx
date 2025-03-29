@@ -55,7 +55,7 @@ export function TableActions({
       )}
       
       {/* Dropdown menu with actions */}
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
             <MoreHorizontal className="h-4 w-4" />
@@ -78,7 +78,7 @@ export function TableActions({
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </div>
   );
 }

@@ -18,11 +18,13 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
+import { ReactNode } from "react";
 
 export function NavMain({
   items,
 }: {
   items: {
+    badge: ReactNode;
     title: string;
     url: string;
     icon: LucideIcon;
@@ -50,6 +52,7 @@ export function NavMain({
                   <a href={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
+                    {item.badge && <Badge variant="info">{item.badge}</Badge>}
                   </a>
                 </SidebarMenuButton>
                 {item.items?.length ? (

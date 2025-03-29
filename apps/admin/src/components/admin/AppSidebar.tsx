@@ -28,6 +28,7 @@ import { useState, useEffect } from "react"
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api"
 
 const pendingResidencesCount = residencesData.filter(residence => residence.status === "Pending").length;
+const demoData = "Demo";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -76,6 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Residences",
       url: "/residences",
       icon: Building2,
+      badge: demoData,
       items: [
         {
           title: "Pending Activations",
@@ -142,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} />
+        <NavMain items={navItems as any} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />
