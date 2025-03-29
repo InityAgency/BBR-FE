@@ -108,7 +108,10 @@ const BrandForm: React.FC<BrandFormProps> = ({
   
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      brandTypeId: initialData.brandType?.id || initialData.brandTypeId || ""
+    },
     mode: "onChange", // Validate on change
   });
 
