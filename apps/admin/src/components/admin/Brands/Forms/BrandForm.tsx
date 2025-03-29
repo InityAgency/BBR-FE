@@ -336,7 +336,11 @@ const BrandForm: React.FC<BrandFormProps> = ({
       router.push("/brands");
     } catch (error) {
       console.error('Form submission error:', error);
-      toast.error('Failed to save brand');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to save brand');
+      }
       setIsSubmitting(false);
     }
   };

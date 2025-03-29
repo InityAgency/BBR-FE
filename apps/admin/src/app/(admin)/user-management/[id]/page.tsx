@@ -33,18 +33,54 @@ export default function UserDetailsPage() {
           throw new Error("User data not found");
         }
 
-        // Ensure all required fields are present
+        // Ensure all required fields are present and handle nested objects carefully
         const validatedUser = {
-          ...userData,
+          id: userData.id,
           fullName: userData.fullName || "Unnamed User",
           email: userData.email || "-",
-          role: userData.role || { id: "-", name: "-" },
+          role: userData.role ? {
+            id: userData.role.id || "-",
+            name: userData.role.name || "-"
+          } : { id: "-", name: "-" },
           status: userData.status || "UNKNOWN",
           createdAt: userData.createdAt || new Date().toISOString(),
           updatedAt: userData.updatedAt || new Date().toISOString(),
-          company: userData.company || null,
-          buyer: userData.buyer || null,
-          unitTypes: userData.unitTypes || null,
+          emailVerified: userData.emailVerified ?? false,
+          company: userData.company ? {
+            id: userData.company.id,
+            name: userData.company.name || "-",
+            address: userData.company.address || "-",
+            phone_number: userData.company.phone_number || "-",
+            website: userData.company.website || "-",
+            image_id: userData.company.image_id,
+            contact_person_avatar_id: userData.company.contact_person_avatar_id,
+            contact_person_full_name: userData.company.contact_person_full_name || "-",
+            contact_person_job_title: userData.company.contact_person_job_title || "-",
+            contact_person_email: userData.company.contact_person_email || "-",
+            contact_person_phone_number: userData.company.contact_person_phone_number || "-",
+            contact_person_phone_number_country_code: userData.company.contact_person_phone_number_country_code || "-"
+          } : null,
+          buyer: userData.buyer ? {
+            image_id: userData.buyer.image_id,
+            budgetRangeFrom: userData.buyer.budgetRangeFrom,
+            budgetRangeTo: userData.buyer.budgetRangeTo,
+            phoneNumber: userData.buyer.phoneNumber || "-",
+            preferredContactMethod: userData.buyer.preferredContactMethod || "-",
+            currentLocation: userData.buyer.currentLocation ? {
+              id: userData.buyer.currentLocation.id || "-",
+              name: userData.buyer.currentLocation.name || "-",
+              code: userData.buyer.currentLocation.code || "-"
+            } : null,
+            preferredResidenceLocation: userData.buyer.preferredResidenceLocation ? {
+              id: userData.buyer.preferredResidenceLocation.id || "-",
+              name: userData.buyer.preferredResidenceLocation.name || "-",
+              code: userData.buyer.preferredResidenceLocation.code || "-"
+            } : null
+          } : null,
+          unitTypes: Array.isArray(userData.unitTypes) ? userData.unitTypes.map(type => ({
+            id: type.id || "-",
+            name: type.name || "-"
+          })) : null,
           notifyLatestNews: userData.notifyLatestNews ?? false,
           notifyMarketTrends: userData.notifyMarketTrends ?? false,
           notifyBlogs: userData.notifyBlogs ?? false,
@@ -55,7 +91,7 @@ export default function UserDetailsPage() {
           receieveLuxuryInsights: userData.receieveLuxuryInsights ?? false,
         };
 
-        setUser(validatedUser);
+        setUser(validatedUser as User);
         setError(null);
       } catch (err) {
         console.error("Error fetching user data:", err);
