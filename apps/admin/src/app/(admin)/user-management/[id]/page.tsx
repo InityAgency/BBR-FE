@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AdminLayout from "../../AdminLayout";
 import { usersService } from "@/lib/api/services";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,42 +14,11 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { UserHeader } from "@/components/admin/Headers/UserHeader";
 
-interface ExtendedUser extends User {
-  buyer?: {
-    image_id?: string | null;
-    budgetRangeFrom?: number;
-    budgetRangeTo?: number;
-    phoneNumber?: string;
-    preferredContactMethod?: string;
-    currentLocation?: {
-      id: string;
-      name: string;
-      code: string;
-    };
-    preferredResidenceLocation?: {
-      id: string;
-      name: string;
-      code: string;
-    };
-  };
-  unitTypes?: Array<{
-    id: string;
-    name: string;
-  }>;
-  notifyLatestNews?: boolean;
-  notifyMarketTrends?: boolean;
-  notifyBlogs?: boolean;
-  pushNotifications?: boolean;
-  emailNotifications?: boolean;
-  signupMethod?: string;
-  agreedTerms?: boolean;
-}
-
 export default function UserDetailsPage() {
   const params = useParams();
   const userId = params.id as string;
   
-  const [user, setUser] = useState<ExtendedUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,11 +27,39 @@ export default function UserDetailsPage() {
       setLoading(true);
       try {
         const userData = await usersService.getUser(userId);
-        setUser(userData as unknown as ExtendedUser);
+        
+        // Validate user data
+        if (!userData) {
+          throw new Error("User data not found");
+        }
+
+        // Ensure all required fields are present
+        const validatedUser = {
+          ...userData,
+          fullName: userData.fullName || "Unnamed User",
+          email: userData.email || "-",
+          role: userData.role || { id: "-", name: "-" },
+          status: userData.status || "UNKNOWN",
+          createdAt: userData.createdAt || new Date().toISOString(),
+          updatedAt: userData.updatedAt || new Date().toISOString(),
+          company: userData.company || null,
+          buyer: userData.buyer || null,
+          unitTypes: userData.unitTypes || null,
+          notifyLatestNews: userData.notifyLatestNews ?? false,
+          notifyMarketTrends: userData.notifyMarketTrends ?? false,
+          notifyBlogs: userData.notifyBlogs ?? false,
+          pushNotifications: userData.pushNotifications ?? false,
+          emailNotifications: userData.emailNotifications ?? false,
+          signupMethod: userData.signupMethod || "email",
+          agreedTerms: userData.agreedTerms ?? false,
+          receieveLuxuryInsights: userData.receieveLuxuryInsights ?? false,
+        };
+
+        setUser(validatedUser);
         setError(null);
       } catch (err) {
         console.error("Error fetching user data:", err);
-        setError("Unable to load user data");
+        setError(err instanceof Error ? err.message : "Unable to load user data");
         setUser(null);
       } finally {
         setLoading(false);
@@ -136,6 +133,12 @@ export default function UserDetailsPage() {
         <Card className="bg-destructive/10 border-destructive">
           <CardContent className="pt-6">
             <p className="text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      ) : !user ? (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-muted-foreground">No user data available</p>
           </CardContent>
         </Card>
       ) : (
@@ -224,7 +227,7 @@ export default function UserDetailsPage() {
                         <UserIcon className="h-5 w-5 text-muted-foreground" />
                         <div>
                           <p className="text-xs text-muted-foreground">Signup Method</p>
-                          <p className="text-sm font-medium capitalize">{user?.signupMethod || "Email"}</p>
+                          <p className="text-sm font-medium capitalize">{user?.signupMethod || "-"}</p>
                         </div>
                       </div>
                       
@@ -232,11 +235,55 @@ export default function UserDetailsPage() {
                         <Building className="h-5 w-5 text-muted-foreground" />
                         <div>
                           <p className="text-xs text-muted-foreground">Company</p>
-                          <p className="text-sm font-medium">{user?.company || "Not specified"}</p>
+                          <p className="text-sm font-medium">{user?.company?.name || "-"}</p>
                         </div>
                       </div>
                     </div>
                   </div>
+
+                  {/* Company Details - Only show if user has company info */}
+                  {user?.company && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Company Details</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="flex items-center gap-2 bg-muted/20 p-3 rounded-md">
+                            <MapPin className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Address</p>
+                              <p className="text-sm font-medium">{user.company.address || "-"}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 bg-muted/20 p-3 rounded-md">
+                            <Phone className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Phone</p>
+                              <p className="text-sm font-medium">{user.company.phone_number || "-"}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 bg-muted/20 p-3 rounded-md">
+                            <Mail className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Website</p>
+                              <p className="text-sm font-medium">{user.company.website || "-"}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 bg-muted/20 p-3 rounded-md">
+                            <UserIcon className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Contact Person</p>
+                              <p className="text-sm font-medium">{user.company.contact_person_full_name || "-"}</p>
+                              <p className="text-xs text-muted-foreground">{user.company.contact_person_job_title || "-"}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* Buyer Info - Only show if user is a buyer */}
                   {user?.buyer && (
@@ -249,7 +296,7 @@ export default function UserDetailsPage() {
                             <MapPin className="h-5 w-5 text-muted-foreground" />
                             <div>
                               <p className="text-xs text-muted-foreground">Current Location</p>
-                              <p className="text-sm font-medium">{user.buyer.currentLocation?.name || "Not specified"}</p>
+                              <p className="text-sm font-medium">{user.buyer.currentLocation?.name || "-"}</p>
                             </div>
                           </div>
                           
@@ -257,7 +304,7 @@ export default function UserDetailsPage() {
                             <MapPin className="h-5 w-5 text-muted-foreground" />
                             <div>
                               <p className="text-xs text-muted-foreground">Preferred Location</p>
-                              <p className="text-sm font-medium">{user.buyer.preferredResidenceLocation?.name || "Not specified"}</p>
+                              <p className="text-sm font-medium">{user.buyer.preferredResidenceLocation?.name || "-"}</p>
                             </div>
                           </div>
                           
@@ -266,7 +313,7 @@ export default function UserDetailsPage() {
                             <div>
                               <p className="text-xs text-muted-foreground">Budget Range</p>
                               <p className="text-sm font-medium">
-                                {formatCurrency(user.buyer.budgetRangeFrom)} - {formatCurrency(user.buyer.budgetRangeTo)}
+                                {user.buyer.budgetRangeFrom ? formatCurrency(user.buyer.budgetRangeFrom) : "-"} - {user.buyer.budgetRangeTo ? formatCurrency(user.buyer.budgetRangeTo) : "-"}
                               </p>
                             </div>
                           </div>
@@ -275,7 +322,7 @@ export default function UserDetailsPage() {
                             <Mail className="h-5 w-5 text-muted-foreground" />
                             <div>
                               <p className="text-xs text-muted-foreground">Preferred Contact Method</p>
-                              <p className="text-sm font-medium capitalize">{user.buyer.preferredContactMethod || "Not specified"}</p>
+                              <p className="text-sm font-medium capitalize">{user.buyer.preferredContactMethod || "-"}</p>
                             </div>
                           </div>
                         </div>
@@ -397,8 +444,6 @@ function UserDetailsSkeleton() {
       <div>
         <Skeleton className="h-6 w-40 mb-3 bg-muted/20" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Skeleton className="h-20 w-full bg-muted/20" />
-          <Skeleton className="h-20 w-full bg-muted/20" />
           <Skeleton className="h-20 w-full bg-muted/20" />
           <Skeleton className="h-20 w-full bg-muted/20" />
         </div>

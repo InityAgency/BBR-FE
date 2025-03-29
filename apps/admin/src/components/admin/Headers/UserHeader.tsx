@@ -15,10 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FormHeader from "@/components/admin/Headers/FormHeader";
-import { User } from "@/app/types/models/User";
+import { User } from "@/lib/api/services/types";
 import { usersService } from "@/lib/api/services";
 
-const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"] as const;
+const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED", "UNKNOWN"] as const;
+type UserStatus = typeof ALLOWED_STATUSES[number];
 
 interface UserHeaderProps {
   user?: User | null; 
@@ -27,8 +28,14 @@ interface UserHeaderProps {
   onResendInvitation?: () => Promise<void>;
 }
 
+const normalizeStatus = (status: string | undefined | null): UserStatus => {
+  if (!status) return "UNKNOWN";
+  const upperStatus = status.toUpperCase() as UserStatus;
+  return ALLOWED_STATUSES.includes(upperStatus) ? upperStatus : "UNKNOWN";
+};
+
 const getStatusBadgeStyle = (status: string) => {
-  switch(status?.toUpperCase()) {
+  switch(normalizeStatus(status)) {
     case "ACTIVE":
       return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50";
     case "INACTIVE":
@@ -47,22 +54,33 @@ export function UserHeader({
   onResendInvitation,
 }: UserHeaderProps) {
   const router = useRouter();
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<UserStatus>("UNKNOWN");
   const [isResendingInvitation, setIsResendingInvitation] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
 
   // Set the initial status once user data is loaded
   useEffect(() => {
-    if (user?.status && user.status.toUpperCase() !== status) {
-      setStatus(user.status.toUpperCase());
+    if (user?.status) {
+      setStatus(normalizeStatus(user.status));
     }
     setIsLoading(loading);
   }, [user, loading]);
-  
 
   // Skeleton view for loading state
-  if (isLoading || !user) {
+  if (isLoading) {
     return <UserHeaderSkeleton />;
+  }
+
+  // Handle case when user is null
+  if (!user) {
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold text-muted-foreground">User Not Found</h1>
+          <p className="text-sm text-muted-foreground">The requested user could not be found.</p>
+        </div>
+      </div>
+    );
   }
 
   const handleStatusChange = async (newStatus: string) => {
@@ -71,21 +89,17 @@ export function UserHeader({
         throw new Error("User ID is required");
       }
       
-      const upperStatus = newStatus.toUpperCase();
-      if (!ALLOWED_STATUSES.includes(upperStatus as typeof ALLOWED_STATUSES[number])) {
+      const normalizedStatus = normalizeStatus(newStatus);
+      if (normalizedStatus === "UNKNOWN") {
         throw new Error("Invalid status value");
       }
-      
-      if (!user.id) {
-        throw new Error("User ID is required");
-      }
 
-      await usersService.updateUserStatus(user.id, upperStatus);
-      setStatus(upperStatus);
-      toast.success(`Status for ${user.fullName} changed to ${upperStatus}`);
+      await usersService.updateUserStatus(user.id, normalizedStatus);
+      setStatus(normalizedStatus);
+      toast.success(`Status for ${user.fullName} changed to ${normalizedStatus}`);
     } catch (error) {
       console.error("Error changing status:", error);
-      toast.error("Error changing status. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Error changing status. Please try again.");
     }
   };
 
@@ -98,42 +112,40 @@ export function UserHeader({
       toast.success("Invitation sent successfully!");
     } catch (error) {
       console.error("Error resending invitation:", error);
-      toast.error("Error resending invitation. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Error resending invitation. Please try again.");
     } finally {
       setIsResendingInvitation(false);
     }
   };
 
   const renderStatusBadge = () => {
-    const currentStatus = status.toUpperCase();
-
     return (
       <div className="flex items-center gap-2">
         <Select 
           onValueChange={handleStatusChange} 
-          value={currentStatus}
+          value={status}
         >
           <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
             <Badge 
-              className={`${getStatusBadgeStyle(currentStatus)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80 capitalize`}
+              className={`${getStatusBadgeStyle(status)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80 capitalize`}
             >
-              {currentStatus}
+              {status.toLowerCase()}
             </Badge>
           </SelectTrigger>
           <SelectContent>
-            {ALLOWED_STATUSES.map((statusOption) => (
+            {ALLOWED_STATUSES.filter(s => s !== "UNKNOWN").map((statusOption) => (
               <SelectItem 
                 key={statusOption} 
                 value={statusOption}
                 className="text-sm capitalize"
               >
-                {statusOption}
+                {statusOption.toLowerCase()}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        {(currentStatus === "INVITED") && (
+        {(status === "INVITED") && (
           <Button
             variant="outline"
             className="transition-all duration-300"
@@ -150,7 +162,7 @@ export function UserHeader({
 
   return (
     <FormHeader
-      title={user.fullName || "User Details"}
+      title={user.fullName || "Unnamed User"}
       titleContent={renderStatusBadge()}
       hideDefaultButtons={true}
       customButtons={
