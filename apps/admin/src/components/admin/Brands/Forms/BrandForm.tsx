@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -105,14 +105,16 @@ const BrandForm: React.FC<BrandFormProps> = ({
   const [loadingBrandTypes, setLoadingBrandTypes] = useState(true);
   const [logoChanged, setLogoChanged] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [isFormValid, setIsFormValid] = useState(false);
   
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandSchema),
     defaultValues: {
       ...initialData,
-      brandTypeId: initialData.brandType?.id || initialData.brandTypeId || ""
+      brandTypeId: initialData.brandType?.id || initialData.brandTypeId || "",
+      status: initialData.status || (isEditing ? undefined : "ACTIVE")
     },
-    mode: "onChange", // Validate on change
+    mode: "onChange"
   });
 
   // Fetch brand types from API when component mounts
@@ -136,7 +138,6 @@ const BrandForm: React.FC<BrandFormProps> = ({
           setBrandTypeOptions(data.data);
         }
       } catch (error) {
-        console.error('Error fetching brand types:', error);
         toast.error('Failed to load brand types');
       } finally {
         setLoadingBrandTypes(false);
@@ -150,9 +151,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
   useEffect(() => {
     const fetchLogoBlob = async () => {
       if (!initialData.logo?.id) return;
-      
-      console.log('Fetching logo with ID:', initialData.logo.id);
-      console.log('Logo mime type:', initialData.logo.mimeType);
+
       
       try {
         const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/media/${initialData.logo.id}/content`, {
@@ -169,17 +168,13 @@ const BrandForm: React.FC<BrandFormProps> = ({
         }
 
         const arrayBuffer = await response.arrayBuffer();
-        console.log('Received array buffer size:', arrayBuffer.byteLength);
         
         const blob = new Blob([arrayBuffer], { type: initialData.logo.mimeType });
-        console.log('Created blob:', blob);
         
         const url = URL.createObjectURL(blob);
-        console.log('Created URL:', url);
         
         setLogoUrl(url);
       } catch (error) {
-        console.error('Error fetching logo:', error);
         toast.error('Failed to load logo');
       }
     };
@@ -189,7 +184,6 @@ const BrandForm: React.FC<BrandFormProps> = ({
     // Clean up blob URL when component unmounts
     return () => {
       if (logoUrl) {
-        console.log('Cleaning up URL:', logoUrl);
         URL.revokeObjectURL(logoUrl);
       }
     };
@@ -201,16 +195,34 @@ const BrandForm: React.FC<BrandFormProps> = ({
   const brandStatus = form.watch("status");
   const logo = form.watch("logo");
 
-  // Determine if the form is valid - all required fields must be filled
-  const isFormValid = 
-    !!brandName && 
-    brandName.trim().length >= 2 && 
-    !!brandTypeId && 
-    !!brandStatus &&
-    (isEditing || logoValid); // Logo je obavezan samo pri kreiranju
+  // Check form validity whenever fields change
+  useEffect(() => {
+    const formValues = form.getValues();
+    const valid = 
+      !!formValues.name && 
+      formValues.name.trim().length >= 2 && 
+      !!formValues.brandTypeId && 
+      (isEditing || logoValid);
+    
+    setIsFormValid(valid);
+  }, [form, brandName, brandTypeId, logoValid, isEditing]);
 
   // Check if form has unsaved changes
   const hasUnsavedChanges = form.formState.isDirty || logoChanged;
+
+  // Check if form is valid for saving
+  const isSaveEnabled = useCallback(() => {
+    const formValues = form.getValues();
+    const hasRequiredFields = 
+      !!formValues.name && 
+      formValues.name.trim().length >= 2 && 
+      !!formValues.brandTypeId;
+
+    const hasChanges = form.formState.isDirty || logoChanged;
+    const isLogoValid = isEditing || logoValid;
+
+    return hasRequiredFields && isLogoValid && hasChanges && !isSubmitting;
+  }, [form, logoChanged, logoValid, isEditing, isSubmitting]);
 
   // Setup discard warning hook
   const {
@@ -244,15 +256,12 @@ const BrandForm: React.FC<BrandFormProps> = ({
       const data = await response.json() as MediaUploadResponse;
       return { id: data.data.id, url: data.data.url };
     } catch (error) {
-      console.error('Error uploading logo:', error);
       throw new Error('Failed to upload logo');
     }
   };
 
   // Monitor logo changes
   useEffect(() => {
-    console.log('Logo changed:', logo);
-    console.log('Initial logo:', initialData.logo);
     if (logo !== initialData.logo && logo !== undefined) {
       setLogoChanged(true);
     }
@@ -261,9 +270,23 @@ const BrandForm: React.FC<BrandFormProps> = ({
   const onSubmit = async (data: BrandFormValues) => {
     try {
       setIsSubmitting(true);
+
+      // Proverite da li ID brenda postoji
+      const brandId = initialData.id;
+      
+      if (!brandId && isEditing) {
+        throw new Error('Brand ID is missing for edit operation');
+      }
+
+
+      const apiUrl = isEditing 
+        ? `${API_BASE_URL}/api/${API_VERSION}/brands/${brandId}`
+        : `${API_BASE_URL}/api/${API_VERSION}/brands`;
+
       
       // Double check that all required fields are present
       if (!data.name || !data.brandTypeId || (!isEditing && !data.logo && !initialData.logo?.id)) {
+
         if (!data.name) {
           form.setError("name", { type: "required", message: "Brand name is required" });
         }
@@ -283,12 +306,12 @@ const BrandForm: React.FC<BrandFormProps> = ({
       let logoId = initialData.logo?.id;
       
       if (logoChanged && data.logo instanceof File) {
+
         try {
           const uploadResult = await uploadLogo(data.logo);
           logoId = uploadResult.id;
         } catch (error) {
           toast.error("Failed to upload logo");
-          console.error("Logo upload error:", error);
           setIsSubmitting(false);
           return;
         }
@@ -312,38 +335,49 @@ const BrandForm: React.FC<BrandFormProps> = ({
         payload.status = "ACTIVE";
       }
       
-      console.log("Submitting brand data:", payload);
       
-      // Submit data to API
-      const url = isEditing 
-        ? `${API_BASE_URL}/api/${API_VERSION}/brands/${initialData.id}`
-        : `${API_BASE_URL}/api/${API_VERSION}/brands`;
-      
-      const method = isEditing ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${isEditing ? 'updating' : 'creating'} brand`);
+      // Submit data to API - WRAP IN TRY/CATCH
+      try {
+        
+        const response = await fetch(apiUrl, {
+          method: isEditing ? 'PUT' : 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        
+        const responseText = await response.text();
+        
+        let responseData;
+        if (responseText) {
+          try {
+            responseData = JSON.parse(responseText);
+          } catch (e) {
+            responseData = { message: responseText };
+          }
+        }
+        
+        if (!response.ok) {
+          throw new Error(responseData?.message || `Error ${isEditing ? 'updating' : 'creating'} brand (Status: ${response.status})`);
+        }
+        
+        
+        toast.success(isEditing ? "Brand updated successfully!" : "Brand created successfully!");
+        router.push("/brands");
+      } catch (fetchError) {
+        throw fetchError;
       }
-      
-      toast.success(isEditing ? "Brand updated successfully!" : "Brand created successfully!");
-      router.push("/brands");
     } catch (error) {
-      console.error('Form submission error:', error);
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Failed to save brand');
       }
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -373,7 +407,6 @@ const BrandForm: React.FC<BrandFormProps> = ({
       router.push('/brands');
       router.refresh();
     } catch (error) {
-      console.error('Error deleting brand:', error);
       toast.error('Failed to delete brand');
     }
   };
@@ -405,7 +438,6 @@ const BrandForm: React.FC<BrandFormProps> = ({
       toast.success(`Brand status updated to ${newStatus}`);
       router.refresh();
     } catch (error) {
-      console.error('Error updating status:', error);
       toast.error('Failed to update brand status');
     }
   };
@@ -478,6 +510,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
           </Button>
         </div>
 
+        {/* ISPRAVKA: Koristimo showRejectDialog umesto showDeleteDialog */}
         <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -536,17 +569,83 @@ const BrandForm: React.FC<BrandFormProps> = ({
     );
   };
 
+  // ISPRAVKA: Direktan poziv onSubmit umesto prosleđivanja kroz form.handleSubmit
+  const handleSave = useCallback(() => {
+    const formValues = form.getValues();
+    
+    if (!isSaveEnabled()) {
+      if (!logoValid && !isEditing) {
+        toast.error("Please upload a logo");
+      } else if (!form.formState.isDirty && !logoChanged) {
+        toast.error("No changes have been made");
+      } else {
+        toast.error("Please fill in all required fields correctly");
+      }
+      return;
+    }
+  
+    // KLJUČNA PROMENA: direktno pozivamo onSubmit umesto kroz form.handleSubmit
+    onSubmit(form.getValues());
+  }, [form, onSubmit, isEditing, logoValid, logoChanged, isSaveEnabled]);
+
+  // Opciono dodajte dugme za direktno testiranje API ažuriranja
+  const testDirectUpdate = () => {
+    const data = form.getValues();
+    
+    if (!initialData.id) {
+      toast.error("No brand ID found");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    const payload = {
+      name: data.name,
+      description: data.description || undefined,
+      brandTypeId: data.brandTypeId,
+      status: data.status
+    };
+    
+    // Direktan API poziv
+    fetch(`${API_BASE_URL}/api/${API_VERSION}/brands/${initialData.id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(text || 'Failed to update brand');
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      toast.success('Brand updated successfully');
+      router.push('/brands');
+    })
+    .catch(error => {
+      toast.error('Update failed: ' + error.message);
+    })
+    .finally(() => {
+      setIsSubmitting(false);
+    });
+  };
+
   return (
     <>
       <FormHeader
-        title={isEditing ? initialData?.name || "Edit brand" : "Add new brand"}
+        title={isEditing ? initialData.name || "Edit brand" : "Add new brand"}
         titleContent={renderStatusBadge()}
         titleActions={renderStatusActions()}
         extraButtons={renderDeleteButton()}
-        onSave={form.handleSubmit(onSubmit)}
+        onSave={handleSave}
         onDiscard={handleDiscard}
         saveButtonText={isEditing ? "Save changes" : "Add Brand"}
-        saveButtonDisabled={!isFormValid || isSubmitting}
+        saveButtonDisabled={!isSaveEnabled()}
         isSubmitting={isSubmitting}
       />
       
@@ -641,7 +740,6 @@ const BrandForm: React.FC<BrandFormProps> = ({
                       <div>
                         <ImageUpload
                           onChange={(file) => {
-                            console.log('ImageUpload onChange:', file);
                             field.onChange(file);
                             setLogoValid(!!file);
                             setLogoChanged(true);
@@ -672,6 +770,8 @@ const BrandForm: React.FC<BrandFormProps> = ({
           </Form>
         </div>
       </div>
+
+
 
       {/* Discard Modal */}
       <DiscardModal

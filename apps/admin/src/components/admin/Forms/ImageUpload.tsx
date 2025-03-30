@@ -29,14 +29,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   // State for preview URL (could be a File object or a string URL for existing images)
   const [preview, setPreview] = useState<string | null>(() => {
-    console.log('ImageUpload initializing preview with value:', value);
     if (!value) return null;
     if (typeof value === 'string') {
-      console.log('Value is string, using directly as preview');
       return value;
     }
     if (value instanceof File) {
-      console.log('Value is File, creating object URL');
       return URL.createObjectURL(value);
     }
     return null;
@@ -48,18 +45,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   // Validate on mount and when value changes
   useEffect(() => {
-    console.log('ImageUpload value changed:', value);
     if (!value) {
-      console.log('No value, setting preview to null');
       setPreview(null);
       return;
     }
     
     if (typeof value === 'string') {
-      console.log('New value is string, updating preview');
       setPreview(value);
     } else if (value instanceof File) {
-      console.log('New value is File, creating new object URL');
       const url = URL.createObjectURL(value);
       setPreview(url);
       return () => URL.revokeObjectURL(url);
@@ -152,7 +145,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             height={200}
             unoptimized={true}
             onError={(e) => {
-              console.error('Error loading image:', e);
               setError('Failed to load image');
             }}
           />

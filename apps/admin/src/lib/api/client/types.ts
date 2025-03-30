@@ -62,6 +62,14 @@ export interface ApiEndpoints {
     delete: EndpointBuilder;
     details: EndpointBuilder;
   };
+  amenities: {
+    list: EndpointBuilder;
+    create: EndpointBuilder;
+    update: EndpointBuilder;
+    delete: EndpointBuilder;
+    details: EndpointBuilder;
+    uploadIcon: EndpointBuilder;
+  };
   settings: {
     get: EndpointBuilder;
     update: EndpointBuilder;

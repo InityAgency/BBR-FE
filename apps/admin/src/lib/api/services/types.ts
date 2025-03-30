@@ -60,6 +60,18 @@ export interface User {
   deletedAt: string | null;
 }
 
+export interface Amenity {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  iconId: string;
+}
+
+
 export interface Brand {
   id: string;
   name: string;
