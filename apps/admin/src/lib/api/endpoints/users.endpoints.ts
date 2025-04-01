@@ -16,4 +16,5 @@ export const usersEndpoints = {
 
   status: ((params?: EndpointParams) => `/users/${params?.id}/status`) as EndpointBuilder,
 
+  resendVerificationEmail: ((params?: EndpointParams) => `/users/${params?.id}/resend-verification-email`) as EndpointBuilder,
 }; 

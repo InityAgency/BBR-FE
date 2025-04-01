@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarIcon, Mail, Phone, User as UserIcon, MapPin, DollarSign, Bell, BellOff, Clock, Building } from "lucide-react";
+import { CalendarIcon, Mail, Phone, User as UserIcon, MapPin, DollarSign, Bell, BellOff, Clock, Building, Mails } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { UserHeader } from "@/components/admin/Headers/UserHeader";
+import { Button } from "@/components/ui/button";
 
 export default function UserDetailsPage() {
   const params = useParams();
@@ -157,6 +158,16 @@ export default function UserDetailsPage() {
     }
   };
 
+  const handleResendVerificationEmail = async () => {
+    try {
+      await usersService.resendVerificationEmail(userId);
+      toast.success("Verification email has been resent");
+    } catch (error) {
+      toast.error("Error sending verification email");
+      console.error(error);
+    }
+  };
+
   return (
     <AdminLayout>
       <UserHeader 
@@ -209,11 +220,17 @@ export default function UserDetailsPage() {
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm flex items-center gap-1">
-                        Email verification: 
+                        Verified: 
                         {user?.emailVerified ? (
-                          <Badge variant="default" className="bg-green-900/20 text-green-300 ml-1">Verified</Badge>
+                          <Badge variant="default" className="bg-green-900/20 text-green-300 border-green-900/50 ml-1 px-3 py-1 text-sm">Verified</Badge>
                         ) : (
-                          <Badge variant="outline" className="bg-yellow-900/20 text-yellow-300 ml-1">Not Verified</Badge>
+                          <>
+                            <Badge variant="outline" className="bg-yellow-900/20 text-yellow-300 border-yellow-900/50 ml-1 px-3 py-1 text-sm">Not Verified</Badge>
+                            <Button variant="ghost" size="sm" className="ml-1" onClick={handleResendVerificationEmail}>
+                              <Mails className="h-4 w-4" />
+                              Resend Verification Email
+                            </Button>
+                          </>
                         )}
                       </span>
                     </div>

@@ -107,5 +107,13 @@ export const columns: ColumnDef<Lifestyle>[] = [
         meta: {
             width: "w-[180px]"
         }
+    },
+    {
+        id: "actions",
+        header: "Actions",
+        enableHiding: false,
+        meta: {
+            width: "w-[40px]"
+        }
     }
 ];  

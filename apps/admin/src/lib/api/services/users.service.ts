@@ -69,4 +69,8 @@ export const usersService = {
   deleteUser: async (id: string): Promise<void> => {
     await api.delete(API_ENDPOINTS.users.delete, { id });
   },
+
+  resendVerificationEmail: async (id: string): Promise<void> => {
+    await api.post(API_ENDPOINTS.users.resendVerificationEmail, {}, { id });
+  },
 };

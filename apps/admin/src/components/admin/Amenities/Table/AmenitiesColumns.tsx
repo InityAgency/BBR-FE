@@ -133,7 +133,7 @@ export const columns: ColumnDef<Amenity>[] = [
         header: "Actions",
         enableHiding: false,
         meta: {
-            width: "w-[80px]"
+            width: "w-[60px]"
         }
     }
 ]

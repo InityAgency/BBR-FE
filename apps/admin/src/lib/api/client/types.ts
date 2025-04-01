@@ -54,6 +54,7 @@ export interface ApiEndpoints {
     delete: EndpointBuilder;
     details: EndpointBuilder;
     status: EndpointBuilder;
+    resendVerificationEmail: EndpointBuilder;
   };
   brands: {
     list: EndpointBuilder;

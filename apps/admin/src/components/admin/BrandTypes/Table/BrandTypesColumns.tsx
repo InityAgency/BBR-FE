@@ -75,8 +75,12 @@ export const columns: ColumnDef<BrandType>[] = [
   },
   {
     id: "actions",
-    header: "",
+    header: "Actions",
     cell: () => null,
+    enableHiding: false,
+    meta: {
+      width: "w-[80px]"
+    }
   },
 ];
 

@@ -184,7 +184,7 @@ export const columns: ColumnDef<Brand>[] = [
     header: "Actions",
     enableHiding: false,
     meta: {
-      width: "w-[80px]"
+      width: "w-[60px]"
     }
   },
 ];

@@ -104,8 +104,6 @@ export function BrandTypesTable({
 }: BrandTypesTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
-
-  // Koristimo generički hook za tabelu
   const {
     table,
     setGlobalFilter: setTableGlobalFilter,
@@ -114,13 +112,9 @@ export function BrandTypesTable({
     columns: enhancedColumns,
     initialSorting: [{ id: "updatedAt", desc: true }],
     globalFilterFn: (row, columnId, value, addMeta) => {
-      // Koristimo našu univerzalnu funkciju
       const result = fuzzyFilter(row, columnId, value, addMeta);
-      
-      // Dodatno proveravamo ID polje eksplicitno
       const id = row.original.id || "";
       const searchValue = String(value).toLowerCase();
-      
       return result || id.toLowerCase().includes(searchValue);
     },
     initialPageSize: ITEMS_PER_PAGE,
@@ -128,27 +122,110 @@ export function BrandTypesTable({
     pageCount: totalPages,
   });
 
-  // Logujemo redove da vidimo šta se dešava
-  useEffect(() => {
-  }, [brandTypes, table]);
-
-  // Sinhronizujemo globalFilter sa tabelom
   React.useEffect(() => {
     setTableGlobalFilter(globalFilter);
   }, [globalFilter, setTableGlobalFilter]);
 
-  // Ako još uvek učitavamo ili nema podataka, prikažimo odgovarajuću poruku
   const showNoData = !loading && (!brandTypes || brandTypes.length === 0);
+
+  // Generate page numbers for pagination
+  const renderPageNumbers = () => {
+    const effectiveTotalPages = Math.max(1, totalPages);
+    
+    if (effectiveTotalPages <= 5) {
+      return Array.from({ length: effectiveTotalPages }, (_, i) => (
+        <Button
+          key={i}
+          variant={currentPage === i + 1 ? "default" : "outline"}
+          size="sm"
+          className="w-8 h-8"
+          onClick={() => goToPage(i + 1)}
+          disabled={loading}
+        >
+          {i + 1}
+        </Button>
+      ));
+    }
+
+    const pageNumbers = [];
+
+    // Always show first page
+    pageNumbers.push(
+      <Button
+        key={1}
+        variant={currentPage === 1 ? "default" : "outline"}
+        size="sm"
+        className="w-8 h-8"
+        onClick={() => goToPage(1)}
+        disabled={loading}
+      >
+        1
+      </Button>
+    );
+
+    // Show ellipsis if current page is not near the beginning
+    if (currentPage > 3) {
+      pageNumbers.push(
+        <span key="startEllipsis" className="px-1">...</span>
+      );
+    }
+
+    // Show pages around current page
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(effectiveTotalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i !== 1 && i !== effectiveTotalPages) {
+        pageNumbers.push(
+          <Button
+            key={i}
+            variant={currentPage === i ? "default" : "outline"}
+            size="sm"
+            className="w-8 h-8"
+            onClick={() => goToPage(i)}
+            disabled={loading}
+          >
+            {i}
+          </Button>
+        );
+      }
+    }
+
+    // Show ellipsis if current page is not near the end
+    if (currentPage < effectiveTotalPages - 2) {
+      pageNumbers.push(
+        <span key="endEllipsis" className="px-1">...</span>
+      );
+    }
+
+    // Always show last page if there are multiple pages
+    if (effectiveTotalPages > 1) {
+      pageNumbers.push(
+        <Button
+          key={effectiveTotalPages}
+          variant={currentPage === effectiveTotalPages ? "default" : "outline"}
+          size="sm"
+          className="w-8 h-8"
+          onClick={() => goToPage(effectiveTotalPages)}
+          disabled={loading}
+        >
+          {effectiveTotalPages}
+        </Button>
+      );
+    }
+
+    return pageNumbers;
+  };
+
+  const effectiveTotalPages = Math.max(1, totalPages);
 
   return (
     <div className="w-full">
-      {/* Filteri */}
       <BrandTypesFilters
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
       />
 
-      {/* Kartice za mobilni prikaz */}
       <div className="block lg:hidden">
         {loading ? (
           <CardsSkeleton />
@@ -161,7 +238,6 @@ export function BrandTypesTable({
         )}
       </div>
 
-      {/* Tabela za desktop prikaz */}
       <div className="hidden lg:block">
         {loading ? (
           <TableSkeleton />
@@ -176,43 +252,29 @@ export function BrandTypesTable({
         )}
       </div>
 
-      {/* Paginacija */}
       {!showNoData && (
-        <div className="flex items-center justify-between py-4">
-          <div className="text-sm text-muted-foreground mb-2 mt-3">
-            Page {currentPage} of {totalPages || 1} | Total brand types: {brandTypes?.length > 0 && totalItems === 0 ? brandTypes.length : totalItems}
+        <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
+          <div className="text-sm text-muted-foreground">
+            Page {currentPage} of {effectiveTotalPages} | Total brand types: {brandTypes?.length > 0 && totalItems === 0 ? brandTypes.length : totalItems}
           </div>
 
-          <div className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               onClick={goToPreviousPage} 
               disabled={currentPage <= 1 || loading}
-              className="mr-2"
             >
               Previous
             </Button>
             
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages || 1 }, (_, i) => (
-                <Button
-                  key={i}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  size="sm"
-                  className="w-8 h-8"
-                  onClick={() => goToPage(i + 1)}
-                  disabled={loading}
-                >
-                  {i + 1}
-                </Button>
-              ))}
+            <div className="flex items-center space-x-1">
+              {renderPageNumbers()}
             </div>
 
             <Button 
               variant="outline" 
               onClick={goToNextPage} 
-              disabled={currentPage >= totalPages || loading}
-              className="ml-2"
+              disabled={currentPage >= effectiveTotalPages || loading}
             >
               Next
             </Button>

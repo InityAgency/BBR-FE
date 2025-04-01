@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Row } from "@tanstack/react-table";
-import { Eye, Archive } from "lucide-react";
+import { Eye, Archive, Edit } from "lucide-react";
 import { TableActions, TableAction } from "@/components/admin/Table/TableActions";
 import { Lifestyle } from "@/app/types/models/Lifestyles";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
@@ -59,6 +59,13 @@ export function LifestylesActions({ row, onDelete, currentPage }: LifestylesActi
             }
         },
         {
+            label: "Edit",
+            icon: <Edit className="h-4 w-4" />,
+            onClick: (lifestyle: Lifestyle) => {
+                window.location.href = `/lifestyles/${lifestyle.id}/edit`;
+            }
+        },
+        {
             label: "Delete",
             icon: <Archive className="h-4 w-4 text-red-400" />,
             className: "text-red-400 hover:text-red-400",
@@ -73,6 +80,9 @@ export function LifestylesActions({ row, onDelete, currentPage }: LifestylesActi
             <TableActions 
                 actions={actions} 
                 row={row}
+                editAction={{
+                    href: `/residences/lifestyles/${row.original.id}/edit`,
+                }}
             />
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
