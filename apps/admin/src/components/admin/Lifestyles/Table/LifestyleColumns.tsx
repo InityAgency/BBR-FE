@@ -11,7 +11,7 @@ import { format } from "date-fns";
 
 const renderNameCell = (value: string, id: string) => (
     <div className="max-w-[200px]">
-        <a href={`/residences/lifestyles/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
+        <a href={`/residences/lifestyles/${id}/edit`} className="font-medium text-foreground hover:underline truncate block" title={value}>
             {value}
         </a>
         <div className="text-xs text-muted-foreground truncate">
@@ -76,7 +76,16 @@ export const columns: ColumnDef<Lifestyle>[] = [
     },
     {
         accessorKey: "createdAt",
-        header: "Created at",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                className="w-full justify-between"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Created at
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => renderDateCell(row.getValue("createdAt")),
         meta: {
             width: "w-[180px]"
@@ -84,7 +93,16 @@ export const columns: ColumnDef<Lifestyle>[] = [
     },
     {
         accessorKey: "updatedAt",
-        header: "Updated at",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                className="w-full justify-between"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Updated at
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => renderDateCell(row.getValue("updatedAt")),
         meta: {
             width: "w-[180px]"
