@@ -71,14 +71,12 @@ export function BrandTypeForm({ initialData, isEdit = false }: BrandTypeFormProp
     setIsSubmitting(true);
 
     try {
-      // Priprema podataka - ukloniti prazna polja
-      const payload: Record<string, any> = { name: values.name };
-      
-      // Dodajemo description samo ako nije prazan
-      if (values.description && values.description.trim() !== '') {
-        payload.description = values.description;
-      }
-      
+      // Create payload with both name and description
+      const payload: Record<string, any> = { 
+        name: values.name,
+        // Always include description (even if empty string)
+        description: values.description || "" 
+      };
 
       let url = `${API_BASE_URL}/api/${API_VERSION}/brand-types`;
       let method = "POST";

@@ -5,6 +5,7 @@ import PageHeader from "@/components/admin/Headers/PageHeader";
 import { UsersTable } from "@/components/admin/Users/Table/UsersTable";
 import AdminLayout from "../AdminLayout";
 import { User } from "@/lib/api/services/types";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { usersService } from "@/lib/api/services/users.service";
 const ITEMS_PER_PAGE = 10;
 
@@ -19,15 +20,40 @@ export default function UserManagementPage() {
   const fetchUsers = async (page: number) => {
     setLoading(true);
     try {
-      const response = await usersService.getUsers({ limit: ITEMS_PER_PAGE, page });
-     
-      setUsers(response.data); 
-      setTotalPages(response.pagination?.totalPages || 1);  
-      setTotalItems(response.pagination?.total || 0);
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/users?limit=${ITEMS_PER_PAGE}&page=${page}`,
+        {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Error fetching users: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Validate pagination data
+      const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
+      const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
+      
+      if (!validTotal || !validTotalPages) {
+        throw new Error('Invalid pagination data received from server');
+      }
+
+      setUsers(data.data || []);
+      setTotalPages(Math.max(1, data.pagination.totalPages));
+      setTotalItems(data.pagination.total);
+      setCurrentPage(data.pagination.page || page);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error);
       setUsers([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -36,27 +62,24 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     fetchUsers(currentPage);
-  }, []);
+  }, [currentPage]); // Re-fetch when page changes
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchUsers(nextPage);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      fetchUsers(prevPage);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(page);
-    fetchUsers(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (

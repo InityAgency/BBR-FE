@@ -43,34 +43,31 @@ export default function BrandTypesPage() {
           }
         }
       );
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API error:", errorData);
         throw new Error(`Error fetching brand types: ${response.status}`);
       }
-      
+
       const data: BrandTypesApiResponse = await response.json();
+
+      // Validate pagination data
+      const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
+      const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
       
-      const brandTypesData = data.data || [];
-      setBrandTypes(brandTypesData);
-      
-      // Postavimo totalItems na osnovu stvarnog broja podataka ako pagination.total nije tačno
-      const apiTotal = data.pagination?.total || 0;
-      // Ako API vraća total=0, a imamo podatke, koristimo dužinu niza
-      const actualTotal = apiTotal === 0 && brandTypesData.length > 0 
-        ? brandTypesData.length 
-        : apiTotal;
-        
-      setTotalItems(actualTotal);
-      
-      // Izračunajmo stvaran broj stranica na osnovu stvarnog broja podataka
-      const actualTotalPages = data.pagination?.totalPages || Math.ceil(actualTotal / ITEMS_PER_PAGE) || 1;
-      setTotalPages(actualTotalPages);
-      
+      if (!validTotal || !validTotalPages) {
+        throw new Error('Invalid pagination data received from server');
+      }
+
+      setBrandTypes(data.data || []);
+      setTotalPages(Math.max(1, data.pagination.totalPages));
+      setTotalItems(data.pagination.total);
+      setCurrentPage(data.pagination.page || page);
     } catch (error) {
-      console.error("Error fetching brand types:", error);
+      console.error('Error fetching brand types:', error);
       setBrandTypes([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -78,7 +75,7 @@ export default function BrandTypesPage() {
 
   useEffect(() => {
     fetchBrandTypes(currentPage);
-  }, []);
+  }, [currentPage]); // Re-fetch when page changes
 
   // Log the state values after they're set
   useEffect(() => {
@@ -86,23 +83,20 @@ export default function BrandTypesPage() {
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchBrandTypes(nextPage);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      fetchBrandTypes(prevPage);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(page);
-    fetchBrandTypes(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (

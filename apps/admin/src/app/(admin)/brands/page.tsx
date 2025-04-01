@@ -54,11 +54,23 @@ export default function BrandsPage() {
       
       const data: BrandsApiResponse = await response.json();
       
-      setBrands(data.data);
-      setTotalPages(data.pagination.totalPages);
+      // Validate pagination data
+      const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
+      const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
+      
+      if (!validTotal || !validTotalPages) {
+        throw new Error('Invalid pagination data received from server');
+      }
+
+      setBrands(data.data || []);
+      setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
+      setCurrentPage(data.pagination.page || page);
     } catch (error) {
+      console.error('Error fetching brands:', error);
       setBrands([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -66,27 +78,24 @@ export default function BrandsPage() {
 
   useEffect(() => {
     fetchBrands(currentPage);
-  }, []);
+  }, [currentPage]); // Re-fetch when page changes
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchBrands(nextPage);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      fetchBrands(prevPage);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(page);
-    fetchBrands(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (

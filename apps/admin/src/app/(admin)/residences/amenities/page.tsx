@@ -10,7 +10,7 @@ import { Amenity } from "@/app/types/models/Amenities";
 import { useSearchParams } from "next/navigation";
 import AmenitiesTable from "@/components/admin/Amenities/Table/AmenitiesTable";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 
 interface AmenitiesApiResponse {
   data: Amenity[];
@@ -54,11 +54,23 @@ export default function AmenitiesPage() {
       
       const data: AmenitiesApiResponse = await response.json();
       
-      setAmenities(data.data);
-      setTotalPages(data.pagination.totalPages);
+      // Validate pagination data
+      const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
+      const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
+      
+      if (!validTotal || !validTotalPages) {
+        throw new Error('Invalid pagination data received from server');
+      }
+
+      setAmenities(data.data || []);
+      setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
+      setCurrentPage(data.pagination.page || page);
     } catch (error) {
+      console.error('Error fetching amenities:', error);
       setAmenities([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -66,27 +78,24 @@ export default function AmenitiesPage() {
 
   useEffect(() => {
     fetchAmenities(currentPage);
-  }, []);
+  }, [currentPage]); // Re-fetch when page changes
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchAmenities(nextPage);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      fetchAmenities(prevPage);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(page);
-    fetchAmenities(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
