@@ -11,7 +11,7 @@ import { format } from "date-fns";
 
 const renderNameCell = (value: string, id: string) => (
     <div className="max-w-[200px]">
-        <a href={`/residences/amenities/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
+        <a href={`/residences/amenities/${id}/edit`} className="font-medium text-foreground hover:underline truncate block" title={value}>
         {value}
         </a>
         <div className="text-xs text-muted-foreground truncate">

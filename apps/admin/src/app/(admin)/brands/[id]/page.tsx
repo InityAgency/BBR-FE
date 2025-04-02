@@ -11,6 +11,7 @@ import { Brand, BrandStatus } from "@/app/types/models/Brand";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ResidencesTable from "@/components/admin/Residences/Table/ResidencesTable";
 import { getBrandById, updateBrandStatus, deleteBrand } from "@/app/services/brands";
+import { useBreadcrumb } from "@/components/admin/Breadcrumb";
 
 export default function BrandsSingle() {
   const router = useRouter();
@@ -20,16 +21,32 @@ export default function BrandsSingle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { setCustomBreadcrumb, resetCustomBreadcrumb } = useBreadcrumb();
+
+  const updateBreadcrumb = (brandData: Brand | null) => {
+    console.log('Updating breadcrumb with brand data:', brandData);
+    if (brandData?.id && brandData.name) {
+      console.log('Setting custom breadcrumb:', brandId, brandData.name);
+      setCustomBreadcrumb(brandId, brandData.name);
+    } else {
+      console.log('Resetting custom breadcrumb for:', brandId);
+      resetCustomBreadcrumb(brandId);
+    }
+  };
+
   const fetchBrand = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getBrandById(brandId);
+      console.log('Fetched brand data:', data);
       setBrand(data);
+      updateBreadcrumb(data);
     } catch (error) {
       console.error("Error fetching brand:", error);
       if (error instanceof Error && error.message === 'Brand not found') {
         setError('Brand not found');
+        updateBreadcrumb(null);
         router.push("/404");
       } else {
         setError('Failed to load brand data');
@@ -42,17 +59,22 @@ export default function BrandsSingle() {
 
   useEffect(() => {
     if (brandId) {
+      console.log('Fetching brand with ID:', brandId);
       fetchBrand();
     }
-  }, [brandId, router]);
+    
+    return () => {
+      console.log('Cleaning up breadcrumb for:', brandId);
+      resetCustomBreadcrumb(brandId);
+    };
+  }, [brandId]);
 
   const handleStatusChange = async (newStatus: string) => {
     try {
       const updatedBrand = await updateBrandStatus(brandId, newStatus);
       setBrand(updatedBrand);
+      updateBreadcrumb(updatedBrand);
       toast.success(`Brand status updated to ${newStatus}`);
-      // Refresh podataka nakon promene statusa
-      await fetchBrand();
     } catch (error) {
       console.error("Error updating brand status:", error);
       if (error instanceof Error && error.message === 'Brand not found') {
@@ -178,6 +200,7 @@ export default function BrandsSingle() {
         onStatusChange={handleStatusChange} 
         onDelete={handleDelete} 
       />
+      
       
       <Tabs defaultValue="overview">
         <TabsList className="bg-foreground/5">
