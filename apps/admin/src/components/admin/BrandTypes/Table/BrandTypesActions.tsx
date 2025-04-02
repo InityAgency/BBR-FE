@@ -3,7 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PenIcon, Trash2 } from "lucide-react";
@@ -26,9 +25,10 @@ import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 
 interface BrandTypesActionsProps {
   row: Row<BrandType>;
+  refetchData?: () => void; // Added refetchData prop
 }
 
-export function BrandTypesActions({ row }: BrandTypesActionsProps) {
+export function BrandTypesActions({ row, refetchData }: BrandTypesActionsProps) {
   const brandType = row.original;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
@@ -49,7 +49,23 @@ export function BrandTypesActions({ row }: BrandTypesActionsProps) {
       }
 
       toast.success('Brand type deleted successfully');
+      
+      // Refresh data using provided refetchData function if available
+      if (refetchData) {
+        // Call refetchData to reload the data
+        refetchData();
+      }
+      
+      // Always refresh the router to ensure UI updates
       router.refresh();
+      
+      // Add a small delay to ensure data is refreshed properly
+      setTimeout(() => {
+        if (window.location.pathname.includes('/brands/types')) {
+          // Force a reload of the current page if on brands/types page
+          window.location.reload();
+        }
+      }, 300);
     } catch (error) {
       toast.error('Failed to delete brand type');
     } finally {
@@ -88,8 +104,8 @@ export function BrandTypesActions({ row }: BrandTypesActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to delete this brand type?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the brand type
-              and all associated data.
+              This action cannot be undone. <strong className="text-red-400">This will permanently delete the brand type
+              and all brands associated with this type.</strong> All related data will be lost.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -105,4 +121,4 @@ export function BrandTypesActions({ row }: BrandTypesActionsProps) {
       </AlertDialog>
     </>
   );
-} 
+}

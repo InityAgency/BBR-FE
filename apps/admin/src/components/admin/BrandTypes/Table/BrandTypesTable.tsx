@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTable } from "@/hooks/useTable";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
 import { BrandTypesFilters } from "./BrandTypesFilters";
@@ -12,6 +12,7 @@ import { BrandTypesActions } from "./BrandTypesActions";
 import { BrandTypesCardList } from "../Cards/BrandTypesCardList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -70,17 +71,6 @@ const CardsSkeleton = () => {
   );
 };
 
-// Popravka za kolone da koriste BrandTypesActions
-const enhancedColumns = columns.map(column => {
-  if (column.id === "actions") {
-    return {
-      ...column,
-      cell: (props: CellContext<BrandType, unknown>) => <BrandTypesActions row={props.row} />
-    };
-  }
-  return column;
-});
-
 interface BrandTypesTableProps {
   brandTypes: BrandType[];
   loading: boolean;
@@ -90,6 +80,7 @@ interface BrandTypesTableProps {
   goToNextPage: () => void;
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
+  refetchData?: () => void; // Added refetchData function
 }
 
 export function BrandTypesTable({
@@ -100,9 +91,32 @@ export function BrandTypesTable({
   currentPage,
   goToNextPage,
   goToPreviousPage,
-  goToPage
+  goToPage,
+  refetchData
 }: BrandTypesTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
+  
+  // Create a function to pass to BrandTypesActions
+  const handleRefetch = useCallback(() => {
+    if (refetchData) {
+      refetchData();
+    }
+  }, [refetchData]);
+
+  // Popravka za kolone da koriste BrandTypesActions sa refetchData funkcijom
+  const enhancedColumns = React.useMemo(() => {
+    return columns.map(column => {
+      if (column.id === "actions") {
+        return {
+          ...column,
+          cell: (props: CellContext<BrandType, unknown>) => (
+            <BrandTypesActions row={props.row} refetchData={handleRefetch} />
+          )
+        };
+      }
+      return column;
+    });
+  }, [handleRefetch]);
 
   const {
     table,
@@ -283,4 +297,4 @@ export function BrandTypesTable({
       )}
     </div>
   );
-} 
+}

@@ -66,6 +66,7 @@ export const columns: ColumnDef<BrandType>[] = [
   {
     accessorKey: "createdAt",
     header: "Created At",
+    
     cell: ({ row }) => formatDate(row.getValue("createdAt")),
   },
   {

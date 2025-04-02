@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { BrandTypesTable } from "@/components/admin/BrandTypes/Table/BrandTypesTable";
@@ -30,16 +30,19 @@ export default function BrandTypesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Fetch funkcija za dohvatanje tipova brendova
-  const fetchBrandTypes = async (page: number) => {
+  const fetchBrandTypes = useCallback(async (page?: number) => {
     setLoading(true);
+    const pageToFetch = page !== undefined ? page : currentPage;
+    
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/${API_VERSION}/brand-types?limit=${ITEMS_PER_PAGE}&page=${page}`,
+        `${API_BASE_URL}/api/${API_VERSION}/brand-types?limit=${ITEMS_PER_PAGE}&page=${pageToFetch}`,
         {
           credentials: 'include',
+          cache: 'no-store',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
           }
         }
       );
@@ -60,9 +63,20 @@ export default function BrandTypesPage() {
       }
 
       setBrandTypes(data.data || []);
-      setTotalPages(Math.max(1, data.pagination.totalPages));
+      
+      const calculatedTotalPages = Math.max(1, data.pagination.totalPages);
+      setTotalPages(calculatedTotalPages);
       setTotalItems(data.pagination.total);
-      setCurrentPage(data.pagination.page || page);
+
+      // Ako smo dobili stranu 0 (što bi bilo čudno), postavimo na 1
+      const receivedPage = Math.max(1, data.pagination.page || pageToFetch);
+      
+      // Ako smo na stranici koja više ne postoji (nakon brisanja poslednjeg elementa stranice)
+      if (receivedPage > calculatedTotalPages && calculatedTotalPages > 0) {
+        setCurrentPage(calculatedTotalPages);
+      } else {
+        setCurrentPage(receivedPage);
+      }
     } catch (error) {
       console.error('Error fetching brand types:', error);
       setBrandTypes([]);
@@ -71,15 +85,15 @@ export default function BrandTypesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]); // currentPage je u nizu zavisnosti
+
+  const refetchData = useCallback(() => {
+    fetchBrandTypes();
+  }, [fetchBrandTypes]);
 
   useEffect(() => {
     fetchBrandTypes(currentPage);
-  }, [currentPage]); // Re-fetch when page changes
-
-  // Log the state values after they're set
-  useEffect(() => {
-  }, [brandTypes, loading, totalItems]);
+  }, [currentPage, fetchBrandTypes]); // Re-fetch when page changes
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
@@ -117,6 +131,7 @@ export default function BrandTypesPage() {
         goToNextPage={goToNextPage}
         goToPreviousPage={goToPreviousPage}
         goToPage={goToPage}
+        refetchData={refetchData} // Dodavanje refetchData funkcije
       />
     </AdminLayout>
   );
