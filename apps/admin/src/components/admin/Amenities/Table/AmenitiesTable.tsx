@@ -13,6 +13,7 @@ import { AmenitiesCardList } from "../Cards/AmenitiesCardList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Amenity } from "../../../../app/types/models/Amenities";
+import { TablePagination } from "@/components/admin/Table/TablePagination";
 const ITEMS_PER_PAGE = 10;
 
 // Popravka za kolone da koriste AmenitiesActions
@@ -175,47 +176,16 @@ export function AmenitiesTable({
         )}
       </div>
 
-      {/* Paginacija */}
-      <div className="flex items-center justify-between py-4">
-        <div className="text-sm text-muted-foreground mb-2 mt-3">
-          Page {currentPage} of {totalPages || 1} | Total Amenities: {totalItems}
-        </div>
-
-        <div className="flex items-center justify-between py-4">
-          <Button 
-            variant="outline" 
-            onClick={goToPreviousPage} 
-            disabled={currentPage <= 1 || loading}
-            className="mr-2"
-          >
-            Previous
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-                size="sm"
-                className="w-8 h-8"
-                onClick={() => goToPage(i + 1)}
-                disabled={loading}
-              >
-                {i + 1}
-              </Button>
-            ))}
-          </div>
-
-          <Button 
-            variant="outline" 
-            onClick={goToNextPage} 
-            disabled={currentPage >= totalPages || loading}
-            className="ml-2"
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={ITEMS_PER_PAGE}
+        goToNextPage={goToNextPage}
+        goToPreviousPage={goToPreviousPage}
+        goToPage={goToPage}
+        loading={loading}
+      />
     </div>
   );
 }

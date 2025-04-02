@@ -3,92 +3,144 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useTablePagination } from "@/hooks/useTablePagination";
 
 interface TablePaginationProps {
-  table: any; // TanStack table
-  totalCount?: number; // Add this to support API total count
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  goToNextPage: () => void;
+  goToPreviousPage: () => void;
+  goToPage: (page: number) => void;
+  loading?: boolean;
+  className?: string;
 }
 
-export function TablePagination({ table, totalCount }: TablePaginationProps) {
-  const {
-    pageIndex,
-    startRow,
-    endRow,
-    totalRows,
-    pageCount,
-    canPreviousPage,
-    canNextPage,
-    previousPage,
-    nextPage,
-    goToPage
-  } = useTablePagination({ table });
+export function TablePagination({
+  currentPage,
+  totalPages,
+  totalItems,
+  itemsPerPage,
+  goToNextPage,
+  goToPreviousPage,
+  goToPage,
+  loading = false,
+  className = ""
+}: TablePaginationProps) {
+  const startRow = (currentPage - 1) * itemsPerPage + 1;
+  const endRow = Math.min(currentPage * itemsPerPage, totalItems);
+  const effectiveTotalPages = Math.max(1, totalPages);
 
-  // Use API total count if provided, otherwise use local data count
-  const displayTotalRows = totalCount !== undefined ? totalCount : totalRows;
-  const displayPageCount = totalCount !== undefined 
-    ? Math.ceil(totalCount / table.getState().pagination.pageSize) 
-    : pageCount;
+  // Generate page numbers for pagination
+  const renderPageNumbers = () => {
+    if (effectiveTotalPages <= 5) {
+      return Array.from({ length: effectiveTotalPages }, (_, i) => (
+        <Button
+          key={i}
+          variant={currentPage === i + 1 ? "default" : "outline"}
+          size="sm"
+          className="w-8 h-8"
+          onClick={() => goToPage(i + 1)}
+          disabled={loading}
+        >
+          {i + 1}
+        </Button>
+      ));
+    }
+
+    const pageNumbers = [];
+
+    // Always show first page
+    pageNumbers.push(
+      <Button
+        key={1}
+        variant={currentPage === 1 ? "default" : "outline"}
+        size="sm"
+        className="w-8 h-8"
+        onClick={() => goToPage(1)}
+        disabled={loading}
+      >
+        1
+      </Button>
+    );
+
+    // Show ellipsis if current page is not near the beginning
+    if (currentPage > 3) {
+      pageNumbers.push(
+        <span key="startEllipsis" className="px-1">...</span>
+      );
+    }
+
+    // Show pages around current page
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(effectiveTotalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i !== 1 && i !== effectiveTotalPages) {
+        pageNumbers.push(
+          <Button
+            key={i}
+            variant={currentPage === i ? "default" : "outline"}
+            size="sm"
+            className="w-8 h-8"
+            onClick={() => goToPage(i)}
+            disabled={loading}
+          >
+            {i}
+          </Button>
+        );
+      }
+    }
+
+    // Show ellipsis if current page is not near the end
+    if (currentPage < effectiveTotalPages - 2) {
+      pageNumbers.push(
+        <span key="endEllipsis" className="px-1">...</span>
+      );
+    }
+
+    // Always show last page if there are multiple pages
+    if (effectiveTotalPages > 1) {
+      pageNumbers.push(
+        <Button
+          key={effectiveTotalPages}
+          variant={currentPage === effectiveTotalPages ? "default" : "outline"}
+          size="sm"
+          className="w-8 h-8"
+          onClick={() => goToPage(effectiveTotalPages)}
+          disabled={loading}
+        >
+          {effectiveTotalPages}
+        </Button>
+      );
+    }
+
+    return pageNumbers;
+  };
 
   return (
-    <div className="flex items-center justify-between py-4">
+    <div className={`flex flex-col md:flex-row items-center justify-between py-4 gap-4 ${className}`}>
       <div className="text-sm text-muted-foreground">
-        Showing {startRow} to {endRow} | of {displayTotalRows} results
+        Page {currentPage} of {effectiveTotalPages} | Total items: {totalItems}
       </div>
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={previousPage}
-          disabled={!canPreviousPage}
-          className="h-8 px-4"
+
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          onClick={goToPreviousPage} 
+          disabled={currentPage <= 1 || loading}
         >
           Previous
         </Button>
-        {/* Numerisana paginacija */}
-        <div className="flex items-center gap-1">
-          {Array.from({ length: displayPageCount }, (_, i) => {
-            // Za veliki broj stranica, prikazujemo samo relevantne
-            const currentPage = pageIndex;
-            const totalPages = displayPageCount;
-            
-            // Uvek prikazujemo prvu i poslednju stranicu
-            // Inače prikazujemo trenutnu stranicu +/- 1 stranicu
-            if (
-              i === 0 || 
-              i === totalPages - 1 ||
-              (i >= currentPage - 1 && i <= currentPage + 1)
-            ) {
-              return (
-                <Button
-                  key={i}
-                  variant={i === currentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => goToPage(i)}
-                  className="h-8 w-8 p-0"
-                >
-                  {i + 1}
-                </Button>
-              );
-            }
-            
-            // Elipsa za srednju prazninu
-            if (
-              (i === 1 && currentPage > 2) ||
-              (i === totalPages - 2 && currentPage < totalPages - 3)
-            ) {
-              return <span key={i} className="px-1">...</span>;
-            }
-            
-            return null;
-          })}
+        
+        <div className="flex items-center space-x-1">
+          {renderPageNumbers()}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={nextPage}
-          disabled={!canNextPage}
-          className="h-8 px-4"
+
+        <Button 
+          variant="outline" 
+          onClick={goToNextPage} 
+          disabled={currentPage >= effectiveTotalPages || loading}
         >
           Next
         </Button>

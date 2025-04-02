@@ -13,6 +13,7 @@ import { LifestyleCardList } from "../Cards/LifestyleCardList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Lifestyle } from "@/app/types/models/Lifestyles";
+import { TablePagination } from "@/components/admin/Table/TablePagination";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -255,34 +256,16 @@ export function LifestylesTable({
                 )}
             </div>
 
-            {/* Footer with pagination */}
-            <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
-                <div className="text-sm text-muted-foreground">
-                    Page {currentPage} of {effectiveTotalPages} | Total Lifestyles: {totalItems}
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={goToPreviousPage}
-                        disabled={currentPage <= 1 || loading}
-                    >
-                        Previous
-                    </Button>
-
-                    <div className="flex items-center space-x-1">
-                        {renderPageNumbers()}
-                    </div>
-
-                    <Button
-                        variant="outline"
-                        onClick={goToNextPage}
-                        disabled={currentPage >= effectiveTotalPages || loading}
-                    >
-                        Next
-                    </Button>
-                </div>
-            </div>
+            <TablePagination
+                currentPage={currentPage}
+                totalPages={effectiveTotalPages}
+                totalItems={totalItems}
+                itemsPerPage={ITEMS_PER_PAGE}
+                goToNextPage={goToNextPage}
+                goToPreviousPage={goToPreviousPage}
+                goToPage={goToPage}
+                loading={loading}
+            />
         </div>
     );
 }

@@ -13,6 +13,7 @@ import { BrandTypesCardList } from "../Cards/BrandTypesCardList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+import { TablePagination } from "@/components/admin/Table/TablePagination";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -267,33 +268,16 @@ export function BrandTypesTable({
       </div>
 
       {!showNoData && (
-        <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
-          <div className="text-sm text-muted-foreground">
-            Page {currentPage} of {effectiveTotalPages} | Total brand types: {brandTypes?.length > 0 && totalItems === 0 ? brandTypes.length : totalItems}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              onClick={goToPreviousPage} 
-              disabled={currentPage <= 1 || loading}
-            >
-              Previous
-            </Button>
-            
-            <div className="flex items-center space-x-1">
-              {renderPageNumbers()}
-            </div>
-
-            <Button 
-              variant="outline" 
-              onClick={goToNextPage} 
-              disabled={currentPage >= effectiveTotalPages || loading}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={effectiveTotalPages}
+          totalItems={brandTypes?.length > 0 && totalItems === 0 ? brandTypes.length : totalItems}
+          itemsPerPage={ITEMS_PER_PAGE}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
+          goToPage={goToPage}
+          loading={loading}
+        />
       )}
     </div>
   );
