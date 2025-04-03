@@ -6,18 +6,18 @@ import { useTable } from "@/hooks/useTable";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
 import { AmenitiesFilters } from "./AmenitiesFilters";
 import { columns } from "./AmenitiesColumns";
-import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { AmenitiesActions } from "./AmenitiesActions";
 import { AmenitiesCardList } from "../Cards/AmenitiesCardList";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Amenity } from "../../../../app/types/models/Amenities";
 import { TablePagination } from "@/components/admin/Table/TablePagination";
-const ITEMS_PER_PAGE = 10;
+import { useSearchParams } from "next/navigation";
+
+const ITEMS_PER_PAGE = 10; // Uskladjeno sa serverskom stranom
 
 // Popravka za kolone da koriste AmenitiesActions
-const enhancedColumns = (fetchAmenities: (page: number) => Promise<void>, currentPage: number) => columns.map(column => {
+const enhancedColumns = (fetchAmenities: (page: number, query?: string) => Promise<void>, currentPage: number) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
@@ -92,7 +92,7 @@ interface AmenitiesTableProps {
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
   initialStatusFilter?: string | null;
-  fetchAmenities: (page: number) => Promise<void>;
+  fetchAmenities: (page: number, query?: string) => Promise<void>;
 }
 
 export function AmenitiesTable({
@@ -107,7 +107,15 @@ export function AmenitiesTable({
   initialStatusFilter,
   fetchAmenities
 }: AmenitiesTableProps) {
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get('query');
+  const [search, setSearch] = useState(queryParam || "");
+  const [calculatedTotalPages, setCalculatedTotalPages] = useState(totalPages);
+
+  // Update calculatedTotalPages when totalItems or totalPages changes
+  useEffect(() => {
+    setCalculatedTotalPages(totalPages);
+  }, [totalItems, totalPages]);
 
   // Koristimo generički hook za tabelu
   const {
@@ -117,31 +125,26 @@ export function AmenitiesTable({
     data: amenities,
     columns: enhancedColumns(fetchAmenities, currentPage),
     initialSorting: [{ id: "createdAt", desc: true }],
-    globalFilterFn: (row, columnId, value, addMeta) => {
-      // Koristimo našu univerzalnu funkciju
-      const result = fuzzyFilter(row, columnId, value, addMeta);
-      
-      // Dodatno proveravamo ID polje eksplicitno
-      const id = row.original.id || "";
-      const searchValue = String(value).toLowerCase();
-      
-      // Vraćamo true ako je univerzalna pretraga uspela ILI ako ID sadrži traženi tekst
-      return result || id.toLowerCase().includes(searchValue);
-    },
+    // Ne možemo koristiti manualFiltering jer nije podržano u useTable custom hooku
+    // Umesto toga, potpuno ćemo zaobići lokalno filtriranje
     initialPageSize: ITEMS_PER_PAGE,
     manualPagination: true,
     pageCount: totalPages,
   });
 
-  // Sinhronizujemo search sa tabelom
-  React.useEffect(() => {
-    setTableGlobalFilter(search);
-  }, [search, setTableGlobalFilter]);
+  // Sinhronizujemo stanje sa URL parametrom
+  useEffect(() => {
+    if (queryParam !== search) {
+      setSearch(queryParam || "");
+    }
+  }, [queryParam]);
 
   // Helper funkcije za stilizovanje redova i ćelija
   const getRowClassName = (row: any) => {
     return "";
   };
+
+  const effectiveTotalPages = Math.max(1, totalPages);
 
   return (
     <div className="w-full">
@@ -178,7 +181,7 @@ export function AmenitiesTable({
 
       <TablePagination
         currentPage={currentPage}
-        totalPages={totalPages}
+        totalPages={effectiveTotalPages}
         totalItems={totalItems}
         itemsPerPage={ITEMS_PER_PAGE}
         goToNextPage={goToNextPage}

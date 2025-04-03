@@ -16,13 +16,21 @@ export function middleware(request: NextRequest) {
   
   // For session-based auth, we need to check if we have the userLoggedIn cookie
   const userLoggedIn = request.cookies.get("userLoggedIn")?.value === 'true';
-  const isLoggedIn = userLoggedIn;
+  const bbrSession = request.cookies.get("bbr-session")?.value;
+  
+  // Check if session exists and is valid
+  const isLoggedIn = userLoggedIn && bbrSession;
   
   // Clone the URL to potentially redirect
   const url = request.nextUrl.clone();
 
-  // If the user is not logged in and trying to access a protected route
+  // If the user is not logged in or session is invalid and trying to access a protected route
   if (!isLoggedIn && !isAuthPath && pathname !== '/') {
+    // Clear all auth-related cookies
+    const response = NextResponse.redirect(url);
+    response.cookies.delete("userLoggedIn");
+    response.cookies.delete("bbr-session");
+    
     url.pathname = "/auth/login"; 
     
     // Store the original URL to redirect back after login
@@ -30,7 +38,7 @@ export function middleware(request: NextRequest) {
       url.searchParams.set('callbackUrl', pathname);
     }
     
-    return NextResponse.redirect(url);
+    return response;
   }
 
   // If the user is logged in and trying to access an auth page, redirect to dashboard

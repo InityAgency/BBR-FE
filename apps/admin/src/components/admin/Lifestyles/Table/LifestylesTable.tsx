@@ -14,10 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Lifestyle } from "@/app/types/models/Lifestyles";
 import { TablePagination } from "@/components/admin/Table/TablePagination";
+import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
-const enhancedColumns = (fetchLifestyles: (page: number) => Promise<void>, currentPage: number) => columns.map(column => {
+const enhancedColumns = (fetchLifestyles: (page: number, query?: string) => Promise<void>, currentPage: number) => columns.map(column => {
     if (column.id === "actions") {
         return {
             ...column,
@@ -85,7 +86,7 @@ interface LifestylesTableProps {
     goToPreviousPage: () => void;
     goToPage: (page: number) => void;
     initialStatusFilter?: string | null;
-    fetchLifestyles: (page: number) => Promise<void>;
+    fetchLifestyles: (page: number, query?: string) => Promise<void>;
 }
 
 export function LifestylesTable({
@@ -100,7 +101,9 @@ export function LifestylesTable({
     initialStatusFilter,
     fetchLifestyles
 }: LifestylesTableProps) {
-    const [search, setSearch] = useState("");
+    const searchParams = useSearchParams();
+    const queryParam = searchParams.get('query');
+    const [search, setSearch] = useState(queryParam || "");
     const [calculatedTotalPages, setCalculatedTotalPages] = useState(totalPages);
 
     // Update calculatedTotalPages when totalItems or totalPages changes
@@ -126,9 +129,17 @@ export function LifestylesTable({
         pageCount: totalPages,
     });
 
+    // Ažuriramo lokalni filter u tabeli kada se promeni search stanje
     React.useEffect(() => {
         setTableGlobalFilter(search);
     }, [search, setTableGlobalFilter]);
+    
+    // Sinhronizujemo stanje search-a sa URL parametrom
+    React.useEffect(() => {
+        if (queryParam !== search) {
+            setSearch(queryParam || "");
+        }
+    }, [queryParam]);
 
     const getRowClassName = (row: any) => {
         return "";

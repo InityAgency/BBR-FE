@@ -35,20 +35,30 @@ export default function LifestylesPage() {
 
     // Get the current page from URL or default to 1
     const pageParam = searchParams.get('page');
+    const queryParam = searchParams.get('query');
     const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
-    const fetchLifestyles = async (page: number) => {
+    const fetchLifestyles = async (page: number, query?: string) => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/api/${API_VERSION}/lifestyles?limit=${ITEMS_PER_PAGE}&page=${page}`,
-                {
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+            // Kreiramo URL parametre
+            const urlParams = new URLSearchParams();
+            urlParams.set('limit', ITEMS_PER_PAGE.toString());
+            urlParams.set('page', page.toString());
+            
+            // Dodajemo query parametar ako postoji
+            if (query) {
+                urlParams.set('query', query);
+            }
+            
+            const url = `${API_BASE_URL}/api/${API_VERSION}/lifestyles?${urlParams.toString()}`;
+            
+            const response = await fetch(url, {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            );
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -74,7 +84,7 @@ export default function LifestylesPage() {
             // Update URL only if the page from API is different
             const apiPage = data.pagination.page || page;
             if (apiPage !== page) {
-                updateUrlWithPage(apiPage);
+                updateUrlWithPage(apiPage, query);
             }
         } catch (error) {
             console.error("Failed to fetch lifestyles:", error);
@@ -85,35 +95,43 @@ export default function LifestylesPage() {
         }
     };
 
-    // Update URL with the current page
-    const updateUrlWithPage = (page: number) => {
+    // Update URL with the current page and query
+    const updateUrlWithPage = (page: number, query?: string) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('page', page.toString());
+        
+        if (query && query.trim() !== '') {
+            params.set('query', query);
+        } else {
+            // Uklanjamo query parametar ako ne postoji ili je prazan string
+            params.delete('query');
+        }
+        
         // Use replace instead of push to avoid adding to history stack for pagination
         router.push(`/residences/lifestyles?${params.toString()}`);
     };
 
     useEffect(() => {
         if (currentPage >= 1) {
-            fetchLifestyles(currentPage);
+            fetchLifestyles(currentPage, queryParam || undefined);
         }
-    }, [currentPage]); // Re-fetch when currentPage changes
+    }, [currentPage, queryParam]); // Re-fetch when currentPage or queryParam changes
 
     const goToNextPage = () => {
         if (currentPage < totalPages) {
-            updateUrlWithPage(currentPage + 1);
+            updateUrlWithPage(currentPage + 1, queryParam || undefined);
         }
     };
 
     const goToPreviousPage = () => {
         if (currentPage > 1) {
-            updateUrlWithPage(currentPage - 1);
+            updateUrlWithPage(currentPage - 1, queryParam || undefined);
         }
     };
 
     const goToPage = (page: number) => {
         if (page >= 1 && page <= totalPages) {
-            updateUrlWithPage(page);
+            updateUrlWithPage(page, queryParam || undefined);
         }
     };
 

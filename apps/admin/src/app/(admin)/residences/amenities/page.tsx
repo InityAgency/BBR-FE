@@ -2,15 +2,15 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { Amenity } from "@/app/types/models/Amenities";
-import { useSearchParams } from "next/navigation";
 import AmenitiesTable from "@/components/admin/Amenities/Table/AmenitiesTable";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 10; // Uskladjeno sa serverskom stranom
 
 interface AmenitiesApiResponse {
   data: Amenity[];
@@ -27,25 +27,40 @@ interface AmenitiesApiResponse {
 }
 
 export default function AmenitiesPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  const fetchAmenities = async (page: number) => {
+  // Get the current page from URL or default to 1
+  const pageParam = searchParams.get('page');
+  const queryParam = searchParams.get('query');
+  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
+
+  const fetchAmenities = async (page: number, query?: string) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/${API_VERSION}/amenities?limit=${ITEMS_PER_PAGE}&page=${page}`,
-        {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+      // Kreiramo URL parametre
+      const urlParams = new URLSearchParams();
+      urlParams.set('limit', ITEMS_PER_PAGE.toString());
+      urlParams.set('page', page.toString());
+      
+      // Dodajemo query parametar ako postoji
+      if (query && query.trim() !== '') {
+        urlParams.set('query', query);
+      }
+      
+      const url = `${API_BASE_URL}/api/${API_VERSION}/amenities?${urlParams.toString()}`;
+      
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         }
-      );
+      });
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -63,38 +78,64 @@ export default function AmenitiesPage() {
       }
 
       setAmenities(data.data || []);
+      
+      // This is important - we're setting these values directly from API response
       setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
-      setCurrentPage(data.pagination.page || page);
+      
+      // Update URL if the page from API is different from the requested page
+      const apiPage = data.pagination.page || page;
+      if (apiPage !== page) {
+        updateUrlWithPage(apiPage, query);
+      }
     } catch (error) {
       console.error('Error fetching amenities:', error);
       setAmenities([]);
-      setTotalPages(1);
-      setTotalItems(0);
     } finally {
       setLoading(false);
     }
   };
 
+  // Update URL with the current page and query
+  const updateUrlWithPage = (page: number, query?: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    
+    if (query && query.trim() !== '') {
+      params.set('query', query);
+    } else {
+      // Uklanjamo query parametar ako ne postoji ili je prazan string
+      params.delete('query');
+    }
+    
+    // Koristimo replace umesto push da ne dodajemo u history stack
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   useEffect(() => {
-    fetchAmenities(currentPage);
-  }, [currentPage]); // Re-fetch when page changes
+    // Ovaj useEffect će se aktivirati na svaku promenu URL-a
+    if (currentPage >= 1) {
+      // Šaljemo query samo ako nije prazan string
+      const query = queryParam && queryParam.trim() !== '' ? queryParam : undefined;
+      fetchAmenities(currentPage, query);
+    }
+  }, [pathname, searchParams]); // Dodali smo pathname i searchParams kao dependencies
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      updateUrlWithPage(currentPage + 1, queryParam || undefined);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      updateUrlWithPage(currentPage - 1, queryParam || undefined);
     }
   };
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      updateUrlWithPage(page, queryParam || undefined);
     }
   };
 
