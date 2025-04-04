@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "prettier": "^3.5.3",
-    "turbo": "^2.4.4",
+    "turbo": "^2.5.0",
     "typescript": "5.8.2"
   },
   "packageManager": "pnpm@9.0.0",
@@ -18,7 +18,10 @@
     "node": ">=18"
   },
   "workspaces": {
-    "packages": ["apps/web", "apps/admin", "packages/*"]
+    "packages": [
+      "apps/web",
+      "apps/admin",
+      "packages/*"
+    ]
   }
-
 }

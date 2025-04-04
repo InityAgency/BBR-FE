@@ -60,6 +60,13 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
     singleTitle: "Brand Type",
     hasDetailPage: false
   },
+  "ranking-category-types": {
+    title: "Ranking Category Types",
+    isLinkable: true,
+    parent: "rankings",
+    singleTitle: "Ranking Category Type",
+    hasDetailPage: false
+  },
   "user-management": { 
     title: "User Management", 
     isLinkable: true,
