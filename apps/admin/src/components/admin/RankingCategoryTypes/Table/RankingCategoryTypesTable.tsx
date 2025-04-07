@@ -101,45 +101,28 @@ export function RankingCategoryTypesTable({
     const searchParams = useSearchParams();
     const queryParam = searchParams.get('query');
     const [search, setSearch] = useState(queryParam || "");
-    const [calculatedTotalPages, setCalculatedTotalPages] = useState(totalPages);
-
-    useEffect(() => {
-        setCalculatedTotalPages(totalPages);
-    }, [totalItems, totalPages]);
 
     const {
         table,
-        setGlobalFilter: setTableGlobalFilter,
     } = useTable<RankingCategoryType>({
         data: rankingCategoryTypes,
         columns: enhancedColumns(fetchRankingCategoryTypes, currentPage),
         initialSorting: [{ id: "createdAt", desc: true }],
-        globalFilterFn: (row, columnId, value, addMeta) => {
-            const result = fuzzyFilter(row, columnId, value, addMeta);
-            const id = row.original.id || "";
-            const searchValue = String(value).toLowerCase();
-            return result || id.toLowerCase().includes(searchValue);
-        },
         initialPageSize: ITEMS_PER_PAGE,
         manualPagination: true,
         pageCount: totalPages,
     });
 
-    React.useEffect(() => {
-        setTableGlobalFilter(search);
-    }, [search, setTableGlobalFilter]);
-    
-    React.useEffect(() => {
+    // Sinhronizujemo stanje sa URL parametrom
+    useEffect(() => {
         if (queryParam !== search) {
             setSearch(queryParam || "");
         }
     }, [queryParam]);
 
-    const getRowClassName = (row: any) => {
+    const getRowClassName = (row: { original: RankingCategoryType }) => {
         return "";
     };
-
-    const effectiveTotalPages = Math.max(1, totalPages);
 
     return (
         <div className="w-full">
@@ -173,7 +156,7 @@ export function RankingCategoryTypesTable({
 
             <TablePagination
                 currentPage={currentPage}
-                totalPages={effectiveTotalPages}
+                totalPages={totalPages}
                 totalItems={totalItems}
                 itemsPerPage={ITEMS_PER_PAGE}
                 goToNextPage={goToNextPage}

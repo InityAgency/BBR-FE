@@ -1,138 +1,121 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { BrandTypesTable } from "@/components/admin/BrandTypes/Table/BrandTypesTable";
-import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { BrandType } from "@/app/types/models/BrandType";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 
 const ITEMS_PER_PAGE = 10;
 
 interface BrandTypesApiResponse {
-  data: BrandType[];
-  statusCode: number;
-  message: string;
-  pagination: {
-    total: number;
-    totalPages: number;
-    page: number;
-    limit: number;
-  };
-  timestamp: string;
-  path: string;
+    data: BrandType[];
+    statusCode: number;
+    message: string;
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+    };
 }
 
 export default function BrandTypesPage() {
-  const [brandTypes, setBrandTypes] = useState<BrandType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+    const [brandTypes, setBrandTypes] = useState<BrandType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
-  const fetchBrandTypes = useCallback(async (page?: number) => {
-    setLoading(true);
-    const pageToFetch = page !== undefined ? page : currentPage;
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/${API_VERSION}/brand-types?limit=${ITEMS_PER_PAGE}&page=${pageToFetch}`,
-        {
-          credentials: 'include',
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-          }
+    const currentPage = Number(searchParams.get('page')) || 1;
+    const queryParam = searchParams.get('query') || '';
+
+    const fetchBrandTypes = async (page: number, query?: string) => {
+        try {
+            setLoading(true);
+            
+            // Kreiramo URL sa parametrima
+            const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/brand-types`);
+            url.searchParams.set('page', page.toString());
+            url.searchParams.set('limit', ITEMS_PER_PAGE.toString());
+            if (query) {
+                url.searchParams.set('query', query);
+            }
+            
+            const response = await fetch(url.toString(), {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data: BrandTypesApiResponse = await response.json();
+            
+            if (data.statusCode === 200) {
+                setBrandTypes(data.data);
+                setTotalPages(Math.ceil(data.pagination.total / ITEMS_PER_PAGE));
+                setTotalItems(data.pagination.total);
+            } else {
+                console.error('Error fetching brand types:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching brand types:', error);
+        } finally {
+            setLoading(false);
         }
-      );
+    };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Error fetching brand types: ${response.status}`);
-      }
+    const updateUrlWithPage = (page: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', page.toString());
+        router.replace(`${pathname}?${params.toString()}`);
+    };
 
-      const data: BrandTypesApiResponse = await response.json();
+    useEffect(() => {
+        fetchBrandTypes(currentPage, queryParam);
+    }, [currentPage, queryParam]);
 
-      // Validate pagination data
-      const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
-      const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
-      
-      if (!validTotal || !validTotalPages) {
-        throw new Error('Invalid pagination data received from server');
-      }
+    const goToNextPage = () => {
+        if (currentPage < totalPages) {
+            updateUrlWithPage(currentPage + 1);
+        }
+    };
 
-      setBrandTypes(data.data || []);
-      
-      const calculatedTotalPages = Math.max(1, data.pagination.totalPages);
-      setTotalPages(calculatedTotalPages);
-      setTotalItems(data.pagination.total);
+    const goToPreviousPage = () => {
+        if (currentPage > 1) {
+            updateUrlWithPage(currentPage - 1);
+        }
+    };
 
-      // Ako smo dobili stranu 0 (što bi bilo čudno), postavimo na 1
-      const receivedPage = Math.max(1, data.pagination.page || pageToFetch);
-      
-      // Ako smo na stranici koja više ne postoji (nakon brisanja poslednjeg elementa stranice)
-      if (receivedPage > calculatedTotalPages && calculatedTotalPages > 0) {
-        setCurrentPage(calculatedTotalPages);
-      } else {
-        setCurrentPage(receivedPage);
-      }
-    } catch (error) {
-      console.error('Error fetching brand types:', error);
-      setBrandTypes([]);
-      setTotalPages(1);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage]); // currentPage je u nizu zavisnosti
+    const goToPage = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            updateUrlWithPage(page);
+        }
+    };
 
-  const refetchData = useCallback(() => {
-    fetchBrandTypes();
-  }, [fetchBrandTypes]);
+    return (
+        <AdminLayout>
+            <PageHeader 
+                title="Brand Types" 
+                count={totalItems} 
+                buttonText="Add new brand type" 
+                buttonUrl="/brands/types/create" 
+            />
 
-  useEffect(() => {
-    fetchBrandTypes(currentPage);
-  }, [currentPage, fetchBrandTypes]); // Re-fetch when page changes
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  return (
-    <AdminLayout>
-      <PageHeader 
-        title="Brand Types" 
-        count={totalItems} 
-        buttonText="Add new brand type" 
-        buttonUrl="/brands/types/create" 
-      />
-
-      <BrandTypesTable 
-        brandTypes={brandTypes}
-        loading={loading}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        currentPage={currentPage}
-        goToNextPage={goToNextPage}
-        goToPreviousPage={goToPreviousPage}
-        goToPage={goToPage}
-        refetchData={refetchData} // Dodavanje refetchData funkcije
-      />
-    </AdminLayout>
-  );
+            <BrandTypesTable 
+                brandTypes={brandTypes}
+                loading={loading}
+                totalItems={totalItems}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                goToNextPage={goToNextPage}
+                goToPreviousPage={goToPreviousPage}
+                goToPage={goToPage}
+            />
+        </AdminLayout>
+    );
 }

@@ -15,11 +15,12 @@ import { BrandsCardList } from "../Cards/BrandsCardList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TablePagination } from "@/components/admin/Table/TablePagination";
+import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
 // Popravka za kolone da koriste BrandsActions
-const enhancedColumns = (fetchBrands: (page: number) => Promise<void>, currentPage: number) => columns.map(column => {
+const enhancedColumns = (fetchBrands: (page: number, query?: string) => Promise<void>, currentPage: number) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
@@ -94,7 +95,7 @@ interface BrandsTableProps {
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
   initialStatusFilter?: string | null;
-  fetchBrands: (page: number) => Promise<void>;
+  fetchBrands: (page: number, query?: string) => Promise<void>;
 }
 
 export function BrandsTable({
@@ -109,7 +110,9 @@ export function BrandsTable({
   initialStatusFilter,
   fetchBrands
 }: BrandsTableProps) {
-  const [globalFilter, setGlobalFilter] = useState("");
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get('query');
+  const [search, setSearch] = useState(queryParam || "");
 
   // Koristimo generički hook za tabelu
   const {
@@ -137,8 +140,8 @@ export function BrandsTable({
 
   // Sinhronizujemo globalFilter sa tabelom
   React.useEffect(() => {
-    setTableGlobalFilter(globalFilter);
-  }, [globalFilter, setTableGlobalFilter]);
+    setTableGlobalFilter(search);
+  }, [search, setTableGlobalFilter]);
 
   // Koristimo hook za filtere
   const {
@@ -170,6 +173,13 @@ export function BrandsTable({
     }
   }, [initialStatusFilter, uniqueStatuses, setSelectedStatuses]);
 
+  // Sinhronizujemo stanje sa URL parametrom
+  useEffect(() => {
+    if (queryParam !== search) {
+      setSearch(queryParam || "");
+    }
+  }, [queryParam]);
+
   // Helper funkcije za stilizovanje redova i ćelija
   const getRowClassName = (row: any) => {
     const status = row.original.status;
@@ -182,8 +192,8 @@ export function BrandsTable({
     <div className="w-full">
       {/* Filteri */}
       <BrandsFilters
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
+        globalFilter={search}
+        setGlobalFilter={setSearch}
         selectedTypes={selectedTypes}
         setSelectedTypes={setSelectedTypes}
         selectedStatuses={selectedStatuses}

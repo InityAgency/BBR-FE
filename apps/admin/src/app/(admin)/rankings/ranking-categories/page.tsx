@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
@@ -24,29 +25,40 @@ interface RankingCategoryApiResponse {
 }
 
 export default function RankingCategoriesPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
     const [rankingCategories, setRankingCategories] = useState<RankingCategory[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
-    const fetchRankingCategories = useCallback(async (page?: number, query?: string) => {
-        setLoading(true);
-        const pageToFetch = page !== undefined ? page : currentPage;
-        const queryParam = query ? `&query=${encodeURIComponent(query)}` : '';
+    // Get the current page from URL or default to 1
+    const pageParam = searchParams.get('page');
+    const queryParam = searchParams.get('query');
+    const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
+    const fetchRankingCategories = async (page: number, query?: string) => {
+        setLoading(true);
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/api/${API_VERSION}/ranking-categories?limit=${ITEMS_PER_PAGE}&page=${pageToFetch}${queryParam}`,
-                {
-                    credentials: 'include',
-                    cache: 'no-store',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
+            // Kreiramo URL parametre
+            const urlParams = new URLSearchParams();
+            urlParams.set('limit', ITEMS_PER_PAGE.toString());
+            urlParams.set('page', page.toString());
+            
+            // Dodajemo query parametar ako postoji
+            if (query && query.trim() !== '') {
+                urlParams.set('query', query);
+            }
+            
+            const url = `${API_BASE_URL}/api/${API_VERSION}/ranking-categories?${urlParams.toString()}`;
+            
+            const response = await fetch(url, {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            );
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -65,49 +77,61 @@ export default function RankingCategoriesPage() {
 
             setRankingCategories(data.data || []);
             
-            const calculatedTotalPages = Math.max(1, data.pagination.totalPages);
-            setTotalPages(calculatedTotalPages);
+            // This is important - we're setting these values regardless of page change
+            setTotalPages(Math.max(1, data.pagination.totalPages));
             setTotalItems(data.pagination.total);
-
-            // If we received page 0 (which would be strange), set to 1
-            const receivedPage = Math.max(1, data.pagination.page || pageToFetch);  
             
-            // If we're on a page that doesn't exist (after deleting the last element of a page), set to the last page
-            if (receivedPage > calculatedTotalPages && calculatedTotalPages > 0) {
-                setCurrentPage(calculatedTotalPages);
-            } else {
-                setCurrentPage(receivedPage);
+            // Update URL only if the page from API is different
+            const apiPage = data.pagination.page || page;
+            if (apiPage !== page) {
+                updateUrlWithPage(apiPage, query);
             }
         } catch (error) {
-            console.error('Error fetching ranking categories:', error);
+            console.error("Failed to fetch ranking categories:", error);
+            // Don't reset pagination data on error, maintain previous state
+            setRankingCategories([]);
         } finally {
             setLoading(false);
         }
-    }, [currentPage]);
+    };
 
-    const refetchData = useCallback(() => {
-        fetchRankingCategories();
-    }, [fetchRankingCategories]);
+    // Update URL with the current page and query
+    const updateUrlWithPage = (page: number, query?: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', page.toString());
+        
+        if (query && query.trim() !== '') {
+            params.set('query', query);
+        } else {
+            // Uklanjamo query parametar ako ne postoji ili je prazan string
+            params.delete('query');
+        }
+        
+        // Koristimo replace umesto push da ne dodajemo u history stack
+        router.replace(`${pathname}?${params.toString()}`);
+    };
 
     useEffect(() => {
-        fetchRankingCategories(currentPage);
-    }, [fetchRankingCategories, currentPage]);
+        if (currentPage >= 1) {
+            fetchRankingCategories(currentPage, queryParam || undefined);
+        }
+    }, [currentPage, queryParam]); // Re-fetch when currentPage or queryParam changes
 
     const goToNextPage = () => {
         if (currentPage < totalPages) {
-            setCurrentPage(prev => prev + 1);
+            updateUrlWithPage(currentPage + 1, queryParam || undefined);
         }
     };
 
     const goToPreviousPage = () => {
         if (currentPage > 1) {
-            setCurrentPage(prev => prev - 1);
+            updateUrlWithPage(currentPage - 1, queryParam || undefined);
         }
     };
 
     const goToPage = (page: number) => {
         if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
+            updateUrlWithPage(page, queryParam || undefined);
         }
     };
 

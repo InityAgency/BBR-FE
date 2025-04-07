@@ -1,7 +1,9 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { TableFilters } from "@/components/admin/Table/TableFilters";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface RankingCategoryTypesFiltersProps {
     globalFilter: string;
@@ -12,17 +14,56 @@ export function RankingCategoryTypesFilters({
     globalFilter,
     setGlobalFilter,
 }: RankingCategoryTypesFiltersProps) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    
+    // Kreiramo lokalno stanje da pratimo vrednost pretrage
+    const [localSearch, setLocalSearch] = useState(globalFilter);
+    const debouncedSearch = useDebounce(localSearch, 500); // Debounce za 500ms
+    
+    // Handler koji se pokreće kada se promeni vrednost u input polju
+    const handleSearchChange = (value: string) => {
+        setLocalSearch(value);
+    };
+    
+    // Efekat koji se pokreće kada se promeni debouncedSearch vrednost
+    useEffect(() => {
+        // Samo ako se debounce vrednost stvarno razlikuje od trenutnog URL parametra
+        const currentQuery = searchParams.get('query') || '';
+        
+        if (debouncedSearch !== currentQuery) {
+            // Kreiramo novi URLSearchParams objekat na osnovu trenutnih parametara
+            const params = new URLSearchParams(searchParams.toString());
+            
+            // Resetujemo stranicu na 1 kad god se promeni pretraga
+            params.set('page', '1');
+            
+            // Ako postoji vrednost pretrage, dodajemo je u URL, inače je uklanjamo
+            if (debouncedSearch) {
+                params.set('query', debouncedSearch);
+            } else {
+                params.delete('query');
+            }
+            
+            // Koristimo replace umesto push da ne dodajemo previše u istoriju
+            router.replace(`${pathname}?${params.toString()}`);
+        }
+    }, [debouncedSearch, router, pathname, searchParams]);
+    
+    // Postavlja inicijalnu vrednost pretrage iz URL-a i ažurira je kad se URL promeni
+    useEffect(() => {
+        const queryParam = searchParams.get('query');
+        if (queryParam !== localSearch) {
+            setLocalSearch(queryParam || '');
+        }
+    }, [searchParams]);
+
     return (
-        <div className="flex flex-col sm:flex-row gap-3 py-4">
-            <div className="w-full sm:max-w-xs relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search by ID, name..."
-                    value={globalFilter || ""}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                    className="w-full pl-8"
-                />
-            </div>
-        </div>
-    )
+        <TableFilters
+            globalFilter={localSearch}
+            setGlobalFilter={handleSearchChange}
+            placeholder="Search ranking category types..."
+        />
+    );
 }
