@@ -107,8 +107,8 @@ export default function LifestylesPage() {
             params.delete('query');
         }
         
-        // Use replace instead of push to avoid adding to history stack for pagination
-        router.push(`/residences/lifestyles?${params.toString()}`);
+        // Koristimo replace umesto push da ne dodajemo u history stack
+        router.replace(`/residences/lifestyles?${params.toString()}`);
     };
 
     useEffect(() => {

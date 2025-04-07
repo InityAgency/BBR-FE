@@ -118,24 +118,13 @@ export function LifestylesTable({
         data: lifestyles,
         columns: enhancedColumns(fetchLifestyles, currentPage),
         initialSorting: [{ id: "createdAt", desc: true }],
-        globalFilterFn: (row, columnId, value, addMeta) => {
-            const result = fuzzyFilter(row, columnId, value, addMeta);
-            const id = row.original.id || "";
-            const searchValue = String(value).toLowerCase();
-            return result || id.toLowerCase().includes(searchValue);
-        },
         initialPageSize: ITEMS_PER_PAGE,
         manualPagination: true,
         pageCount: totalPages,
     });
 
-    // Ažuriramo lokalni filter u tabeli kada se promeni search stanje
-    React.useEffect(() => {
-        setTableGlobalFilter(search);
-    }, [search, setTableGlobalFilter]);
-    
-    // Sinhronizujemo stanje search-a sa URL parametrom
-    React.useEffect(() => {
+    // Sinhronizujemo stanje sa URL parametrom
+    useEffect(() => {
         if (queryParam !== search) {
             setSearch(queryParam || "");
         }

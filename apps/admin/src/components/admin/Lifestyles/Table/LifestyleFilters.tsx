@@ -27,22 +27,26 @@ export function LifestyleFilters({ globalFilter, setGlobalFilter }: LifestyleFil
     
     // Efekat koji se pokreće kada se promeni debouncedSearch vrednost
     useEffect(() => {
-        // Kreiramo novi URLSearchParams objekat na osnovu trenutnih parametara
-        const params = new URLSearchParams(searchParams.toString());
+        // Samo ako se debounce vrednost stvarno razlikuje od trenutnog URL parametra
+        const currentQuery = searchParams.get('query') || '';
         
-        // Resetujemo stranicu na 1 kad god se promeni pretraga
-        params.set('page', '1');
-        
-        // Ako postoji vrednost pretrage, dodajemo je u URL, inače je uklanjamo
-        if (debouncedSearch) {
-            params.set('query', debouncedSearch);
-        } else {
-            params.delete('query');
+        if (debouncedSearch !== currentQuery) {
+            // Kreiramo novi URLSearchParams objekat na osnovu trenutnih parametara
+            const params = new URLSearchParams(searchParams.toString());
+            
+            // Resetujemo stranicu na 1 kad god se promeni pretraga
+            params.set('page', '1');
+            
+            // Ako postoji vrednost pretrage, dodajemo je u URL, inače je uklanjamo
+            if (debouncedSearch) {
+                params.set('query', debouncedSearch);
+            } else {
+                params.delete('query');
+            }
+            
+            // Koristimo replace umesto push da ne dodajemo previše u istoriju
+            router.replace(`${pathname}?${params.toString()}`);
         }
-        
-        // Ažuriramo URL sa novim parametrima
-        router.push(`${pathname}?${params.toString()}`);
-        
     }, [debouncedSearch, router, pathname, searchParams]);
     
     // Postavlja inicijalnu vrednost pretrage iz URL-a kada se komponenta učita
