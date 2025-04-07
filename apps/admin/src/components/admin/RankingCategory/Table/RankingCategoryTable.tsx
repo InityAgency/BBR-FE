@@ -14,8 +14,16 @@ import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
+interface RankingCategoryType {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Modify columns to use RankingCategoryActions
-const enhancedColumns = (fetchCategories: (page: number, query?: string) => Promise<void>, currentPage: number) => columns.map(column => {
+const enhancedColumns = (fetchCategories: (page: number, query?: string, statuses?: string[], categoryTypeIds?: string[]) => Promise<void>, currentPage: number) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
@@ -97,6 +105,7 @@ const RankingCategoryCardList = ({ categories }: { categories: RankingCategory[]
 
 interface RankingCategoryTableProps {
   categories: RankingCategory[];
+  categoryTypes: RankingCategoryType[];
   loading: boolean;
   totalItems: number;
   totalPages: number;
@@ -104,12 +113,16 @@ interface RankingCategoryTableProps {
   goToNextPage: () => void;
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
-  initialStatusFilter?: string | null;
-  fetchCategories: (page: number, query?: string) => Promise<void>;
+  selectedStatuses: string[];
+  onStatusesChange: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedCategoryTypeIds: string[];
+  onCategoryTypeIdsChange: React.Dispatch<React.SetStateAction<string[]>>;
+  fetchCategories: (page: number, query?: string, statuses?: string[], categoryTypeIds?: string[]) => Promise<void>;
 }
 
 export function RankingCategoryTable({
   categories,
+  categoryTypes = [],
   loading,
   totalItems,
   totalPages,
@@ -117,7 +130,10 @@ export function RankingCategoryTable({
   goToNextPage,
   goToPreviousPage,
   goToPage,
-  initialStatusFilter,
+  selectedStatuses,
+  onStatusesChange,
+  selectedCategoryTypeIds,
+  onCategoryTypeIdsChange,
   fetchCategories
 }: RankingCategoryTableProps) {
   const searchParams = useSearchParams();
@@ -127,14 +143,29 @@ export function RankingCategoryTable({
   // Use generic table hook
   const {
     table,
+    setGlobalFilter: setTableGlobalFilter,
   } = useTable<RankingCategory>({
     data: categories,
     columns: enhancedColumns(fetchCategories, currentPage),
     initialSorting: [{ id: "name", desc: false }],
+    globalFilterFn: (row, columnId, value) => {
+      const searchValue = String(value).toLowerCase();
+      const cellValue = String(row.getValue(columnId) || "").toLowerCase();
+      
+      // Takođe proveravamo ID polje eksplicitno
+      const id = row.original.id || "";
+      
+      return cellValue.includes(searchValue) || id.toLowerCase().includes(searchValue);
+    },
     initialPageSize: ITEMS_PER_PAGE,
     manualPagination: true,
     pageCount: totalPages,
   });
+
+  // Sync globalFilter with the table
+  React.useEffect(() => {
+    setTableGlobalFilter(search);
+  }, [search, setTableGlobalFilter]);
 
   // Sinhronizujemo stanje sa URL parametrom
   useEffect(() => {
@@ -156,6 +187,11 @@ export function RankingCategoryTable({
       <RankingCategoryFilters
         globalFilter={search}
         setGlobalFilter={setSearch}
+        selectedCategoryTypeIds={selectedCategoryTypeIds}
+        setSelectedCategoryTypeIds={onCategoryTypeIdsChange}
+        selectedStatuses={selectedStatuses}
+        setSelectedStatuses={onStatusesChange}
+        categoryTypes={categoryTypes}
       />
 
       {/* Cards for mobile view */}
