@@ -84,8 +84,17 @@ const CardsSkeleton = () => {
   );
 };
 
+interface Role {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface UsersTableProps {
   users: User[];
+  roles: Role[];
   loading: boolean;
   totalItems: number;
   totalPages: number;
@@ -93,17 +102,26 @@ interface UsersTableProps {
   goToNextPage: () => void;
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
+  selectedStatuses: string[];
+  onStatusesChange: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedRoleIds: string[];
+  onRoleIdsChange: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function UsersTable({
   users,
+  roles = [],
   loading,
   totalItems,
   totalPages,
   currentPage,
   goToNextPage,
   goToPreviousPage,
-  goToPage
+  goToPage,
+  selectedStatuses,
+  onStatusesChange,
+  selectedRoleIds,
+  onRoleIdsChange
 }: UsersTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -134,15 +152,9 @@ export function UsersTable({
   }, [globalFilter, setTableGlobalFilter]);
 
   const {
-    selectedLocations: selectedRoles,
-    setSelectedLocations: setSelectedRoles,
     locationSearchValue: roleSearchValue,
     setLocationSearchValue: setRoleSearchValue,
-    selectedStatuses,
-    setSelectedStatuses,
-    uniqueLocations: uniqueRoles,
     uniqueStatuses,
-    filteredLocations: filteredRoles,
   } = useTableFilters<User>({
     table,
     data: users,
@@ -155,7 +167,7 @@ export function UsersTable({
   // Helper function for styling rows
   const getRowClassName = (row: Row<User>) => {
     // Normalize status to lowercase for case-insensitive comparison
-    const status = row.original.status?.toLowerCase();
+    const status = row.original.status?.toUpperCase();
     
     if (status === "INACTIVE") return "opacity-60";
     if (status === "DELETED") return "opacity-60";
@@ -167,13 +179,12 @@ export function UsersTable({
       <UsersFilters
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
-        selectedRoles={selectedRoles}
-        setSelectedRoles={setSelectedRoles}
+        selectedRoleIds={selectedRoleIds}
+        setSelectedRoleIds={onRoleIdsChange}
         selectedStatuses={selectedStatuses}
-        setSelectedStatuses={setSelectedStatuses}
-        uniqueRoles={uniqueRoles}
+        setSelectedStatuses={onStatusesChange}
+        roles={roles}
         uniqueStatuses={uniqueStatuses}
-        filteredRoles={filteredRoles}
         roleSearchValue={roleSearchValue}
         setRoleSearchValue={setRoleSearchValue}
       />

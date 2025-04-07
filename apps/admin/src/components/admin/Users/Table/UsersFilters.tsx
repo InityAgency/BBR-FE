@@ -11,29 +11,45 @@ import { Command, CommandInput, CommandItem, CommandList, CommandEmpty } from "@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 
+interface Role {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface UsersFiltersProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
-  selectedRoles: string[];
-  setSelectedRoles: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedRoleIds: string[];
+  setSelectedRoleIds: React.Dispatch<React.SetStateAction<string[]>>;
   selectedStatuses: string[];
   setSelectedStatuses: React.Dispatch<React.SetStateAction<string[]>>;
-  uniqueRoles: string[];
+  roles: Role[];
   uniqueStatuses: string[];
-  filteredRoles: string[];
   roleSearchValue: string;
   setRoleSearchValue: (value: string) => void;
 }
 
+// Definisanje fiksnih vrednosti za status - samo oni koje želimo da koristimo
+const PREDEFINED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED"];
+
+// Funkcija za formatiranje imena uloge sa prvim velikim slovom
+const formatRoleName = (name: string): string => {
+  if (!name) return '';
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
 export function UsersFilters({
   globalFilter,
   setGlobalFilter,
-  selectedRoles,
-  setSelectedRoles,
+  selectedRoleIds,
+  setSelectedRoleIds,
   selectedStatuses,
   setSelectedStatuses,
+  roles = [],
   uniqueStatuses,
-  filteredRoles,
   roleSearchValue,
   setRoleSearchValue,
 }: UsersFiltersProps) {
@@ -44,6 +60,22 @@ export function UsersFilters({
   // Kreiramo lokalno stanje da pratimo vrednost pretrage
   const [localSearch, setLocalSearch] = useState(globalFilter);
   const debouncedSearch = useDebounce(localSearch, 500); // Debounce za 500ms
+  
+  // Filtriranje uloga na osnovu pretrage
+  const [filteredRoles, setFilteredRoles] = useState<Role[]>(roles);
+  
+  // Ažuriranje filtriranih uloga kada se promeni pretraga ili lista uloga
+  useEffect(() => {
+    if (roleSearchValue.trim() === '') {
+      setFilteredRoles(roles);
+    } else {
+      const lowercaseSearch = roleSearchValue.toLowerCase();
+      const filtered = roles.filter(role => 
+        role.name.toLowerCase().includes(lowercaseSearch)
+      );
+      setFilteredRoles(filtered);
+    }
+  }, [roleSearchValue, roles]);
   
   // Handler koji se pokreće kada se promeni vrednost u input polju
   const handleSearchChange = (value: string) => {
@@ -82,6 +114,12 @@ export function UsersFilters({
     }
   }, [searchParams]);
 
+  // Funkcija za pronalaženje imena uloge na osnovu ID-a
+  const getRoleName = (roleId: string): string => {
+    const role = roles.find(r => r.id === roleId);
+    return role ? formatRoleName(role.name) : roleId;
+  };
+
   return (
     <>
       <TableFilters
@@ -95,11 +133,11 @@ export function UsersFilters({
             <Button variant="outline" className="h-10">
               <UserRound className="h-4 w-4 mr-2" />
               Roles
-              {selectedRoles.length > 0 && (
+              {selectedRoleIds.length > 0 && (
                 <>
                   <div className="w-px h-4 bg-muted mx-2" />
                   <Badge variant="secondary" className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs">
-                    {selectedRoles.length}
+                    {selectedRoleIds.length}
                   </Badge>
                 </>
               )}
@@ -116,32 +154,32 @@ export function UsersFilters({
                 <CommandEmpty>No results found.</CommandEmpty>
                 {filteredRoles.map((role) => (
                   <CommandItem
-                    key={role}
+                    key={role.id}
                     onSelect={() => {
-                      setSelectedRoles((prev) => {
-                        if (prev.includes(role)) {
-                          return prev.filter(item => item !== role);
+                      setSelectedRoleIds((prev) => {
+                        if (prev.includes(role.id)) {
+                          return prev.filter(item => item !== role.id);
                         } else {
-                          return [...prev, role];
+                          return [...prev, role.id];
                         }
                       });
                     }}
                   >
                     <Checkbox
-                      checked={selectedRoles.includes(role)}
+                      checked={selectedRoleIds.includes(role.id)}
                       className="mr-2 h-4 w-4"
                     />
-                    <span className="capitalize">{role}</span>
+                    <span className="capitalize">{formatRoleName(role.name)}</span>
                   </CommandItem>
                 ))}
               </CommandList>
-              {selectedRoles.length > 0 && (
+              {selectedRoleIds.length > 0 && (
                 <div className="border-t border-border p-2">
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedRoles([])}
+                    onClick={() => setSelectedRoleIds([])}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -172,7 +210,7 @@ export function UsersFilters({
             <Command>
               <CommandList>
                 <CommandEmpty>No statuses found.</CommandEmpty>
-                {uniqueStatuses.map((status) => (
+                {PREDEFINED_STATUSES.map((status) => (
                   <CommandItem
                     key={status}
                     onSelect={() => {
@@ -189,7 +227,7 @@ export function UsersFilters({
                       checked={selectedStatuses.includes(status)}
                       className="mr-2 h-4 w-4"
                     />
-                    <span className="capitalize">{status}</span>
+                    <span className="capitalize">{status.toLowerCase()}</span>
                   </CommandItem>
                 ))}
               </CommandList>
@@ -212,17 +250,17 @@ export function UsersFilters({
       </TableFilters>
 
       {/* Display active filters */}
-      {(selectedRoles.length > 0 || selectedStatuses.length > 0) && (
+      {(selectedRoleIds.length > 0 || selectedStatuses.length > 0) && (
         <div className="flex gap-2 mb-4 flex-wrap">
           {/* Role badges */}
-          {selectedRoles.map(role => (
-            <Badge key={`role-${role}`} variant="secondary" className="px-2 py-1">
-              <span className="capitalize">{role}</span>
+          {selectedRoleIds.map(roleId => (
+            <Badge key={`role-${roleId}`} variant="secondary" className="px-2 py-1">
+              <span className="capitalize">{getRoleName(roleId)}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedRoles(prev => prev.filter(r => r !== role))}
+                onClick={() => setSelectedRoleIds(prev => prev.filter(r => r !== roleId))}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -232,7 +270,7 @@ export function UsersFilters({
           {/* Status badges */}
           {selectedStatuses.map(status => (
             <Badge key={`status-${status}`} variant="secondary" className="px-2 py-1">
-              <span className="capitalize">{status}</span>
+              <span className="capitalize">{status.toLowerCase()}</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -245,13 +283,13 @@ export function UsersFilters({
           ))}
           
           {/* Clear all button */}
-          {(selectedRoles.length > 1 || selectedStatuses.length > 1) && (
+          {(selectedRoleIds.length > 1 || selectedStatuses.length > 1) && (
             <Button
               variant="ghost"
               size="sm"
               className="h-7 px-2"
               onClick={() => {
-                setSelectedRoles([]);
+                setSelectedRoleIds([]);
                 setSelectedStatuses([]);
               }}
             >

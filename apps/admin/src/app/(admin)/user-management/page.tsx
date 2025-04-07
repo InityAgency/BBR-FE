@@ -21,11 +21,35 @@ interface UsersApiResponse {
     };
 }
 
+interface Role {
+    id: string;
+    name: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+interface RolesApiResponse {
+    data: Role[];
+    statusCode: number;
+    message: string;
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        limit: number;
+    };
+}
+
 export default function UserManagementPage() {
     const [users, setUsers] = useState<User[]>([]);
+    const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const [rolesLoading, setRolesLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+    const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -33,8 +57,59 @@ export default function UserManagementPage() {
     
     const currentPage = Number(searchParams.get('page')) || 1;
     const queryParam = searchParams.get('query') || '';
+    const statusParam = searchParams.get('status') || '';
+    const roleIdParam = searchParams.get('roleId') || '';
 
-    const fetchUsers = async (page: number, query?: string) => {
+    // Parsiramo status iz URL paramtra
+    useEffect(() => {
+        if (statusParam) {
+            const statusArray = statusParam.split(',');
+            setSelectedStatuses(statusArray);
+        } else {
+            setSelectedStatuses([]);
+        }
+    }, [statusParam]);
+
+    // Parsiramo roleId iz URL parametra
+    useEffect(() => {
+        if (roleIdParam) {
+            const roleIdArray = roleIdParam.split(',');
+            setSelectedRoleIds(roleIdArray);
+        } else {
+            setSelectedRoleIds([]);
+        }
+    }, [roleIdParam]);
+
+    // Učitavamo uloge sa API-a
+    const fetchRoles = async () => {
+        try {
+            setRolesLoading(true);
+            const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/roles`);
+            url.searchParams.set('limit', '100'); // Pretpostavljamo da će 100 biti dovoljno za sve uloge
+            url.searchParams.set('page', '1');
+            
+            const response = await fetch(url.toString(), {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Error fetching roles: ${response.status}`);
+            }
+
+            const data: RolesApiResponse = await response.json();
+            setRoles(data.data || []);
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+            setRoles([]);
+        } finally {
+            setRolesLoading(false);
+        }
+    };
+
+    const fetchUsers = async (page: number, query?: string, statuses?: string[], roleIds?: string[]) => {
         try {
             setLoading(true);
             
@@ -44,6 +119,14 @@ export default function UserManagementPage() {
             url.searchParams.set('limit', ITEMS_PER_PAGE.toString());
             if (query) {
                 url.searchParams.set('query', query);
+            }
+            // Dodajemo status parametre ako postoje
+            if (statuses && statuses.length > 0) {
+                url.searchParams.set('status', statuses.join(','));
+            }
+            // Dodajemo roleId parametre ako postoje
+            if (roleIds && roleIds.length > 0) {
+                url.searchParams.set('roleId', roleIds.join(','));
             }
             
             const response = await fetch(url.toString(), {
@@ -80,31 +163,69 @@ export default function UserManagementPage() {
         }
     };
 
-    const updateUrlWithPage = (page: number) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('page', page.toString());
-        router.replace(`${pathname}?${params.toString()}`);
+    const updateUrlParams = (params: { page?: number, statuses?: string[], roleIds?: string[] }) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        
+        if (params.page !== undefined) {
+            newParams.set('page', params.page.toString());
+        }
+        
+        if (params.statuses !== undefined) {
+            if (params.statuses && params.statuses.length > 0) {
+                newParams.set('status', params.statuses.join(','));
+            } else {
+                newParams.delete('status');
+            }
+        }
+        
+        if (params.roleIds !== undefined) {
+            if (params.roleIds && params.roleIds.length > 0) {
+                newParams.set('roleId', params.roleIds.join(','));
+            } else {
+                newParams.delete('roleId');
+            }
+        }
+        
+        router.replace(`${pathname}?${newParams.toString()}`);
     };
 
+    // Efekat za učitavanje uloga
     useEffect(() => {
-        fetchUsers(currentPage, queryParam);
-    }, [currentPage, queryParam]);
+        fetchRoles();
+    }, []);
+
+    // Efekat za ažuriranje URL-a kada se promene statusi
+    useEffect(() => {
+        updateUrlParams({ statuses: selectedStatuses, page: 1 });
+    }, [selectedStatuses]);
+
+    // Efekat za ažuriranje URL-a kada se promene uloge
+    useEffect(() => {
+        updateUrlParams({ roleIds: selectedRoleIds, page: 1 });
+    }, [selectedRoleIds]);
+
+    // Efekat za učitavanje korisnika
+    useEffect(() => {
+        const statusArray = statusParam ? statusParam.split(',') : [];
+        const roleIdArray = roleIdParam ? roleIdParam.split(',') : [];
+        fetchUsers(currentPage, queryParam, statusArray, roleIdArray);
+    }, [currentPage, queryParam, statusParam, roleIdParam]);
 
     const goToNextPage = () => {
         if (currentPage < totalPages) {
-            updateUrlWithPage(currentPage + 1);
+            updateUrlParams({ page: currentPage + 1 });
         }
     };
 
     const goToPreviousPage = () => {
         if (currentPage > 1) {
-            updateUrlWithPage(currentPage - 1);
+            updateUrlParams({ page: currentPage - 1 });
         }
     };
 
     const goToPage = (page: number) => {
         if (page >= 1 && page <= totalPages) {
-            updateUrlWithPage(page);
+            updateUrlParams({ page });
         }
     };
 
@@ -118,13 +239,18 @@ export default function UserManagementPage() {
             />
             <UsersTable 
                 users={users}
-                loading={loading}
+                roles={roles}
+                loading={loading || rolesLoading}
                 totalItems={totalItems}
                 totalPages={totalPages}
                 currentPage={currentPage}
                 goToNextPage={goToNextPage}
                 goToPreviousPage={goToPreviousPage}
                 goToPage={goToPage}
+                selectedStatuses={selectedStatuses}
+                onStatusesChange={setSelectedStatuses}
+                selectedRoleIds={selectedRoleIds}
+                onRoleIdsChange={setSelectedRoleIds}
             />
         </AdminLayout>
     );
