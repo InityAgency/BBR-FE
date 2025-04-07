@@ -25,21 +25,98 @@ interface BrandsApiResponse {
     path: string;
 }
 
+interface BrandType {
+    id: string;
+    name: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+interface BrandTypesApiResponse {
+    data: BrandType[];
+    statusCode: number;
+    message: string;
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        limit: number;
+    };
+    timestamp: string;
+    path: string;
+}
+
 export default function BrandsPage() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [brands, setBrands] = useState<Brand[]>([]);
+    const [brandTypes, setBrandTypes] = useState<BrandType[]>([]);
     const [loading, setLoading] = useState(true);
+    const [brandTypesLoading, setBrandTypesLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+    const [selectedBrandTypeIds, setSelectedBrandTypeIds] = useState<string[]>([]);
 
     // Get the current page from URL or default to 1
     const pageParam = searchParams.get('page');
     const queryParam = searchParams.get('query');
+    const statusParam = searchParams.get('status') || '';
+    const brandTypeIdParam = searchParams.get('brandTypeId') || '';
     const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
-    const fetchBrands = async (page: number, query?: string) => {
+    // Parsiramo status iz URL parametra
+    useEffect(() => {
+        if (statusParam) {
+            const statusArray = statusParam.split(',');
+            setSelectedStatuses(statusArray);
+        } else {
+            setSelectedStatuses([]);
+        }
+    }, [statusParam]);
+
+    // Parsiramo brandTypeId iz URL parametra
+    useEffect(() => {
+        if (brandTypeIdParam) {
+            const brandTypeIdArray = brandTypeIdParam.split(',');
+            setSelectedBrandTypeIds(brandTypeIdArray);
+        } else {
+            setSelectedBrandTypeIds([]);
+        }
+    }, [brandTypeIdParam]);
+
+    // Učitavamo tipove brendova sa API-a
+    const fetchBrandTypes = async () => {
+        try {
+            setBrandTypesLoading(true);
+            const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/brand-types`);
+            url.searchParams.set('limit', '100'); // Pretpostavljamo da će 100 biti dovoljno za sve tipove
+            url.searchParams.set('page', '1');
+            
+            const response = await fetch(url.toString(), {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Error fetching brand types: ${response.status}`);
+            }
+
+            const data: BrandTypesApiResponse = await response.json();
+            setBrandTypes(data.data || []);
+        } catch (error) {
+            console.error('Error fetching brand types:', error);
+            setBrandTypes([]);
+        } finally {
+            setBrandTypesLoading(false);
+        }
+    };
+
+    const fetchBrands = async (page: number, query?: string, statuses?: string[], brandTypeIds?: string[]) => {
         setLoading(true);
         try {
             // Kreiramo URL parametre
@@ -50,6 +127,16 @@ export default function BrandsPage() {
             // Dodajemo query parametar ako postoji
             if (query && query.trim() !== '') {
                 urlParams.set('query', query);
+            }
+
+            // Dodajemo status parametre ako postoje
+            if (statuses && statuses.length > 0) {
+                urlParams.set('status', statuses.join(','));
+            }
+
+            // Dodajemo brandTypeId parametre ako postoje
+            if (brandTypeIds && brandTypeIds.length > 0) {
+                urlParams.set('brandTypeId', brandTypeIds.join(','));
             }
             
             const url = `${API_BASE_URL}/api/${API_VERSION}/brands?${urlParams.toString()}`;
@@ -85,7 +172,7 @@ export default function BrandsPage() {
             // Update URL only if the page from API is different
             const apiPage = data.pagination.page || page;
             if (apiPage !== page) {
-                updateUrlWithPage(apiPage, query);
+                updateUrlParams({ page: apiPage });
             }
         } catch (error) {
             console.error("Failed to fetch brands:", error);
@@ -96,43 +183,73 @@ export default function BrandsPage() {
         }
     };
 
-    // Update URL with the current page and query
-    const updateUrlWithPage = (page: number, query?: string) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('page', page.toString());
+    // Update URL with the current page, query, status, and brandTypeId
+    const updateUrlParams = (params: { page?: number, statuses?: string[], brandTypeIds?: string[] }) => {
+        const newParams = new URLSearchParams(searchParams.toString());
         
-        if (query && query.trim() !== '') {
-            params.set('query', query);
-        } else {
-            // Uklanjamo query parametar ako ne postoji ili je prazan string
-            params.delete('query');
+        if (params.page !== undefined) {
+            newParams.set('page', params.page.toString());
+        }
+        
+        if (params.statuses !== undefined) {
+            if (params.statuses && params.statuses.length > 0) {
+                newParams.set('status', params.statuses.join(','));
+            } else {
+                newParams.delete('status');
+            }
+        }
+        
+        if (params.brandTypeIds !== undefined) {
+            if (params.brandTypeIds && params.brandTypeIds.length > 0) {
+                newParams.set('brandTypeId', params.brandTypeIds.join(','));
+            } else {
+                newParams.delete('brandTypeId');
+            }
         }
         
         // Koristimo replace umesto push da ne dodajemo u history stack
-        router.replace(`${pathname}?${params.toString()}`);
+        router.replace(`${pathname}?${newParams.toString()}`);
     };
 
+    // Efekat za učitavanje tipova brendova
+    useEffect(() => {
+        fetchBrandTypes();
+    }, []);
+
+    // Efekat za ažuriranje URL-a kada se promene statusi
+    useEffect(() => {
+        updateUrlParams({ statuses: selectedStatuses, page: 1 });
+    }, [selectedStatuses]);
+
+    // Efekat za ažuriranje URL-a kada se promene tipovi
+    useEffect(() => {
+        updateUrlParams({ brandTypeIds: selectedBrandTypeIds, page: 1 });
+    }, [selectedBrandTypeIds]);
+
+    // Efekat za učitavanje brendova
     useEffect(() => {
         if (currentPage >= 1) {
-            fetchBrands(currentPage, queryParam || undefined);
+            const statusArray = statusParam ? statusParam.split(',') : [];
+            const brandTypeIdArray = brandTypeIdParam ? brandTypeIdParam.split(',') : [];
+            fetchBrands(currentPage, queryParam || undefined, statusArray, brandTypeIdArray);
         }
-    }, [currentPage, queryParam]); // Re-fetch when currentPage or queryParam changes
+    }, [currentPage, queryParam, statusParam, brandTypeIdParam]);
 
     const goToNextPage = () => {
         if (currentPage < totalPages) {
-            updateUrlWithPage(currentPage + 1, queryParam || undefined);
+            updateUrlParams({ page: currentPage + 1 });
         }
     };
 
     const goToPreviousPage = () => {
         if (currentPage > 1) {
-            updateUrlWithPage(currentPage - 1, queryParam || undefined);
+            updateUrlParams({ page: currentPage - 1 });
         }
     };
 
     const goToPage = (page: number) => {
         if (page >= 1 && page <= totalPages) {
-            updateUrlWithPage(page, queryParam || undefined);
+            updateUrlParams({ page });
         }
     };
 
@@ -147,7 +264,8 @@ export default function BrandsPage() {
 
             <BrandsTable 
                 brands={brands}
-                loading={loading}
+                brandTypes={brandTypes}
+                loading={loading || brandTypesLoading}
                 totalItems={totalItems}
                 totalPages={totalPages}
                 currentPage={currentPage}
@@ -155,6 +273,10 @@ export default function BrandsPage() {
                 goToPreviousPage={goToPreviousPage}
                 goToPage={goToPage}
                 fetchBrands={fetchBrands}
+                selectedStatuses={selectedStatuses}
+                onStatusesChange={setSelectedStatuses}
+                selectedBrandTypeIds={selectedBrandTypeIds}
+                onBrandTypeIdsChange={setSelectedBrandTypeIds}
             />
         </AdminLayout>
     );

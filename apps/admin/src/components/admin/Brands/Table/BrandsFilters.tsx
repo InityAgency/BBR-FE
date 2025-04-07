@@ -12,29 +12,45 @@ import { Command, CommandInput, CommandItem, CommandList, CommandEmpty } from "@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 
+interface BrandType {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface BrandsFiltersProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
-  selectedTypes: string[];
-  setSelectedTypes: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedBrandTypeIds: string[];
+  setSelectedBrandTypeIds: React.Dispatch<React.SetStateAction<string[]>>;
   selectedStatuses: string[];
   setSelectedStatuses: React.Dispatch<React.SetStateAction<string[]>>;
-  uniqueTypes: string[];
+  brandTypes: BrandType[];
   uniqueStatuses: string[];
-  filteredTypes: string[];
   typeSearchValue: string;
   setTypeSearchValue: (value: string) => void;
 }
 
+// Definisanje fiksnih vrednosti za status - samo oni koje želimo da koristimo
+const PREDEFINED_STATUSES = ["ACTIVE", "DRAFT", "PENDING", "DELETED"];
+
+// Funkcija za formatiranje imena tipa brenda sa prvim velikim slovom
+const formatTypeName = (name: string): string => {
+  if (!name) return '';
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
 export function BrandsFilters({
   globalFilter,
   setGlobalFilter,
-  selectedTypes,
-  setSelectedTypes,
+  selectedBrandTypeIds,
+  setSelectedBrandTypeIds,
   selectedStatuses,
   setSelectedStatuses,
+  brandTypes = [],
   uniqueStatuses,
-  filteredTypes,
   typeSearchValue,
   setTypeSearchValue,
 }: BrandsFiltersProps) {
@@ -45,6 +61,22 @@ export function BrandsFilters({
   // Kreiramo lokalno stanje da pratimo vrednost pretrage
   const [localSearch, setLocalSearch] = useState(globalFilter);
   const debouncedSearch = useDebounce(localSearch, 500); // Debounce za 500ms
+  
+  // Filtriranje tipova na osnovu pretrage
+  const [filteredBrandTypes, setFilteredBrandTypes] = useState<BrandType[]>(brandTypes);
+  
+  // Ažuriranje filtriranih tipova kada se promeni pretraga ili lista tipova
+  useEffect(() => {
+    if (typeSearchValue.trim() === '') {
+      setFilteredBrandTypes(brandTypes);
+    } else {
+      const lowercaseSearch = typeSearchValue.toLowerCase();
+      const filtered = brandTypes.filter(brandType => 
+        brandType.name.toLowerCase().includes(lowercaseSearch)
+      );
+      setFilteredBrandTypes(filtered);
+    }
+  }, [typeSearchValue, brandTypes]);
   
   // Handler koji se pokreće kada se promeni vrednost u input polju
   const handleSearchChange = (value: string) => {
@@ -83,6 +115,12 @@ export function BrandsFilters({
     }
   }, [searchParams]);
 
+  // Funkcija za pronalaženje imena tipa brenda na osnovu ID-a
+  const getBrandTypeName = (brandTypeId: string): string => {
+    const brandType = brandTypes.find(bt => bt.id === brandTypeId);
+    return brandType ? formatTypeName(brandType.name) : brandTypeId;
+  };
+
   return (
     <>
       <TableFilters
@@ -90,17 +128,17 @@ export function BrandsFilters({
         setGlobalFilter={handleSearchChange}
         placeholder="Search brands..."
       >
-        {/* Type Filter */}
+        {/* Brand Type Filter */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="h-10">
               <Tag className="h-4 w-4 mr-2" />
               Brand Types
-              {selectedTypes.length > 0 && (
+              {selectedBrandTypeIds.length > 0 && (
                 <>
                   <div className="w-px h-4 bg-muted mx-2" />
                   <Badge variant="secondary" className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs">
-                    {selectedTypes.length}
+                    {selectedBrandTypeIds.length}
                   </Badge>
                 </>
               )}
@@ -115,34 +153,34 @@ export function BrandsFilters({
               />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
-                {filteredTypes.map((type) => (
+                {filteredBrandTypes.map((brandType) => (
                   <CommandItem
-                    key={type}
+                    key={brandType.id}
                     onSelect={() => {
-                      setSelectedTypes((prev) => {
-                        if (prev.includes(type)) {
-                          return prev.filter(item => item !== type);
+                      setSelectedBrandTypeIds((prev) => {
+                        if (prev.includes(brandType.id)) {
+                          return prev.filter(item => item !== brandType.id);
                         } else {
-                          return [...prev, type];
+                          return [...prev, brandType.id];
                         }
                       });
                     }}
                   >
                     <Checkbox
-                      checked={selectedTypes.includes(type)}
+                      checked={selectedBrandTypeIds.includes(brandType.id)}
                       className="mr-2 h-4 w-4"
                     />
-                    {type}
+                    <span className="capitalize">{formatTypeName(brandType.name)}</span>
                   </CommandItem>
                 ))}
               </CommandList>
-              {selectedTypes.length > 0 && (
+              {selectedBrandTypeIds.length > 0 && (
                 <div className="border-t border-border p-2">
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedTypes([])}
+                    onClick={() => setSelectedBrandTypeIds([])}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -173,7 +211,7 @@ export function BrandsFilters({
             <Command>
               <CommandList>
                 <CommandEmpty>No statuses found.</CommandEmpty>
-                {uniqueStatuses.map((status) => (
+                {PREDEFINED_STATUSES.map((status) => (
                   <CommandItem
                     key={status}
                     onSelect={() => {
@@ -190,7 +228,7 @@ export function BrandsFilters({
                       checked={selectedStatuses.includes(status)}
                       className="mr-2 h-4 w-4"
                     />
-                    {status}
+                    <span className="capitalize">{status.toLowerCase()}</span>
                   </CommandItem>
                 ))}
               </CommandList>
@@ -213,17 +251,17 @@ export function BrandsFilters({
       </TableFilters>
 
       {/* Prikaz aktivnih filtera */}
-      {(selectedTypes.length > 0 || selectedStatuses.length > 0) && (
+      {(selectedBrandTypeIds.length > 0 || selectedStatuses.length > 0) && (
         <div className="flex gap-2 mb-4 flex-wrap">
-          {/* Oznake za tipove */}
-          {selectedTypes.map(type => (
-            <Badge key={`type-${type}`} variant="secondary" className="px-2 py-1">
-              {type}
+          {/* Oznake za tipove brendova */}
+          {selectedBrandTypeIds.map(brandTypeId => (
+            <Badge key={`brandType-${brandTypeId}`} variant="secondary" className="px-2 py-1">
+              <span className="capitalize">{getBrandTypeName(brandTypeId)}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedTypes(prev => prev.filter(t => t !== type))}
+                onClick={() => setSelectedBrandTypeIds(prev => prev.filter(id => id !== brandTypeId))}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -233,7 +271,7 @@ export function BrandsFilters({
           {/* Oznake za statuse */}
           {selectedStatuses.map(status => (
             <Badge key={`status-${status}`} variant="secondary" className="px-2 py-1">
-              {status}
+              <span className="capitalize">{status.toLowerCase()}</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -246,13 +284,13 @@ export function BrandsFilters({
           ))}
           
           {/* Dugme za brisanje svih filtera */}
-          {(selectedTypes.length > 1 || selectedStatuses.length > 1) && (
+          {(selectedBrandTypeIds.length > 1 || selectedStatuses.length > 1) && (
             <Button
               variant="ghost"
               size="sm"
               className="h-7 px-2"
               onClick={() => {
-                setSelectedTypes([]);
+                setSelectedBrandTypeIds([]);
                 setSelectedStatuses([]);
               }}
             >

@@ -19,8 +19,16 @@ import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
+interface BrandType {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Popravka za kolone da koriste BrandsActions
-const enhancedColumns = (fetchBrands: (page: number, query?: string) => Promise<void>, currentPage: number) => columns.map(column => {
+const enhancedColumns = (fetchBrands: (page: number, query?: string, statuses?: string[], brandTypeIds?: string[]) => Promise<void>, currentPage: number) => columns.map(column => {
   if (column.id === "actions") {
     return {
       ...column,
@@ -87,6 +95,7 @@ const CardsSkeleton = () => {
 
 interface BrandsTableProps {
   brands: Brand[];
+  brandTypes: BrandType[];
   loading: boolean;
   totalItems: number;
   totalPages: number;
@@ -94,12 +103,16 @@ interface BrandsTableProps {
   goToNextPage: () => void;
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
-  initialStatusFilter?: string | null;
-  fetchBrands: (page: number, query?: string) => Promise<void>;
+  selectedStatuses: string[];
+  onStatusesChange: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedBrandTypeIds: string[];
+  onBrandTypeIdsChange: React.Dispatch<React.SetStateAction<string[]>>;
+  fetchBrands: (page: number, query?: string, statuses?: string[], brandTypeIds?: string[]) => Promise<void>;
 }
 
 export function BrandsTable({
   brands,
+  brandTypes = [],
   loading,
   totalItems,
   totalPages,
@@ -107,7 +120,10 @@ export function BrandsTable({
   goToNextPage,
   goToPreviousPage,
   goToPage,
-  initialStatusFilter,
+  selectedStatuses,
+  onStatusesChange,
+  selectedBrandTypeIds,
+  onBrandTypeIdsChange,
   fetchBrands
 }: BrandsTableProps) {
   const searchParams = useSearchParams();
@@ -143,17 +159,10 @@ export function BrandsTable({
     setTableGlobalFilter(search);
   }, [search, setTableGlobalFilter]);
 
-  // Koristimo hook za filtere
   const {
-    selectedLocations: selectedTypes,
-    setSelectedLocations: setSelectedTypes,
     locationSearchValue: typeSearchValue,
     setLocationSearchValue: setTypeSearchValue,
-    selectedStatuses,
-    setSelectedStatuses,
-    uniqueLocations: uniqueTypes,
     uniqueStatuses,
-    filteredLocations: filteredTypes,
   } = useTableFilters<Brand>({
     table,
     data: brands,
@@ -162,16 +171,6 @@ export function BrandsTable({
     useNestedFilter: true,
     nestedField: "name"
   });
-
-  // Primeni inicijalni filter za status ako postoji
-  useEffect(() => {
-    if (initialStatusFilter) {
-      // Proveri da li inicijalni status postoji među opcijama
-      if (uniqueStatuses.includes(initialStatusFilter)) {
-        setSelectedStatuses([initialStatusFilter]);
-      }
-    }
-  }, [initialStatusFilter, uniqueStatuses, setSelectedStatuses]);
 
   // Sinhronizujemo stanje sa URL parametrom
   useEffect(() => {
@@ -194,13 +193,12 @@ export function BrandsTable({
       <BrandsFilters
         globalFilter={search}
         setGlobalFilter={setSearch}
-        selectedTypes={selectedTypes}
-        setSelectedTypes={setSelectedTypes}
+        selectedBrandTypeIds={selectedBrandTypeIds}
+        setSelectedBrandTypeIds={onBrandTypeIdsChange}
         selectedStatuses={selectedStatuses}
-        setSelectedStatuses={setSelectedStatuses}
-        uniqueTypes={uniqueTypes}
+        setSelectedStatuses={onStatusesChange}
+        brandTypes={brandTypes}
         uniqueStatuses={uniqueStatuses}
-        filteredTypes={filteredTypes}
         typeSearchValue={typeSearchValue}
         setTypeSearchValue={setTypeSearchValue}
       />
