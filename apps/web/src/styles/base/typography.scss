@@ -1,0 +1,116 @@
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face{
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-LightItalic.woff2') format('woff2');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-MediumItalic.woff2') format('woff2');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-SemiBoldItalic.woff2') format('woff2');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'InterDisplay';
+    src: url('../../fonts/InterDisplay-BoldItalic.woff2') format('woff2');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+// PPEiko fontovi (za naslove)
+@font-face {
+    font-family: 'PPEiko';
+    src: url('../../fonts/PPEiko-Regular.woff2') format('woff2'),
+            url('../../fonts/PPEiko-Regular.woff') format('woff'),
+            url('../../fonts/PPEiko-Regular.eot') format('embedded-opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'PPEiko';
+    src: url('../../fonts/PPEiko-Medium.woff2') format('woff2'),
+            url('../../fonts/PPEiko-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+// Primena fontova
+body {
+    font-family: 'InterDisplay', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'PPEiko', serif;
+    font-style: normal;
+    font-weight: 400;
+}

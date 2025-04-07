@@ -4,6 +4,10 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['InterDisplay', 'sans-serif'],
+        display: ['PPEiko', 'serif'],
+      },
       colors: {
         primary: {
           100: "#F4E1D2",
