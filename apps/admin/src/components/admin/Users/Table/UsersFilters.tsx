@@ -84,24 +84,18 @@ export function UsersFilters({
   
   // Efekat koji se pokreće kada se promeni debouncedSearch vrednost
   useEffect(() => {
-    // Samo ako se debounce vrednost stvarno razlikuje od trenutnog URL parametra
     const currentQuery = searchParams.get('query') || '';
     
     if (debouncedSearch !== currentQuery) {
-      // Kreiramo novi URLSearchParams objekat na osnovu trenutnih parametara
       const params = new URLSearchParams(searchParams.toString());
-      
-      // Resetujemo stranicu na 1 kad god se promeni pretraga
       params.set('page', '1');
       
-      // Ako postoji vrednost pretrage, dodajemo je u URL, inače je uklanjamo
       if (debouncedSearch) {
         params.set('query', debouncedSearch);
       } else {
         params.delete('query');
       }
       
-      // Koristimo replace umesto push da ne dodajemo previše u istoriju
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [debouncedSearch, router, pathname, searchParams]);
@@ -113,11 +107,25 @@ export function UsersFilters({
       setLocalSearch(queryParam || '');
     }
   }, [searchParams]);
-
+  
   // Funkcija za pronalaženje imena uloge na osnovu ID-a
   const getRoleName = (roleId: string): string => {
     const role = roles.find(r => r.id === roleId);
     return role ? formatRoleName(role.name) : roleId;
+  };
+
+  // Izmenjena funkcija za čišćenje svih filtera
+  const clearAllFilters = () => {
+    setSelectedRoleIds([]);
+    setSelectedStatuses([]); // Postavljamo prazno stanje
+    setGlobalFilter('');
+    setLocalSearch('');
+  
+    const params = new URLSearchParams();
+    params.set('page', '1'); // Samo page=1 ostaje u URL-u
+  
+    // Koristimo { scroll: false } da izbegnemo skrolovanje
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -179,7 +187,13 @@ export function UsersFilters({
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedRoleIds([])}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.delete('roleId');
+                      params.set('page', '1');
+                      router.replace(`${pathname}?${params.toString()}`);
+                      setSelectedRoleIds([]);
+                    }}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -237,7 +251,13 @@ export function UsersFilters({
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedStatuses([])}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.delete('status');
+                      params.set('page', '1');
+                      router.replace(`${pathname}?${params.toString()}`);
+                      setSelectedStatuses([]);
+                    }}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -260,7 +280,15 @@ export function UsersFilters({
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedRoleIds(prev => prev.filter(r => r !== roleId))}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  const remainingRoleIds = selectedRoleIds.filter(r => r !== roleId);
+                  params.delete('roleId');
+                  remainingRoleIds.forEach(id => params.append('roleId', id));
+                  params.set('page', '1');
+                  router.replace(`${pathname}?${params.toString()}`);
+                  setSelectedRoleIds(remainingRoleIds);
+                }}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -275,7 +303,15 @@ export function UsersFilters({
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedStatuses(prev => prev.filter(s => s !== status))}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  const remainingStatuses = selectedStatuses.filter(s => s !== status);
+                  params.delete('status');
+                  remainingStatuses.forEach(s => params.append('status', s));
+                  params.set('page', '1');
+                  router.replace(`${pathname}?${params.toString()}`);
+                  setSelectedStatuses(remainingStatuses);
+                }}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -283,15 +319,12 @@ export function UsersFilters({
           ))}
           
           {/* Clear all button */}
-          {(selectedRoleIds.length > 1 || selectedStatuses.length > 1) && (
+          {(selectedRoleIds.length > 0 || selectedStatuses.length > 0) && (
             <Button
               variant="ghost"
               size="sm"
               className="h-7 px-2"
-              onClick={() => {
-                setSelectedRoleIds([]);
-                setSelectedStatuses([]);
-              }}
+              onClick={clearAllFilters}
             >
               Clear All
             </Button>
