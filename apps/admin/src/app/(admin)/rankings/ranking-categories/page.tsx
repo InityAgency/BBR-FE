@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -11,274 +11,278 @@ import { RankingCategoryTable } from "@/components/admin/RankingCategory/Table/R
 const ITEMS_PER_PAGE = 10;
 
 interface RankingCategoryApiResponse {
-    data: RankingCategory[];
-    statusCode: number;
-    message: string;
-    pagination: {
-        total: number;
-        totalPages: number;
-        page: number;
-        limit: number;
-    };
-    timestamp: string;
-    path: string;
+  data: RankingCategory[];
+  statusCode: number;
+  message: string;
+  pagination: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
+  timestamp: string;
+  path: string;
 }
 
 interface RankingCategoryType {
-    id: string;
-    name: string;
-    description?: string;
-    createdAt?: string;
-    updatedAt?: string;
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface RankingCategoryTypesApiResponse {
-    data: RankingCategoryType[];
-    statusCode: number;
-    message: string;
-    pagination: {
-        total: number;
-        totalPages: number;
-        page: number;
-        limit: number;
-    };
-    timestamp: string;
-    path: string;
+  data: RankingCategoryType[];
+  statusCode: number;
+  message: string;
+  pagination: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
+  timestamp: string;
+  path: string;
 }
 
 export default function RankingCategoriesPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    
-    const [rankingCategories, setRankingCategories] = useState<RankingCategory[]>([]);
-    const [rankingCategoryTypes, setRankingCategoryTypes] = useState<RankingCategoryType[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [typesLoading, setTypesLoading] = useState(true);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    
-    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-    const [selectedCategoryTypeIds, setSelectedCategoryTypeIds] = useState<string[]>([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-    // Get the current page from URL or default to 1
-    const pageParam = searchParams.get('page');
-    const queryParam = searchParams.get('query');
-    const statusParam = searchParams.get('status') || '';
-    const categoryTypeIdParam = searchParams.get('categoryTypeId') || '';
-    const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
+  const [rankingCategories, setRankingCategories] = useState<RankingCategory[]>([]);
+  const [rankingCategoryTypes, setRankingCategoryTypes] = useState<RankingCategoryType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [typesLoading, setTypesLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-    // Parsiramo status iz URL parametra
-    useEffect(() => {
-        if (statusParam) {
-            const statusArray = statusParam.split(',');
-            setSelectedStatuses(statusArray);
-        } else {
-            setSelectedStatuses([]);
-        }
-    }, [statusParam]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedCategoryTypeIds, setSelectedCategoryTypeIds] = useState<string[]>([]);
 
-    // Parsiramo categoryTypeId iz URL parametra
-    useEffect(() => {
-        if (categoryTypeIdParam) {
-            const categoryTypeIdArray = categoryTypeIdParam.split(',');
-            setSelectedCategoryTypeIds(categoryTypeIdArray);
-        } else {
-            setSelectedCategoryTypeIds([]);
-        }
-    }, [categoryTypeIdParam]);
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const queryParam = searchParams.get("query") || "";
 
-    // Učitavamo tipove rankinga sa API-a
-    const fetchRankingCategoryTypes = async () => {
-        try {
-            setTypesLoading(true);
-            const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/ranking-category-types`);
-            url.searchParams.set('limit', '100'); // Pretpostavljamo da će 100 biti dovoljno za sve tipove
-            url.searchParams.set('page', '1');
-            
-            const response = await fetch(url.toString(), {
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Error fetching ranking category types: ${response.status}`);
-            }
+  // Parsiramo status iz URL parametara
+  useEffect(() => {
+    const statusValues = searchParams.getAll("status");
+    if (statusValues.length > 0) {
+      setSelectedStatuses(statusValues);
+    }
+  }, [searchParams]);
 
-            const data: RankingCategoryTypesApiResponse = await response.json();
-            setRankingCategoryTypes(data.data || []);
-        } catch (error) {
-            console.error('Error fetching ranking category types:', error);
-            setRankingCategoryTypes([]);
-        } finally {
-            setTypesLoading(false);
-        }
-    };
+  // Parsiramo categoryTypeId iz URL parametara
+  useEffect(() => {
+    const categoryTypeIdValues = searchParams.getAll("categoryTypeId");
+    if (categoryTypeIdValues.length > 0) {
+      setSelectedCategoryTypeIds(categoryTypeIdValues);
+    }
+  }, [searchParams]);
 
-    const fetchRankingCategories = async (page: number, query?: string, statuses?: string[], categoryTypeIds?: string[]) => {
-        setLoading(true);
-        try {
-            // Kreiramo URL parametre
-            const urlParams = new URLSearchParams();
-            urlParams.set('limit', ITEMS_PER_PAGE.toString());
-            urlParams.set('page', page.toString());
-            
-            // Dodajemo query parametar ako postoji
-            if (query && query.trim() !== '') {
-                urlParams.set('query', query);
-            }
-            
-            // Dodajemo status parametre ako postoje
-            if (statuses && statuses.length > 0) {
-                urlParams.set('status', statuses.join(','));
-            }
+  // Učitavamo tipove rankinga sa API-a
+  const fetchRankingCategoryTypes = async () => {
+    try {
+      setTypesLoading(true);
+      const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/ranking-category-types`);
+      url.searchParams.set("limit", "100");
+      url.searchParams.set("page", "1");
 
-            // Dodajemo categoryTypeId parametre ako postoje
-            if (categoryTypeIds && categoryTypeIds.length > 0) {
-                urlParams.set('categoryTypeId', categoryTypeIds.join(','));
-            }
-            
-            const url = `${API_BASE_URL}/api/${API_VERSION}/ranking-categories?${urlParams.toString()}`;
-            
-            const response = await fetch(url, {
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+      const response = await fetch(url.toString(), {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Error fetching ranking categories: ${response.status}`);
-            }
+      if (!response.ok) {
+        throw new Error(`Error fetching ranking category types: ${response.status}`);
+      }
 
-            const data: RankingCategoryApiResponse = await response.json();
+      const data: RankingCategoryTypesApiResponse = await response.json();
+      setRankingCategoryTypes(data.data || []);
+    } catch (error) {
+      console.error("Error fetching ranking category types:", error);
+      setRankingCategoryTypes([]);
+    } finally {
+      setTypesLoading(false);
+    }
+  };
 
-            // Validate pagination data
-            const validTotal = typeof data.pagination.total === 'number' && data.pagination.total >= 0;
-            const validTotalPages = typeof data.pagination.totalPages === 'number' && data.pagination.totalPages >= 0;
-            
-            if (!validTotal || !validTotalPages) {
-                throw new Error('Invalid pagination data received from server');
-            }
+  const fetchRankingCategories = async (
+    page: number,
+    query?: string,
+    statuses?: string[],
+    categoryTypeIds?: string[]
+  ) => {
+    setLoading(true);
+    try {
+      const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories`);
+      url.searchParams.set("limit", ITEMS_PER_PAGE.toString());
+      url.searchParams.set("page", page.toString());
 
-            setRankingCategories(data.data || []);
-            
-            // This is important - we're setting these values regardless of page change
-            setTotalPages(Math.max(1, data.pagination.totalPages));
-            setTotalItems(data.pagination.total);
-            
-            // Update URL only if the page from API is different
-            const apiPage = data.pagination.page || page;
-            if (apiPage !== page) {
-                updateUrlParams({ page: apiPage });
-            }
-        } catch (error) {
-            console.error("Failed to fetch ranking categories:", error);
-            // Don't reset pagination data on error, maintain previous state
-            setRankingCategories([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (query && query.trim() !== "") {
+        url.searchParams.set("query", query);
+      }
 
-    // Update URL with parameters
-    const updateUrlParams = (params: { page?: number, statuses?: string[], categoryTypeIds?: string[] }) => {
-        const newParams = new URLSearchParams(searchParams.toString());
-        
-        if (params.page !== undefined) {
-            newParams.set('page', params.page.toString());
-        }
-        
-        if (params.statuses !== undefined) {
-            if (params.statuses && params.statuses.length > 0) {
-                newParams.set('status', params.statuses.join(','));
-            } else {
-                newParams.delete('status');
-            }
-        }
-        
-        if (params.categoryTypeIds !== undefined) {
-            if (params.categoryTypeIds && params.categoryTypeIds.length > 0) {
-                newParams.set('categoryTypeId', params.categoryTypeIds.join(','));
-            } else {
-                newParams.delete('categoryTypeId');
-            }
-        }
-        
-        // Koristimo replace umesto push da ne dodajemo u history stack
-        router.replace(`${pathname}?${newParams.toString()}`);
-    };
+      if (statuses && statuses.length > 0) {
+        statuses.forEach((status) => {
+          url.searchParams.append("status", status);
+        });
+      }
 
-    // Efekat za učitavanje tipova
-    useEffect(() => {
-        fetchRankingCategoryTypes();
-    }, []);
+      if (categoryTypeIds && categoryTypeIds.length > 0) {
+        categoryTypeIds.forEach((categoryTypeId) => {
+          url.searchParams.append("categoryTypeId", categoryTypeId);
+        });
+      }
 
-    // Efekat za ažuriranje URL-a kada se promene statusi
-    useEffect(() => {
-        updateUrlParams({ statuses: selectedStatuses, page: 1 });
-    }, [selectedStatuses]);
+      const response = await fetch(url.toString(), {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    // Efekat za ažuriranje URL-a kada se promene tipovi
-    useEffect(() => {
-        updateUrlParams({ categoryTypeIds: selectedCategoryTypeIds, page: 1 });
-    }, [selectedCategoryTypeIds]);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Error fetching ranking categories: ${response.status}`);
+      }
 
-    // Efekat za učitavanje kategorija
-    useEffect(() => {
-        if (currentPage >= 1) {
-            const statusArray = statusParam ? statusParam.split(',') : [];
-            const categoryTypeIdArray = categoryTypeIdParam ? categoryTypeIdParam.split(',') : [];
-            fetchRankingCategories(currentPage, queryParam || undefined, statusArray, categoryTypeIdArray);
-        }
-    }, [currentPage, queryParam, statusParam, categoryTypeIdParam]);
+      const data: RankingCategoryApiResponse = await response.json();
 
-    const goToNextPage = () => {
-        if (currentPage < totalPages) {
-            updateUrlParams({ page: currentPage + 1 });
-        }
-    };
+      const validTotal =
+        typeof data.pagination.total === "number" && data.pagination.total >= 0;
+      const validTotalPages =
+        typeof data.pagination.totalPages === "number" && data.pagination.totalPages >= 0;
 
-    const goToPreviousPage = () => {
-        if (currentPage > 1) {
-            updateUrlParams({ page: currentPage - 1 });
-        }
-    };
+      if (!validTotal || !validTotalPages) {
+        throw new Error("Invalid pagination data received from server");
+      }
 
-    const goToPage = (page: number) => {
-        if (page >= 1 && page <= totalPages) {
-            updateUrlParams({ page });
-        }
-    };
+      setRankingCategories(data.data || []);
+      setTotalPages(Math.max(1, data.pagination.totalPages));
+      setTotalItems(data.pagination.total);
 
-    return (
-        <AdminLayout>
-            <PageHeader 
-                title="Ranking Categories" 
-                count={totalItems}
-                buttonText="Add new ranking category"
-                buttonUrl="/rankings/ranking-categories/create"
-            />
+      const apiPage = data.pagination.page || page;
+      if (apiPage !== page) {
+        updateUrlParams({ page: apiPage });
+      }
+    } catch (error) {
+      console.error("Failed to fetch ranking categories:", error);
+      setRankingCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <RankingCategoryTable
-                categories={rankingCategories}
-                categoryTypes={rankingCategoryTypes}
-                loading={loading || typesLoading}
-                totalItems={totalItems}
-                totalPages={totalPages}
-                currentPage={currentPage}
-                goToNextPage={goToNextPage}
-                goToPreviousPage={goToPreviousPage}
-                goToPage={goToPage}
-                fetchCategories={fetchRankingCategories}
-                selectedStatuses={selectedStatuses}
-                onStatusesChange={setSelectedStatuses}
-                selectedCategoryTypeIds={selectedCategoryTypeIds}
-                onCategoryTypeIdsChange={setSelectedCategoryTypeIds}
-            />
-        </AdminLayout>
-    );
+  // Update URL with parameters
+  const updateUrlParams = (params: {
+    page?: number;
+    statuses?: string[];
+    categoryTypeIds?: string[];
+  }) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+
+    if (params.page !== undefined) {
+      newParams.set("page", params.page.toString());
+    }
+
+    if (params.statuses !== undefined) {
+      newParams.delete("status");
+      if (params.statuses && params.statuses.length > 0) {
+        params.statuses.forEach((status) => {
+          newParams.append("status", status);
+        });
+      }
+    }
+
+    if (params.categoryTypeIds !== undefined) {
+      newParams.delete("categoryTypeId");
+      if (params.categoryTypeIds && params.categoryTypeIds.length > 0) {
+        params.categoryTypeIds.forEach((categoryTypeId) => {
+          newParams.append("categoryTypeId", categoryTypeId);
+        });
+      }
+    }
+
+    router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+  };
+
+  // Efekat za učitavanje tipova
+  useEffect(() => {
+    fetchRankingCategoryTypes();
+  }, []);
+
+  // Efekat za ažuriranje URL-a kada se promene statusi
+  useEffect(() => {
+    if (selectedStatuses.length > 0) {
+      updateUrlParams({ statuses: selectedStatuses, page: 1 });
+    }
+  }, [selectedStatuses]);
+
+  // Efekat za ažuriranje URL-a kada se promene tipovi
+  useEffect(() => {
+    if (selectedCategoryTypeIds.length > 0) {
+      updateUrlParams({ categoryTypeIds: selectedCategoryTypeIds, page: 1 });
+    }
+  }, [selectedCategoryTypeIds]);
+
+  // Efekat za učitavanje kategorija
+  useEffect(() => {
+    if (currentPage >= 1) {
+      fetchRankingCategories(
+        currentPage,
+        queryParam || undefined,
+        searchParams.getAll("status"),
+        searchParams.getAll("categoryTypeId")
+      );
+    }
+  }, [currentPage, queryParam, searchParams]);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      updateUrlParams({ page: currentPage + 1 });
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      updateUrlParams({ page: currentPage - 1 });
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      updateUrlParams({ page });
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <PageHeader
+        title="Ranking Categories"
+        count={totalItems}
+        buttonText="Add new ranking category"
+        buttonUrl="/rankings/ranking-categories/create"
+      />
+
+      <RankingCategoryTable
+        categories={rankingCategories}
+        categoryTypes={rankingCategoryTypes}
+        loading={loading || typesLoading}
+        totalItems={totalItems}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        goToNextPage={goToNextPage}
+        goToPreviousPage={goToPreviousPage}
+        goToPage={goToPage}
+        fetchCategories={fetchRankingCategories}
+        selectedStatuses={selectedStatuses}
+        onStatusesChange={setSelectedStatuses}
+        selectedCategoryTypeIds={selectedCategoryTypeIds}
+        onCategoryTypeIdsChange={setSelectedCategoryTypeIds}
+      />
+    </AdminLayout>
+  );
 }
