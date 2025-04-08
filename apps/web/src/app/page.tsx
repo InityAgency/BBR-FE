@@ -12,7 +12,7 @@ import {
 export default function Home() {
   return (
     <div>
-      <h1>BBR Web</h1>
+      
     </div>
   );
 }
