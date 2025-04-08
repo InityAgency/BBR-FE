@@ -1,4 +1,3 @@
-// components/admin/Brands/Table/BrandsFilters.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -8,7 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableFilters } from "@/components/admin/Table/TableFilters";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandInput, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+} from "@/components/ui/command";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -33,12 +38,10 @@ interface BrandsFiltersProps {
   setTypeSearchValue: (value: string) => void;
 }
 
-// Definisanje fiksnih vrednosti za status - samo oni koje želimo da koristimo
 const PREDEFINED_STATUSES = ["ACTIVE", "DRAFT", "PENDING", "DELETED"];
 
-// Funkcija za formatiranje imena tipa brenda sa prvim velikim slovom
 const formatTypeName = (name: string): string => {
-  if (!name) return '';
+  if (!name) return "";
   return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 };
 
@@ -57,68 +60,67 @@ export function BrandsFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  
-  // Kreiramo lokalno stanje da pratimo vrednost pretrage
+
   const [localSearch, setLocalSearch] = useState(globalFilter);
-  const debouncedSearch = useDebounce(localSearch, 500); // Debounce za 500ms
-  
-  // Filtriranje tipova na osnovu pretrage
-  const [filteredBrandTypes, setFilteredBrandTypes] = useState<BrandType[]>(brandTypes);
-  
-  // Ažuriranje filtriranih tipova kada se promeni pretraga ili lista tipova
+  const debouncedSearch = useDebounce(localSearch, 500);
+
+  const [filteredBrandTypes, setFilteredBrandTypes] =
+    useState<BrandType[]>(brandTypes);
+
   useEffect(() => {
-    if (typeSearchValue.trim() === '') {
+    if (typeSearchValue.trim() === "") {
       setFilteredBrandTypes(brandTypes);
     } else {
       const lowercaseSearch = typeSearchValue.toLowerCase();
-      const filtered = brandTypes.filter(brandType => 
+      const filtered = brandTypes.filter((brandType) =>
         brandType.name.toLowerCase().includes(lowercaseSearch)
       );
       setFilteredBrandTypes(filtered);
     }
   }, [typeSearchValue, brandTypes]);
-  
-  // Handler koji se pokreće kada se promeni vrednost u input polju
+
   const handleSearchChange = (value: string) => {
     setLocalSearch(value);
   };
-  
-  // Efekat koji se pokreće kada se promeni debouncedSearch vrednost
+
   useEffect(() => {
-    // Samo ako se debounce vrednost stvarno razlikuje od trenutnog URL parametra
-    const currentQuery = searchParams.get('query') || '';
-    
+    const currentQuery = searchParams.get("query") || "";
     if (debouncedSearch !== currentQuery) {
-      // Kreiramo novi URLSearchParams objekat na osnovu trenutnih parametara
       const params = new URLSearchParams(searchParams.toString());
-      
-      // Resetujemo stranicu na 1 kad god se promeni pretraga
-      params.set('page', '1');
-      
-      // Ako postoji vrednost pretrage, dodajemo je u URL, inače je uklanjamo
+      params.set("page", "1");
+
       if (debouncedSearch) {
-        params.set('query', debouncedSearch);
+        params.set("query", debouncedSearch);
       } else {
-        params.delete('query');
+        params.delete("query");
       }
-      
-      // Koristimo replace umesto push da ne dodajemo previše u istoriju
-      router.replace(`${pathname}?${params.toString()}`);
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }
   }, [debouncedSearch, router, pathname, searchParams]);
-  
-  // Postavlja inicijalnu vrednost pretrage iz URL-a i ažurira je kad se URL promeni
+
   useEffect(() => {
-    const queryParam = searchParams.get('query');
+    const queryParam = searchParams.get("query");
     if (queryParam !== localSearch) {
-      setLocalSearch(queryParam || '');
+      setLocalSearch(queryParam || "");
     }
   }, [searchParams]);
 
-  // Funkcija za pronalaženje imena tipa brenda na osnovu ID-a
   const getBrandTypeName = (brandTypeId: string): string => {
-    const brandType = brandTypes.find(bt => bt.id === brandTypeId);
+    const brandType = brandTypes.find((bt) => bt.id === brandTypeId);
     return brandType ? formatTypeName(brandType.name) : brandTypeId;
+  };
+
+  const clearAllFilters = () => {
+    setSelectedBrandTypeIds([]);
+    setSelectedStatuses([]);
+    setGlobalFilter("");
+    setLocalSearch("");
+
+    const params = new URLSearchParams();
+    params.set("page", "1");
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -137,7 +139,10 @@ export function BrandsFilters({
               {selectedBrandTypeIds.length > 0 && (
                 <>
                   <div className="w-px h-4 bg-muted mx-2" />
-                  <Badge variant="secondary" className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs"
+                  >
                     {selectedBrandTypeIds.length}
                   </Badge>
                 </>
@@ -146,8 +151,8 @@ export function BrandsFilters({
           </PopoverTrigger>
           <PopoverContent className="w-64 p-0" align="start">
             <Command>
-              <CommandInput 
-                placeholder="Search Brand Types..." 
+              <CommandInput
+                placeholder="Search Brand Types..."
                 value={typeSearchValue}
                 onValueChange={setTypeSearchValue}
               />
@@ -159,7 +164,7 @@ export function BrandsFilters({
                     onSelect={() => {
                       setSelectedBrandTypeIds((prev) => {
                         if (prev.includes(brandType.id)) {
-                          return prev.filter(item => item !== brandType.id);
+                          return prev.filter((item) => item !== brandType.id);
                         } else {
                           return [...prev, brandType.id];
                         }
@@ -170,7 +175,9 @@ export function BrandsFilters({
                       checked={selectedBrandTypeIds.includes(brandType.id)}
                       className="mr-2 h-4 w-4"
                     />
-                    <span className="capitalize">{formatTypeName(brandType.name)}</span>
+                    <span className="capitalize">
+                      {formatTypeName(brandType.name)}
+                    </span>
                   </CommandItem>
                 ))}
               </CommandList>
@@ -180,7 +187,17 @@ export function BrandsFilters({
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedBrandTypeIds([])}
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("brandTypeId");
+                      params.set("page", "1");
+                      router.replace(`${pathname}?${params.toString()}`, {
+                        scroll: false,
+                      });
+                      setSelectedBrandTypeIds([]);
+                    }}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -190,7 +207,7 @@ export function BrandsFilters({
             </Command>
           </PopoverContent>
         </Popover>
-        
+
         {/* Status Filter */}
         <Popover>
           <PopoverTrigger asChild>
@@ -200,7 +217,10 @@ export function BrandsFilters({
               {selectedStatuses.length > 0 && (
                 <>
                   <div className="w-px h-4 bg-muted mx-2" />
-                  <Badge variant="secondary" className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm w-6 h-6 p-0 flex items-center justify-center text-xs"
+                  >
                     {selectedStatuses.length}
                   </Badge>
                 </>
@@ -217,7 +237,7 @@ export function BrandsFilters({
                     onSelect={() => {
                       setSelectedStatuses((prev) => {
                         if (prev.includes(status)) {
-                          return prev.filter(item => item !== status);
+                          return prev.filter((item) => item !== status);
                         } else {
                           return [...prev, status];
                         }
@@ -238,7 +258,17 @@ export function BrandsFilters({
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setSelectedStatuses([])}
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.delete("status");
+                      params.set("page", "1");
+                      router.replace(`${pathname}?${params.toString()}`, {
+                        scroll: false,
+                      });
+                      setSelectedStatuses([]);
+                    }}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -254,45 +284,76 @@ export function BrandsFilters({
       {(selectedBrandTypeIds.length > 0 || selectedStatuses.length > 0) && (
         <div className="flex gap-2 mb-4 flex-wrap">
           {/* Oznake za tipove brendova */}
-          {selectedBrandTypeIds.map(brandTypeId => (
-            <Badge key={`brandType-${brandTypeId}`} variant="secondary" className="px-2 py-1">
+          {selectedBrandTypeIds.map((brandTypeId) => (
+            <Badge
+              key={`brandType-${brandTypeId}`}
+              variant="secondary"
+              className="px-2 py-1"
+            >
               <span className="capitalize">{getBrandTypeName(brandTypeId)}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedBrandTypeIds(prev => prev.filter(id => id !== brandTypeId))}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  const remainingBrandTypeIds = selectedBrandTypeIds.filter(
+                    (id) => id !== brandTypeId
+                  );
+                  params.delete("brandTypeId");
+                  remainingBrandTypeIds.forEach((id) =>
+                    params.append("brandTypeId", id)
+                  );
+                  params.set("page", "1");
+                  router.replace(`${pathname}?${params.toString()}`, {
+                    scroll: false,
+                  });
+                  setSelectedBrandTypeIds(remainingBrandTypeIds);
+                }}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           ))}
-          
+
           {/* Oznake za statuse */}
-          {selectedStatuses.map(status => (
-            <Badge key={`status-${status}`} variant="secondary" className="px-2 py-1">
+          {selectedStatuses.map((status) => (
+            <Badge
+              key={`status-${status}`}
+              variant="secondary"
+              className="px-2 py-1"
+            >
               <span className="capitalize">{status.toLowerCase()}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => setSelectedStatuses(prev => prev.filter(s => s !== status))}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  const remainingStatuses = selectedStatuses.filter(
+                    (s) => s !== status
+                  );
+                  params.delete("status");
+                  remainingStatuses.forEach((s) => params.append("status", s));
+                  params.set("page", "1");
+                  router.replace(`${pathname}?${params.toString()}`, {
+                    scroll: false,
+                  });
+                  setSelectedStatuses(remainingStatuses);
+                }}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           ))}
-          
+
           {/* Dugme za brisanje svih filtera */}
-          {(selectedBrandTypeIds.length > 1 || selectedStatuses.length > 1) && (
+          {(selectedBrandTypeIds.length > 0 || selectedStatuses.length > 0) && (
             <Button
               variant="ghost"
               size="sm"
               className="h-7 px-2"
-              onClick={() => {
-                setSelectedBrandTypeIds([]);
-                setSelectedStatuses([]);
-              }}
+              onClick={clearAllFilters}
             >
               Clear All
             </Button>
