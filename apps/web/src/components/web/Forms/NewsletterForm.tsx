@@ -30,8 +30,8 @@ export default function NewsletterForm() {
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                        <FormItem className="flex flex-col space-y-0.5">
-                            <FormLabel className="text-sm">Email</FormLabel>
+                        <FormItem className="flex flex-col space-y-0.5 w-full">
+                            <FormLabel className="text-sm w-full">Email</FormLabel>
                             <div className="flex flex-col sm:flex-row gap-2 w-full">
                                 <FormControl>
                                     <Input 
@@ -42,7 +42,7 @@ export default function NewsletterForm() {
                                     />
                                 </FormControl>
                                 {/* Mobile version - shown below input, hidden on lg and up */}
-                                <FormMessage className="block lg:hidden" />
+                                <FormMessage className="block lg:hidden w-full" />
                                 <Button 
                                     type="submit" 
                                     className="w-full sm:w-auto sm:self-end"
@@ -51,7 +51,7 @@ export default function NewsletterForm() {
                                 </Button>
                             </div>
                             {/* Desktop version - shown below everything, hidden below lg */}
-                            <FormMessage className="hidden lg:block" />
+                            <FormMessage className="hidden lg:block w-full" />
                         </FormItem>
                     )}
                 />

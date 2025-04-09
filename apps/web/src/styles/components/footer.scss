@@ -1,16 +1,18 @@
 footer{
-    background: var(--Colors-Surface-1, #101518);
 
     h3{
         letter-spacing: -0.2px;
         line-height: 140%;
     }
 
-    a{
-        transition: all 0.3s ease;
+
+    a:not([data-slot="button"]){
+        color: #fff;
+        transition: color 0.3s ease;
+        cursor: pointer;
+    
         &:hover{
             color: $primary-link;
-            opacity: 0.8;
         }
     }
 }
