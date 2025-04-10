@@ -266,7 +266,7 @@ export default function PrimaryNav() {
       `}</style>
 
       {/* Main navigation bar */}
-      <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[80svw] mx-auto px-4 py-2 bg-secondary rounded-t-lg mt-2 py-8 px-8">
+      <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-2 bg-secondary rounded-t-lg mt-2 py-8 px-8">
         <div className="flex flex-col lg:flex-row justify-between items-center">
           <div className="flex w-full lg:w-auto justify-between items-center">
             <Link href="/">
@@ -318,7 +318,7 @@ export default function PrimaryNav() {
           </div>
 
           <div className="hidden lg:flex">
-            <Button variant="secondary">Contact us</Button>
+            <Button className="bg-white/[5%] hover:bg-white/10 text-white py-5 px-5 rounded-lg transition-colors">Contact us</Button>
           </div>
         </div>
       </div>

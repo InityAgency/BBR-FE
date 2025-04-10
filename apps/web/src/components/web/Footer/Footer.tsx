@@ -10,7 +10,7 @@ export default function Footer() {
     
     return (
         <footer className="bg-background text-foreground bg-secondary">
-            <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[80svw] mx-auto px-4 py-8 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-16">
+            <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-8 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-16">
                 <div className="flex flex-col gap-3">
                     <Link href="/" className="mb-6">
                         <Image src="/logo-horizontal.svg" alt="Logo" width={100} height={100} />
@@ -39,7 +39,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-2 newsletter w-full">
+                <div className="flex flex-col gap-2 newsletter">
                     <h3 className="text-xl font-bold text-white w-full lg:w-90">Latest of news, insights & info straight into your inbox</h3>
                     <NewsletterForm />
                     <div className="flex gap-2 sodical-media mt-6">
@@ -70,7 +70,7 @@ export default function Footer() {
                 </div>
                 
             </div>
-            <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[80svw]  mx-auto px-4 py-8 flex flex-col gap-16">
+            <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw]  mx-auto px-4 py-8 flex flex-col gap-16">
                 <Separator orientation="horizontal" />
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="flex flex-col gap-2">

@@ -22,7 +22,7 @@ export default function MiniNav() {
     };
 
     return (
-        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[80svw] mx-auto px-4 py-2 justify-end items-center gap-6 hidden md:flex">
+        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-2 justify-end items-center gap-6 hidden md:flex">
             <div className="flex flex-row gap-6">
                 <Link href="/">Marketing solutions</Link>
                 <Link href="/">Rank your residences</Link>
@@ -44,7 +44,7 @@ export default function MiniNav() {
                 ) : (
                     <>
                         <Button variant="secondary" asChild>
-                            <Link href="/join">Join</Link>
+                            <Link href="/register">Join</Link>
                         </Button>
                         <Button variant="outline" className="flex items-center gap-1" onClick={handleLoginToggle}>
                             <User className="h-4 w-4" />
