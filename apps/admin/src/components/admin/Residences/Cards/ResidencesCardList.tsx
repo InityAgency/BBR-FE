@@ -13,4 +13,4 @@ export const ResidencesCardList: React.FC<ResidencesCardListProps> = ({ residenc
       ))}
     </div>
   );
-}; 
+};

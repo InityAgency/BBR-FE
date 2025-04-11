@@ -7,7 +7,7 @@ import { multiSelectFilter, nestedFieldFilter } from "@/lib/tableFilters";
 interface UseTableFiltersProps<TData> {
   table: Table<TData>;
   data: TData[];
-  locationAccessor?: keyof TData;
+  locationAccessor?: keyof TData | string; // Može biti string ili keyof TData
   statusAccessor?: keyof TData;
   useNestedFilter?: boolean;
   nestedField?: string;
@@ -32,7 +32,7 @@ export function useTableFilters<TData>({
     // Ako koristimo ugneždeno polje, pristupamo mu na odgovarajući način
     if (useNestedFilter) {
       const locations = data.map(item => {
-        const value = item[locationAccessor];
+        const value = item[locationAccessor as keyof TData];
         if (value && typeof value === 'object' && nestedField in (value as object)) {
           return (value as any)[nestedField];
         }
@@ -42,7 +42,7 @@ export function useTableFilters<TData>({
       return [...new Set(locations)].sort();
     } else {
       const locations = data.map(item => {
-        const value = item[locationAccessor];
+        const value = item[locationAccessor as keyof TData];
         if (value && typeof value === 'object' && 'name' in value) {
           return (value as { name: string }).name;
         }
@@ -55,7 +55,7 @@ export function useTableFilters<TData>({
   // Izdvajamo jedinstvene statuse iz podataka
   const uniqueStatuses = useMemo(() => {
     if (!statusAccessor) return [];
-    const statuses = data.map(item => item[statusAccessor] as unknown as string);
+    const statuses = data.map(item => item[statusAccessor as keyof TData] as unknown as string);
     return [...new Set(statuses)].sort();
   }, [data, statusAccessor]);
 
@@ -71,8 +71,15 @@ export function useTableFilters<TData>({
   useEffect(() => {
     if (locationAccessor) {
       try {
-        // Explicitno postavimo filter funkciju pre nego što postavimo vrednost filtera
-        const locationColumn = table.getColumn(locationAccessor as string);
+        // Proveravamo da li kolona postoji i, ako ne, koristimo 'location' ili ne primenjujemo filter
+        let columnId = locationAccessor as string;
+        let locationColumn = table.getColumn(columnId);
+        
+        // Ako ne postoji, probamo sa 'location' kao alternativom
+        if (!locationColumn && columnId !== 'location') {
+          locationColumn = table.getColumn('location');
+          columnId = 'location';
+        }
         
         if (locationColumn) {
           // Postavljamo funkciju filtera eksplicitno 
@@ -101,7 +108,7 @@ export function useTableFilters<TData>({
           }
         }
       } catch (error) {
-        console.warn(`Column ${String(locationAccessor)} not found in table`);
+        console.warn(`Could not apply location filter:`, error);
       }
     }
   }, [selectedLocations, table, locationAccessor, useNestedFilter, nestedField]);
