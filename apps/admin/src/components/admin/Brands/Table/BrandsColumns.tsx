@@ -9,15 +9,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Brand } from "../../../../app/types/models/Brand";
 import { format } from "date-fns";
+import Image from "next/image";
 
 // Helper funkcije za renderovanje ćelija
-const renderNameCell = (value: string, id: string) => (
-    <div className="max-w-[200px]">
-        <a href={`/brands/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
-        {value}
-        </a>
-        <div className="text-xs text-muted-foreground truncate">
-        {id}
+const renderNameCell = (value: string, id: string, logo?: { id: string }) => (
+    <div className="flex items-center gap-3 max-w-[300px]">
+        {logo?.id && (
+            <div className="relative w-10 h-10 rounded-md p-1 overflow-hidden">
+                <Image
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${logo.id}/content`}
+                    alt={value}
+                    fill
+                    className="object-contain"
+                />
+            </div>
+        )}
+        <div>
+            <a href={`/brands/${id}`} className="font-medium text-foreground hover:underline truncate block" title={value}>
+                {value}
+            </a>
+            <div className="text-xs text-muted-foreground truncate">
+                {id}
+            </div>
         </div>
     </div>
 );
@@ -106,9 +119,9 @@ export const columns: ColumnDef<Brand>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => renderNameCell(row.getValue("name"), row.original.id),
+    cell: ({ row }) => renderNameCell(row.getValue("name"), row.original.id, row.original.logo),
     meta: {
-      width: "w-[250px]" // Malo povećana širina da primi i ID
+      width: "w-[300px]"
     }
   },
   {
