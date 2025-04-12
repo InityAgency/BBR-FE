@@ -296,8 +296,8 @@ export default function ResidenceForm() {
 
         <TabsContent value="general-information">
           <GeneralInformation 
-            formData={formData} 
-            updateFormData={updateFormData} 
+            // formData={formData} 
+            // updateFormData={updateFormData} 
           />
         </TabsContent>
 

@@ -1,0 +1,42 @@
+.brand-card{
+    border: 1px solid #333638;
+    overflow: hidden;
+
+    &::before{
+        content: '';
+        position: absolute;
+        top: 0; 
+        left: 0; 
+        width: 200%; 
+        height: 2px;
+        background-color: #333638; 
+        opacity: 0.5;
+        transform: rotate(45deg);
+        transform-origin: top left;
+        z-index: -1;
+    }
+
+    &::after{
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200%;
+        height: 2px;
+        background-color: #333638;
+        opacity: .5;
+        transform: rotate(-45deg);
+        transform-origin: top right;
+        z-index: -1;
+    }
+
+    &-image{
+        max-width: 162px;
+        max-height: 162px;
+        margin: 0 auto;
+    }
+    &-description{
+        // border-top: 1px solid #333638;
+        padding-top: 1rem;
+    }
+}
