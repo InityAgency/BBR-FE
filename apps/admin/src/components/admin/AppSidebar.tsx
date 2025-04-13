@@ -49,7 +49,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Residences",
       url: "/residences",
       icon: Building2,
-      badge: demoData,
       items: [
         // {
         //   title: "Claim Requests",
