@@ -35,6 +35,13 @@ export default function LocationSelector({ value, onChange, error }: LocationSel
     language: "en",
   });
 
+  // Ažuriranje adrese kada se promeni vrednost iz propa
+  useEffect(() => {
+    if (value.address) {
+      setAddress(value.address);
+    }
+  }, [value.address]);
+
   const onMapLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
   }, []);

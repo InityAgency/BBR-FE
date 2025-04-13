@@ -5,6 +5,8 @@ export const ResidenceStatus = {
   DRAFT: "DRAFT",
   PUBLISHED: "PUBLISHED",
   ARCHIVED: "ARCHIVED",
+  PENDING: "PENDING",
+  ACTIVE: "ACTIVE",
 } as const;
 
 export const DevelopmentStatus = {
@@ -75,11 +77,17 @@ export const amenitySchema = z.object({
   // ... any other fields
 });
 
+// Highlighted Amenity Schema
+export const highlightedAmenitySchema = z.object({
+  id: z.string(),
+  order: z.number()
+});
+
 // Main Residence Schema
 export const residenceSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  status: z.enum(["ACTIVE", "INACTIVE", "DELETED"]).default("ACTIVE"),
+  status: z.enum(["DRAFT", "ACTIVE", "DELETED", "PENDING"]).default("ACTIVE"),
   developmentStatus: z.enum(Object.keys(DevelopmentStatus) as [string, ...string[]]),
   subtitle: z.string().optional(),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -104,12 +112,15 @@ export const residenceSchema = z.object({
   petFriendly: z.boolean().optional(),
   disabledFriendly: z.boolean().optional(),
   videoTourUrl: z.string().url().optional().nullable(),
-  videoTour: z.any().optional().nullable(),
-  featuredImage: z.any().optional().nullable(),
+  // videoTour: z.any().optional().nullable(),
+  featuredImageId: z.any().optional().nullable(),
   keyFeatures: z.array(keyFeatureSchema).optional(),
   amenities: z.array(amenitySchema).optional(),
-  units: z.array(z.any()).optional(),
-  company: z.any().optional().nullable(),
+  highlightedAmenities: z.array(highlightedAmenitySchema)
+    .max(3, "You can select up to 3 highlighted amenities")
+    .optional(),
+  // units: z.array(z.any()).optional(),
+  // company: z.any().optional().nullable(),
   mainGallery: z.array(z.any()).optional(),
 });
 
@@ -158,13 +169,14 @@ export const initialResidenceValues: ResidenceFormValues = {
   petFriendly: false,
   disabledFriendly: false,
   videoTourUrl: null,
-  videoTour: null,
-  featuredImage: null,
+  // videoTour: null,
+  featuredImageId: null,
   keyFeatures: [],
   amenities: [],
+  highlightedAmenities: [],
   brand: undefined,
-  units: [],
-  company: null,
+  // units: [],
+  // company: null,
   mainGallery: [],
 };
 

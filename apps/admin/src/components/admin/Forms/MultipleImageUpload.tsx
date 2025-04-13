@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Star } from "lucide-react";
 import Image from "next/image";
@@ -21,6 +21,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 
 export interface UploadedImage {
   id: string;
@@ -30,30 +31,51 @@ export interface UploadedImage {
   order: number;
 }
 
+// Interfejs za slike u edit modu
+export interface EditModeImage {
+  preview: string;
+  isFeatured: boolean;
+  order: number;
+  mediaId: string;
+}
+
+type ImageType = UploadedImage | EditModeImage;
+
+// Helper funkcija za prepoznavanje tipa slike
+function isUploadedImage(image: ImageType): image is UploadedImage {
+  return 'file' in image;
+}
+
+function isEditModeImage(image: ImageType): image is EditModeImage {
+  return 'mediaId' in image;
+}
+
 interface MultipleImageUploadProps {
   maxImages?: number;
   maxSizePerImage?: number; // in MB
   supportedFormats?: string[];
-  onChange?: (images: UploadedImage[]) => void;
-  onFeaturedChange?: (image: UploadedImage | null) => void;
+  onChange?: (images: ImageType[]) => void;
+  onFeaturedChange?: (image: ImageType | null) => void;
   className?: string;
-  value?: UploadedImage[];
+  initialImages?: EditModeImage[];
 }
 
 interface SortableImageProps {
-  image: UploadedImage;
+  image: ImageType;
   onRemove: (id: string) => void;
   onFeaturedChange: (id: string) => void;
 }
 
 const SortableImage = ({ image, onRemove, onFeaturedChange }: SortableImageProps) => {
+  const imageId = isUploadedImage(image) ? image.id : image.mediaId;
+
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: image.id });
+  } = useSortable({ id: imageId });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -89,7 +111,7 @@ const SortableImage = ({ image, onRemove, onFeaturedChange }: SortableImageProps
             type="radio"
             name="featured"
             checked={image.isFeatured}
-            onChange={() => onFeaturedChange(image.id)}
+            onChange={() => onFeaturedChange(imageId)}
             className="w-4 h-4 text-primary"
           />
           <label className="text-sm text-muted-foreground">
@@ -101,7 +123,7 @@ const SortableImage = ({ image, onRemove, onFeaturedChange }: SortableImageProps
           size="sm"
           variant="destructive"
           className="h-8 px-2"
-          onClick={() => onRemove(image.id)}
+          onClick={() => onRemove(imageId)}
         >
           <X className="h-4 w-4 mr-1" />
           Remove
@@ -118,11 +140,18 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
   onChange,
   onFeaturedChange,
   className,
-  value = [],
+  initialImages = [],
 }) => {
-  const [images, setImages] = useState<UploadedImage[]>(value);
+  const [images, setImages] = useState<ImageType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Učitavanje inicijalnih slika
+  useEffect(() => {
+    if (initialImages.length > 0 && images.length === 0) {
+      setImages(initialImages);
+    }
+  }, [initialImages, images.length]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -194,13 +223,21 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
   }, [images, maxImages, maxSizePerImage, supportedFormats, onChange, onFeaturedChange]);
 
   const handleRemove = useCallback((id: string) => {
-    const imageToRemove = images.find(img => img.id === id);
+    const imageToRemove = images.find(img => isUploadedImage(img) ? img.id === id : img.mediaId === id);
     const wasFeautured = imageToRemove?.isFeatured;
 
-    const updatedImages = images.filter(img => img.id !== id).map((img, index) => ({
-      ...img,
-      order: index,
-    }));
+    // Ako je UploadedImage, treba revocati URL object za preview
+    if (imageToRemove && isUploadedImage(imageToRemove)) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+
+    // Ažuriranje rednih brojeva kada se ukloni jedna slika
+    const updatedImages = images
+      .filter(img => isUploadedImage(img) ? img.id !== id : img.mediaId !== id)
+      .map((img, index) => ({
+        ...img,
+        order: index,
+      }));
 
     setImages(updatedImages);
     
@@ -208,25 +245,25 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
       onChange(updatedImages);
     }
 
-    // If we removed the featured image, set the first remaining image as featured
+    // Ako smo uklonili featured sliku, postavimo prvu preostalu sliku kao featured
     if (wasFeautured && updatedImages.length > 0 && onFeaturedChange) {
       const newFeatured = { ...updatedImages[0], isFeatured: true };
       onFeaturedChange(newFeatured);
       setImages(updatedImages.map(img => ({
         ...img,
-        isFeatured: img.id === newFeatured.id,
+        isFeatured: isUploadedImage(img) 
+          ? isUploadedImage(newFeatured) && img.id === newFeatured.id
+          : isEditModeImage(newFeatured) && img.mediaId === newFeatured.mediaId,
       })));
     } else if (wasFeautured && updatedImages.length === 0 && onFeaturedChange) {
       onFeaturedChange(null);
     }
-
-    URL.revokeObjectURL(imageToRemove?.preview || "");
   }, [images, onChange, onFeaturedChange]);
 
   const handleFeaturedChange = useCallback((id: string) => {
     const updatedImages = images.map(img => ({
       ...img,
-      isFeatured: img.id === id
+      isFeatured: isUploadedImage(img) ? img.id === id : img.mediaId === id
     }));
 
     setImages(updatedImages);
@@ -236,7 +273,10 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
     }
 
     if (onFeaturedChange) {
-      const featuredImage = updatedImages.find(img => img.id === id) || null;
+      const featuredImage = updatedImages.find(img => 
+        isUploadedImage(img) ? img.id === id : img.mediaId === id
+      ) || null;
+      
       onFeaturedChange(featuredImage);
     }
   }, [images, onChange, onFeaturedChange]);
@@ -245,8 +285,12 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = images.findIndex(img => img.id === active.id);
-      const newIndex = images.findIndex(img => img.id === over.id);
+      const oldIndex = images.findIndex(img => 
+        isUploadedImage(img) ? img.id === active.id : img.mediaId === active.id
+      );
+      const newIndex = images.findIndex(img => 
+        isUploadedImage(img) ? img.id === over.id : img.mediaId === over.id
+      );
 
       const updatedImages = [...images];
       const [movedImage] = updatedImages.splice(oldIndex, 1);
@@ -313,10 +357,13 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
           {/* Image Grid */}
           {images.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              <SortableContext items={images.map(img => img.id)} strategy={rectSortingStrategy}>
+              <SortableContext 
+                items={images.map(img => isUploadedImage(img) ? img.id : img.mediaId)} 
+                strategy={rectSortingStrategy}
+              >
                 {images.map((image) => (
                   <SortableImage
-                    key={image.id}
+                    key={isUploadedImage(image) ? image.id : image.mediaId}
                     image={image}
                     onRemove={handleRemove}
                     onFeaturedChange={handleFeaturedChange}
@@ -331,4 +378,4 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
   );
 };
 
-export default MultipleImageUpload; 
+export default MultipleImageUpload;
