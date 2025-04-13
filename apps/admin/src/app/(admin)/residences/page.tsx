@@ -42,31 +42,12 @@ export default function ResidencesPage() {
   // Parsiramo status iz URL parametara
   useEffect(() => {
     const statusValues = searchParams.getAll("status");
-    if (statusValues.length > 0) {
-      setSelectedStatuses(statusValues);
-    } else {
-      setSelectedStatuses([]);
-    }
-  }, [searchParams]);
-
-  // Parsiramo cityId iz URL parametara
-  useEffect(() => {
     const cityIdValues = searchParams.getAll("cityId");
-    if (cityIdValues.length > 0) {
-      setSelectedCityIds(cityIdValues);
-    } else {
-      setSelectedCityIds([]);
-    }
-  }, [searchParams]);
-
-  // Parsiramo countryId iz URL parametara (zadržavamo za kompatibilnost)
-  useEffect(() => {
     const countryIdValues = searchParams.getAll("countryId");
-    if (countryIdValues.length > 0) {
-      setSelectedCountryIds(countryIdValues);
-    } else {
-      setSelectedCountryIds([]);
-    }
+    
+    setSelectedStatuses(statusValues);
+    setSelectedCityIds(cityIdValues);
+    setSelectedCountryIds(countryIdValues);
   }, [searchParams]);
 
   const fetchResidences = async (
@@ -187,21 +168,6 @@ export default function ResidencesPage() {
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
-  // Efekat za ažuriranje URL-a kada se promene statusi
-  useEffect(() => {
-    updateUrlParams({ statuses: selectedStatuses, page: 1 });
-  }, [selectedStatuses]);
-
-  // Efekat za ažuriranje URL-a kada se promene gradovi
-  useEffect(() => {
-    updateUrlParams({ cityIds: selectedCityIds, page: 1 });
-  }, [selectedCityIds]);
-
-  // Efekat za ažuriranje URL-a kada se promene države (zadržavamo za kompatibilnost)
-  useEffect(() => {
-    updateUrlParams({ countryIds: selectedCountryIds, page: 1 });
-  }, [selectedCountryIds]);
-
   // Efekat za učitavanje rezidencija
   useEffect(() => {
     if (currentPage >= 1) {
@@ -214,6 +180,18 @@ export default function ResidencesPage() {
       );
     }
   }, [currentPage, queryParam, searchParams]);
+
+  // Efekat za ažuriranje URL-a kada se promene filteri
+  useEffect(() => {
+    if (selectedStatuses.length > 0 || selectedCityIds.length > 0 || selectedCountryIds.length > 0) {
+      updateUrlParams({ 
+        statuses: selectedStatuses, 
+        cityIds: selectedCityIds, 
+        countryIds: selectedCountryIds,
+        page: 1 
+      });
+    }
+  }, [selectedStatuses, selectedCityIds, selectedCountryIds]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {

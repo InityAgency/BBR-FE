@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -17,31 +17,21 @@ import {
 } from "@/components/ui/select";
 import { ResidenceFormData } from "@/components/admin/Residences/Forms/ResidenceForm";
 import { Switch } from "@/components/ui/switch";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+import { toast } from "sonner";
+
+interface KeyFeature {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface KeyFeaturesProps {
   formData: ResidenceFormData;
   updateFormData: (data: Partial<ResidenceFormData>) => void;
   residenceId: string | null;
 }
-
-const KEY_FEATURE_OPTIONS = [
-  { id: "roofDeck", label: "Roof Deck / Patio" },
-  { id: "wineCellar", label: "Wine Cellar / Wine Room" },
-  { id: "homeTheater", label: "Home Theater" },
-  { id: "butlersPantry", label: "Butler's Pantry / Service Kitchen" },
-  { id: "privateElevator", label: "Private Elevator" },
-  { id: "privatePool", label: "Private Pool" },
-  { id: "infinityPool", label: "Infinity Pool" },
-  { id: "spaWellness", label: "Spa / Wellness Area" },
-  { id: "privateGarage", label: "Private Garage" },
-  { id: "gameRoom", label: "Game Room / Entertainment Area" },
-  { id: "homeOffice", label: "Home Office" },
-  { id: "chefsKitchen", label: "Chef's Kitchen" },
-  { id: "outdoorKitchen", label: "Outdoor Kitchen / BBQ Area" },
-  { id: "fitnessRoom", label: "Fitness Room / Gym" },
-  { id: "panoramicViews", label: "Panoramic Views" },
-  { id: "privateBalcony", label: "Private Balcony / Terrace" },
-];
 
 const DEVELOPMENT_STATUS_OPTIONS = [
   { value: "COMPLETED", label: "Completed" },
@@ -65,11 +55,50 @@ export default function KeyFeatures({
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
     formData.keyFeatures || []
   );
+  const [keyFeatures, setKeyFeatures] = useState<KeyFeature[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleFeatureChange = (feature: string, checked: boolean) => {
+  useEffect(() => {
+    fetchKeyFeatures();
+    
+    // Pravilno inicijalizovati selectedFeatures iz formData
+    if (formData.keyFeatures && formData.keyFeatures.length > 0) {
+      setSelectedFeatures(formData.keyFeatures);
+    }
+  }, [formData.keyFeatures]);
+
+  const fetchKeyFeatures = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/key-features?limit=60&page=1`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch key features");
+      }
+
+      const result = await response.json();
+      setKeyFeatures(result.data);
+    } catch (error) {
+      console.error("Error fetching key features:", error);
+      toast.error("Failed to load key features");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFeatureChange = (featureId: string, checked: boolean) => {
     const updatedFeatures = checked
-      ? [...selectedFeatures, feature]
-      : selectedFeatures.filter((f) => f !== feature);
+      ? [...selectedFeatures, featureId]
+      : selectedFeatures.filter((f) => f !== featureId);
     
     setSelectedFeatures(updatedFeatures);
     updateFormData({ keyFeatures: updatedFeatures });
@@ -89,29 +118,35 @@ export default function KeyFeatures({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {KEY_FEATURE_OPTIONS.map((feature) => (
-              <div key={feature.id} className="flex items-start space-x-2">
-                <Checkbox
-                  id={feature.id}
-                  checked={selectedFeatures.includes(feature.id)}
-                  onCheckedChange={(checked) =>
-                    handleFeatureChange(feature.id, checked === true)
-                  }
-                  disabled={
-                    !selectedFeatures.includes(feature.id) &&
-                    selectedFeatures.length >= 5
-                  }
-                />
-                <Label
-                  htmlFor={feature.id}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  {feature.label}
-                </Label>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <p>Loading key features...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {keyFeatures.map((feature) => (
+                <div key={feature.id} className="flex items-start space-x-2">
+                  <Checkbox
+                    id={feature.id}
+                    checked={selectedFeatures.includes(feature.id)}
+                    onCheckedChange={(checked) =>
+                      handleFeatureChange(feature.id, checked === true)
+                    }
+                    disabled={
+                      !selectedFeatures.includes(feature.id) &&
+                      selectedFeatures.length >= 5
+                    }
+                  />
+                  <Label
+                    htmlFor={feature.id}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {feature.name}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -159,7 +194,7 @@ export default function KeyFeatures({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="floor-area" className="text-sm">
-                  Floor are sq. ft. <span className="text-red-500">*</span>
+                  Floor area sq. ft. <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="floor-area"
@@ -187,7 +222,7 @@ export default function KeyFeatures({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div className="space-y-2">
               <Label htmlFor="price-per-unit" className="text-sm">
-                Average price per unit.
+                Average price per unit
               </Label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -213,7 +248,7 @@ export default function KeyFeatures({
                 </div>
                 <Input
                   id="price-per-sqft"
-                  placeholder="Enter avg. unit price"
+                  placeholder="Enter avg. price per sq. ft."
                   className="pl-7"
                   value={formData.pricePerSqFt || ""}
                   onChange={(e) => updateFormData({ pricePerSqFt: e.target.value })}
