@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 // Definisanje tipova za strukture podataka
 type MenuItem = {
@@ -28,6 +29,8 @@ type MenuContent = {
 type NavigationStep = "main" | "tabs" | "content";
 
 export default function PrimaryNav() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [activeMegaMenu, setActiveMegaMenu] = useState<MenuName>(null);
   const [activeTab, setActiveTab] = useState<string>("");
   const navRef = useRef<HTMLDivElement>(null);
@@ -51,6 +54,16 @@ export default function PrimaryNav() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Dodajemo useEffect za praćenje promene rute
+  useEffect(() => {
+    setActiveMegaMenu(null);
+    setIsMobileMenuOpen(false);
+    setVisibleView("main");
+    setPreviousView(null);
+    setActiveMobileMenu(null);
+    setIsAnimating(false);
+  }, [pathname]);
 
   const toggleMegaMenu = (menuName: Exclude<MenuName, null>) => {
     if (activeMegaMenu === menuName) {
@@ -180,6 +193,13 @@ export default function PrimaryNav() {
         { label: "Fendi", href: "/brands/0618436b-8f02-49a7-b865-49c05bb03cc5" },
         { label: "Giorgio Armani", href: "/brands/f331baf2-b282-4638-b66c-692577b809d2" },
         { label: "Hermès", href: "/brands/e218b112-69ab-4e1e-8f4f-43f3c3f9d0cb" },
+        { label: "Karl Lagerfeld", href: "/brands/c4663188-fbfc-40ff-a810-4783b2a2fa24"},
+        { label: "Kenzo", href: "/brands/da46c791-3743-4667-b6e0-988a05c7f978"},
+        { label: "LVMH", href: "/brands/baa4448c-44df-4ca6-b75d-a13f4cd952bb"},
+        { label: "Missoni", href: "/brands/e5734663-2658-4088-9ccc-8ca3cf80c8f7"},
+        { label: "Paramount", href: "/brands/2a8cf044-7384-492e-bdc5-4222876dcbc2"},
+        { label: "Ralph Lauren", href: "/brands/22d6eb3c-5ef3-4868-af14-a0f9f8d5ccfd"},
+        
         
       ],
       "Automotive Brands": [
@@ -192,10 +212,37 @@ export default function PrimaryNav() {
         { label: "Porsche Design Tower", href: "/brands/340db0e3-93a4-4571-989e-5173f6f48e71" },
       ],
       "Luxury Hotel and Resort Brands": [
-        { label: "Design Hotels", href: "/brands/design-hotels" },
-        { label: "Small Luxury Hotels", href: "/brands/slh" },
-        { label: "Autograph Collection", href: "/brands/autograph" },
-        { label: "Leading Hotels of the World", href: "/brands/lhw" }
+        { label: "Alila", href: "/brands/a2630e8c-5afe-4ce5-b634-b3ce73906ffb" },
+        { label: "Aman", href: "/brands/bba222d8-d18e-4584-9643-b6a75635bf9c" },
+        { label: "Anantara", href: "/brands/05c3e57c-4e36-48a7-9ac0-7461646a442b" },
+        { label: "Ascott", href: "/brands/e23fa7ab-ca9a-4479-a107-dd6354622191" },
+        { label: "Banyan Tree", href: "/brands/01d2163a-6ec4-4ffd-bad4-68e8c18a17c2"},
+        { label: "Belmond", href: "/brands/d0c728f9-5241-4d47-a85d-639eabb0271b"},
+        { label: "Capella", href: "/brands/94a4e4d6-7f2d-4fe5-898e-a1c6bbd10273"},
+        { label: "Cheval Blanc", href: "/brands/6b4b018c-afea-452c-871b-92433a050e16"},
+        { label: "Cheval", href: "/brands/e971925d-194c-44fd-ac28-811d83e85b6b"},
+        { label: "Club Quarters", href: "/brands/bb4c721a-931c-412e-b091-5d519c96a296"},
+        { label: "Como", href: "/brands/1877ad88-b654-4193-a0b0-332ed6eedcb4"},
+        { label: "Conrad", href: "/brands/fad54e52-1e02-43b7-a1b2-7520ffc1cc47"},
+        { label: "Montage", href: "/brands/4e86b0ec-a44f-4355-97f7-16dc04cc17d5"},
+        { label: "DAMAC", href: "/brands/ce027b89-c631-4e58-ac99-d9ae9de1b393"},
+        { label: "Six Senses", href: "/brands/0b4322c1-7de1-4909-9986-dfb67dc58a21"},
+        { label: "Discovery Land Company", href: "/brands/73d25314-e9e5-43d3-8d7d-f1f7bc3d66a1"},
+        { label: "Dorchester", href: "/brands/7aff0fd4-14e4-43d2-8b3c-d5a9232298ed"},
+        { label: "Edition", href: "/brands/4252a088-bc74-40f1-8621-ee5ede134629"},
+        { label: "Equinox", href: "/brands/5265854b-593d-472b-b39d-0ac82a9532f2"},
+        // { label: "Fairmont", href: "/brands/58479014-739a-4c34-8768-da34bd4d8ad2"},
+        // { label: "Four Points", href: "/brands/cc755ed9-5303-4055-bdf2-f0d823a4e08d"},
+        // { label: "Four Seasons", href: "/brands/ef7b9894-7510-4454-b9b2-1b719b5a05c1"},
+        // { label: "Grand Hyatt", href: "/brands/a3e1a83a-292a-43cc-9065-d9a0362dcb09"},
+        // { label: "Hard Rock", href: "/brands/d685a6d8-6a22-4c62-89a9-ada74429316f"},
+        // { label: "Hilton", href: "/brands/Hilton"},
+        // { label: "Hyatt Centric", href: "/brands/4eb56d5c-cb5b-41a9-8e41-0f083432515b"},
+        // { label: "Emaar", href: "/brands/9202526e-5c16-4d35-b3c2-af4a3031311b"},
+        // { label: "InterContinental", href: "/brands/0d93a503-00a3-4421-aadf-a7f17e357e8b"},
+        // { label: "Jumeirah Living", href: "/brands/5caf0ad6-2a10-4835-9ee6-135d9adb6dc6"},
+        // { label: "JW Marriott", href: "/brands/5529c50d-dcb8-41f2-a330-a7deb5b298f5"}
+
       ],
     }
   };
