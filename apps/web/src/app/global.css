@@ -118,3 +118,77 @@
     @apply bg-background text-foreground;
   }
 }
+
+.prose .wp-block-image img {
+  @apply rounded-lg;
+}
+
+.prose .wp-caption {
+  @apply my-4;
+}
+
+.prose .wp-caption-text {
+  @apply text-sm text-muted-foreground italic mt-2;
+}
+
+.prose .aligncenter {
+  @apply mx-auto;
+}
+
+.prose .alignleft {
+  @apply float-left mr-4;
+}
+
+.prose .alignright {
+  @apply float-right ml-4;
+}
+
+/* Stilovi za popravku WordPress listi */
+.prose ul, .prose ol {
+  @apply my-6 pl-6;
+  list-style-type: disc;
+}
+
+.prose li {
+  @apply my-2;
+}
+
+/* Stilovi za WordPress tabele */
+.prose table {
+  @apply w-full border-collapse my-6;
+}
+
+.prose table th {
+  @apply bg-secondary text-left p-2 border border-muted-foreground/20;
+}
+
+.prose table td {
+  @apply p-2 border border-muted-foreground/20;
+}
+
+.prose h1 {
+  @apply text-4xl font-medium mb-6 mt-10 tracking-tight;
+}
+
+.prose h2 {
+  @apply text-3xl font-medium mb-5 mt-8 tracking-tight;
+}
+
+.prose h3 {
+  @apply text-2xl font-medium mb-4 mt-6  tracking-tight;
+}
+
+.prose h4 {
+  @apply text-xl font-medium mb-3 mt-4  tracking-tight;
+}
+
+/* Ukoliko želite da dodate podvlačenje ili poseban stil za headinge */
+.prose h2::after {
+  content: "";
+  @apply block w-16 h-1 ;
+}
+
+
+.prose h2:target {
+  @apply bg-primary/10 -mx-4 px-4 py-2 rounded transition-colors duration-500;
+}

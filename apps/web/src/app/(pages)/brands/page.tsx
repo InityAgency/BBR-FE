@@ -80,7 +80,7 @@ export default function BrandsPage() {
             <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
                 <div className="page-header flex flex-col gap-6 w-full">
                     <p className="text-md uppercase text-center text-primary">luxurious residences by exclusive brands</p>
-                    <h1 className="text-5xl font-bold text-center">Meet the Elite Residence Brands</h1>
+                    <h1 className="text-4xl font-bold text-center">Meet the Elite Residence Brands</h1>
                     <div className="flex flex-row gap-4 w-full mt-8">
                         <Image src="/brends-left.webp" alt="Brand 1" width={1000} height={100} className="w-1/2 rounded-lg" />
                         <Image src="/brends-right.webp" alt="Brand 2" width={1000} height={100} className="w-1/2 rounded-lg" />

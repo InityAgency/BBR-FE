@@ -1,0 +1,11 @@
+.single-blog{
+    &-content{
+        img{
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 1.5rem;
+            margin: 2rem 0;
+        }
+    }
+}
