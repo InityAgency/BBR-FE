@@ -10,7 +10,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Search } from "lucide-react";
-
+import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 // TODO: Add a search bar to the brands page
 export default function BrandsPage() {
     const [brands, setBrands] = useState<Brand[]>([]);
@@ -124,6 +124,7 @@ export default function BrandsPage() {
                     )}
                 </div>
             </div>
+            <NewsletterBlock />
         </>
     );
 }
