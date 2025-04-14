@@ -443,7 +443,7 @@ export default function PrimaryNav() {
                       ))}
                     </div>
                     <div className="mt-8 text-primary">
-                      <Link href={`/view-all/${activeMobileMenu}/${activeTab}`} className="flex items-center text-primary text-lg font-medium gap-2">
+                      <Link href={`/brands/${activeMobileMenu}/${activeTab}`} className="flex items-center text-primary text-lg font-medium gap-2">
                         View all 
                         <ChevronRight className="w-5 h-5" />
                       </Link>
@@ -482,7 +482,7 @@ export default function PrimaryNav() {
                 ))}
               </div>
               <div className="mt-8 flex justify-end">
-                <Link href={activeMegaMenu && activeTab ? `/view-all/${activeMegaMenu}/${activeTab}` : '#'} className="flex items-center text-primary-400">
+                <Link href={activeMegaMenu && activeTab ? `/brands/${activeMegaMenu}/${activeTab}` : '#'} className="flex items-center text-primary-400">
                   View all <span className="ml-2">→</span>
                 </Link>
               </div>
