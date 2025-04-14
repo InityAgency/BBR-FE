@@ -34,6 +34,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         .filter(relatedPost => relatedPost.id !== post.id)
         .slice(0, 3);
 
+    // Pre-fetch all data for related posts
+    const relatedPostsWithData = await Promise.all(
+        filteredRelatedPosts.map(async (relatedPost) => {
+            await Promise.all([
+                relatedPost.featured_media ? getFeaturedMediaById(relatedPost.featured_media) : null,
+                relatedPost.author ? getAuthorById(relatedPost.author) : null,
+                relatedPost.categories?.[0] ? getCategoryById(relatedPost.categories[0]) : null,
+            ]);
+
+            return relatedPost;
+        })
+    );
+
     const date = new Date(post.date).toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
@@ -108,7 +121,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8">
                     <h2 className="text-4xl font-medium">Explore More Articles</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                        {filteredRelatedPosts.map((relatedPost) => (
+                        {relatedPostsWithData.map((relatedPost) => (
                             <PostCard key={relatedPost.id} post={relatedPost} />
                         ))}
                     </div>
