@@ -14,7 +14,11 @@ import type {
 const baseUrl = process.env.NEXT_PUBLIC_WP_API_URL;
 
 if (!baseUrl) {
-  throw new Error("WORDPRESS_URL environment variable is not defined");
+  console.error('Environment variables:', {
+    NEXT_PUBLIC_WP_API_URL: process.env.NEXT_PUBLIC_WP_API_URL,
+    WORDPRESS_URL: process.env.WORDPRESS_URL
+  });
+  throw new Error("NEXT_PUBLIC_WP_API_URL environment variable is not defined");
 }
 
 // Utility type for fetch options
