@@ -18,10 +18,9 @@ const renderNameCell = (value: string, id: string, logo?: { id: string }) => (
     <div className="flex items-center gap-3 max-w-[300px]">
         {logo?.id && (
             <div className="relative w-10 h-10 rounded-md p-1 overflow-hidden">
-                <Image
+                <img
                     src={`${API_BASE_URL}/api/${API_VERSION}/media/${logo.id}/content`}
                     alt={value}
-                    fill
                     className="object-contain"
                 />
             </div>
