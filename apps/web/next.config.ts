@@ -1,3 +1,5 @@
+import path from "path";
+
 // next.config.js
 const nextConfig = {
   async rewrites() {
@@ -33,6 +35,13 @@ const nextConfig = {
     // Isključujemo proveru TypeScript grešaka tokom build procesa
     ignoreBuildErrors: true,
   },
+  webpack: (config: any) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, './src')
+    };
+    return config;
+  }
 };
 
-export default nextConfig;
+export default nextConfig;  

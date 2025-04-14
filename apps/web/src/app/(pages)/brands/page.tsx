@@ -3,12 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { BrandCard } from "../../../components/brands/BrandCard";
+import { BrandCard } from "@/components/brands/BrandCard";
 import { BrandCardSkeleton } from "../../../components/brands/BrandCardSkeleton";
 import { Brand, BrandsResponse } from "@/types/brand";
-import { Pagination } from "../../../components/common/Pagination";
-import { Input } from "../../../components/ui/input";
-import { useDebounce } from "../../../hooks/useDebounce";
+import { Pagination } from "@/components/common/Pagination";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Search } from "lucide-react";
 
 // TODO: Add a search bar to the brands page

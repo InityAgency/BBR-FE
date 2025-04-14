@@ -7,7 +7,7 @@ interface BrandCardProps {
   brand: Brand;
 }
 
-export function BrandCard({ brand }: BrandCardProps) {
+export function BrandCard({ brand }: { brand: any }) {
   const [imageError, setImageError] = useState(false);
 
   return (

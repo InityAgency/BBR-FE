@@ -10,11 +10,11 @@ import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 
 interface BlogPostPageProps {
     params: {
-        slug: string;
+      slug: string;
     };
-}
-
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+    searchParams?: Record<string, string | string[]>;
+  }
+export default async function BlogPostPage({ params, searchParams }: BlogPostPageProps) {
     const post = await getPostBySlug(params.slug);
 
     if (!post) {
