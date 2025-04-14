@@ -134,9 +134,9 @@ const SortableImage = ({ image, onRemove, onFeaturedChange }: SortableImageProps
 };
 
 const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
-  maxImages = 10,
+  maxImages = 20,
   maxSizePerImage = 2,
-  supportedFormats = ["JPG", "JPEG", "PNG"],
+  supportedFormats = ["JPG", "JPEG", "PNG", "SVG", "WEBP"],
   onChange,
   onFeaturedChange,
   className,

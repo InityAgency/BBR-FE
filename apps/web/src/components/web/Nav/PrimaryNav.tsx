@@ -72,7 +72,7 @@ export default function PrimaryNav() {
   const menuTabs: Tabs = {
     bestResidences: ["Exclusive Locations", "Property Features", "Lifestyle Options", "Investment Value", "Special Amenities", "Family Friendly"],
     allResidences: ["Country", "City", "Geographical Area", "Lifestyle", "Property Type", "Price Range"],
-    allBrands: ["Luxury Brands", "Premium Brands", "Boutique Collections", "Resort Chains", "Villa Networks", "Membership Clubs"]
+    allBrands: ["Fashion and Lifestyle Brands", "Automotive Brands", "Luxury Hotel and Resort Brands"]
   };
 
   const menuContent: MenuContent = {
@@ -169,42 +169,34 @@ export default function PrimaryNav() {
       ]
     },
     allBrands: {
-      "Luxury Brands": [
-        { label: "Four Seasons", href: "/brands/four-seasons" },
-        { label: "Aman Resorts", href: "/brands/aman" },
-        { label: "Ritz-Carlton", href: "/brands/ritz-carlton" },
-        { label: "One&Only", href: "/brands/one-and-only" },
-        { label: "Six Senses", href: "/brands/six-senses" }
+      "Fashion and Lifestyle Brands": [
+        { label: "Accor", href: "/brands/d5ffad0f-caa9-4b0b-b61e-86d6c90eae6d" },
+        { label: "Armani", href: "/brands/f10b8ffd-9269-49af-b9ef-be210f41ce63" },
+        { label: "Baccarat", href: "/brands/232f8343-66b4-488b-a980-2fb96beb4b06" },
+        { label: "Cavalli", href: "/brands/997971d9-c0c4-4f79-a507-2a85f9c832ad" },
+        { label: "Bvlgari", href: "/brands/e12d8be0-fced-4aff-a955-b9f2d7e35866" },
+        { label: "Diesel Living", href: "/brands/9a3f6f6d-183b-4443-9763-c7455053c08a" },
+        { label: "Elie Saab", href: "/brands/0c5e8647-655d-4be4-bdc8-57d2a84b3deb" },
+        { label: "Fendi", href: "/brands/0618436b-8f02-49a7-b865-49c05bb03cc5" },
+        { label: "Giorgio Armani", href: "/brands/f331baf2-b282-4638-b66c-692577b809d2" },
+        { label: "Hermès", href: "/brands/e218b112-69ab-4e1e-8f4f-43f3c3f9d0cb" },
+        
       ],
-      "Premium Brands": [
-        { label: "Marriott", href: "/brands/marriott" },
-        { label: "Hilton", href: "/brands/hilton" },
-        { label: "Hyatt", href: "/brands/hyatt" },
-        { label: "InterContinental", href: "/brands/intercontinental" },
-        { label: "Westin", href: "/brands/westin" }
+      "Automotive Brands": [
+        { label: "Aston Martin", href: "/brands/1fde35e7-ba71-4a98-a9be-cf84679046c8" },
+        { label: "Bentley", href: "/brands/74b8d073-12bf-4d9d-93fb-6266037269c0" },
+        { label: "Bugatti", href: "/brands/bda0b587-57e7-41a5-a87b-51674c30ec34" },
+        { label: "Ferrari", href: "/brands/8a2dd78f-c96d-48c6-b2f8-2e201c14be14" },
+        { label: "Lamborghini", href: "/brands/9f937aea-3cbb-4257-a4d3-ed2fefdd10d0" },
+        { label: "Mercedes-Benz", href: "/brands/e739f99b-fd18-40a4-abe1-d513cc698f57" },
+        { label: "Porsche Design Tower", href: "/brands/340db0e3-93a4-4571-989e-5173f6f48e71" },
       ],
-      "Boutique Collections": [
+      "Luxury Hotel and Resort Brands": [
         { label: "Design Hotels", href: "/brands/design-hotels" },
         { label: "Small Luxury Hotels", href: "/brands/slh" },
         { label: "Autograph Collection", href: "/brands/autograph" },
         { label: "Leading Hotels of the World", href: "/brands/lhw" }
       ],
-      "Resort Chains": [
-        { label: "Club Med", href: "/brands/club-med" },
-        { label: "Sandals", href: "/brands/sandals" },
-        { label: "Banyan Tree", href: "/brands/banyan-tree" },
-        { label: "Anantara", href: "/brands/anantara" }
-      ],
-      "Villa Networks": [
-        { label: "Airbnb Luxe", href: "/brands/airbnb-luxe" },
-        { label: "Exclusive Resorts", href: "/brands/exclusive-resorts" },
-        { label: "The Hideaways Club", href: "/brands/hideaways" }
-      ],
-      "Membership Clubs": [
-        { label: "Soho House", href: "/brands/soho-house" },
-        { label: "Quintessentially", href: "/brands/quintessentially" },
-        { label: "Inspirato", href: "/brands/inspirato" }
-      ]
     }
   };
 
@@ -419,7 +411,7 @@ export default function PrimaryNav() {
 
       {/* Mega Menu - Desktop */}
       {activeMegaMenu && (
-        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[80svw] mx-auto absolute left-0 right-0 bg-secondary rounded-b-lg text-white shadow-xl z-50 hidden lg:block">
+        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto absolute left-0 right-0 bg-secondary rounded-b-lg text-white shadow-xl z-50 hidden lg:block">
           <div className="flex flex-row">
             <div className="w-1/5 p-4 border-r border-white/10">
               {menuTabs[activeMegaMenu].map((tab) => (
