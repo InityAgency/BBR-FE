@@ -17,5 +17,10 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "globalEnv": [
+    "RESEND_API_KEY",
+    "RESEND_AUDIENCE_ID", 
+    "NEXT_PUBLIC_APP_URL"
+  ]
 }

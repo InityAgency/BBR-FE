@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.NODE_ENV === 'production' 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : { 
+      contacts: { 
+        create: async () => ({}), 
+        remove: async () => ({}),
+        update: async () => ({})
+      },
+      emails: {
+        send: async () => ({})
+      }
+    };
 
 export async function POST(request: NextRequest) {
   try {
