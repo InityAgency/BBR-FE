@@ -47,7 +47,13 @@ export async function POST(request: NextRequest) {
                   <!-- Logo -->
                   <tr>
                     <td align="center" style="padding: 40px 20px 20px 20px;">
-                      <img src="${process.env.NEXT_PUBLIC_APP_URL || 'bbrweb.inity.space'}/logo-horizontal.svg" alt="Best Branded Residences" width="180" style="display: block; margin: 0 auto;" />
+                      <img 
+                        src="data:image/png;base64,YOUR_BASE64_ENCODED_LOGO_HERE" 
+                        alt="Best Branded Residences" 
+                        width="180" 
+                        style="display: block; margin: 0 auto; background-color: #121416;"
+                        onerror="this.onerror=null; this.src='data:image/png;base64,YOUR_FALLBACK_BASE64_ENCODED_LOGO_HERE'"
+                      />
                     </td>
                   </tr>
                   

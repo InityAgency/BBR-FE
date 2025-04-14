@@ -6,7 +6,7 @@ import { calculateReadingTime } from "@/lib/utils";
 import Link from "next/link";
 import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
 import { PostCard } from "@/components/web/Posts/PostCard";
-
+import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 
 interface BlogPostPageProps {
     params: {
@@ -111,11 +111,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         className="prose prose-lg prose-headings:font-medium prose-h1:text-4xl prose-h2:text-3xl 
                         prose-h3:text-2xl prose-h4:text-xl prose-headings:my-6 prose-headings:text-foreground 
                         prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                        prose-img:rounded-lg prose-img:my-8 w-full mx-auto"
+                        prose-img:rounded-lg prose-img:my-8 w-full mx-auto pb-8"
                         dangerouslySetInnerHTML={{ __html: post.content?.rendered || "" }}
                     />
                 </div>
             </div>
+
 
             <div className="bg-secondary">
                 <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8">
@@ -127,6 +128,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     </div>
                 </div>
             </div>
+
+            <NewsletterBlock />
         </>
     );
 }

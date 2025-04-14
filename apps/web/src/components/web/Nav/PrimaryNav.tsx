@@ -305,7 +305,7 @@ export default function PrimaryNav() {
       `}</style>
 
       {/* Main navigation bar */}
-      <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-2 bg-secondary rounded-t-lg mt-2 py-8 px-8">
+      <div className="menu-wrapper max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-2 bg-secondary rounded-t-lg mt-2 py-8 px-8">
         <div className="flex flex-col lg:flex-row justify-between items-center">
           <div className="flex w-full lg:w-auto justify-between items-center">
             <Link href="/">
@@ -458,7 +458,7 @@ export default function PrimaryNav() {
 
       {/* Mega Menu - Desktop */}
       {activeMegaMenu && (
-        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto absolute left-0 right-0 bg-secondary rounded-b-lg text-white shadow-xl z-50 hidden lg:block">
+        <div className="menu-wrapper max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto absolute left-0 right-0 bg-secondary rounded-b-lg text-white shadow-xl z-50 hidden lg:block">
           <div className="flex flex-row">
             <div className="w-1/5 p-4 border-r border-white/10">
               {menuTabs[activeMegaMenu].map((tab) => (

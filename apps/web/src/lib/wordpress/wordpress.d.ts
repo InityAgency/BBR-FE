@@ -53,6 +53,7 @@ interface WPEntity {
   
   // Content types
   export interface Post extends WPEntity {
+    _embedded: any;
     title: RenderedTitle;
     content: RenderedContent;
     excerpt: RenderedContent;

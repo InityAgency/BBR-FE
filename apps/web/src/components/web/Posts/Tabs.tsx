@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 interface Category {
     id: number;
     name: string;
+    slug: string;
 }
 
 interface TabsProps {
@@ -15,18 +16,18 @@ interface TabsProps {
 export function Tabs({ categories }: TabsProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const currentCategoryId = searchParams.get('category');
+    const currentCategorySlug = searchParams.get('category');
 
-    const handleTabClick = (categoryId: string) => {
+    const handleTabClick = (categorySlug: string) => {
         const params = new URLSearchParams(searchParams.toString());
         
         // Remove page parameter when changing categories
         params.delete('page');
         
-        if (categoryId === "") {
+        if (categorySlug === "") {
             params.delete('category');
         } else {
-            params.set('category', categoryId);
+            params.set('category', categorySlug);
         }
         
         router.push(`/blog${params.toString() ? `?${params.toString()}` : ''}`);
@@ -35,7 +36,7 @@ export function Tabs({ categories }: TabsProps) {
     return (
         <div className="flex gap-2 flex-wrap border-b border-border ">
             <a
-                className={!currentCategoryId ? "active-tab" : "classic-tab"}
+                className={!currentCategorySlug ? "active-tab" : "classic-tab"}
                 onClick={() => handleTabClick("")}
             >
                 All
@@ -43,8 +44,8 @@ export function Tabs({ categories }: TabsProps) {
             {categories.map((category) => (
                 <a
                     key={category.id}
-                    className={currentCategoryId === category.id.toString() ? "active-tab" : "classic-tab"}
-                    onClick={() => handleTabClick(category.id.toString())}
+                    className={currentCategorySlug === category.slug ? "active-tab" : "classic-tab"}
+                    onClick={() => handleTabClick(category.slug)}
                 >
                     {category.name}
                 </a>
