@@ -157,7 +157,6 @@
 .prose table {
   @apply w-full border-collapse my-6;
 }
-
 .prose table th {
   @apply bg-secondary text-left p-2 border border-muted-foreground/20;
 }

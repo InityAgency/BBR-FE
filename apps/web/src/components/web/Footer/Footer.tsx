@@ -114,9 +114,9 @@ export default function Footer() {
                     <div className="flex flex-col gap-2">
                         <h3 className="text-xl font-bold text-primary-link">About Us</h3>
                         <ul className="flex flex-col gap-1">
-                            <li><Link href="/#">Careers</Link></li>
+                            <li><Link href="/careers">Careers</Link></li>
                             <li><Link href="/#">Newsroom</Link></li>
-                            <li><Link href="/#">Luxury Insights Blog</Link></li>
+                            <li><Link href="/blog">Luxury Insights Blog</Link></li>
                             <li><Link href="/#">Contact Us</Link></li>
                         </ul>
                     </div>

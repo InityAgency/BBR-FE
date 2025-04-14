@@ -353,7 +353,7 @@ export default function PrimaryNav() {
             </button>
             <Link href="/">Evaluation Criteria</Link>
             <Link href="/">Exclusive Deals</Link>
-            <Link href="/">Luxury Insights</Link>
+            <Link href="/blog">Luxury Insights</Link>
           </div>
 
           <div className="hidden lg:flex">

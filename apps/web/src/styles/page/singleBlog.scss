@@ -1,5 +1,31 @@
 .single-blog{
     &-content{
+        .prose{
+            p,span, ul, li, strong {
+                opacity: 0.95;
+                a{
+                    opacity: 1 !important;
+                }
+            }
+            h1,h2,h3,h4{
+                opacity: 1 !important;
+                span, strong, ul, li{
+                    opacity: 1 !important;
+                }
+            }
+            a{
+                transition: color 0.3s ease;
+                text-decoration: underline;
+                opacity: 1 !important;
+                color: $primary-link !important;
+                span, strong, ul, li{
+                    opacity: 1 !important;
+                }
+                &:hover{
+                    color: white !important;
+                }
+            }
+        }
         img{
             width: 100%;
             height: auto;
@@ -7,5 +33,6 @@
             border-radius: 1.5rem;
             margin: 2rem 0;
         }
+       
     }
 }

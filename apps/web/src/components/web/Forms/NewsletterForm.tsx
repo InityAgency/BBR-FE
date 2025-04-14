@@ -6,8 +6,13 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { newsletterService } from "@/app/api/newsletter/newsletter";
 
 export default function NewsletterForm() {
+    const [isLoading, setIsLoading] = useState(false);
+    
     const formSchema = z.object({
         email: z.string().email(),
     })
@@ -19,8 +24,20 @@ export default function NewsletterForm() {
         },
     })
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        console.log(data)
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
+        try {
+            setIsLoading(true);
+            
+            await newsletterService.subscribe(data.email);
+            
+            toast.success('Successfully subscribed to the newsletter!');
+            form.reset();
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('An error occurred. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -39,6 +56,7 @@ export default function NewsletterForm() {
                                         placeholder="Enter your email" 
                                         {...field} 
                                         className="w-full"
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 {/* Mobile version - shown below input, hidden on lg and up */}
@@ -46,8 +64,9 @@ export default function NewsletterForm() {
                                 <Button 
                                     type="submit" 
                                     className="w-full sm:w-auto sm:self-end"
+                                    disabled={isLoading}
                                 >
-                                    Subscribe
+                                    {isLoading ? 'Subscribing...' : 'Subscribe'}
                                 </Button>
                             </div>
                             {/* Desktop version - shown below everything, hidden below lg */}
