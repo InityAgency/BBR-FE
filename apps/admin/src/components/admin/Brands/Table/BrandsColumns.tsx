@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Brand } from "../../../../app/types/models/Brand";
 import { format } from "date-fns";
 import Image from "next/image";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+
 
 // Helper funkcije za renderovanje ćelija
 const renderNameCell = (value: string, id: string, logo?: { id: string }) => (
@@ -17,7 +19,7 @@ const renderNameCell = (value: string, id: string, logo?: { id: string }) => (
         {logo?.id && (
             <div className="relative w-10 h-10 rounded-md p-1 overflow-hidden">
                 <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${logo.id}/content`}
+                    src={`${API_BASE_URL}/api/${API_VERSION}/media/${logo.id}/content`}
                     alt={value}
                     fill
                     className="object-contain"
