@@ -149,7 +149,7 @@ export default async function BlogPage({
               </div>
               
               {/* Right column with two posts without images */}
-              <div className="lg:col-span-1 flex flex-col gap-2 border rounded-lg border-white/10 px-4 py-2">
+              <div className="lg:col-span-1 flex flex-col gap-2 border rounded-lg border-white/10 px-4 py-4 justify-between">
                 {featuredPosts[2] && <FeaturedPostNoImage post={featuredPosts[2]} />}
                 <div className="border-t border-white/10 w-full"></div>
                 {featuredPosts[3] && <FeaturedPostNoImage post={featuredPosts[3]} />}
