@@ -41,7 +41,7 @@ export default function Home() {
 
       <div className="bg-secondary">
         <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8 mb-12">
-           <span className="text-md lg:text-lg text-start lg:text-center text-primary w-full">IMPECABLE RANKING CRITERIA</span>
+           <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">IMPECABLE RANKING CRITERIA</span>
            <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">Find your new home or investment from the World’s Best</h2>
            <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">
            Best Branded Residences help you choose a private residence partner or property  that is right for you by giving expert insights, offers & ratings           </p>
@@ -83,7 +83,7 @@ export default function Home() {
       
 
       <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8 mb-12 bg-secondary rounded-2xl">
-        <span className="text-md lg:text-lg text-start lg:text-center text-primary w-full">NEW SOLUTION</span>
+        <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">NEW SOLUTION</span>
         <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">The Smartest Way to Buy, Invest & Discover Branded Residences</h2>
         <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">
         From iconic penthouses to high-ROI investments, explore properties ranked by trust, quality, and long-term value.</p>

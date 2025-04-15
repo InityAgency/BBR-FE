@@ -31,7 +31,7 @@ export async function PostCard({ post }: { post: Post }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-8 hover:bg-zinc-800/20 transition-all h-full"
+      className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-8 hover:bg-zinc-800/20 transition-all h-full hover:-translate-y-2"
     >
       <div className="flex flex-col gap-4 h-full">
         <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center">

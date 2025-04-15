@@ -27,13 +27,14 @@ import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import Link from "next/link";
 import { Post } from "@/lib/wordpress/wordpress.d";
 import { PostCardNoImage } from "@/components/web/Posts/PostCardNoImage";
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 600;
+
 export const metadata: Metadata = {
   title: "Blog Posts",
   description: "Browse all our blog posts",
 };
-
-export const dynamic = "auto";
-export const revalidate = 600;
 
 // Featured post card with image
 const FeaturedPostWithImage = ({ post }: { post: Post }) => {

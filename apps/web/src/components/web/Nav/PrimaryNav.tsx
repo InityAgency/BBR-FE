@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-
 // Definisanje tipova za strukture podataka
 type MenuItem = {
   label: string;
@@ -197,19 +196,17 @@ export default function PrimaryNav() {
         { label: "Kenzo", href: "/brands/da46c791-3743-4667-b6e0-988a05c7f978"},
         { label: "LVMH", href: "/brands/baa4448c-44df-4ca6-b75d-a13f4cd952bb"},
         { label: "Missoni", href: "/brands/e5734663-2658-4088-9ccc-8ca3cf80c8f7"},
-        { label: "Paramount", href: "/brands/2a8cf044-7384-492e-bdc5-4222876dcbc2"},
-        { label: "Ralph Lauren", href: "/brands/22d6eb3c-5ef3-4868-af14-a0f9f8d5ccfd"},
-        
-        
+        { label: "Paramount", href: "/brands/paramount"},
+        { label: "Ralph Lauren", href: "/brands/ralph-lauren"},
       ],
       "Automotive Brands": [
-        { label: "Aston Martin", href: "/brands/1fde35e7-ba71-4a98-a9be-cf84679046c8" },
-        { label: "Bentley", href: "/brands/74b8d073-12bf-4d9d-93fb-6266037269c0" },
-        { label: "Bugatti", href: "/brands/bda0b587-57e7-41a5-a87b-51674c30ec34" },
-        { label: "Ferrari", href: "/brands/8a2dd78f-c96d-48c6-b2f8-2e201c14be14" },
-        { label: "Lamborghini", href: "/brands/9f937aea-3cbb-4257-a4d3-ed2fefdd10d0" },
-        { label: "Mercedes-Benz", href: "/brands/e739f99b-fd18-40a4-abe1-d513cc698f57" },
-        { label: "Porsche Design Tower", href: "/brands/340db0e3-93a4-4571-989e-5173f6f48e71" },
+        { label: "Aston Martin", href: "/brands/aston-martin" },
+        { label: "Bentley", href: "/brands/bentley" },
+        { label: "Bugatti", href: "/brands/bugatti" },
+        { label: "Ferrari", href: "/brands/ferrari" },
+        { label: "Lamborghini", href: "/brands/lamborghini" },
+        { label: "Mercedes-Benz", href: "/brands/mercedes-benz" },
+        { label: "Porsche Design Tower", href: "/brands/porsche-design-tower" },
       ],
       "Luxury Hotel and Resort Brands": [
         { label: "Alila", href: "/brands/a2630e8c-5afe-4ce5-b634-b3ce73906ffb" },
@@ -357,7 +354,7 @@ export default function PrimaryNav() {
           </div>
 
           <div className="hidden lg:flex">
-            <Button className="bg-white/[5%] hover:bg-white/10 text-white py-5 px-5 rounded-lg transition-colors">Contact us</Button>
+            <Link href="/contact" className="bg-white/[5%] hover:bg-white/[8%] text-white py-3 px-5 rounded-lg transition-colors contact-button">Contact us</Link>
           </div>
         </div>
       </div>

@@ -11,3 +11,18 @@
 button, a{
     cursor: pointer;
 }
+
+.menu-wrapper a.contact-button:hover {
+    color: #fff !important;
+    background-color: #ffffff11 !important;
+    transition: all 0.3s ease;
+}
+
+.custom-card {
+    background-color: #1A1E21;
+}
+.contact-form{
+    input, textarea{
+        background-color: transparent;
+    }
+}

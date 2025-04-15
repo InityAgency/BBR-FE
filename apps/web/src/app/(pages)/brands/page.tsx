@@ -91,7 +91,7 @@ export default function BrandsPage() {
             <div ref={brandsSectionRef} className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
                 <div className="flex flex-col gap-6 w-full">
                     <div className="flex flex-col lg:flex-row gap-16 items-center justify-between">
-                        <h2 className="text-4xl font-bold text-start">Top Branded Residences by Brands</h2>
+                        <h2 className="text-4xl font-bold text-left">Top Branded Residences by Brands</h2>
                         <div className="max-w-lg w-full lg:w-auto relative">
                             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-6 h-6 " />
                             <Input
