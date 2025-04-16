@@ -12,7 +12,7 @@ export function BrandCard({ brand }: { brand: any }) {
 
   return (
     <Link 
-      href={`/brands/${brand.id}`}
+      href={`/brands/${brand.slug}`}
       className="block group"
     >
       <div className="flex flex-col gap-4 p-6 rounded-xl brand-card relative transition-transform duration-300 ease-in-out transform hover:-translate-y-2">

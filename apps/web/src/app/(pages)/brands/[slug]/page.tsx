@@ -8,18 +8,20 @@ import Image from "next/image";
 import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import { Residence } from "@/types/residence";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
+import SectionLayout from "@/components/web/SectionLayout";
 
 export default function BrandPage() {
     const [brand, setBrand] = useState<Brand | null>(null);
     const [loading, setLoading] = useState(true);
     const params = useParams();
-    const brandId = params.id as string;
+    const brandSlug = params.slug as string;
+    const brandId = brand?.id;
     const [residences, setResidences] = useState<Residence[]>([]);
 
     useEffect(() => {
         const fetchBrand = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/brands/${brandId}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/brands/slug/${brandSlug}`);
                 const residences = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?brandId=${brandId}`);
                 const residencesData = await residences.json();
                 const data = await response.json();
@@ -33,7 +35,7 @@ export default function BrandPage() {
         };
 
         fetchBrand();
-    }, [brandId]);
+    }, [brandSlug]);
 
     if (loading) {
         return <BrandTitleSkeleton />;
@@ -54,8 +56,8 @@ export default function BrandPage() {
                     <p className="text-center text-xl max-w-2xl mx-auto">{brand.description}</p>
                 </div>
             </div>
-            <div className="flex flex-col items-center max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-2 xl:gap-24 mb-12">
-                <div className="flex flex-col gap-2 w-full">
+            <SectionLayout>
+                <div className="flex flex-col gap-2 w-full mb-12">
                     <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">brand locations</span>
                     <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">{brand.name} Residence Collection</h2>
                 </div>
@@ -79,7 +81,7 @@ export default function BrandPage() {
                         ))}
                     </div>
                 </div>
-            </div>
+            </SectionLayout>
             <NewsletterBlock />
         </>
     );

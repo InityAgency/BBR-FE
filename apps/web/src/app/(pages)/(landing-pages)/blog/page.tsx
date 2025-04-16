@@ -27,6 +27,7 @@ import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import Link from "next/link";
 import { Post } from "@/lib/wordpress/wordpress.d";
 import { PostCardNoImage } from "@/components/web/Posts/PostCardNoImage";
+import SectionLayout from "@/components/web/SectionLayout";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 600;
@@ -132,12 +133,12 @@ export default async function BlogPage({
       <>  
         <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
           <div className="page-header flex flex-col gap-6 w-full">
-            <h1 className="text-4xl font-bold text-center w-[50%] mx-auto">Discover Exclusive Insights and Trends in the Luxury Market</h1>
+            <h1 className="text-4xl font-bold text-left lg:text-center w-full lg:w-[50%] mx-auto">Discover Exclusive Insights and Trends in the Luxury Market</h1>
           </div>
         </div>
         
         {/* Featured posts section */}
-        <div className="flex flex-col items-start lg:items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 pt-12 pb-16 gap-4 xl:gap-8 mb-12">
+        <SectionLayout>
         
             <h2 className="text-4xl font-bold text-white mb-8 w-full">Dive into this week's trends</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,13 +157,13 @@ export default async function BlogPage({
                 {featuredPosts[3] && <FeaturedPostNoImage post={featuredPosts[3]} />}
               </div>
             </div>
-        </div>
+        </SectionLayout>
         
         {/* Main posts section */}
-        <div className="bg-secondary">
-          <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-20 space-y-8">
-            <div className="flex justify-between items-center">
-              <h2 id="latest-articles" className="text-4xl font-bold">Latest Articles</h2>
+        <SectionLayout>
+    
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 justify-between items-center w-full mb-6 lg:mb-0">
+              <h2 id="latest-articles" className="text-4xl font-bold text-left w-full">Latest Articles</h2>
               <SearchInput />
             </div>
 
@@ -175,8 +176,8 @@ export default async function BlogPage({
                 ))}
               </div>
             ) : (
-              <div className="h-24 w-full border rounded-lg bg-accent/25 flex items-center justify-center">
-                <p>No posts found</p>
+              <div className="h-24 w-full border rounded-lg bg-secondary flex items-center justify-center">
+                <p className="text-white text-lg">No posts found</p>
               </div>
             )}
     
@@ -207,8 +208,7 @@ export default async function BlogPage({
                 </PaginationContent>
               </Pagination>
             )}
-          </div>
-        </div>
+        </SectionLayout>
         <NewsletterBlock />
       </>
     );

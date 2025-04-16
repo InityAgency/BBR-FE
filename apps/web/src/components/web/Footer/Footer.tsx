@@ -115,18 +115,18 @@ export default function Footer() {
                         <h3 className="text-xl font-bold text-primary-link">About Us</h3>
                         <ul className="flex flex-col gap-1">
                             <li><Link href="/careers">Careers</Link></li>
-                            <li><Link href="/#">Newsroom</Link></li>
+                            {/* <li><Link href="/#">Newsroom</Link></li> */}
                             <li><Link href="/blog">Luxury Insights Blog</Link></li>
-                            <li><Link href="/#">Contact Us</Link></li>
+                            <li><Link href="/contact">Contact Us</Link></li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-2">
                         <h3 className="text-xl font-bold text-primary-link">Legal</h3>
                         <ul className="flex flex-col gap-1">
-                            <li><Link href="/#">Terms of Service</Link></li>
-                            <li><Link href="/#">Cookie Policy</Link></li>
-                            <li><Link href="/#">GDPR Compliance</Link></li>
-                            <li><Link href="/#">User Agreement</Link></li>
+                            <li><Link href="/terms-of-service">Terms of Service</Link></li>
+                            <li><Link href="/cookie-policy">Cookie Policy</Link></li>
+                            <li><Link href="/gdpr-compliance">GDPR Compliance</Link></li>
+                            {/* <li><Link href="/user-agreement">User Agreement</Link></li> */}
                         </ul>
                     </div>
                 </div>

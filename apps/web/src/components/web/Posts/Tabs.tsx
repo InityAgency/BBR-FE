@@ -34,7 +34,7 @@ export function Tabs({ categories }: TabsProps) {
     };
 
     return (
-        <div className="flex gap-2 flex-wrap border-b border-border ">
+        <div className="flex gap-2 flex-wrap border-b border-border w-full">
             <a
                 className={!currentCategorySlug ? "active-tab" : "classic-tab"}
                 onClick={() => handleTabClick("")}
