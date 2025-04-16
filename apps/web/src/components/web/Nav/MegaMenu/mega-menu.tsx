@@ -97,7 +97,7 @@ export function MegaMenu() {
             <Link href="/deals" className="text-white hover:text-[#b3804c] transition-colors">
               Exclusive Deals
             </Link>
-            <Link href="/insights" className="text-white hover:text-[#b3804c] transition-colors">
+            <Link href="/blog" className="text-white hover:text-[#b3804c] transition-colors">
               Luxury Insights
             </Link>
           </div>

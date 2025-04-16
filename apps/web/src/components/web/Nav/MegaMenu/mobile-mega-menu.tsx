@@ -154,7 +154,7 @@ export function MobileMegaMenu({ isOpen, onClose, animationType = "slide-right" 
                     Exclusive Deals
                   </Link>
                   <Link
-                    href="/insights"
+                    href="/blog"
                     className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors"
                   >
                     Luxury Insights
