@@ -22,7 +22,7 @@ export default function MiniNav() {
     };
 
     return (
-        <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-2 justify-end items-center gap-6 hidden md:flex">
+        <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-2 justify-end items-center gap-6 hidden md:flex">
             <div className="flex flex-row gap-6">
                 <Link href="/">Marketing solutions</Link>
                 <Link href="/">Rank your residences</Link>

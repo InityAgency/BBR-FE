@@ -60,8 +60,8 @@ export default async function BlogPostPage({ params, searchParams }: BlogPostPag
         <>
             {/* Hero Section */}
             <div className="single-blog-hero">
-                <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-4">
+                <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-4">
                         <Link href="/blog" className="hover:text-primary transition-colors">
                             Luxury Insights
                         </Link>
@@ -99,7 +99,7 @@ export default async function BlogPostPage({ params, searchParams }: BlogPostPag
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-blog-content">
+            <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-blog-content">
                 <div className="w-full flex gap-4 mx-auto space-y-8 relative">
                     {/* Table of Contents */}
                     <TableOfContents 
@@ -119,7 +119,7 @@ export default async function BlogPostPage({ params, searchParams }: BlogPostPag
 
 
             <div className="bg-secondary">
-                <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8">
+                <div className="flex flex-col lg:flex-col gap-4 max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8">
                     <h2 className="text-4xl font-medium">Explore More Articles</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
                         {relatedPostsWithData.map((relatedPost) => (

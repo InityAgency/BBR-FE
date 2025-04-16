@@ -130,14 +130,14 @@ export default async function BlogPage({
 
     return (
       <>  
-        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
           <div className="page-header flex flex-col gap-6 w-full">
             <h1 className="text-4xl font-bold text-center w-[50%] mx-auto">Discover Exclusive Insights and Trends in the Luxury Market</h1>
           </div>
         </div>
         
         {/* Featured posts section */}
-        <div className="flex flex-col items-start lg:items-center rounded-b-xl max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 pt-12 pb-16 gap-4 xl:gap-8 mb-12">
+        <div className="flex flex-col items-start lg:items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 pt-12 pb-16 gap-4 xl:gap-8 mb-12">
         
             <h2 className="text-4xl font-bold text-white mb-8 w-full">Dive into this week's trends</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -160,7 +160,7 @@ export default async function BlogPage({
         
         {/* Main posts section */}
         <div className="bg-secondary">
-          <div className="max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 py-20 space-y-8">
+          <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-20 space-y-8">
             <div className="flex justify-between items-center">
               <h2 id="latest-articles" className="text-4xl font-bold">Latest Articles</h2>
               <SearchInput />

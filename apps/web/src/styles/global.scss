@@ -19,10 +19,13 @@ button, a{
 }
 
 .custom-card {
-    background-color: #1A1E21;
+    background-color: hsl(206 18% 9% / 1);
 }
 .contact-form{
     input, textarea{
         background-color: transparent;
     }
+}
+.faq-title{
+    font-family: 'InterDisplay';
 }

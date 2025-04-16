@@ -1,0 +1,7 @@
+.newsletter-image{
+    min-width: 52rem;
+
+    @media (max-width: 800px) {
+        min-width: 30rem;
+    }
+}

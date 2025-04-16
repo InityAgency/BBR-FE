@@ -45,7 +45,7 @@ export default function BrandPage() {
 
     return (
         <>
-            <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12 ">
+            <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12 ">
                 <div className="page-header flex flex-col gap-6 w-full">
                     <div className="flex flex-row gap-4 items-center justify-center rounded-xl mx-auto bg-black/10 p-4 mb-6">
                         <Image src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${brand.logo.id}/content`} alt={brand.name} width={150} height={150}  />
@@ -54,7 +54,7 @@ export default function BrandPage() {
                     <p className="text-center text-xl max-w-2xl mx-auto">{brand.description}</p>
                 </div>
             </div>
-            <div className="flex flex-col items-center max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-2 xl:gap-24 mb-12">
+            <div className="flex flex-col items-center max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-2 xl:gap-24 mb-12">
                 <div className="flex flex-col gap-2 w-full">
                     <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">brand locations</span>
                     <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">{brand.name} Residence Collection</h2>

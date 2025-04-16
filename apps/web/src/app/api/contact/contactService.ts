@@ -1,7 +1,6 @@
 "use client";
 
-import { z } from "zod";
-
+import { z } from "zod";    
 // Definicija šeme za validaciju forme
 export const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -9,9 +8,10 @@ export const formSchema = z.object({
     email: z.string().email("Invalid email address"),
     subject: z.string().min(1, "Subject is required"),
     message: z.string().min(10, "Message must be at least 10 characters"),
-    policy: z.boolean().refine(val => val === true, {
+    termsAccepted: z.boolean().refine(val => val === true, {
         message: "You must agree to the terms and conditions"
-    })
+    }),
+    type: z.literal("CONTACT_US")
 });
 
 // Definicija tipa za podatke forme
@@ -20,7 +20,7 @@ export type FormValues = z.infer<typeof formSchema>;
 export const contactService = {
     async sendMessage(data: FormValues) {
         try {
-            const response = await fetch("{{baseUrl}}/api/{{apiVersion}}/requests", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/public/requests`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -21,7 +21,8 @@ export default function ContactForm() {
             email: "",
             subject: "",
             message: "",
-            policy: false
+            termsAccepted: false,
+            type: "CONTACT_US"
         },
     });
 
@@ -41,7 +42,7 @@ export default function ContactForm() {
     };
 
     return (
-        <div className="flex flex-col gap-4 p-8 h-full flex-col items-center justify-center gap-12 border border-white/10 rounded-lg custom-card contact-form">
+        <div className="flex flex-col gap-4 p-8 h-full flex-col items-center justify-center gap-12 border rounded-lg custom-card contact-form">
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-bold w-full">Let's Start a Conversation</h2>
                 <p className="text-md text-white/80 w-full">Have questions or want to collaborate? Fill out the form below or reach out via email, and we'll respond as soon as possible.</p>
@@ -122,7 +123,7 @@ export default function ContactForm() {
 
                     <FormField
                         control={form.control}
-                        name="policy"
+                        name="termsAccepted"
                         render={({ field }) => (
                             <FormItem className="flex items-start gap-2">
                                 <FormControl>

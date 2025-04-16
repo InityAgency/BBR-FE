@@ -78,7 +78,7 @@ export default function BrandsPage() {
 
     return (
         <>
-            <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+            <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
                 <div className="page-header flex flex-col gap-6 w-full">
                     <p className="text-md uppercase text-center text-primary">luxurious residences by exclusive brands</p>
                     <h1 className="text-4xl font-bold text-center">Meet the Elite Residence Brands</h1>
@@ -88,7 +88,7 @@ export default function BrandsPage() {
                     </div>
                 </div>
             </div>
-            <div ref={brandsSectionRef} className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-3rem)] 2xl:max-w-[90svw] mx-auto lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+            <div ref={brandsSectionRef} className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
                 <div className="flex flex-col gap-6 w-full">
                     <div className="flex flex-col lg:flex-row gap-16 items-center justify-between">
                         <h2 className="text-4xl font-bold text-left">Top Branded Residences by Brands</h2>

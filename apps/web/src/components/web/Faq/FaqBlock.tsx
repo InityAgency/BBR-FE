@@ -1,5 +1,8 @@
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import Image from "next/image"
+import Link from "next/link"
+import { MessageCircleQuestion } from "lucide-react"
+import SectionLayout from "../SectionLayout"
 const faqItems = [
     {
         question: "How can connect with your experts?",
@@ -25,25 +28,34 @@ const faqItems = [
 
 export default function FaqBlock() {
     return (
-        <div className="flex flex-col items-center bg-secondary  mx-auto px-4 lg:px-12 py-24 gap-4 xl:gap-8 mb-12 relative">
-            <Image src="/bg-pattern.png" alt="FAQ" width={500} height={500} className="absolute top-0 left-0 w-full h-full z-0" />
-            <div className="page-header flex flex-col gap-8 max-w-[calc(100svw-1rem)] 2xl:max-w-[90svw] z-3">
-                <h2 className="text-4xl font-bold text-left lg:text-center">FAQ</h2>
-                <div className="xl:w-[50svw] mx-auto">
+        <SectionLayout>
+            <div className="flex flex-col lg:flex-row w-full gap-8">
+                <div className="flex flex-col gap-6 w-full lg:w-1/2 xl:w-1/3">
+                    <span className="text-md uppercase text-left lg:text-left text-primary">FAQ’s</span>
+                    <h2 className="text-4xl font-bold text-left w-full mb-4">
+                        Questions?
+                        We’re happy to help
+                    </h2>
+                    <Link href="/contact" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit">
+                        <MessageCircleQuestion absoluteStrokeWidth />
+                        Still need help? Contact us.
+                    </Link>
+                </div>
+                <div className="w-full">
                     <Accordion type="single" collapsible defaultValue="0" className="w-full flex flex-col gap-4">
                         {faqItems.map((item, index) => (
                             <AccordionItem key={index} value={`${index}`}>
                                 <AccordionTrigger>
-                                    <h3 className="text-2xl font-bold">{item.question}</h3>
+                                    <h3 className="text-xl font-medium faq-title">{item.question}</h3>
                                 </AccordionTrigger>
                             <AccordionContent>
-                                <p className="text-lg text-white/70">{item.answer}</p>
+                                <p className="text-lg text-regular text-white/70">{item.answer}</p>
                                 </AccordionContent>
                             </AccordionItem>
                         ))}
                     </Accordion>
                 </div>
             </div>
-        </div>
+        </SectionLayout>
     );
 }
