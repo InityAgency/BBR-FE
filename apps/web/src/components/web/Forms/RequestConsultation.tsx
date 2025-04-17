@@ -1,16 +1,21 @@
 "use client";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { contactService, formSchema, type FormValues } from "@/app/api/contact/contactService";
+import { contactService, formSchema, type FormValues } from "@/app/api/contact/requestConsultation";
+import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { Mail, Phone } from "lucide-react";
+import Image from "next/image";
 
-export default function ContactForm() {
+export default function RequestConsultationForm() {
     const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm<FormValues>({
@@ -19,10 +24,11 @@ export default function ContactForm() {
             firstName: "",
             lastName: "",
             email: "",
-            subject: "",
+            phoneNumber: "",
             message: "",
             termsAccepted: false,
-            type: "CONTACT_US"
+            type: "CONSULTATION",
+            preferredContactMethod: [],
         },
     });
 
@@ -43,10 +49,8 @@ export default function ContactForm() {
 
     return (
         <div className="flex flex-col gap-4 p-4 lg:p-8 h-full flex-col items-center justify-center gap-12 border rounded-lg custom-card contact-form">
-            <div className="flex flex-col gap-4">
-                <h2 className="text-2xl font-bold w-full">Let's Start a Conversation</h2>
-                <p className="text-md text-white/80 w-full">Have questions or want to collaborate? Fill out the form below or reach out via email, and we'll respond as soon as possible.</p>
-            </div>
+          
+            <h2 className="text-2xl font-bold w-full">Contact our expert</h2>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
                     <div className="flex flex-col lg:flex-row gap-4">
@@ -92,21 +96,21 @@ export default function ContactForm() {
                             </FormItem>
                         )}
                     />
-                    
+
                     <FormField
                         control={form.control}
-                        name="subject"
+                        name="phoneNumber"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Subject</FormLabel>
+                                <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
-                                    <Input {...field} placeholder="Enter your subject" />
+                                    <Input {...field} placeholder="Enter your phone number" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    
+
                     <FormField
                         control={form.control}
                         name="message"
@@ -120,6 +124,52 @@ export default function ContactForm() {
                             </FormItem>
                         )}
                     />
+
+                    <div className="flex flex-col gap-4">
+                        <FormLabel>How can we reach you?</FormLabel>
+                        <div className="flex flex-col gap-2">
+                            <FormField
+                                control={form.control}
+                                name="preferredContactMethod"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-0">
+                                        <div className="flex flex-col lg:flex-row gap-2">
+                                            {[
+                                                { value: "EMAIL", label: "Email" },
+                                                { value: "PHONE", label: "Phone" },
+                                                { value: "WHATSAPP", label: "WhatsApp" }
+                                            ].map((method) => (
+                                                <div
+                                                    key={method.value}
+                                                    className={`flex items-center space-x-3 rounded-md border px-3 py-3 cursor-pointer transition-colors w-full ${
+                                                        (field.value || []).includes(method.value as "EMAIL" | "PHONE" | "WHATSAPP")
+                                                            ? "border-primary bg-primary/10"
+                                                            : "border-muted"
+                                                    }`}
+                                                    onClick={() => {
+                                                        const currentValue = field.value || [];
+                                                        const newValue = currentValue.includes(method.value as "EMAIL" | "PHONE" | "WHATSAPP")
+                                                            ? currentValue.filter((v) => v !== method.value)
+                                                            : [...currentValue, method.value];
+                                                        field.onChange(newValue);
+                                                    }}
+                                                >
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel className="cursor-pointer">
+                                                            {method.value === "EMAIL" && <Mail color="#6B7280" className="w-5 h-5" />}
+                                                            {method.value === "PHONE" && <Phone color="#6B7280" className="w-5 h-5" />}
+                                                            {method.value === "WHATSAPP" && <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />}
+                                                            {method.label}
+                                                        </FormLabel>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
 
                     <FormField
                         control={form.control}
