@@ -34,7 +34,7 @@ export default async function CareerPage() {
                 </div>
 
                 {jobPositions.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 w-full">
                         {jobPositions.map((position) => (
                             <CareerCard key={position.id} career={position} />  
                         ))}

@@ -29,7 +29,7 @@ export async function CareerCard({ career }: { career: Post }) {
 
   return (
     <Link
-      href={`/career/${career.slug}`}
+      href={`/careers/${career.slug}`}
       className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-4 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2"
     >
       <div className="flex flex-col gap-4 h-full">

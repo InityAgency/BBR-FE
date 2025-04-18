@@ -1,0 +1,201 @@
+import { getJobPostitions, getFeaturedMediaById, getJobPostitionById } from "@/lib/wordpress/wordpress";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { Clock, ChevronRight, MapPin, Banknote, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
+import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
+import { CareerCard } from "@/components/web/Careers/CareerCard";
+import SectionLayout from "@/components/web/SectionLayout";
+import { CareerFormWrapper } from "@/components/web/Careers/CareerFormWrapper";
+
+// Dinamička strana sa revalidacijom
+export const dynamic = 'force-dynamic';
+export const revalidate = 600;
+
+interface CareerPostPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+// Helper funkcija za dohvatanje karijere po slugu
+async function getJobPostitionBySlug(slug: string) {
+  try {
+    const careers = await getJobPostitions();
+    const career = careers.find((career) => career.slug === slug);
+    console.log("dohvatili ovo: ", career);
+    
+    if (!career) {
+      console.error(`Career with slug "${slug}" not found`);
+      return null;
+    }
+    
+    console.log('Found career:', career.title?.rendered);
+    console.log('Featured media ID:', career.featured_media);
+    if (career._embedded && career._embedded['wp:featuredmedia']) {
+      console.log('Embedded media found:', career._embedded['wp:featuredmedia'][0]?.source_url);
+    }
+    
+    return career;
+  } catch (error) {
+    console.error(`Error fetching career by slug "${slug}":`, error);
+    return null;
+  }
+}
+
+export default async function CareerPostPage({ params }: CareerPostPageProps) {
+  // VAŽNO: Sada koristimo await sa params.slug
+  const slug = params.slug;
+  const career = await getJobPostitionBySlug(slug);
+  const id = career?.id;
+  console.log("Career ID:", id);
+
+  const data = await getJobPostitionById(id!); // ! je za sigurnost();
+  console.log("Career data:", data);
+
+  if (!career) {
+    notFound();
+  }
+
+  // Pokušaj dohvatanja media iz _embedded ako postoji
+  let mediaUrl = null;
+  if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0]) {
+    mediaUrl = data._embedded['wp:featuredmedia'][0].source_url;
+    console.log('Using embedded media:', mediaUrl);
+  } else if (data.featured_media && data.featured_media > 0) {
+    // Samo ako je ID veci od 0
+    try {
+      const media = await getFeaturedMediaById(data.featured_media);
+      if (media && media.source_url) {
+        mediaUrl = media.source_url;
+        console.log('Using fetched media:', mediaUrl);
+      }
+    } catch (error) {
+      console.error('Error fetching media:', error);
+    }
+  }
+
+  const date = new Date(data.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  // Dohvatanje kategorije iz ugrađenih podataka
+  const careerCategory = data._embedded?.['wp:term']?.[0]?.[0]?.name || "Uncategorized";
+  
+  // Dohvatanje ACF polja
+  const location = data.acf?.location || "Remote";
+  const salaryFrom = data.acf?.salary?.from || "Not specified";
+  const salaryTo = data.acf?.salary?.to || "Not specified";
+  const aboutTheRole = data.acf?.about_the_role || "";
+  const keyResponsibilities = data.acf?.key_responsibilities || "";
+  const qualifications = data.acf?.qualifications || "";
+
+  // Dobijanje punog naslova za position
+  const position = data.title?.rendered || "";
+
+  return (
+    <>
+      {/* Hero Section */}
+      <div className="single-career-hero">
+        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-4">
+            <Link href="/career" className="hover:text-primary transition-colors flex items-center gap-1">
+              Career Opportunities
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-foreground line-clamp-1" dangerouslySetInnerHTML={{ __html: career.title?.rendered || "" }} />
+          </div>
+          <div className="w-full mx-auto items-center flex flex-col gap-6 px-12">
+            <div className="uppercase text-primary">
+              {careerCategory}
+            </div>
+            <h1 
+              className="text-4xl font-medium w-[70%] text-center"
+              dangerouslySetInnerHTML={{ __html: career.title?.rendered || "" }}
+            />
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                <span>Location: <span className="text-white">{location}</span></span>
+              </div>
+              <span className="hidden md:block">•</span>
+              <div className="flex items-center gap-1">
+                <Banknote className="w-4 h-4" />
+                <span>Salary: <span className="text-white">{salaryFrom} - {salaryTo}</span></span>
+              </div>
+              <span className="hidden md:block">•</span>
+              <span>Posted: {date}</span>
+            </div>
+          </div>
+       
+          <Link href={"#apply"} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full text-center max-w-[10svw]">Apply</Link>
+          
+          {mediaUrl ? (
+            <div className="relative w-full h-[400px] rounded-lg overflow-hidden mt-8">
+              <Image
+                src={mediaUrl}
+                alt={career.title?.rendered || "Career thumbnail"}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div className="relative w-full h-[400px] rounded-lg overflow-hidden mt-8 bg-secondary border border-white/10 flex items-center justify-center">
+              <p className="text-muted-foreground">No image available</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-career-content">
+        <div className="w-full flex gap-4 mx-auto space-y-8 relative">
+    
+          <SectionLayout>
+            <div className="prose prose-lg prose-headings:font-medium prose-h1:text-4xl prose-h2:text-3xl 
+                    prose-h3:text-2xl prose-h4:text-xl prose-headings:my-6 prose-headings:text-foreground 
+                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                    prose-img:rounded-lg prose-img:my-8 w-full lg:w-[50svw] mx-auto">
+                {/* About the Role */}
+               <div className="border-b pb-8">
+                <h2>About the Role</h2>
+                <div dangerouslySetInnerHTML={{ __html: aboutTheRole }} />
+               </div>
+                
+                {/* Key Responsibilities */}
+                <div className="border-b pb-8">
+                {keyResponsibilities && (
+                <>
+                    <h2>Key Responsibilities</h2>
+                    <div dangerouslySetInnerHTML={{ __html: keyResponsibilities }} />
+                </>
+                )}
+                </div>
+                
+                {/* Qualifications */}
+                <div className="pb-8">
+                {qualifications && (
+                <>
+                    <h2>Qualifications</h2>
+                    <div dangerouslySetInnerHTML={{ __html: qualifications }} />
+                </>
+                )}
+                </div>
+                
+                {/* Application Form - Nova shadcn forma */}
+                <CareerFormWrapper 
+                  position={position}
+                  slug={slug}
+                />
+            </div>
+          </SectionLayout>
+        </div>
+      </div>
+
+      <NewsletterBlock />
+    </>
+  );
+}
