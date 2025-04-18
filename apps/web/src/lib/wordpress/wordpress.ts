@@ -435,5 +435,33 @@ export async function revalidateWordPressData(tags: string[] = ["wordpress"]) {
   }
 }
 
+
+export async function getJobPostitions(): Promise<Post[]> {
+  const url = getUrl("/wp-json/wp/v2/career", { 
+    _embed: true,
+    per_page: 100 
+  });
+  
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", "career"],
+    },
+  });
+
+  return response;
+}
+
+export async function getJobPostitionById(id: number): Promise<Post> {
+  const url = getUrl(`/wp-json/wp/v2/career/${id}`);
+  const response = await wordpressFetch<Post>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `career-${id}`],
+    },
+  });
+
+  return response;
+}
 // Export error class for error handling
 export { WordPressAPIError };
