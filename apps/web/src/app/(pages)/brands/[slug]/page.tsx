@@ -21,12 +21,17 @@ export default function BrandPage() {
     useEffect(() => {
         const fetchBrand = async () => {
             try {
+                // Prvo dobavljamo podatke o brendu
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/brands/slug/${brandSlug}`);
-                const residences = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?brandId=${brandId}`);
-                const residencesData = await residences.json();
                 const data = await response.json();
                 setBrand(data.data);
-                setResidences(residencesData.data);
+                
+                const fetchedBrandId = data.data?.id;
+                if (fetchedBrandId) {
+                    const residencesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?brandId=${fetchedBrandId}`);
+                    const residencesData = await residencesResponse.json();
+                    setResidences(residencesData.data);
+                }
             } catch (error) {
                 console.error('Error fetching brand:', error);  
             } finally {
@@ -62,25 +67,35 @@ export default function BrandPage() {
                     <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">{brand.name} Residence Collection</h2>
                 </div>
                 
-                {/* Prvi red sa dve kartice */}
-                <div className="flex flex-col gap-6 w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                        {residences.slice(0, 2).map((residence) => (
-                            <div key={residence.id}>
-                                <ResidenceCard residence={residence} />
-                            </div>
-                        ))}
-                    </div>
+                {residences.length > 0 ? (
+                    /* Prikazujemo rezidencije ako postoje */
+                    <div className="flex flex-col gap-6 w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                            {residences.slice(0, 2).map((residence) => (
+                                <div key={residence.id}>
+                                    <ResidenceCard residence={residence} />
+                                </div>
+                            ))}
+                        </div>
 
-                    {/* Ostale kartice po tri u redu */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                        {residences.slice(2).map((residence) => (
-                            <div key={residence.id}>
-                                <ResidenceCard residence={residence} />
-                            </div>
-                        ))}
+                        {/* Ostale kartice po tri u redu */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                            {residences.slice(2).map((residence) => (
+                                <div key={residence.id}>
+                                    <ResidenceCard residence={residence} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    /* Prikazujemo poruku ako nema rezidencija */
+                    <div className="w-full py-12 text-center">
+                        <div className="bg-secondary rounded-xl w-full border py-12 px-4 mx-auto">
+                            <h3 className="text-2xl font-medium mb-2">No residences available</h3>
+                            <p className="text-gray-300">New residences for {brand.name} will be added soon.</p>
+                        </div>
+                    </div>
+                )}
             </SectionLayout>
             <NewsletterBlock />
         </>
