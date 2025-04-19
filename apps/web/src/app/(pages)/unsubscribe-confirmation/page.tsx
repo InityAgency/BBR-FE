@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function UnsubscribeConfirmationPage() {
   return (
 
-    <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+    <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
         <h1 className="text-4xl lg:text-4xl font-bold w-full xl:w-[80%] text-left lg:text-center mt-0 lg:mt-8">Unsubscribe Confirmation</h1>
         <p className="text-md lg:text-lg w-full xl:w-[60%] text-left lg:text-center">
             You have successfully unsubscribed from our newsletter.

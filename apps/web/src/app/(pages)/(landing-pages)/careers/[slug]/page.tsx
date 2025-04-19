@@ -105,23 +105,23 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
     <>
       {/* Hero Section */}
       <div className="single-career-hero">
-        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-4">
+        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-0 lg:px-4 py-0 lg:py-4">
             <Link href="/carees" className="hover:text-primary transition-colors flex items-center gap-1">
               Career Opportunities
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-foreground line-clamp-1" dangerouslySetInnerHTML={{ __html: career.title?.rendered || "" }} />
           </div>
-          <div className="w-full mx-auto items-center flex flex-col gap-6 px-12">
-            <div className="uppercase text-primary">
+          <div className="w-full mx-auto lg:items-center flex flex-col gap-6 lg:px-12">
+            <div className="uppercase text-primary w-full text-left lg:text-center">
               {careerCategory}
             </div>
             <h1 
-              className="text-4xl font-medium w-[70%] text-center"
+              className="text-4xl font-medium lg:w-[70%] text-left lg:text-center"
               dangerouslySetInnerHTML={{ __html: career.title?.rendered || "" }}
             />
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-col md:flex-row lg:items-center lg:justify-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 <span>Location: <span className="text-white">{location}</span></span>
@@ -136,7 +136,7 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
             </div>
           </div>
        
-          <Link href={"#apply"} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full text-center max-w-[10svw]">Apply</Link>
+          <Link href={"#apply"} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full text-center lg:max-w-[10svw]">Apply</Link>
           
           {mediaUrl ? (
             <div className="relative w-full h-[400px] rounded-lg overflow-hidden mt-8">
