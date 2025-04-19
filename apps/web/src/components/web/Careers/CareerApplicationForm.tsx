@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
+import FileUpload from "../Forms/FileUpload";
 
 // Validaciona šema za formu
 const formSchema = z.object({
@@ -140,72 +141,77 @@ export function CareerApplicationForm({ position, pageUrl }: CareerApplicationFo
   };
 
   return (
-    <div className="bg-secondary rounded-lg p-6 border" id="apply">
+    <div className="bg-secondary rounded-lg p-6 border w-full xl:w-[60svw] flex gap-8 contact-form" id="apply">
+      <h2 className="text-4xl font-bold text-white mb-8 w-full lg:w-[50%]">Submit your application</h2>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="fullName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your full name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your email address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your email address" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your phone number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="linkedin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>LinkedIn Profile</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://linkedin.com/in/yourprofile" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-col lg:flex-row gap-4">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="linkedin"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>LinkedIn Profile</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://linkedin.com/in/yourprofile" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           
           <FormField
             control={form.control}
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cover Letter</FormLabel>
+                <FormLabel>Your message to BBR team</FormLabel>
                 <FormControl>
                   <Textarea 
                     placeholder="Tell us why you're interested in this position" 
@@ -225,23 +231,13 @@ export function CareerApplicationForm({ position, pageUrl }: CareerApplicationFo
               <FormItem>
                 <FormLabel>Upload Resume</FormLabel>
                 <FormControl>
-                  <div className="flex flex-col gap-2">
-                    <Input
-                      type="file"
-                      accept=".pdf,.docx"
-                      className="bg-secondary/30 border border-white/10 rounded-md p-2"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          onChange(file);
-                        }
-                      }}
-                      {...field}
-                    />
-                    <FormDescription className="text-xs text-muted-foreground">
-                      Supported formats: PDF, DOCX (Max 5MB)
-                    </FormDescription>
-                  </div>
+                  <FileUpload
+                    value={value}
+                    onChange={onChange}
+                    required={true}
+                    maxSize={5}
+                    supportedFormats={["PDF", "DOCX"]}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

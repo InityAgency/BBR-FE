@@ -1,11 +1,9 @@
 import { getJobPostitions, getFeaturedMediaById, getJobPostitionById } from "@/lib/wordpress/wordpress";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Clock, ChevronRight, MapPin, Banknote, ArrowLeft } from "lucide-react";
+import { ChevronRight, MapPin, Banknote } from "lucide-react";
 import Link from "next/link";
 import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
-import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
-import { CareerCard } from "@/components/web/Careers/CareerCard";
 import SectionLayout from "@/components/web/SectionLayout";
 import { CareerFormWrapper } from "@/components/web/Careers/CareerFormWrapper";
 
@@ -24,15 +22,12 @@ async function getJobPostitionBySlug(slug: string) {
   try {
     const careers = await getJobPostitions();
     const career = careers.find((career) => career.slug === slug);
-    console.log("dohvatili ovo: ", career);
     
     if (!career) {
       console.error(`Career with slug "${slug}" not found`);
       return null;
     }
-    
-    console.log('Found career:', career.title?.rendered);
-    console.log('Featured media ID:', career.featured_media);
+
     if (career._embedded && career._embedded['wp:featuredmedia']) {
       console.log('Embedded media found:', career._embedded['wp:featuredmedia'][0]?.source_url);
     }
@@ -44,12 +39,24 @@ async function getJobPostitionBySlug(slug: string) {
   }
 }
 
+// Helper funkcija za dohvatanje naziva kategorije iz class_list-a
+function getCategoryFromClassList(classList?: string[]): string {
+  if (!Array.isArray(classList)) return "Uncategorized";
+  
+  const categoryClass = classList.find(cls => cls.startsWith('career_category-'));
+  if (!categoryClass) return "Uncategorized";
+  
+  return categoryClass
+    .replace('career_category-', '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 export default async function CareerPostPage({ params }: CareerPostPageProps) {
   // VAŽNO: Sada koristimo await sa params.slug
   const slug = params.slug;
   const career = await getJobPostitionBySlug(slug);
   const id = career?.id;
-  console.log("Career ID:", id);
 
   const data = await getJobPostitionById(id!); // ! je za sigurnost();
   console.log("Career data:", data);
@@ -62,28 +69,26 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
   let mediaUrl = null;
   if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0]) {
     mediaUrl = data._embedded['wp:featuredmedia'][0].source_url;
-    console.log('Using embedded media:', mediaUrl);
   } else if (data.featured_media && data.featured_media > 0) {
     // Samo ako je ID veci od 0
     try {
       const media = await getFeaturedMediaById(data.featured_media);
       if (media && media.source_url) {
         mediaUrl = media.source_url;
-        console.log('Using fetched media:', mediaUrl);
       }
     } catch (error) {
       console.error('Error fetching media:', error);
     }
   }
-
+  
   const date = new Date(data.date).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  // Dohvatanje kategorije iz ugrađenih podataka
-  const careerCategory = data._embedded?.['wp:term']?.[0]?.[0]?.name || "Uncategorized";
+  // Dohvatanje kategorije iz class_list (pouzdanije od API poziva)
+  const careerCategory = getCategoryFromClassList(data.class_list);
   
   // Dohvatanje ACF polja
   const location = data.acf?.location || "Remote";
@@ -102,7 +107,7 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
       <div className="single-career-hero">
         <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
           <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-4">
-            <Link href="/career" className="hover:text-primary transition-colors flex items-center gap-1">
+            <Link href="/carees" className="hover:text-primary transition-colors flex items-center gap-1">
               Career Opportunities
             </Link>
             <ChevronRight className="w-4 h-4" />
@@ -151,7 +156,7 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-career-content">
+      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-0 single-career-content m-0 -mt-12 mb-0">
         <div className="w-full flex gap-4 mx-auto space-y-8 relative">
     
           <SectionLayout>
@@ -176,7 +181,7 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
                 </div>
                 
                 {/* Qualifications */}
-                <div className="pb-8">
+                <div>
                 {qualifications && (
                 <>
                     <h2>Qualifications</h2>
@@ -186,16 +191,18 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
                 </div>
                 
                 {/* Application Form - Nova shadcn forma */}
-                <CareerFormWrapper 
-                  position={position}
-                  slug={slug}
-                />
             </div>
           </SectionLayout>
-        </div>
+        </div>        
       </div>
 
-      <NewsletterBlock />
+      <div className="flex flex-col items-start lg:items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] lg:max-w-[95svw] xl:max-w-[90svw] 2xl:max-w-[90svw] 3xl:max-w-[60svw] mx-auto px-2 lg:px-4 xl:px-12 pb-8 lg:pb-16 gap-4 xl:gap-8">
+        <CareerFormWrapper
+          position={position}
+          slug={slug}
+        />
+      </div>
+
     </>
   );
 }

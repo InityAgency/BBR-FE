@@ -463,5 +463,18 @@ export async function getJobPostitionById(id: number): Promise<Post> {
 
   return response;
 }
+
+export async function getCareerCategoryById(id: number): Promise<Category> {
+  const url = getUrl(`/wp-json/wp/v2/career_category/${id}`);
+  const response = await wordpressFetch<Category>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `career-category-${id}`],
+    },
+  });
+
+  return response;
+}
 // Export error class for error handling
 export { WordPressAPIError };
+

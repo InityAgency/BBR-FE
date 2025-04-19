@@ -79,6 +79,9 @@ interface WPEntity {
     categories: number[];
     tags: number[];
     meta: Record<string, unknown>;
+    // Dodajemo ova polja za karijere
+    career_categories?: number[];
+    class_list?: string[];
   }
   
   export interface Page extends WPEntity {
