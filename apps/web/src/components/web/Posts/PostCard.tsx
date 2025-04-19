@@ -70,7 +70,7 @@ export async function PostCard({ post }: { post: Post }) {
           className="text-xl text-white font-medium transition-all"
         ></h3>
         <div
-          className="text-sm text-muted-foreground"
+          className="text-md text-muted-foreground"
           dangerouslySetInnerHTML={{
             __html: post.excerpt?.rendered
               ? post.excerpt.rendered.split(" ").slice(0, 32).join(" ").trim() +

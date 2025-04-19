@@ -1,28 +1,48 @@
-import { Residence } from "@/types/residence";
-import Image from "next/image";
-import Link from "next/link";
-export function ResidenceCard({ residence }: { residence: Residence }) {
+import Image from "next/image"
+import Link from "next/link"
+import type { Residence } from "@/types/residence"
+import { Card, CardContent } from "@/components/ui/card"
 
-    const featuredImage = residence.featuredImage;
-    
-    return (
-        <Link href={`/residences/${residence.id}`} className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-8 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2">
-            <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
-                {typeof featuredImage === "object" && featuredImage !== null && "id" in featuredImage ? (
-                    <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${(featuredImage as { id: string }).id}/content`}
-                        alt={residence.name}
-                        fill
-                        className="object-cover"
-                    />
-                ) : (
-                    <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center animate-pulse" />
-                )}
+interface ResidenceCardProps {
+  residence: Residence
+}
+
+export function ResidenceCard({ residence }: ResidenceCardProps) {
+
+  
+  return (
+    <Link href={`/residences/${residence.slug}`} className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-4 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2">
+
+        <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
+          {residence.featuredImage ? (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${residence.featuredImage.id}/content`}
+              alt={residence.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-secondary">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${residence.brand.logo.id}/content`}
+                alt={residence.brand.name}
+                width={100}
+                height={100}
+                className="object-cover w-[30%] h-auto"
+              />
             </div>
-            <div className="px-2 pb-4">
-                <h3 className="text-xl font-bold mb-2">{residence.name}</h3>
-                <p className="text-md text-muted-foreground">{residence.description} </p>
-            </div>
-        </Link>
-    );
+          )}
+        </div>
+          <div className="mt-2 flex items-center gap-2 w-full justify-between">
+            {residence.city && residence.country ? (
+            <span className="text-xs text-muted-foreground">
+              {residence.city.name}, {residence.country.name}
+            </span>
+            ): ( null )}
+            <span className="text-xs font-medium text-primary">{residence.developmentStatus}</span>
+          </div>
+          <h3 className="text-xl text-white font-medium transition-all">{residence.name}</h3>
+          <p className="text-md text-muted-foreground">{residence.description}</p>
+    </Link>
+  )
 }

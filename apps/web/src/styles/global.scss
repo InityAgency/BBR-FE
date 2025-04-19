@@ -29,3 +29,35 @@ button, a{
 .faq-title{
     font-family: 'InterDisplay';
 }
+
+.residence-filters{
+    input, select, button {
+        background-color: #101417;
+        color: #fff;
+        border-color: oklch(1 0 0 / 5%);
+    }
+}
+.search-wrapper{
+    background-color: #101417;
+    top: -4px;
+    input{
+        background-color: transparent;
+        color: #fff;
+    }
+}
+div[data-radix-select-viewport]{
+    background-color: #101417;
+    border-color: oklch(1 0 0 / 5%);
+
+    div[role="option"]{
+        transition: 0.3s ease-in-out;
+        cursor: pointer;
+        &:hover{
+            background-color: #ffffff11;
+        }
+    }
+}
+div[data-slot="select-scroll-up-button"],
+div[data-slot="select-scroll-down-button"]{
+    background-color: #101417;
+}
