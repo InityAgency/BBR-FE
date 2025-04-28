@@ -1,14 +1,40 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
-import EmblaCarousel from "@/components/web/Carousel/Carousel";
+import Carousel from "@/components/web/Carousel/ProgressCarousel";
 import FaqBlock from "@/components/web/Faq/FaqBlock";
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
 import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 
-const OPTIONS: EmblaOptionsType = { dragFree: true };
-const SLIDE_COUNT = 5;
-const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
+const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
+const CAROUSEL_CARDS = [
+  {
+    title: "Amenities & Facilities",
+    description:
+      "Luxury is lived in the everyday experience. We evaluate wellness offerings, spa and fitness infrastructure, concierge services, smart home integrations, and shared spaces. Everything must exceed expectations — not just meet them.",
+  },
+  {
+    title: "Investment Value",
+    description:
+      "A residence is a lifestyle and a strategic asset. We analyze market performance, price trends, rental yield, resale liquidity, and the added value brought by the brand. We also factor in tax advantages and investment incentives where applicable.",
+  },
+  {
+    title: "Service Quality",
+    description:
+      "Luxury is felt in the details — intuitive service, impeccable upkeep, and a seamless living experience. Our review covers concierge depth, maintenance standards, owner sentiment, and the brand’s ability to consistently deliver five-star hospitality at home.",
+  },
+  {
+    title: "Design & Architecture",
+    description:
+      "Aesthetic excellence and architectural vision define timeless residences. We assess the architect’s reputation, spatial innovation, material quality, interior design, and how well the design reflects the brand’s identity and lifestyle promise.",
+  },
+  {
+    title: "+ Unique Criteria",
+    description:
+      "Aesthetic excellence and architectural vision define timeless residences. We assess the architect’s reputation, spatial innovation, material quality, interior design, and how well the design reflects the brand’s identity and lifestyle promise.",
+  },
+];
 
 export default function EvaluationCriteriaPage() {
   return (
@@ -141,7 +167,7 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* THIRD SECTION */}
-      <div className="bg-beigeVariant1 px-[30px] py-[20px] lg:px-[120px] lg:py-[96px]">
+      <div className="bg-beigeVariant1 pl-[30px] py-[20px] lg:pl-[120px] lg:py-[96px] overflow-hidden">
         <h1 className="text-secondary text-4xl lg:text-6xl mb-[24px]">
           Our Ranking Evaluation Pillars
         </h1>
@@ -168,8 +194,8 @@ export default function EvaluationCriteriaPage() {
             market does, powered by AI and verified by expert review.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row mt-[56px] gap-[100px] lg:h-[500px]">
-          <div className="flex flex-col bg-secondary lg:w-[540px] rounded-xl p-[16px] lg:p-[32px]">
+        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[500px]">
+          <div className="flex flex-col bg-secondary max-w-[540px] mr-[30px] rounded-xl p-[16px] lg:p-[32px]">
             <h1 className="text-xl lg:text-[36px] mb-[10px] lg:mb-[24px]">
               Location & Area
             </h1>
@@ -185,11 +211,11 @@ export default function EvaluationCriteriaPage() {
               alt="about-us"
               width={200}
               height={480}
-              className="max-h-[200px] w-full rounded mt-[24px]"
+              className="max-h-[200px]  w-full rounded mt-[24px]"
             />
           </div>
-          <div className="text-black place-self-start h-full">
-            {/* <EmblaCarousel slides={SLIDES} options={OPTIONS} /> */}
+          <div className="text-black place-self-start h-full w-full overflow-hidden">
+            <Carousel slides={CAROUSEL_CARDS} options={CAROUSEL_OPTIONS} />
           </div>
         </div>
       </div>
