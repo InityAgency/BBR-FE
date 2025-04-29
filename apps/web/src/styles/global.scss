@@ -61,3 +61,32 @@ div[data-slot="select-scroll-up-button"],
 div[data-slot="select-scroll-down-button"]{
     background-color: #101417;
 }
+
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/zoom';
+
+.swiper-button-prev, .swiper-button-next{
+    background-color: #0000008a !important;
+    width: 40px !important;
+    height: 40px !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    border-radius: 8px;
+
+    &::after, &::before{
+        width: 100% !important;
+        height: 100% !important;
+        font-size: 1.5rem !important;
+        text-align: center;
+        color: #fff;
+        font-weight: 500;
+    }
+}
+.swiper-pagination-bullet{
+    background-color: #fff !important;
+}
+.swiper-pagination-bullet-active{
+    background-color: #b3804c !important;
+}
