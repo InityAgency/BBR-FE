@@ -77,7 +77,7 @@ export default function GalleryModal({
         </div>
 
         {/* Swiper galerija */}
-        <div className="flex-1 w-full h-full">
+        <div className="flex-1 w-full h-[70svh]">
           {loaded && images.length > 0 && (
             <Swiper
               modules={[Navigation, Pagination, Keyboard, Zoom]}
