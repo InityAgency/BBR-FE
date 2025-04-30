@@ -46,6 +46,13 @@ interface AmenityFormProps {
       uploadStatus: string;
       size: number;
     } | null;
+    featuredImage?: {
+      id: string;
+      originalFileName: string;
+      mimeType: string;
+      uploadStatus: string;
+      size: number;
+    } | null;
   };
   isEditing?: boolean;
 }
@@ -59,15 +66,24 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
   const [iconValid, setIconValid] = useState(initialData?.icon ? true : false);
   const [iconChanged, setIconChanged] = useState(false);
   const [iconUrl, setIconUrl] = useState<string | null>(null);
+  
+  // Analogno za featuredImage
+  const [featuredImageValid, setFeaturedImageValid] = useState(initialData?.featuredImage ? true : false);
+  const [featuredImageChanged, setFeaturedImageChanged] = useState(false);
+  const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(null);
+  
   const [isFormValid, setIsFormValid] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
+  // Inicijalizujemo formu
   const form = useForm<AmenityFormValues>({
     resolver: zodResolver(amenitySchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData
+    },
     mode: "onChange",
   });
-
+  
   // Fetch and create blob URL for icon when component mounts
   useEffect(() => {
     const fetchIconBlob = async () => {
@@ -106,9 +122,49 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
     };
   }, [initialData.icon?.id]);
 
+  // Fetch and create blob URL for featuredImage when component mounts - identično kao za icon
+  useEffect(() => {
+    const fetchFeaturedImageBlob = async () => {
+      if (!initialData.featuredImage?.id) return;
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/media/${initialData.featuredImage.id}/content`, {
+          credentials: 'include',
+          headers: {
+            'Accept': '*/*',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch featured image: ${response.status}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: initialData.featuredImage.mimeType });
+        const url = URL.createObjectURL(blob);
+        setFeaturedImageUrl(url);
+      } catch (error) {
+        console.error('Error fetching featured image:', error);
+        toast.error('Failed to load featured image');
+      }
+    };
+
+    fetchFeaturedImageBlob();
+
+    return () => {
+      if (featuredImageUrl) {
+        URL.revokeObjectURL(featuredImageUrl);
+      }
+    };
+
+  }, [initialData.featuredImage?.id]);
+  
   // Watch required form fields
   const amenityName = form.watch("name");
   const icon = form.watch("icon");
+  const featuredImage = form.watch("featuredImage");
 
   // Check form validity whenever fields change
   useEffect(() => {
@@ -122,7 +178,7 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
   }, [form, amenityName, iconValid, isEditing]);
 
   // Check if form has unsaved changes
-  const hasUnsavedChanges = form.formState.isDirty || iconChanged;
+  const hasUnsavedChanges = form.formState.isDirty || iconChanged || featuredImageChanged;
 
   // Check if form is valid for saving
   const isSaveEnabled = useCallback(() => {
@@ -131,11 +187,11 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
       !!formValues.name && 
       formValues.name.trim().length >= 2;
 
-    const hasChanges = form.formState.isDirty || iconChanged;
+    const hasChanges = form.formState.isDirty || iconChanged || featuredImageChanged;
     const isIconValid = isEditing || iconValid;
 
     return hasRequiredFields && isIconValid && hasChanges && !isSubmitting;
-  }, [form, iconChanged, iconValid, isEditing, isSubmitting]);
+  }, [form, iconChanged, featuredImageChanged, iconValid, isEditing, isSubmitting]);
 
   // Setup discard warning hook
   const {
@@ -150,8 +206,8 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
     },
   });
 
-  // Handle file upload for icon
-  const uploadIcon = async (file: File): Promise<{ id: string, url: string }> => {
+  // Handle file upload for images
+  const uploadImage = async (file: File, type: string): Promise<{ id: string, url: string }> => {
     const formData = new FormData();
     formData.append('file', file);
     
@@ -167,23 +223,39 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to upload icon');
+        throw new Error(errorData.message || `Failed to upload ${type}`);
       }
       
       const data = await response.json();
       return { id: data.data.id, url: data.data.url };
     } catch (error) {
-      console.error('Error uploading icon:', error);
+      console.error(`Error uploading ${type}:`, error);
       throw error;
     }
   };
 
-  // Monitor icon changes
+  // Monitor image changes
   useEffect(() => {
-    if (icon !== initialData.icon && icon !== undefined) {
+    // Ako je vrednost null (slika je uklonjena), postavite da je došlo do promene
+    if (icon === null && initialData.icon) {
+      setIconChanged(true);
+    }
+    // Postojeći kod za praćenje drugih promena
+    else if (icon !== initialData.icon && icon !== undefined) {
       setIconChanged(true);
     }
   }, [icon, initialData.icon]);
+
+  useEffect(() => {
+    // Ako je vrednost null (slika je uklonjena), postavite da je došlo do promene
+    if (featuredImage === null && initialData.featuredImage) {
+      setFeaturedImageChanged(true);
+    }
+    // Postojeći kod za praćenje drugih promena
+    else if (featuredImage !== initialData.featuredImage && featuredImage !== undefined) {
+      setFeaturedImageChanged(true);
+    }
+  }, [featuredImage, initialData.featuredImage]);
 
   const onSubmit = async (data: AmenityFormValues) => {
     try {
@@ -208,11 +280,26 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
       
       if (iconChanged && data.icon instanceof File) {
         try {
-          const uploadResult = await uploadIcon(data.icon);
+          const uploadResult = await uploadImage(data.icon, "icon");
           iconId = uploadResult.id;
         } catch (error) {
           toast.error("Failed to upload icon");
           console.error("Icon upload error:", error);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      
+      // Upload featuredImage if changed - isti pristup kao za icon
+      let featuredImageId = initialData.featuredImage?.id;
+      
+      if (featuredImageChanged && data.featuredImage instanceof File) {
+        try {
+          const uploadResult = await uploadImage(data.featuredImage, "featured image");
+          featuredImageId = uploadResult.id;
+        } catch (error) {
+          toast.error("Failed to upload featured image");
+          console.error("Featured image upload error:", error);
           setIsSubmitting(false);
           return;
         }
@@ -224,9 +311,18 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
         description: data.description || undefined,
       };
 
-      // Add iconId only if it exists or was changed
-      if (iconId || iconChanged) {
+      // Za icon - eksplicitno dodati prazan string ako je uklonjen
+      if (iconChanged) {
+        payload.iconId = data.icon ? (iconId || "") : "";
+      } else if (iconId) {
         payload.iconId = iconId;
+      }
+      
+      // Za featuredImage - eksplicitno dodati prazan string ako je uklonjena
+      if (featuredImageChanged) {
+        payload.featuredImageId = data.featuredImage ? (featuredImageId || "") : "";
+      } else if (featuredImageId) {
+        payload.featuredImageId = featuredImageId;
       }
       
       // Submit data to API
@@ -278,7 +374,7 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
     if (!isSaveEnabled()) {
       if (!iconValid && !isEditing) {
         toast.error("Please upload an icon");
-      } else if (!form.formState.isDirty && !iconChanged) {
+      } else if (!form.formState.isDirty && !iconChanged && !featuredImageChanged) {
         toast.error("No changes have been made");
       } else {
         toast.error("Please fill in all required fields correctly");
@@ -287,7 +383,7 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
     }
   
     onSubmit(form.getValues());
-  }, [form, onSubmit, isEditing, iconValid, iconChanged, isSaveEnabled]);
+  }, [form, onSubmit, isEditing, iconValid, featuredImageChanged, iconChanged, isSaveEnabled]);
 
   const handleDelete = async () => {
     if (!initialData?.id) return;
@@ -348,6 +444,7 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
     );
   };
 
+  console.log("featured: ", initialData);
   return (
     <>
       <FormHeader
@@ -438,6 +535,44 @@ const AmenityForm: React.FC<AmenityFormProps> = ({
                         />
                         <p className="text-xs text-muted-foreground mt-2">
                           JPG, JPEG, PNG, WEBP and SVG formats are supported<br />
+                          Max. upload size - 5MB
+                        </p>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Featured Image - ISTI PRISTUP KAO ZA ICON */}
+              <FormField
+                control={form.control}
+                name="featuredImage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Featured Image</FormLabel>
+                    <FormControl>
+                      <div>
+                        <ImageUpload
+                          onChange={(file) => {
+                            field.onChange(file);
+                            setFeaturedImageValid(!!file);
+                            setFeaturedImageChanged(true);
+                          }}
+                          value={
+                            field.value instanceof File 
+                              ? field.value 
+                              : featuredImageUrl
+                                ? featuredImageUrl
+                                : null
+                          }
+                          supportedFormats={["JPG", "JPEG", "PNG", "WEBP"]}
+                          maxSize={5}
+                          required={false}
+                          onValidation={setFeaturedImageValid}
+                        />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          JPG, JPEG, PNG and WEBP formats are supported<br />
                           Max. upload size - 5MB
                         </p>
                       </div>
