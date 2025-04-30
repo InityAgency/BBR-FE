@@ -62,23 +62,15 @@ export default function BrandsPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const queryParam = searchParams.get("query") || "";
 
-  // Parsiramo status iz URL parametara
+  // Parse status and brandTypeId from URL parameters
   useEffect(() => {
     const statusValues = searchParams.getAll("status");
-    if (statusValues.length > 0) {
-      setSelectedStatuses(statusValues);
-    }
-  }, [searchParams]);
-
-  // Parsiramo brandTypeId iz URL parametara
-  useEffect(() => {
     const brandTypeIdValues = searchParams.getAll("brandTypeId");
-    if (brandTypeIdValues.length > 0) {
-      setSelectedBrandTypeIds(brandTypeIdValues);
-    }
+    setSelectedStatuses(statusValues);
+    setSelectedBrandTypeIds(brandTypeIdValues);
   }, [searchParams]);
 
-  // Učitavamo tipove brendova sa API-a
+  // Fetch brand types from API
   const fetchBrandTypes = async () => {
     try {
       setBrandTypesLoading(true);
@@ -164,6 +156,7 @@ export default function BrandsPage() {
       setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
 
+      // Update URL to reflect the API's returned page, preserving filters
       const apiPage = data.pagination.page || page;
       if (apiPage !== page) {
         updateUrlParams({ page: apiPage });
@@ -178,66 +171,65 @@ export default function BrandsPage() {
 
   const updateUrlParams = (params: {
     page?: number;
+    query?: string;
     statuses?: string[];
     brandTypeIds?: string[];
   }) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams();
 
-    if (params.page !== undefined) {
-      newParams.set("page", params.page.toString());
+    // Always set page
+    newParams.set("page", (params.page ?? currentPage).toString());
+
+    // Set query if provided or preserve existing
+    if (params.query !== undefined) {
+      if (params.query.trim() !== "") {
+        newParams.set("query", params.query);
+      }
+    } else if (queryParam) {
+      newParams.set("query", queryParam);
     }
 
+    // Set statuses if provided or preserve existing
     if (params.statuses !== undefined) {
-      newParams.delete("status");
-      if (params.statuses && params.statuses.length > 0) {
-        params.statuses.forEach((status) => {
-          newParams.append("status", status);
-        });
-      }
+      params.statuses.forEach((status) => {
+        newParams.append("status", status);
+      });
+    } else {
+      selectedStatuses.forEach((status) => {
+        newParams.append("status", status);
+      });
     }
 
+    // Set brandTypeIds if provided or preserve existing
     if (params.brandTypeIds !== undefined) {
-      newParams.delete("brandTypeId");
-      if (params.brandTypeIds && params.brandTypeIds.length > 0) {
-        params.brandTypeIds.forEach((brandTypeId) => {
-          newParams.append("brandTypeId", brandTypeId);
-        });
-      }
+      params.brandTypeIds.forEach((brandTypeId) => {
+        newParams.append("brandTypeId", brandTypeId);
+      });
+    } else {
+      selectedBrandTypeIds.forEach((brandTypeId) => {
+        newParams.append("brandTypeId", brandTypeId);
+      });
     }
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
-  // Efekat za učitavanje tipova brendova
+  // Fetch brand types on mount
   useEffect(() => {
     fetchBrandTypes();
   }, []);
 
-  // Efekat za ažuriranje URL-a kada se promene statusi
-  useEffect(() => {
-    if (selectedStatuses.length > 0) {
-      updateUrlParams({ statuses: selectedStatuses, page: 1 });
-    }
-  }, [selectedStatuses]);
-
-  // Efekat za ažuriranje URL-a kada se promene tipovi
-  useEffect(() => {
-    if (selectedBrandTypeIds.length > 0) {
-      updateUrlParams({ brandTypeIds: selectedBrandTypeIds, page: 1 });
-    }
-  }, [selectedBrandTypeIds]);
-
-  // Efekat za učitavanje brendova
+  // Fetch brands when page, query, statuses, or brandTypeIds change
   useEffect(() => {
     if (currentPage >= 1) {
       fetchBrands(
         currentPage,
         queryParam || undefined,
-        searchParams.getAll("status"),
-        searchParams.getAll("brandTypeId")
+        selectedStatuses,
+        selectedBrandTypeIds
       );
     }
-  }, [currentPage, queryParam, searchParams]);
+  }, [currentPage, queryParam, selectedStatuses, selectedBrandTypeIds]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
