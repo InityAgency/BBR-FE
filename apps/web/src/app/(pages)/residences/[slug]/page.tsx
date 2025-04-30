@@ -265,8 +265,8 @@ export default function ResidencePage() {
                 <StickyScrollTabs sections={sections} offset={80} />
 
 
-                <div id="overview" className="flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0">
-                    <div className="about-residence w-3/5">
+                <div id="overview" className="flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">
+                    <div className="about-residence w-full">
                         <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">
                             RESIDENCE INFORMATION
                         </span>
@@ -277,7 +277,7 @@ export default function ResidencePage() {
                             {residence.description}
                         </p>
                     </div>
-                    <div className="badges bg-secondary rounded-lg w-2/5 opacity-0">
+                    <div className="badges bg-secondary rounded-lg min-w-full lg:min-w-[40svw] opacity-0">
                         {/* Badges */}
                     </div>
                 </div>
