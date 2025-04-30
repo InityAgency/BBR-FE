@@ -354,11 +354,15 @@ export default function ResidencePage() {
                             {sortedHighlightedAmenities.map((highlightedAmenity) => (
                                 <div key={highlightedAmenity.amenity.id} className="amenity-card rounded-lg flex flex-col gap-4 transition-all">
                                     {highlightedAmenity.amenity.featuredImage ? (
-                                        <Image 
-                                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${highlightedAmenity.amenity.featuredImage}/content`}
-                                            alt={highlightedAmenity.amenity.name}
-                                            className="w-6 h-6"
-                                        />
+                                        <div className="w-full h-[300px] rounded-md overflow-hidden">
+                                            <Image 
+                                                src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${highlightedAmenity.amenity.featuredImage?.id}/content`}
+                                                alt={highlightedAmenity.amenity.name}
+                                                className="w-full h-full object-cover"
+                                                width={1000}
+                                                height={500}
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="placeholder-icon w-12 h-12 bg-zinc-800/10 rounded-md border flex items-center justify-center">
                                             <span className="text-lg text-zinc-200">{highlightedAmenity.amenity.name.charAt(0)}</span>
