@@ -179,6 +179,35 @@ export default function Footer() {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-primary-link">
+              Business Solutions
+            </h3>
+            <ul className="flex flex-col gap-1">
+              <li>
+                <Link href="/#">Marketing Solutions</Link>
+              </li>
+              <li>
+                <Link href="/#">Features</Link>
+              </li>
+              <li>
+                <Link href="/why-choose-us">Why Choose Us</Link>
+              </li>
+              <li>
+                <Link href="/#">How it Works</Link>
+              </li>
+              <li>
+                <Link href="/#">Pricing</Link>
+              </li>
+              <li>
+                <Link href="/#">About Us</Link>
+              </li>
+              <li>
+                <Link href="/#">Let’s talk</Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-bold text-primary-link">
               Developer Hub
             </h3>
             <ul className="flex flex-col gap-1">
@@ -199,6 +228,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-primary-link">Support</h3>
             <ul className="flex flex-col gap-1">
