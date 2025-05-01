@@ -449,13 +449,12 @@ export default function ResidencesPage() {
         </div>
       </div>
       <SectionLayout>
-        <div ref={residencesSectionRef} className="w-full residence-filters">
+        <div ref={residencesSectionRef} className="w-full ">
           <div className="flex flex-col gap-1 lg:gap-4 w-full">
             <div>
-              {/* Pretraga za desktop i mobilne uređaje */}
 
               {/* Desktop filteri */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 residence-filters">
                 <div className="w-full mb-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 w-5 h-5" />
@@ -543,7 +542,7 @@ export default function ResidencesPage() {
               </div>
 
               {/* Mobilno dugme za filtere */}
-              <div className="lg:hidden w-full mb-4">
+              <div className="lg:hidden w-full mb-4 residence-filters">
                 <Button 
                   variant="outline" 
                   className="w-full flex items-center justify-center gap-2"

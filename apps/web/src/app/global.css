@@ -218,3 +218,40 @@
 .prose h2:target {
   @apply bg-primary/10 -mx-4 px-4 py-2 rounded transition-colors duration-500;
 }
+
+/* Embla Carousel stilovi */
+.embla {
+  max-width: "full";
+  margin: auto;
+  --slide-height: 300px;
+  --slide-spacing: 1rem;
+}
+.embla__viewport {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(var(--slide-spacing) * -1);
+}
+.embla__slide {
+  transform: translate3d(0, 0, 0);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
+}
+.embla__slide__content {
+  border-radius: 1.8rem;
+}
+.embla__controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+.embla__buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  align-items: center;
+}

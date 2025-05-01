@@ -173,7 +173,7 @@ export default function Footer() {
                 <Link href="/#">Matchmaking Tool</Link>
               </li>
               <li>
-                <Link href="/#">Buyer FAQs</Link>
+                <Link href="/faq-buyer">Buyer FAQs</Link>
               </li>
             </ul>
           </div>

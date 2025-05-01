@@ -104,7 +104,8 @@ export default function AmenityEditPage({
     id: amenity.id,
     name: amenity.name,
     description: amenity.description || "",
-    icon: amenity.icon
+    icon: amenity.icon,
+    featuredImage: amenity.featuredImage
   };
 
   return (

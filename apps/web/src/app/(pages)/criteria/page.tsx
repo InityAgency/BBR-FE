@@ -1,7 +1,40 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
+import Carousel from "@/components/web/Carousel/ProgressCarousel";
 import FaqBlock from "@/components/web/Faq/FaqBlock";
+import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
+import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
+
+const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
+const CAROUSEL_CARDS = [
+  {
+    title: "Amenities & Facilities",
+    description:
+      "Luxury is lived in the everyday experience. We evaluate wellness offerings, spa and fitness infrastructure, concierge services, smart home integrations, and shared spaces. Everything must exceed expectations — not just meet them.",
+  },
+  {
+    title: "Investment Value",
+    description:
+      "A residence is a lifestyle and a strategic asset. We analyze market performance, price trends, rental yield, resale liquidity, and the added value brought by the brand. We also factor in tax advantages and investment incentives where applicable.",
+  },
+  {
+    title: "Service Quality",
+    description:
+      "Luxury is felt in the details — intuitive service, impeccable upkeep, and a seamless living experience. Our review covers concierge depth, maintenance standards, owner sentiment, and the brand’s ability to consistently deliver five-star hospitality at home.",
+  },
+  {
+    title: "Design & Architecture",
+    description:
+      "Aesthetic excellence and architectural vision define timeless residences. We assess the architect’s reputation, spatial innovation, material quality, interior design, and how well the design reflects the brand’s identity and lifestyle promise.",
+  },
+  {
+    title: "+ Unique Criteria",
+    description:
+      "Aesthetic excellence and architectural vision define timeless residences. We assess the architect’s reputation, spatial innovation, material quality, interior design, and how well the design reflects the brand’s identity and lifestyle promise.",
+  },
+];
 
 export default function EvaluationCriteriaPage() {
   return (
@@ -93,17 +126,17 @@ export default function EvaluationCriteriaPage() {
 
       {/* SECOND SECTION */}
       <div className="relative mx-[30px] lg:mx-[120px] mb-20">
-        <div className="flex flex-col bg-secondary rounded-xl w-full">
-          <div className="flex flex-1 px-[70px] items-center py-[64px] gap-[100px]">
+        <div className="flex bg-secondary rounded-xl w-full">
+          <div className="flex flex-col lg:flex-row px-[20px] lg:px-[70px] items-center py-[24px] lg:py-[64px] gap-[100px]">
             <Image
               src="/evaluation-top-residence.png"
               alt="about-us"
               width={690}
               height={560}
-              className="h-full w-[50%] rounded mt-[24px]"
+              className="h-full w-[100%] lg:w-[40%] rounded mt-[24px]"
             />
-            <div className="flex flex-col w-[55%] gap-[24px]">
-              <h1 className="text-center 2xl:text-[56px] text-[40px] text-left mx-auto">
+            <div className="flex flex-col w-[100%] lg:w-[60%] gap-[24px]">
+              <h1 className="2xl:text-[56px] text-[40px] mx-auto">
                 What Makes a Top Residence?
               </h1>
               <p className="text-md text-justify text-[20px] mx-auto text-white">
@@ -134,12 +167,12 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* THIRD SECTION */}
-      <div className="bg-beigeVariant1 px-[120px] py-[96px]">
-        <h1 className="text-secondary text-[56px] mb-[24px]">
+      <div className="bg-beigeVariant1 pl-[30px] py-[20px] lg:pl-[120px] lg:py-[96px] overflow-hidden">
+        <h1 className="text-secondary text-4xl lg:text-6xl mb-[24px]">
           Our Ranking Evaluation Pillars
         </h1>
-        <div className="flex gap-[200px]">
-          <div className="flex place-self-end gap-[12px]">
+        <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px]">
+          <div className="flex place-self-start gap-[12px] lg:place-self-end">
             <Button
               onClick={() => {}}
               className="place-self-start lg:place-self-center"
@@ -154,17 +187,19 @@ export default function EvaluationCriteriaPage() {
               Explore residences
             </Button>
           </div>
-          <p className="text-blackBlueVariant1 w-[50%] text-justify">
+          <p className="text-blackBlueVariant1 lg:w-[50%] text-justify">
             We don’t just list properties—we evaluate them. Every ranked
             residence is scored through a dynamic system that adapts to context,
             location, lifestyle, and value potential. Our model evolves as the
             market does, powered by AI and verified by expert review.
           </p>
         </div>
-        <div className="flex mt-[56px] gap-[24px]">
-          <div className="flex flex-col bg-secondary h-[500px] w-[540px] rounded-xl p-[32px]">
-            <h1 className="text-[36px] mb-[24px]">Location & Area</h1>
-            <h2 className="text-justify text-[18px]">
+        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[500px]">
+          <div className="flex flex-col bg-secondary max-w-[540px] mr-[30px] rounded-xl p-[16px] lg:p-[32px]">
+            <h1 className="text-xl lg:text-[36px] mb-[10px] lg:mb-[24px]">
+              Location & Area
+            </h1>
+            <h2 className="text-justify text-[12px] lg:text-[18px]">
               The foundation of every exceptional residence is where it stands.
               We assess the micro and macro context — proximity to landmarks,
               cultural richness, safety, connectivity, and long-term
@@ -176,24 +211,24 @@ export default function EvaluationCriteriaPage() {
               alt="about-us"
               width={200}
               height={480}
-              className="max-h-[200px] w-full rounded mt-[24px]"
+              className="max-h-[200px]  w-full rounded mt-[24px]"
             />
           </div>
-          <div className="text-black place-self-center">
-            PLACE CAROUSEL HERE
+          <div className="text-black place-self-start h-full w-full overflow-hidden">
+            <Carousel slides={CAROUSEL_CARDS} options={CAROUSEL_OPTIONS} />
           </div>
         </div>
       </div>
 
       {/* FOURTH SECTION */}
-      <div className="bg-white px-[120px] py-[84px]">
-        <div className="flex flex-col gap-[56px] bg-beigeVariant2 rounded-xl p-[64px]">
-          <div className="flex gap-[48px]">
-            <h1 className="text-[56px] text-black w-[50%]">
+      <div className="bg-white px-[30px] py-[20px] lg:px-[120px] lg:py-[84px]">
+        <div className="flex flex-col gap-[56px] bg-beigeVariant2 rounded-xl p-[32px] lg:p-[64px]">
+          <div className="flex flex-col lg:flex-row gap-[48px]">
+            <h1 className="text-4xl lg:text-6xl text-black lg:w-[50%]">
               The Evaluation Process
               <span className="text-primary"> AI-Powered.</span> Expert-Curated
             </h1>
-            <h2 className="text-[18px] text-blackBlueVariant1 w-[50%] place-self-end">
+            <h2 className="text-[18px] text-blackBlueVariant1 lg:w-[50%] place-self-end">
               Evaluation criteria are essential for assessing property quality
               and helping buyers make informed decisions. Properties are
               evaluated based on factors such as location, design, amenities,
@@ -202,7 +237,7 @@ export default function EvaluationCriteriaPage() {
               meaningful comparisons and guiding purchasing decisions.
             </h2>
           </div>
-          <div className="flex gap-[40px]">
+          <div className="flex flex-col lg:flex-row gap-[40px]">
             <div className="flex flex-col gap-[44px]">
               <div className="flex gap-[24px]">
                 <Image
@@ -264,7 +299,7 @@ export default function EvaluationCriteriaPage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col w-[400px] bg-white rounded-xl px-[32px] py-[24px] min-w-[470px] gap-[24px]">
+            <div className="flex flex-col bg-white rounded-xl px-[20px] py-[16px] lg:px-[32px] lg:py-[24px] min-w-[200px] gap-[24px]">
               <h1 className="text-[28px] text-blackBlueVariant1">Benefits</h1>
               <div className="flex gap-[12px]">
                 <Image
@@ -327,15 +362,15 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* FIFTH SECTION */}
-      <div className="flex bg-beigeVariant1 px-[120px] py-[96px] gap-[56px]">
+      <div className="flex flex-col lg:flex-row bg-beigeVariant1 px-[40px] py-[28px] lg:px-[120px] lg:py-[96px] gap-[56px]">
         <Image
           src="/evaluation-custom-rankings.png"
           alt="about-us"
           width={780}
           height={530}
-          className="h-full w-[50%] rounded mt-[24px]"
+          className="h-full lg:w-[50%] rounded mt-[24px]"
         />
-        <div className="flex flex-col w-[50%] gap-[24px]">
+        <div className="flex flex-col lg:w-[50%] gap-[24px]">
           <h1 className="text-center text-black 2xl:text-[56px] text-[40px] text-left mx-auto">
             Custom Rankings. Relevant Comparisons.
           </h1>
@@ -364,7 +399,103 @@ export default function EvaluationCriteriaPage() {
         </div>
       </div>
 
+      {/* SIXTH SECTION */}
+      <div className="bg-beigeVariant3 px-[40px] py-[24px] lg:px-[120px] lg:py-[96px]">
+        <div className="flex flex-col lg:flex-row justify-between">
+          <h1 className="text-xl lg:text-6xl text-black">
+            Built for Buyers, Brokers and Developers Who Demand Clarity
+          </h1>
+          <div className="flex flex-col rounded-xl bg-beigeVariant4 p-[24px] gap-[24px]">
+            <h3 className="text-black text-xl lg:text-2xl">
+              "The BBR Score gave our buyers real confidence. It’s like a
+              Michelin star for real estate."
+            </h3>
+            <div className="flex gap-[10px]">
+              <Image
+                src="/jack-michaels.png"
+                alt="Jack Michaels"
+                height={56}
+                width={56}
+              />
+              <div className="flex flex-col gap-2">
+                <p className="text-black text-[20px]">Jack Michaels</p>
+                <p className="text-black text-[16px]">
+                  International Property Advisor
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full mt-6 mb-2 lg:mt-12 lg:mb-8">
+          <div className="flex flex-col bg-beigeVariant2 justify-center w-full p-[32px] gap-4 border-t-2 border-beigeVariant4">
+            <h1 className="text-[28px] text-black">Precision</h1>
+            <p className="text-black">
+              Eliminate the noise — focus only on properties that meet elite
+              standards
+            </p>
+          </div>
+
+          <div className="flex flex-col bg-beigeVariant2 justify-center w-full p-[32px] gap-4 border-t-2 border-beigeVariant4">
+            <h1 className="text-[28px] text-black">Speed & Scale </h1>
+            <p className="text-black">
+              Evaluate opportunities globally in minutes, not months
+            </p>
+          </div>
+
+          <div className="flex flex-col bg-beigeVariant2 justify-center w-full p-[32px] gap-4 border-t-2 border-beigeVariant4">
+            <h1 className="text-[28px] text-black">Trust & Transparency </h1>
+            <p className="text-black">
+              Eliminate the noise — focus only on properties that meet elite
+              standards
+            </p>
+          </div>
+
+          <div className="flex flex-col bg-beigeVariant2 justify-center w-full p-[32px] gap-4 border-t-2 border-beigeVariant4">
+            <h1 className="text-[28px] text-black">Competitive Advantage </h1>
+            <p className="text-black">
+              Eliminate the noise — focus only on properties that meet elite
+              standards
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* SEVENTH SECTION */}
       <FaqBlock />
+
+      {/* EIGHTH SECTION */}
+      <div className="flex gap-[80px] bg-secondary px-[32px] py-[16px] lg:py-[130px] lg:px-[176px]">
+        <div className="contact-form-wrapper w-full lg:w-[80%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px]">
+          <div className="flex flex-col gap-4">
+            <p className="text-[16px] text-primary">GET IN TOUCH</p>
+            <h1 className="text-3xl lg:text-6xl">Connect with Our Experts</h1>
+            <p className="text-[18px] text-justify">
+              Have questions or need personalized assistance? Our dedicated
+              consultants provide tailored guidance, ensuring you make the right
+              investment choices with confidence.
+            </p>
+            <p className="text-[18px] text-justify">
+              Whether you are looking for a luxury home, a profitable
+              investment, or an exclusive lifestyle experience, our consultants
+              are here to help.
+            </p>
+            <Button onClick={() => {}} className="place-self-start">
+              Schedule a consultation
+            </Button>
+            <Image
+              src="/connect-with-experts.png"
+              width={2800}
+              height={1600}
+              alt="Connect With Experts"
+              className="w-full h-full"
+            />
+          </div>
+          <div className="flex flex-col gap-4">
+            <RequestConsultationForm />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

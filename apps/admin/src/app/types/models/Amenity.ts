@@ -1,4 +1,11 @@
 export interface Amenity {
+  featuredImage?: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  } | null;
   id: string;
   name: string;
   description?: string;

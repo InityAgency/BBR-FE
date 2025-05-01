@@ -78,7 +78,7 @@ type MenuItem = {
     allResidences: {
       title: "All Residences",
       href: "/residences", // Direktan link
-      tabs: ["Country", "City", "Geographical Area", "Lifestyle", "Property Type", "Price Range"],
+      tabs: ["Country", "City", "Geographical Area", "Lifestyle", "Brands"],
       content: {
         Country: [
           { label: "Europe", href: "/residences/europe" },
@@ -121,7 +121,7 @@ type MenuItem = {
           { label: "Chalets", href: "/residences/chalets" },
           { label: "Penthouses", href: "/residences/penthouses" },
         ],
-        "Price Range": [
+        "Brands": [
           { label: "Luxury ($1M+)", href: "/residences/luxury" },
           { label: "Premium ($500K-$1M)", href: "/residences/premium" },
           { label: "Mid-Range ($250K-$500K)", href: "/residences/mid-range" },

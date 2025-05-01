@@ -1,51 +1,66 @@
-import * as Tabs from "@radix-ui/react-tabs";
-import React from "react";
-import clsx from "clsx"; // koristi ako želiš da kombinuješ klase bez problema
+"use client";
 
-type TabItem = {
-  label: string;
-  value: string;
-  content: React.ReactNode;
-};
+import * as React from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
 
-type CustomTabsProps = {
-  tabs: TabItem[];
-  defaultValue?: string;
-  className?: string; // <- dodat prop
-};
+import { cn } from "@/lib/utils";
 
-const tabClasses =
-  "px-4 py-2 border-b-2 transition-colors duration-200 border-transparent text-gray-500 data-[state=active]:border-primary data-[state=active]:text-primary whitespace-nowrap";
-
-const CustomTabs: React.FC<CustomTabsProps> = ({
-  tabs,
-  defaultValue,
+function Tabs({
   className,
-}) => {
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
-    <Tabs.Root
-      defaultValue={defaultValue || tabs[0]?.value}
-      className={clsx("w-full", className)}
-    >
-      <Tabs.List className="flex flex-wrap border-b border-primary justify-between overflow-x-auto whitespace-nowrap">
-        {tabs.map((tab) => (
-          <Tabs.Trigger
-            key={tab.value}
-            value={tab.value}
-            className={tabClasses}
-          >
-            {tab.label}
-          </Tabs.Trigger>
-        ))}
-      </Tabs.List>
-
-      {tabs.map((tab) => (
-        <Tabs.Content key={tab.value} value={tab.value} className="p-4">
-          {tab.content}
-        </Tabs.Content>
-      ))}
-    </Tabs.Root>
+    <TabsPrimitive.Root
+      data-slot="tabs"
+      className={cn("flex flex-col gap-2", className)}
+      {...props}
+    />
   );
-};
+}
 
-export default CustomTabs;
+function TabsList({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List>) {
+  return (
+    <TabsPrimitive.List
+      data-slot="tabs-list"
+      className={cn(
+        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+  return (
+    <TabsPrimitive.Trigger
+      data-slot="tabs-trigger"
+      className={cn(
+        "data-[state=active]:bg-background data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/50 inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  return (
+    <TabsPrimitive.Content
+      data-slot="tabs-content"
+      className={cn("flex-1 outline-none", className)}
+      {...props}
+    />
+  );
+}
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };
