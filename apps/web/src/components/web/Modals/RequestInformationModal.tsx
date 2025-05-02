@@ -33,9 +33,9 @@ export function RequestInformationModal({
 }: RequestInformationModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose} >
-      <DialogContent>
+      <DialogContent className="p-4 lg:p-8 min-w-[100svw] lg:min-w-[50vw] xl:min-w-[40vw] max-h-[100svh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-3xl font-medium text-left lg:text-left mx-auto mt-4 mb-4">
+          <DialogTitle className="text-2xl lg:text-4xl font-medium text-left lg:text-left mx-auto me-2">
             Would you like to know more about Four Seasons Private Residences in Miami?
           </DialogTitle>
           <RequestConsultationForm 
