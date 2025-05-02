@@ -18,6 +18,8 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-quaternary: var(--quaternary);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -62,6 +64,10 @@
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.985 0 0); /* Changed to white */
+  --tertiary: oklch(0.17 0.0076 229.43); /* #0C1012 */
+  /* TODO: ADD --tertiary-foreground if needed */
+  --quaternary: oklch(0.22 0.0084 240.29); /* #171B1E */
+  /* TODO: ADD --quaternary-foreground if needed */
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
   --accent: oklch(0.967 0.001 286.375);
@@ -105,6 +111,10 @@
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.19 0.0098 234.36);
   --secondary-foreground: oklch(0.985 0 0); /* Already white */
+  --tertiary: oklch(0.17 0.0076 229.43); /* #0C1012 */
+  /* TODO: ADD --tertiary-foreground if needed */
+  --quaternary: oklch(0.22 0.0084 240.29); /* #171B1E */
+  /* TODO: ADD --quaternary-foreground if needed */
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
@@ -219,7 +229,7 @@
   @apply bg-primary/10 -mx-4 px-4 py-2 rounded transition-colors duration-500;
 }
 
-/* Embla Carousel stilovi */
+/* #region Progress Carousel stilovi */
 .embla {
   max-width: "full";
   margin: auto;
@@ -255,3 +265,95 @@
   gap: 0.6rem;
   align-items: center;
 }
+/* #endregion */
+
+/* #region Slides Per View Carousel stilovi */
+.embla_slides_per_view {
+  display: flex;
+  width: 100%;
+  gap: 18px;
+  --slide-height--slides-per-view: 19rem;
+  --slide-spacing--slides-per-view: 1rem;
+  --slide-size--slides-per-view: 100%;
+  --slide-spacing-sm--slides-per-view: 1.6rem;
+  --slide-size-sm--slides-per-view: 50%;
+  --slide-spacing-lg--slides-per-view: 2rem;
+  --slide-size-lg--slides-per-view: calc(100% / 3);
+}
+.embla__viewport_slides_per_view {
+  overflow: hidden;
+}
+.embla__container_slides_per_view {
+  backface-visibility: visible;
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+}
+.embla__slide_slides_per_view {
+  padding: 10;
+  flex: 0 0 var(--slide-size--slides-per-view);
+}
+@media (min-width: 750px) {
+  .embla__slide_slides_per_view {
+    flex: 0 0 var(--slide-size-sm--slides-per-view);
+  }
+}
+@media (min-width: 1200px) {
+  .embla__slide_slides_per_view {
+    flex: 0 0 var(--slide-size-lg--slides-per-view);
+  }
+}
+.embla__slide__number_slides_per_view {
+  box-shadow: inset 0 0 0 1 gray;
+  border-radius: 1.8rem;
+  font-size: 4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--slide-height--slides-per-view);
+  user-select: none;
+}
+.embla__controls_slides_per_view {
+  display: flex;
+}
+.embla__buttons_slides_per_view {
+  display: flex;
+  align-items: center;
+}
+.embla__button_slides_per_view {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: inset 0 0 0 1 rgb(61, 61, 61);
+  width: 2rem;
+  height: 2rem;
+  background-color: #dadada52;
+  z-index: 1;
+  border-radius: 4;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (min-width: 750px) {
+  .embla__button_slides_per_view {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 10;
+  }
+}
+.embla__button_slides_per_view:disabled {
+  background-color: #101518;
+}
+.embla__button__svg_slides_per_view {
+  width: 35%;
+  height: 35%;
+}
+/* #endregion */

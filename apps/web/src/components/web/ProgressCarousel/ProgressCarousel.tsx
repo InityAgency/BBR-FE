@@ -15,7 +15,10 @@ type EmblaCarouselProps = {
   options?: EmblaOptionsType;
 };
 
-const EmblaCarousel: React.FC<EmblaCarouselProps> = ({ slides, options }) => {
+const ProgressCarousel: React.FC<EmblaCarouselProps> = ({
+  slides,
+  options,
+}) => {
   const [emblaRef, emblaApi] = useEmblaCarousel(options);
 
   const {
@@ -57,4 +60,4 @@ const EmblaCarousel: React.FC<EmblaCarouselProps> = ({ slides, options }) => {
   );
 };
 
-export default EmblaCarousel;
+export default ProgressCarousel;
