@@ -10,9 +10,10 @@ export const formSchema = z.object({
     termsAccepted: z.boolean().refine(val => val === true, {
         message: "You must agree to the terms and conditions"
     }),
-    type: z.literal("CONSULTATION"),
+    type: z.enum(["CONSULTATION", "MORE_INFORMATION", "CONTACT_US"]).default("CONSULTATION"),
     phoneNumber: z.string().min(1, "Phone is required"),
-    preferredContactMethod: z.array(z.enum(["EMAIL", "PHONE", "WHATSAPP"])).min(1, "At least one contact method is required")
+    preferredContactMethod: z.array(z.enum(["EMAIL", "PHONE", "WHATSAPP"])).min(1, "At least one contact method is required"),
+    entityId: z.string().optional() 
 });
 
 // Definicija tipa za podatke forme

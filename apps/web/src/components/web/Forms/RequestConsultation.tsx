@@ -23,7 +23,23 @@ import {
 import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
 
-export default function RequestConsultationForm() {
+interface RequestConsultationFormProps {
+  className?: string;
+  showTitle?: boolean;
+  customTitle?: string;
+  entityId?: string;
+  type?: "CONSULTATION" | "MORE_INFORMATION" | "CONTACT_US";
+  buttonText?: string;
+}
+
+export default function RequestConsultationForm({
+  className = "",
+  showTitle = true,
+  customTitle = "Contact our expert",
+  entityId,
+  type = "CONSULTATION", 
+  buttonText = "Send Message" 
+}: RequestConsultationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -35,7 +51,8 @@ export default function RequestConsultationForm() {
       phoneNumber: "",
       message: "",
       termsAccepted: false,
-      type: "CONSULTATION",
+      type: type,
+      entityId: entityId,  
       preferredContactMethod: [],
     },
   });
@@ -56,8 +73,10 @@ export default function RequestConsultationForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full flex-col items-center justify-center gap-12 border rounded-lg custom-card contact-form">
-      <h2 className="text-2xl font-bold w-full">Contact our expert</h2>
+    <div className={`flex flex-col gap-4 p-4 lg:p-8 h-full flex-col items-center justify-center gap-12 border rounded-lg custom-card contact-form ${className}`}>
+      {showTitle && (
+        <h2 className="text-2xl font-bold w-full">{customTitle}</h2>
+      )}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -222,7 +241,7 @@ export default function RequestConsultationForm() {
           />
 
           <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? "Sending..." : "Send Message"}
+            {isLoading ? "Sending..." : buttonText} {/* Koristimo buttonText ovde */}
           </Button>
         </form>
       </Form>

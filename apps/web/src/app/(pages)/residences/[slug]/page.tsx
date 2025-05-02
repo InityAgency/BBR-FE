@@ -10,6 +10,7 @@ import Image from "next/image";
 import { ArrowRight, Lock } from "lucide-react";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { RequestInformationModal } from "@/components/web/Modals/RequestInformationModal";
 
 interface MediaImage {
     id: string;
@@ -39,6 +40,7 @@ export default function ResidencePage() {
     const [galleryImages, setGalleryImages] = useState<MediaImage[]>([]);
     const [similarResidences, setSimilarResidences] = useState<Residence[]>([]);
     const [loadingSimilar, setLoadingSimilar] = useState(false);
+    const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
     
     const params = useParams();
     const residenceSlug = params.slug as string;
@@ -173,14 +175,12 @@ export default function ResidencePage() {
                         </div>
                     </div>
                     <div className="w-full lg:w-fit flex gap-2 mb-4 lg:mb-0">
-                        <Link href="#" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"> 
+                        <button 
+                            onClick={() => setIsRequestInfoModalOpen(true)}
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
+                        >
                             Request Information 
-                        </Link>
-                        {/* <Link href="#" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-[#1a1e21] hover:bg-[#252F37] border border-[#29343D] text-primary-foreground shadow-xs h-9 px-1 py-1 has-[>svg]:px-1 w-[36px] w-fit">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M19.25 2.625C18.6953 2.62481 18.1473 2.74636 17.6446 2.98105C17.1419 3.21575 16.6969 3.55789 16.3409 3.98332C15.9849 4.40876 15.7266 4.90713 15.5842 5.44328C15.4417 5.97944 15.4187 6.54031 15.5167 7.08633L9.99836 10.9503C9.97076 10.9694 9.94427 10.9901 9.91902 11.0122C9.35918 10.5745 8.68763 10.303 7.98093 10.2286C7.27424 10.1542 6.56086 10.2798 5.92214 10.5913C5.28342 10.9027 4.74506 11.3873 4.36846 11.9899C3.99186 12.5925 3.79218 13.2888 3.79218 13.9994C3.79218 14.71 3.99186 15.4063 4.36846 16.0089C4.74506 16.6115 5.28342 17.0961 5.92214 17.4076C6.56086 17.719 7.27424 17.8447 7.98093 17.7702C8.68763 17.6958 9.35918 17.4243 9.91902 16.9867C9.94424 17.0092 9.97073 17.0302 9.99836 17.0497L15.5167 20.9137C15.3529 21.8269 15.5296 22.7685 16.0133 23.5602C16.4971 24.3518 17.2543 24.9387 18.1417 25.2096C19.029 25.4805 19.9849 25.4167 20.8284 25.0301C21.6718 24.6436 22.3443 23.9613 22.7184 23.1123C23.0926 22.2633 23.1425 21.3066 22.8587 20.4233C22.5749 19.54 21.977 18.7914 21.1784 18.3192C20.3797 17.847 19.4356 17.6841 18.5249 17.8612C17.6142 18.0384 16.8 18.5433 16.2365 19.2803L11.011 15.6228C11.2444 15.1305 11.375 14.581 11.375 14C11.375 13.419 11.2444 12.8683 11.011 12.3772L16.2377 8.7185C16.6292 9.23098 17.145 9.63513 17.7362 9.89273C18.3274 10.1503 18.9746 10.2529 19.6165 10.1906C20.2584 10.1284 20.8739 9.9035 21.4046 9.53715C21.9354 9.17079 22.3639 8.67511 22.6497 8.09698C22.9355 7.51884 23.0691 6.87737 23.0379 6.2332C23.0067 5.58904 22.8117 4.96348 22.4714 4.41568C22.131 3.86788 21.6566 3.41594 21.0929 3.1026C20.5292 2.78927 19.8949 2.62488 19.25 2.625ZM17.2084 6.41667C17.2084 5.87518 17.4235 5.35588 17.8063 4.97299C18.1892 4.5901 18.7085 4.375 19.25 4.375C19.7915 4.375 20.3108 4.5901 20.6937 4.97299C21.0766 5.35588 21.2917 5.87518 21.2917 6.41667C21.2917 6.95815 21.0766 7.47746 20.6937 7.86034C20.3108 8.24323 19.7915 8.45833 19.25 8.45833C18.7085 8.45833 18.1892 8.24323 17.8063 7.86034C17.4235 7.47746 17.2084 6.95815 17.2084 6.41667ZM7.58336 11.9583C7.04187 11.9583 6.52257 12.1734 6.13968 12.5563C5.75679 12.9392 5.54169 13.4585 5.54169 14C5.54169 14.5415 5.75679 15.0608 6.13968 15.4437C6.52257 15.8266 7.04187 16.0417 7.58336 16.0417C8.12484 16.0417 8.64415 15.8266 9.02703 15.4437C9.40992 15.0608 9.62502 14.5415 9.62502 14C9.62502 13.4585 9.40992 12.9392 9.02703 12.5563C8.64415 12.1734 8.12484 11.9583 7.58336 11.9583ZM19.25 19.5417C18.7085 19.5417 18.1892 19.7568 17.8063 20.1397C17.4235 20.5225 17.2084 21.0418 17.2084 21.5833C17.2084 22.1248 17.4235 22.6441 17.8063 23.027C18.1892 23.4099 19.7915 23.625 19.25 23.625C19.7915 23.625 20.3108 23.4099 20.6937 23.027C21.0766 22.6441 21.2917 22.1248 21.2917 21.5833C21.2917 21.0418 21.0766 20.5225 20.6937 20.1397C20.3108 19.7568 19.7915 19.5417 19.25 19.5417Z" fill="white"/>
-                            </svg>
-                        </Link> */}
+                        </button>
                     </div>
                 </div>
 
@@ -261,6 +261,14 @@ export default function ResidencePage() {
                 />
             )}
             
+            <RequestInformationModal 
+                isOpen={isRequestInfoModalOpen}
+                onClose={() => setIsRequestInfoModalOpen(false)}
+                entityId={residence.id} 
+                type="MORE_INFORMATION" 
+                buttonText="Request More Information"
+            />
+                        
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />
 
