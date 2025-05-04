@@ -236,10 +236,10 @@ export default function Footer() {
                 <Link href="/#">Customer Support</Link>
               </li>
               <li>
-                <Link href="/#">Suggest A Feature</Link>
+                <Link href="/suggest-feature">Suggest A Feature</Link>
               </li>
               <li>
-                <Link href="/#">Report An Error</Link>
+                <Link href="/report-issue">Report An Error</Link>
               </li>
             </ul>
           </div>
