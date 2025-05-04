@@ -8,14 +8,21 @@ import { cn } from "@/lib/utils"
 import { navigationData } from "./navigation-data"
 
 type NavigationStep = "main" | "tabs" | "content"
+type NavigationData = typeof navigationData;
 
 interface MobileMegaMenuProps {
   isOpen: boolean
   onClose: () => void
-  animationType?: "slide-right" | "slide-down" // Dodajemo opciju za tip animacije
+  animationType?: "slide-right" | "slide-down"
+  navigationData: NavigationData
 }
 
-export function MobileMegaMenu({ isOpen, onClose, animationType = "slide-right" }: MobileMegaMenuProps) {
+export function MobileMegaMenu({ 
+  isOpen, 
+  onClose, 
+  animationType = "slide-right",
+  navigationData 
+}: MobileMegaMenuProps) {
   const [visibleView, setVisibleView] = useState<NavigationStep>("main")
   const [previousView, setPreviousView] = useState<NavigationStep | null>(null)
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -226,9 +233,13 @@ export function MobileMegaMenu({ isOpen, onClose, animationType = "slide-right" 
                       <Link
                         key={index}
                         href={item.href}
-                        className="block py-2 hover:bg-white/5 rounded-lg px-2 transition-all duration-200"
+                        className="block py-2 hover:bg-white/5 rounded-lg px-2 transition-all duration-200 mb-0"
+                        onClick={onClose}
                       >
                         {item.label}
+                        {item.description && (
+                          <span className="block text-sm text-gray-400">{item.description}</span>
+                        )}
                       </Link>
                     ))}
                   </div>

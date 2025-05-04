@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { MegaMenuContent } from "./mega-menu-content";
 import { MobileMegaMenu } from "./mobile-mega-menu";
-import { navigationData } from "./navigation-data";
+import { navigationData, getNavigationDataWithCities } from "./navigation-data";
 import { usePathname } from "next/navigation";
 
 type MobileMenuAnimation = "slide-right" | "slide-down";
+type NavigationData = typeof navigationData;
 
 export function MegaMenu() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -19,8 +20,27 @@ export function MegaMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileMenuAnimation] = useState<MobileMenuAnimation>("slide-right");
+  const [navData, setNavData] = useState<NavigationData>(navigationData);
+  const [isLoading, setIsLoading] = useState(true);
 
   const pathname = usePathname();
+
+  // Učitavanje gradova iz API-ja
+  useEffect(() => {
+    async function loadCities() {
+      try {
+        setIsLoading(true);
+        const updatedNavData = await getNavigationDataWithCities();
+        setNavData(updatedNavData);
+      } catch (error) {
+        console.error("Failed to load cities:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadCities();
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -40,15 +60,11 @@ export function MegaMenu() {
   useEffect(() => {
     setActiveMenu(null);
     setIsMobileMenuOpen(false);
-  }, []);
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
   }, [pathname]);
 
   const handleMouseEnter = (menuName: string) => {
     setActiveMenu(menuName);
-    const firstTab = navigationData[menuName]?.tabs[0] || "";
+    const firstTab = navData[menuName]?.tabs[0] || "";
     setActiveTab(firstTab);
   };
 
@@ -84,14 +100,14 @@ export function MegaMenu() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex flex-row gap-8 items-center">
-            {Object.keys(navigationData).map((menuName) => (
+            {Object.keys(navData).map((menuName) => (
               <div
                 key={menuName}
                 className="relative group"
                 onMouseEnter={() => handleMouseEnter(menuName)}
               >
                 <Link
-                  href={navigationData[menuName].href}
+                  href={navData[menuName].href}
                   className={cn(
                     "flex flex-row gap-1 items-center cursor-pointer",
                     activeMenu === menuName
@@ -99,7 +115,7 @@ export function MegaMenu() {
                       : "text-white"
                   )}
                 >
-                  {navigationData[menuName].title}
+                  {navData[menuName].title}
                   <ChevronDown
                     className={cn(
                       "w-4 h-4 transition-transform",
@@ -146,6 +162,7 @@ export function MegaMenu() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         animationType={mobileMenuAnimation}
+        navigationData={navData}
       />
 
       {/* Mega Menu - Desktop */}
@@ -155,6 +172,7 @@ export function MegaMenu() {
             activeMenu={activeMenu}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            navigationData={navData}
           />
         </div>
       )}

@@ -5,13 +5,21 @@ import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { navigationData } from "./navigation-data"
 
+type NavigationData = typeof navigationData;
+
 interface MegaMenuContentProps {
   activeMenu: string
   activeTab: string
   setActiveTab: (tab: string) => void
+  navigationData: NavigationData
 }
 
-export function MegaMenuContent({ activeMenu, activeTab, setActiveTab }: MegaMenuContentProps) {
+export function MegaMenuContent({ 
+  activeMenu, 
+  activeTab, 
+  setActiveTab,
+  navigationData 
+}: MegaMenuContentProps) {
   const menuData = navigationData[activeMenu]
 
   if (!menuData) return null
@@ -56,6 +64,9 @@ export function MegaMenuContent({ activeMenu, activeTab, setActiveTab }: MegaMen
               className="text-white hover:text-[#b3804c] transition-all duration-200 hover:translate-x-1"
             >
               {item.label}
+              {item.description && (
+                <span className="block text-sm text-gray-400">{item.description}</span>
+              )}
             </Link>
           ))}
         </div>

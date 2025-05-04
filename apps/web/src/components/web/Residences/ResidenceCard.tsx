@@ -18,8 +18,9 @@ export function ResidenceCard({ residence }: ResidenceCardProps) {
             <Image
               src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${residence.featuredImage.id}/content`}
               alt={residence.name}
-              fill
-              className="object-cover"
+              width={1000}
+              height={1000}
+              className="object-cover w-full h-full"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-secondary">
