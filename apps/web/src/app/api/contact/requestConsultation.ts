@@ -3,18 +3,17 @@
 import { z } from "zod";
 // Definicija šeme za validaciju forme
 export const formSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-  termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the terms and conditions",
-  }),
-  type: z.literal("CONSULTATION"),
-  phoneNumber: z.string().min(1, "Phone is required"),
-  preferredContactMethod: z
-    .array(z.enum(["EMAIL", "PHONE", "WHATSAPP"]))
-    .min(1, "At least one contact method is required"),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    message: z.string().min(10, "Message must be at least 10 characters"),
+    termsAccepted: z.boolean().refine(val => val === true, {
+        message: "You must agree to the terms and conditions"
+    }),
+    type: z.enum(["CONSULTATION", "MORE_INFORMATION", "CONTACT_US"]).default("CONSULTATION"),
+    phoneNumber: z.string().min(1, "Phone is required"),
+    preferredContactMethod: z.array(z.enum(["EMAIL", "PHONE", "WHATSAPP"])).min(1, "At least one contact method is required"),
+    entityId: z.string().optional() 
 });
 
 // Definicija tipa za podatke forme
