@@ -1,6 +1,6 @@
 "use client";
 
-import { z } from "zod";    
+import { z } from "zod";
 // Definicija šeme za validaciju forme
 export const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -20,24 +20,27 @@ export const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 export const contactService = {
-    async sendMessage(data: FormValues) {
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/public/requests`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data),
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to send message: ${response.status}`);
-            }
-            
-            return await response.json();
-        } catch (error) {
-            console.error("Error in contactService:", error);
-            throw error;
+  async sendMessage(data: FormValues) {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/public/requests`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to send message: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error in contactService:", error);
+      throw error;
     }
+  },
 };

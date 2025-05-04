@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Carousel from "@/components/web/Carousel/ProgressCarousel";
+import ProgressCarousel from "@/components/web/ProgressCarousel/ProgressCarousel";
 import FaqBlock from "@/components/web/Faq/FaqBlock";
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
 import { EmblaOptionsType } from "embla-carousel";
@@ -215,7 +215,10 @@ export default function EvaluationCriteriaPage() {
             />
           </div>
           <div className="text-black place-self-start h-full w-full overflow-hidden">
-            <Carousel slides={CAROUSEL_CARDS} options={CAROUSEL_OPTIONS} />
+            <ProgressCarousel
+              slides={CAROUSEL_CARDS}
+              options={CAROUSEL_OPTIONS}
+            />
           </div>
         </div>
       </div>
