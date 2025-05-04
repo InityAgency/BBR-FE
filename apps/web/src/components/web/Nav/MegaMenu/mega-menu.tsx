@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import { MegaMenuContent } from "./mega-menu-content";
 import { MobileMegaMenu } from "./mobile-mega-menu";
 import { navigationData } from "./navigation-data";
-// Dodajte import za usePathname na vrhu fajla
 import { usePathname } from "next/navigation";
 
-// Tip animacije za mobilni meni
 type MobileMenuAnimation = "slide-right" | "slide-down";
 
 export function MegaMenu() {
@@ -20,11 +18,8 @@ export function MegaMenu() {
   const [activeTab, setActiveTab] = useState<string>("");
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // Možete promeniti tip animacije ovde - "slide-right" ili "slide-down"
   const [mobileMenuAnimation] = useState<MobileMenuAnimation>("slide-right");
 
-  // Unutar komponente MegaMenu, dodajte usePathname hook
-  // Dodajte ovo odmah nakon deklaracije drugih state varijabli
   const pathname = usePathname();
 
   // Close menu when clicking outside
@@ -47,17 +42,12 @@ export function MegaMenu() {
     setIsMobileMenuOpen(false);
   }, []);
 
-  // Dodajte novi useEffect koji prati promene rute
-  // Dodajte ovo nakon postojećih useEffect-a
   useEffect(() => {
-    // Zatvaramo mobilni meni kada se promeni ruta
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Funkcije za hover
   const handleMouseEnter = (menuName: string) => {
     setActiveMenu(menuName);
-    // Set the first tab as active by default
     const firstTab = navigationData[menuName]?.tabs[0] || "";
     setActiveTab(firstTab);
   };

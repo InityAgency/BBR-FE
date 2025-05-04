@@ -90,29 +90,29 @@ export default function BrandsPage() {
                 </div>
             </div>
             <SectionLayout>
-                <div ref={brandsSectionRef} className="">
+                <div ref={brandsSectionRef} className="w-full">
                     <div className="flex flex-col gap-1 lg:gap-8 w-full">
-                        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center justify-between">
+                        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center justify-between w-full">
                             <h2 className="text-4xl font-bold text-left">Top Branded Residences by Brands</h2>
-                            <div className="max-w-lg w-full lg:w-auto relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-6 h-6 " />
+                            <div className="lg:max-w-lg w-full lg:w-auto relative">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4 lg:w-6 lg:h-6 " />
                                 <Input
                                     placeholder="Search by brand name"
                                     value={search}
                                     onChange={handleSearch}
-                                    className="h-12 bg-secondary text-lg pl-12 w-100"
+                                    className="lg:h-12 bg-secondary text-md lg:text-lg pl-8 lg:pl-12 w-full"
                                 />
                             </div>
                         </div>
                         {loading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4 lg:mt-16">
                                 {[...Array(12)].map((_, i) => (
                                     <BrandCardSkeleton key={i} />
                                 ))}
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4 lg:mt-16">
                                     {brands.map((brand) => (
                                         <BrandCard key={brand.id} brand={brand} />
                                     ))}
