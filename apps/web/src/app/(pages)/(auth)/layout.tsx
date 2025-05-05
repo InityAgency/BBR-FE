@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return(
     <div className="grid lg:grid-cols-2">
         <div className="flex flex-col gap-4 p-6 md:p-10 items-center">
-          <div className="w-full min-h-[50svh] flex flex-col items-center justify-center">
+          <div className="w-full min-h-[75svh] xl:max-w-[30svw] flex flex-col items-center justify-center">
               {children}
           </div>
         </div>
