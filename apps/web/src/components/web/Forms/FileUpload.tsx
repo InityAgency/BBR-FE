@@ -150,7 +150,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         >
           <Upload className={`h-8 w-8 ${error ? 'text-destructive' : 'text-muted-foreground'}`} />
           <div className="text-sm text-center">
-            <p className="font-medium">Upload your CV</p>
+            <p className="font-medium">Upload your files</p>
             <p className="text-xs text-muted-foreground">
               {supportedFormats.join(', ')} formats are supported
             </p>

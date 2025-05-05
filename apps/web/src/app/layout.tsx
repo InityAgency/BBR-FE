@@ -7,6 +7,7 @@ import "@/styles/global.scss";
 import Footer from "@/components/web/Footer/Footer";
 import MiniNav from "@/components/web/Nav/MiniNav";
 import PrimaryNav from "@/components/web/Nav/PrimaryNav";
+import ClientLayout from "@/components/web/ClientLayout"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,11 +35,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <MiniNav />
-          <PrimaryNav />
-          {children}
-          <Toaster position="top-center" visibleToasts={9} richColors closeButton theme="dark" />
-          <Footer />
+          <ClientLayout> 
+            <MiniNav />
+            <PrimaryNav />
+            {children}
+            <Toaster position="top-center" visibleToasts={9} richColors closeButton theme="dark" />
+            <Footer />
+          </ClientLayout> 
         </ThemeProvider>
       </body>
     </html>

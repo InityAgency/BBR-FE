@@ -3,22 +3,58 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Phone, User } from "lucide-react"; // For the user icon
-import { useState } from "react";
+import { Mail, Phone, User, LogOut, BellRing, Settings, HelpCircle, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
 
 export default function MiniNav() {
-    // Simulate login state (this would come from your auth system later)
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { user, isLoading, logout } = useAuth();
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
     
-    // Simulated user data (this would come from backend)
-    const simulatedUser = {
-        name: "John Doe",
-        avatarUrl: "https://github.com/shadcn.png" // Example avatar
+    useEffect(() => {
+      function handleClickOutside(event: MouseEvent) {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setDropdownOpen(false);
+        }
+      }
+      
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+    
+    const handleLogout = async () => {
+      try {
+        await logout();
+        setDropdownOpen(false);
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
     };
 
-    // Toggle login state for simulation
-    const handleLoginToggle = () => {
-        setIsLoggedIn(!isLoggedIn);
+    const getInitials = (name: string) => {
+        if (!name) return "";
+        return name
+            .split(' ')
+            .map(part => part[0])
+            .join('')
+            .toUpperCase();
+    };
+    
+    const getDashboardUrl = () => {
+      if (!user) return "/";
+      
+      if (user.role?.name === "developer") {
+        return "/developer/dashboard";
+      } else if (user.role?.name === "buyer") {
+        return "/buyer/dashboard";
+      }
+      
+      return "/";
     };
 
     return (
@@ -37,33 +73,96 @@ export default function MiniNav() {
                 <Link href="/" className="hover:text-primary transition-all">Schedule a demo</Link>
                 <Link href="/" className="hover:text-primary transition-all">Developer features</Link>
                 <Link href="/" className="hover:text-primary transition-all">Marketing solutions</Link>
-                <div className="flex flex-col sm:flex-row gap-2">
-                    {isLoggedIn ? (
-                        <div className="flex items-center gap-2">
-                            <Avatar>
-                                <AvatarImage src={simulatedUser.avatarUrl} alt={simulatedUser.name} />
-                                <AvatarFallback>{simulatedUser.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-md font-medium">{simulatedUser.name}</span>
-                            {/* Simulation button - remove later */}
-                            <Button variant="ghost" size="sm" onClick={handleLoginToggle}>
-                                Logout
-                            </Button>
+                <div className="flex flex-col sm:flex-row gap-2 relative">
+                    {user ? (
+                        <div className="relative">
+                            <div 
+                                className="flex items-center gap-2 cursor-pointer py-2 px-3 rounded-md hover:secondary dark:hover:bg-secondary transition-colors"
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                            >
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src={user.company?.image_id || ""} alt={user.fullName} />
+                                    <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium">{user.fullName}</span>
+                                    <span className="text-xs text-muted-foreground">{user.role?.name}</span>
+                                </div>
+                                <ChevronDown className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                            </div>
+                            
+                            {/* Dropdown Menu */}
+                            {dropdownOpen && (
+                                <div 
+                                    ref={dropdownRef}
+                                    className="absolute right-0 mt-2 w-56 bg-secondary rounded-md shadow-lg z-50 border border-border overflow-hidden"
+                                >
+                                    <div className="p-4 border-b border-border">
+                                        <p className="font-medium text-sm">{user.fullName}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                    </div>
+                                    <div className="py-1">
+                                        <Link 
+                                            href={getDashboardUrl()}
+                                            className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <User className="h-4 w-4" />
+                                            My Dashboard
+                                        </Link>
+                                        <Link 
+                                            href="/notifications"
+                                            className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <BellRing className="h-4 w-4" />
+                                            Notifications
+                                        </Link>
+                                        <Link 
+                                            href="/account-settings"
+                                            className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <Settings className="h-4 w-4" />
+                                            Account Settings
+                                        </Link>
+                                        <Link 
+                                            href="/help-support"
+                                            className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <HelpCircle className="h-4 w-4" />
+                                            Help & Support
+                                        </Link>
+                                    </div>
+                                    <div className="border-t border-border py-1">
+                                        <button
+                                            onClick={handleLogout}
+                                            disabled={isLoading}
+                                            className="flex items-center gap-3 px-4 py-2 text-sm text-destructive hover:bg-white/5 w-full text-left transition-colors"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            <span>Logout</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <>
                             <Button variant="secondary" asChild>
                                 <Link href="/register">Join</Link>
                             </Button>
-                            <Button variant="outline" className="flex items-center gap-1" onClick={handleLoginToggle}>
-                                <User className="h-4 w-4" />
-                                <span>Login</span>
+                            <Button variant="outline" className="flex items-center gap-1" asChild>
+                                <Link href="/login">
+                                    <User className="h-4 w-4" />
+                                    <span>Login</span>
+                                </Link>
                             </Button>
                         </>
                     )}
                 </div>
             </div>
-
         </div>
     );
 }
