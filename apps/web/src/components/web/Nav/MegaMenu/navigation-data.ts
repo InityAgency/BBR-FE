@@ -1,10 +1,62 @@
-import { City, CityApiResponse } from "@/types/city";
-import { Country, CountryApiResponse } from "@/types/country";
+// Funkcija za učitavanje kontinenata
+async function fetchContinents(): Promise<ContinentApiResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/continents`;
+  
+  console.log(`Fetching continents from: ${apiUrl}`);
+  
+  const response = await fetch(apiUrl, {
+    cache: 'no-store', // Osigurava svež podatak
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Error fetching continents: ${response.status}`);
+  }
+  
+  return response.json();
+}
 
-type MenuItem = {
+// Funkcija za dobijanje kontinenata
+export async function getContinents(): Promise<MenuItem[]> {
+  try {
+    // Provera keša
+    const cachedContinents = getCachedData('continentsCache');
+    if (cachedContinents) {
+      console.log(`Returning ${cachedContinents.length} continents from cache`);
+      return cachedContinents;
+    }
+
+    // Učitaj kontinente
+    const continentsResponse = await fetchContinents();
+    const continents: Continent[] = continentsResponse.data;
+    
+    console.log(`Total continents collected: ${continents.length}`);
+    
+    // Transformacija u format za navigaciju
+    const continentMenuItems = continents
+      .map((continent) => ({
+        label: continent.name,
+        href: `/residences/continent/${continent.slug || continent.name.toLowerCase().replace(/\s+/g, '-')}`
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    
+    // Keširaj rezultate - pošto se kontinenti retko menjaju, možemo ih trajno keširati
+    cacheData('continentsCache', continentMenuItems);
+    
+    return continentMenuItems;
+  } catch (error) {
+    console.error("Failed to fetch continents:", error);
+    return []; // Vrati prazan niz u slučaju greške
+  }
+}import { City, CityApiResponse } from "@/types/city";
+import { Country, CountryApiResponse } from "@/types/country";
+import { Brand, BrandsResponse } from "@/types/brand";
+import { Continent, ContinentApiResponse } from "@/types/continent";
+
+export interface MenuItem {
   label: string;
   href: string;
-  description?: string
 }
 
 type MenuContent = {
@@ -94,12 +146,7 @@ export const navigationData: NavigationData = {
         { label: "Island", href: "/residences/island" },
         { label: "Lake", href: "/residences/lake" },
       ],
-      "Brands": [
-        { label: "Luxury ($1M+)", href: "/residences/luxury" },
-        { label: "Premium ($500K-$1M)", href: "/residences/premium" },
-        { label: "Mid-Range ($250K-$500K)", href: "/residences/mid-range" },
-        { label: "Affordable (Under $250K)", href: "/residences/affordable" },
-      ],
+      "Brands": [], // Biće popunjeno dinamički sa pravim brendovima
     },
   },
   allBrands: {
@@ -195,7 +242,9 @@ export const navigationData: NavigationData = {
 
 // Funkcija za učitavanje jedne stranice gradova
 async function fetchCitiesPage(page: number): Promise<CityApiResponse> {
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/cities?page=${page}`;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/public/cities?page=${page}`;
   
   console.log(`Fetching cities page ${page} from: ${apiUrl}`);
   
@@ -210,7 +259,9 @@ async function fetchCitiesPage(page: number): Promise<CityApiResponse> {
 
 // Funkcija za učitavanje jedne stranice država
 async function fetchCountriesPage(page: number): Promise<CountryApiResponse> {
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/countries?page=${page}`;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/public/countries?page=${page}`;
   
   console.log(`Fetching countries page ${page} from: ${apiUrl}`);
   
@@ -218,6 +269,25 @@ async function fetchCountriesPage(page: number): Promise<CountryApiResponse> {
   
   if (!response.ok) {
     throw new Error(`Error fetching countries page ${page}: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Funkcija za učitavanje brendova
+async function fetchBrandsPage(page: number): Promise<BrandsResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/public/brands?sortBy=name&sortOrder=asc&withResidences=true&page=${page}`;
+  
+  console.log(`Fetching brands page ${page} from: ${apiUrl}`);
+  
+  const response = await fetch(apiUrl, {
+    cache: 'no-store', // Osigurava svež podatak
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Error fetching brands page ${page}: ${response.status}`);
   }
   
   return response.json();
@@ -263,8 +333,7 @@ export async function getCities(): Promise<MenuItem[]> {
     const cityMenuItems = allCities
       .map((city) => ({
         label: city.name,
-        href: `/residences/city/${city.name.toLowerCase().replace(/\s+/g, '-')}`,
-        description: city.country ? `${city.country.name}` : undefined
+        href: `/residences/city/${city.name.toLowerCase().replace(/\s+/g, '-')}`
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
     
@@ -315,12 +384,10 @@ export async function getCountries(): Promise<MenuItem[]> {
     console.log(`Total countries collected: ${allCountries.length}`);
     
     // Transformacija u format za navigaciju i sortiranje po abecednom redu
-    // Sada koristimo samo ime zemlje za URL bez dodatnih elemenata
     const countryMenuItems = allCountries
       .map((country) => ({
         label: country.name,
-        href: `/residences/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
-        description: `${country.code}`
+        href: `/residences/country/${country.name.toLowerCase().replace(/\s+/g, '-')}`
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
     
@@ -334,7 +401,61 @@ export async function getCountries(): Promise<MenuItem[]> {
   }
 }
 
-// Funkcije za keš - sada podržavaju više različitih keš tipova
+// Funkcija za dobijanje brendova
+export async function getBrands(): Promise<MenuItem[]> {
+  try {
+    // Provera keša
+    const cachedBrands = getCachedData('brandsCache');
+    if (cachedBrands) {
+      console.log(`Returning ${cachedBrands.length} brands from cache`);
+      return cachedBrands;
+    }
+
+    // Učitaj prvu stranicu da bismo saznali ukupan broj stranica
+    const firstPageResponse = await fetchBrandsPage(1);
+    const { totalPages } = firstPageResponse.pagination;
+    
+    console.log(`Total brand pages: ${totalPages}, first page has ${firstPageResponse.data.length} brands`);
+    
+    let allBrands: Brand[] = [...firstPageResponse.data];
+    
+    // Učitaj preostale stranice ako ih ima
+    if (totalPages > 1) {
+      const remainingPagesPromises = [];
+      for (let page = 2; page <= totalPages; page++) {
+        remainingPagesPromises.push(fetchBrandsPage(page));
+      }
+      
+      const remainingPagesResponses = await Promise.all(remainingPagesPromises);
+      
+      // Dodaj brendove iz ostalih stranica
+      remainingPagesResponses.forEach((response, index) => {
+        console.log(`Brand page ${index + 2} has ${response.data.length} brands`);
+        allBrands = [...allBrands, ...response.data];
+      });
+    }
+    
+    console.log(`Total brands collected: ${allBrands.length}`);
+    
+    // Transformacija svih brendova u format za navigaciju
+    const brandMenuItems = allBrands
+      .map((brand) => ({
+        label: brand.name,
+        href: `/residences/brand/${brand.slug || brand.name.toLowerCase().replace(/\s+/g, '-')}`
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    
+    // Keširaj rezultate
+    cacheData('brandsCache', brandMenuItems);
+    
+    return brandMenuItems;
+  } catch (error) {
+    console.error("Failed to fetch brands:", error);
+    return []; // Vrati prazan niz u slučaju greške
+  }
+}
+
+// Funkcije za keš
 function getCachedData(cacheKey: string): MenuItem[] | null {
   if (typeof window === 'undefined') return null;
   
@@ -375,22 +496,28 @@ function cacheData(cacheKey: string, items: MenuItem[]): void {
   }
 }
 
-// Funkcija za dinamičko popunjavanje gradova i država u navigationData
+// Funkcija za dinamičko popunjavanje gradova, država, brendova i kontinenata u navigationData
 export async function getNavigationDataWithCities(): Promise<NavigationData> {
   // Pravimo kopiju osnovnih podataka
   const data = JSON.parse(JSON.stringify(navigationData));
   
-  // Dobavimo gradove i države
-  const [cities, countries] = await Promise.all([
+  // Dobavimo gradove, države, brendove i kontinente
+  const [cities, countries, brands, continents] = await Promise.all([
     getCities(),
-    getCountries()
+    getCountries(),
+    getBrands(),
+    getContinents()
   ]);
   
-  console.log(`Adding ${cities.length} cities and ${countries.length} countries to navigation data`);
+  console.log(`Adding ${cities.length} cities, ${countries.length} countries, ${brands.length} brands, and ${continents.length} continents to navigation data`);
   
-  // Postavimo gradove i države u kopiju
+  // Postavimo gradove, države, brendove i kontinente u kopiju
   data.allResidences.content.City = cities;
   data.allResidences.content.Country = countries;
+  data.allResidences.content.Brands = brands;
+  
+  // Postavimo kontinente u Geographical Area sekciju
+  data.allResidences.content["Geographical Area"] = continents;
 
   return data;
 }

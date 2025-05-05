@@ -2,6 +2,7 @@ export interface Brand {
   id: string;
   name: string;
   description: string;
+  slug?: string;
   status: string;
   createdAt: string;
   updatedAt: string;
