@@ -61,7 +61,7 @@ export default function ReportIssueForm() {
         uploadedFiles.forEach((file) => {
           formData.append("media", file);
         });
-        const uploadRes = await fetch(`/api/v1/media?type=REPORT_ISSUE`, {
+        const uploadRes = await fetch(`/api/v1/media?type=CONTACT_FORM`, {
           method: "POST",
           body: formData,
         });

@@ -62,7 +62,7 @@ export default function SuggestFeatureForm() {
           formData.append("media", file);
         });
         // TODO: zameni baseUrl/apiVersion pravim vrednostima
-        const uploadRes = await fetch(`/api/v1/media?type=SUGGEST_FEATURE`, {
+        const uploadRes = await fetch(`/api/v1/media?type=CONTACT_FORM`, {
           method: "POST",
           body: formData,
         });
