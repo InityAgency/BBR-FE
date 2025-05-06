@@ -99,7 +99,7 @@ export default function SuggestFeatureForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4">
+    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4 w-full lg:max-w-2xl lg:m-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
           <div className="flex flex-col lg:flex-row gap-4">
