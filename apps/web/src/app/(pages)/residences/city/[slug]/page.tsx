@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import React from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
 import { ResidenceCardSkeleton } from "@/components/web/Residences/ResidenceCardSkeleton";
@@ -22,6 +23,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import type { Brand, BrandsResponse } from "@/types/brand";
 
 interface City {
   id: string;
@@ -35,9 +37,74 @@ interface CityResponse {
   message: string;
 }
 
+// Dodajemo ErrorBoundary komponentu
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
+          <p className="text-xl font-medium mb-2">Something went wrong</p>
+          <p className="text-muted-foreground mb-6">Please try refreshing the page</p>
+          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Dodajemo caching za podatke o gradu
+const cityCache = new Map<string, { data: City; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minuta
+
+const fetchCityWithCache = async (slug: string): Promise<City | null> => {
+  const cached = cityCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+    const url = `${baseUrl}/api/${apiVersion}/cities/${slug}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`Failed to fetch city: ${response.status} (${url})`);
+      return null;
+    }
+
+    const data: CityResponse = await response.json();
+    if (!data.data?.id) {
+      console.error("City ID not found in response", data);
+      return null;
+    }
+
+    cityCache.set(slug, { data: data.data, timestamp: Date.now() });
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching city:", error);
+    return null;
+  }
+};
+
 export default function CityResidencesPage() {
   const [residences, setResidences] = useState<Residence[]>([]);
-  const [city, setCity] = useState<City | null>(null);
+  const [cityId, setCityId] = useState<string>("");
+  const [cityName, setCityName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [cityLoading, setCityLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -51,36 +118,95 @@ export default function CityResidencesPage() {
   const router = useRouter();
   const params = useParams();
   const citySlug = params.slug as string;
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [brandId, setBrandId] = useState<string>("");
 
-  // Fetch city data
+  // Nova funkcija za fetch svih gradova i pronalaženje ID-ja po slugu
+  const fetchAndSetCityId = async (slug: string) => {
+    setCityLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      // Povećaj limit ako imaš više gradova
+      const url = `${baseUrl}/api/${apiVersion}/public/cities?limit=1000`;
+      const response = await fetch(url);
+      const data = await response.json();
+      // Pronađi grad po formatiranom slugu
+      const city = data.data.find((c: any) =>
+        c.name.toLowerCase().replace(/\s+/g, "-") === slug.toLowerCase()
+      );
+      if (city) {
+        setCityId(city.id);
+        setCityName(city.name);
+      } else {
+        setCityId("");
+        setCityName("");
+      }
+    } catch (e) {
+      setCityId("");
+      setCityName("");
+    } finally {
+      setCityLoading(false);
+    }
+  };
+
+  // Fetch city ID by slug
   useEffect(() => {
     if (citySlug) {
-      fetchCity(citySlug);
+      fetchAndSetCityId(citySlug);
     }
+    // eslint-disable-next-line
   }, [citySlug]);
+
+  // Fetch brendova na mount-u
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      setBrandsLoading(true);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      const url = new URL(`${baseUrl}/api/${apiVersion}/public/brands`);
+      url.searchParams.set("limit", "100");
+      const response = await fetch(url.toString());
+      const data: BrandsResponse = await response.json();
+      setBrands(data.data);
+    } catch (error) {
+      setBrands([]);
+    } finally {
+      setBrandsLoading(false);
+    }
+  };
 
   // Handle URL params and fetch residences
   useEffect(() => {
     const page = searchParams.get("page") || "1";
     const query = searchParams.get("query") || "";
     const status = searchParams.get("developmentStatus") || "";
+    const brand = searchParams.get("brandId") || "";
 
     setCurrentPage(Number.parseInt(page));
     setSearch(query);
     setDevelopmentStatus(status);
+    setBrandId(brand);
 
-    if (city) {
-      fetchResidences(Number.parseInt(page), query, status);
+    if (cityId) {
+      fetchResidences(Number.parseInt(page), query, status, cityId, brand);
     }
-  }, [searchParams, city]);
+    // eslint-disable-next-line
+  }, [searchParams, cityId]);
 
   // Handle search changes
   useEffect(() => {
     updateUrlWithFilters(1);
+    // eslint-disable-next-line
   }, [debouncedSearch]);
 
   // Manage filter animation
-  const hasActiveFilters = search || developmentStatus;
+  const hasActiveFilters = search || developmentStatus || brandId;
 
   useEffect(() => {
     if (hasActiveFilters) {
@@ -93,67 +219,40 @@ export default function CityResidencesPage() {
     }
   }, [hasActiveFilters]);
 
-  const fetchCity = async (slug: string) => {
-    try {
-      setCityLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-      const url = `${baseUrl}/api/${apiVersion}/cities/${slug}`;
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch city: ${response.status}`);
-      }
-
-      const data: CityResponse = await response.json();
-      if (!data.data?.id) {
-        throw new Error("City ID not found");
-      }
-      setCity(data.data);
-    } catch (error) {
-      console.error("Error fetching city:", error);
-      setCity(null); // Reset city on error
-    } finally {
-      setCityLoading(false);
-    }
-  };
-
-  const fetchResidences = async (page: number, query = "", status = "") => {
-    if (!city?.id) {
-      console.warn("Cannot fetch residences: city ID is missing");
+  const fetchResidences = async (
+    page: number,
+    query = "",
+    status = "",
+    cityId: string,
+    brand = ""
+  ) => {
+    if (!cityId) {
       setResidences([]);
       setLoading(false);
       return;
     }
-
     try {
       setLoading(true);
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
       const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
       const url = new URL(`${baseUrl}/api/${apiVersion}/public/residences`);
-
-      // Add query parameters
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", "12");
-      url.searchParams.set("cityId", city.id); // Use city ID
-
+      url.searchParams.set("cityId", cityId);
       if (query) {
         url.searchParams.set("query", query);
       }
       if (status) {
         url.searchParams.set("developmentStatus", status);
       }
-
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new Error(`Failed to fetch residences: ${response.status}`);
+      if (brand) {
+        url.searchParams.set("brandId", brand);
       }
-
+      const response = await fetch(url.toString());
       const data: ResidencesResponse = await response.json();
       setResidences(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
     } catch (error) {
-      console.error("Error fetching residences:", error);
       setResidences([]);
     } finally {
       setLoading(false);
@@ -168,6 +267,9 @@ export default function CityResidencesPage() {
     }
     if (developmentStatus) {
       params.set("developmentStatus", developmentStatus);
+    }
+    if (brandId) {
+      params.set("brandId", brandId);
     }
     router.push(`?${params.toString()}`, { scroll: false });
   };
@@ -194,9 +296,27 @@ export default function CityResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const handleBrandChange = (value: string) => {
+    const newBrandId = value === "ALL" ? "" : value;
+    setBrandId(newBrandId);
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    if (newBrandId) {
+      params.set("brandId", newBrandId);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   const clearFilters = () => {
     setSearch("");
     setDevelopmentStatus("");
+    setBrandId("");
     const params = new URLSearchParams();
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -213,6 +333,9 @@ export default function CityResidencesPage() {
     if (developmentStatus) {
       params.set("developmentStatus", developmentStatus);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -227,13 +350,27 @@ export default function CityResidencesPage() {
     if (debouncedSearch) {
       params.set("query", debouncedSearch);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const getCityName = () => {
-    if (cityLoading) return "Loading...";
-    if (!city) return citySlug.replace(/-/g, " ");
-    return city.name;
+  const clearBrandFilter = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setBrandId("");
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const formatCityName = (name: string) => {
@@ -243,11 +380,11 @@ export default function CityResidencesPage() {
       .join(" ");
   };
 
-  const activeFiltersCount = [search, developmentStatus].filter(Boolean).length;
-  const displayCityName = city?.name || formatCityName(citySlug);
+  const displayCityName = cityName || formatCityName(citySlug);
+  const activeFiltersCount = [search, developmentStatus, brandId].filter(Boolean).length;
 
   return (
-    <>
+    <ErrorBoundary>
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
         <div className="page-header flex flex-col gap-6 w-full">
           <p className="text-md uppercase text-left lg:text-center text-primary">PROPERTIES IN {displayCityName.toUpperCase()}</p>
@@ -288,9 +425,21 @@ export default function CityResidencesPage() {
                       <SelectItem value="COMPLETED">Completed</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Select value={brandId} onValueChange={handleBrandChange}>
+                    <SelectTrigger className="w-full lg:w-[180px]">
+                      <SelectValue placeholder="Brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">All brands</SelectItem>
+                      {brandsLoading ? (
+                        <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                      ) : brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
               {/* Mobile filter button */}
               <div className="lg:hidden w-full mb-4 residence-filters">
                 <Button
@@ -307,7 +456,6 @@ export default function CityResidencesPage() {
                   )}
                 </Button>
               </div>
-
               {/* Drawer for mobile filters */}
               <Drawer open={isFilterDrawerOpen} onOpenChange={setIsFilterDrawerOpen}>
                 <DrawerContent>
@@ -334,26 +482,23 @@ export default function CityResidencesPage() {
                         </SelectContent>
                       </Select>
                     </div>
-
-                    {/* Active filters in drawer */}
-                    {hasActiveFilters && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Active Filters</label>
-                        <div className="flex flex-wrap gap-2">
-                          {developmentStatus && (
-                            <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm">
-                              Status: {developmentStatus.replace("_", " ")}
-                              <button
-                                onClick={clearDevelopmentStatusFilter}
-                                className="h-4 w-4 ml-1 flex items-center justify-center"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                    {/* Brand filter */}
+                    <div className="space-y-2 flex flex-col">
+                      <label className="text-sm font-medium">Brand</label>
+                      <Select value={brandId} onValueChange={handleBrandChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select brand" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">All brands</SelectItem>
+                          {brandsLoading ? (
+                            <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                          ) : brands.map((brand) => (
+                            <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <DrawerFooter>
                     <DrawerClose asChild>
@@ -362,7 +507,6 @@ export default function CityResidencesPage() {
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
-
               {/* Active filters display for desktop */}
               <div
                 className={`
@@ -400,16 +544,27 @@ export default function CityResidencesPage() {
                         </button>
                       </Badge>
                     )}
+                    {brandId && (
+                      <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm transition-all hover:shadow-sm">
+                        Brand: {brands.find((b) => b.id === brandId)?.name}
+                        <button
+                          onClick={clearBrandFilter}
+                          className="h-4 w-4 ml-1 flex items-center justify-center"
+                          aria-label="Clear brand filter"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-
             {cityLoading ? (
               <div className="flex justify-center items-center h-40">
                 <p className="text-xl text-muted-foreground">Loading city information...</p>
               </div>
-            ) : !city ? (
+            ) : !cityId ? (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
                 <p className="text-xl font-medium mb-2">City not found</p>
                 <p className="text-muted-foreground mb-6">The requested city does not exist.</p>
@@ -440,6 +595,6 @@ export default function CityResidencesPage() {
         </div>
       </SectionLayout>
       <NewsletterBlock />
-    </>
+    </ErrorBoundary>
   );
 }

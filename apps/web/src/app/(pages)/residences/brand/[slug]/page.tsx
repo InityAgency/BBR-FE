@@ -37,7 +37,8 @@ interface BrandResponse {
 
 export default function BrandResidencesPage() {
   const [residences, setResidences] = useState<Residence[]>([]);
-  const [brand, setBrand] = useState<Brand | null>(null);
+  const [brandId, setBrandId] = useState<string>("");
+  const [brandName, setBrandName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [brandLoading, setBrandLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,11 +53,40 @@ export default function BrandResidencesPage() {
   const params = useParams();
   const brandSlug = params.slug as string;
 
-  // Fetch brand data
+  // Nova funkcija za fetch svih brendova i pronalaženje ID-ja po slugu
+  const fetchAndSetBrandId = async (slug: string) => {
+    setBrandLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      const url = `${baseUrl}/api/${apiVersion}/public/brands?limit=1000`;
+      const response = await fetch(url);
+      const data = await response.json();
+      // Pronađi brend po formatiranom slugu
+      const brand = data.data.find((b: any) =>
+        b.name.toLowerCase().replace(/\s+/g, "-") === slug.toLowerCase()
+      );
+      if (brand) {
+        setBrandId(brand.id);
+        setBrandName(brand.name);
+      } else {
+        setBrandId("");
+        setBrandName("");
+      }
+    } catch (e) {
+      setBrandId("");
+      setBrandName("");
+    } finally {
+      setBrandLoading(false);
+    }
+  };
+
+  // Fetch brand ID by slug
   useEffect(() => {
     if (brandSlug) {
-      fetchBrand(brandSlug);
+      fetchAndSetBrandId(brandSlug);
     }
+    // eslint-disable-next-line
   }, [brandSlug]);
 
   // Handle URL params and fetch residences
@@ -69,10 +99,10 @@ export default function BrandResidencesPage() {
     setSearch(query);
     setDevelopmentStatus(status);
 
-    if (brand) {
+    if (brandId) {
       fetchResidences(Number.parseInt(page), query, status);
     }
-  }, [searchParams, brand]);
+  }, [searchParams, brandId]);
 
   // Handle search changes
   useEffect(() => {
@@ -93,33 +123,8 @@ export default function BrandResidencesPage() {
     }
   }, [hasActiveFilters]);
 
-  const fetchBrand = async (slug: string) => {
-    try {
-      setBrandLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-      const url = `${baseUrl}/api/${apiVersion}/brands/${slug}`;
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch brand: ${response.status}`);
-      }
-
-      const data: BrandResponse = await response.json();
-      if (!data.data?.id) {
-        throw new Error("Brand ID not found");
-      }
-      setBrand(data.data);
-    } catch (error) {
-      console.error("Error fetching brand:", error);
-      setBrand(null); // Reset brand on error
-    } finally {
-      setBrandLoading(false);
-    }
-  };
-
   const fetchResidences = async (page: number, query = "", status = "") => {
-    if (!brand?.id) {
+    if (!brandId) {
       console.warn("Cannot fetch residences: brand ID is missing");
       setResidences([]);
       setLoading(false);
@@ -135,7 +140,7 @@ export default function BrandResidencesPage() {
       // Add query parameters
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", "12");
-      url.searchParams.set("brandId", brand.id); // Use brand ID
+      url.searchParams.set("brandId", brandId);
 
       if (query) {
         url.searchParams.set("query", query);
@@ -230,12 +235,6 @@ export default function BrandResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const getBrandName = () => {
-    if (brandLoading) return "Loading...";
-    if (!brand) return brandSlug.replace(/-/g, " ");
-    return brand.name;
-  };
-
   const formatBrandName = (name: string) => {
     return name
       .split("-")
@@ -244,7 +243,7 @@ export default function BrandResidencesPage() {
   };
 
   const activeFiltersCount = [search, developmentStatus].filter(Boolean).length;
-  const displayBrandName = brand?.name || formatBrandName(brandSlug);
+  const displayBrandName = brandName || formatBrandName(brandSlug);
 
   return (
     <>
@@ -409,7 +408,7 @@ export default function BrandResidencesPage() {
               <div className="flex justify-center items-center h-40">
                 <p className="text-xl text-muted-foreground">Loading brand information...</p>
               </div>
-            ) : !brand ? (
+            ) : !brandId ? (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
                 <p className="text-xl font-medium mb-2">Brand not found</p>
                 <p className="text-muted-foreground mb-6">The requested brand does not exist.</p>

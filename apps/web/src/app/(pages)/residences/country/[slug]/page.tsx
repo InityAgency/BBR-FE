@@ -22,6 +22,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import type { Brand, BrandsResponse } from "@/types/brand";
 
 interface Country {
   id: string;
@@ -37,7 +38,8 @@ interface CountryResponse {
 
 export default function CountryResidencesPage() {
   const [residences, setResidences] = useState<Residence[]>([]);
-  const [country, setCountry] = useState<Country | null>(null);
+  const [countryId, setCountryId] = useState<string>("");
+  const [countryName, setCountryName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [countryLoading, setCountryLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -51,28 +53,85 @@ export default function CountryResidencesPage() {
   const router = useRouter();
   const params = useParams();
   const countrySlug = params.slug as string;
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [brandId, setBrandId] = useState<string>("");
 
-  // Fetch country data
+  // Nova funkcija za fetch svih država i pronalaženje ID-ja po slugu
+  const fetchAndSetCountryId = async (slug: string) => {
+    setCountryLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      // Povećaj limit ako imaš više država
+      const url = `${baseUrl}/api/${apiVersion}/public/countries?limit=1000`;
+      const response = await fetch(url);
+      const data = await response.json();
+      // Pronađi državu po formatiranom slugu
+      const country = data.data.find((c: any) =>
+        c.name.toLowerCase().replace(/\s+/g, "-") === slug.toLowerCase()
+      );
+      if (country) {
+        setCountryId(country.id);
+        setCountryName(country.name);
+      } else {
+        setCountryId("");
+        setCountryName("");
+      }
+    } catch (e) {
+      setCountryId("");
+      setCountryName("");
+    } finally {
+      setCountryLoading(false);
+    }
+  };
+
+  // Fetch country ID by slug
   useEffect(() => {
     if (countrySlug) {
-      fetchCountry(countrySlug);
+      fetchAndSetCountryId(countrySlug);
     }
+    // eslint-disable-next-line
   }, [countrySlug]);
+
+  // Fetch brendova na mount-u
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      setBrandsLoading(true);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      const url = new URL(`${baseUrl}/api/${apiVersion}/public/brands`);
+      url.searchParams.set("limit", "100");
+      const response = await fetch(url.toString());
+      const data: BrandsResponse = await response.json();
+      setBrands(data.data);
+    } catch (error) {
+      setBrands([]);
+    } finally {
+      setBrandsLoading(false);
+    }
+  };
 
   // Handle URL params and fetch residences
   useEffect(() => {
     const page = searchParams.get("page") || "1";
     const query = searchParams.get("query") || "";
     const status = searchParams.get("developmentStatus") || "";
+    const brand = searchParams.get("brandId") || "";
 
     setCurrentPage(Number.parseInt(page));
     setSearch(query);
     setDevelopmentStatus(status);
+    setBrandId(brand);
 
-    if (country) {
-      fetchResidences(Number.parseInt(page), query, status);
+    if (countryId) {
+      fetchResidences(Number.parseInt(page), query, status, brand);
     }
-  }, [searchParams, country]);
+  }, [searchParams, countryId]);
 
   // Handle search changes
   useEffect(() => {
@@ -80,7 +139,7 @@ export default function CountryResidencesPage() {
   }, [debouncedSearch]);
 
   // Manage filter animation
-  const hasActiveFilters = search || developmentStatus;
+  const hasActiveFilters = search || developmentStatus || brandId;
 
   useEffect(() => {
     if (hasActiveFilters) {
@@ -93,33 +152,8 @@ export default function CountryResidencesPage() {
     }
   }, [hasActiveFilters]);
 
-  const fetchCountry = async (slug: string) => {
-    try {
-      setCountryLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-      const url = `${baseUrl}/api/${apiVersion}/countries/${slug}`;
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch country: ${response.status}`);
-      }
-
-      const data: CountryResponse = await response.json();
-      if (!data.data?.id) {
-        throw new Error("Country ID not found");
-      }
-      setCountry(data.data);
-    } catch (error) {
-      console.error("Error fetching country:", error);
-      setCountry(null); // Reset country on error
-    } finally {
-      setCountryLoading(false);
-    }
-  };
-
-  const fetchResidences = async (page: number, query = "", status = "") => {
-    if (!country?.id) {
+  const fetchResidences = async (page: number, query = "", status = "", brand = "") => {
+    if (!countryId) {
       console.warn("Cannot fetch residences: country ID is missing");
       setResidences([]);
       setLoading(false);
@@ -135,13 +169,16 @@ export default function CountryResidencesPage() {
       // Add query parameters
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", "12");
-      url.searchParams.set("countryId", country.id); // Use country ID
+      url.searchParams.set("countryId", countryId);
 
       if (query) {
         url.searchParams.set("query", query);
       }
       if (status) {
         url.searchParams.set("developmentStatus", status);
+      }
+      if (brand) {
+        url.searchParams.set("brandId", brand);
       }
 
       const response = await fetch(url.toString());
@@ -169,6 +206,9 @@ export default function CountryResidencesPage() {
     if (developmentStatus) {
       params.set("developmentStatus", developmentStatus);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -194,9 +234,27 @@ export default function CountryResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const handleBrandChange = (value: string) => {
+    const newBrandId = value === "ALL" ? "" : value;
+    setBrandId(newBrandId);
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    if (newBrandId) {
+      params.set("brandId", newBrandId);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   const clearFilters = () => {
     setSearch("");
     setDevelopmentStatus("");
+    setBrandId("");
     const params = new URLSearchParams();
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -230,10 +288,21 @@ export default function CountryResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const getCountryName = () => {
-    if (countryLoading) return "Loading...";
-    if (!country) return countrySlug.replace(/-/g, " ");
-    return country.name;
+  const clearBrandFilter = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setBrandId("");
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const formatCountryName = (name: string) => {
@@ -243,8 +312,8 @@ export default function CountryResidencesPage() {
       .join(" ");
   };
 
-  const activeFiltersCount = [search, developmentStatus].filter(Boolean).length;
-  const displayCountryName = country?.name || formatCountryName(countrySlug);
+  const activeFiltersCount = [search, developmentStatus, brandId].filter(Boolean).length;
+  const displayCountryName = countryName || formatCountryName(countrySlug);
 
   return (
     <>
@@ -286,6 +355,19 @@ export default function CountryResidencesPage() {
                       <SelectItem value="PLANNED">Planned</SelectItem>
                       <SelectItem value="UNDER_CONSTRUCTION">Under Construction</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={brandId} onValueChange={handleBrandChange}>
+                    <SelectTrigger className="w-full lg:w-[180px]">
+                      <SelectValue placeholder="Brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">All brands</SelectItem>
+                      {brandsLoading ? (
+                        <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                      ) : brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -335,6 +417,24 @@ export default function CountryResidencesPage() {
                       </Select>
                     </div>
 
+                    {/* Brand filter */}
+                    <div className="space-y-2 flex flex-col">
+                      <label className="text-sm font-medium">Brand</label>
+                      <Select value={brandId} onValueChange={handleBrandChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select brand" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">All brands</SelectItem>
+                          {brandsLoading ? (
+                            <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                          ) : brands.map((brand) => (
+                            <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     {/* Active filters in drawer */}
                     {hasActiveFilters && (
                       <div className="space-y-2">
@@ -346,6 +446,18 @@ export default function CountryResidencesPage() {
                               <button
                                 onClick={clearDevelopmentStatusFilter}
                                 className="h-4 w-4 ml-1 flex items-center justify-center"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </Badge>
+                          )}
+                          {brandId && (
+                            <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm">
+                              Brand: {brands.find((b) => b.id === brandId)?.name}
+                              <button
+                                onClick={clearBrandFilter}
+                                className="h-4 w-4 ml-1 flex items-center justify-center"
+                                aria-label="Clear brand filter"
                               >
                                 <X className="h-4 w-4" />
                               </button>
@@ -400,6 +512,18 @@ export default function CountryResidencesPage() {
                         </button>
                       </Badge>
                     )}
+                    {brandId && (
+                      <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm">
+                        Brand: {brands.find((b) => b.id === brandId)?.name}
+                        <button
+                          onClick={clearBrandFilter}
+                          className="h-4 w-4 ml-1 flex items-center justify-center"
+                          aria-label="Clear brand filter"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>
@@ -409,7 +533,7 @@ export default function CountryResidencesPage() {
               <div className="flex justify-center items-center h-40">
                 <p className="text-xl text-muted-foreground">Loading country information...</p>
               </div>
-            ) : !country ? (
+            ) : !countryId ? (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
                 <p className="text-xl font-medium mb-2">Country not found</p>
                 <p className="text-muted-foreground mb-6">The requested country does not exist.</p>

@@ -22,6 +22,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import type { Brand, BrandsResponse } from "@/types/brand";
 
 interface Continent {
   id: string;
@@ -37,7 +38,8 @@ interface ContinentResponse {
 
 export default function ContinentResidencesPage() {
   const [residences, setResidences] = useState<Residence[]>([]);
-  const [continent, setContinent] = useState<Continent | null>(null);
+  const [continentId, setContinentId] = useState<string>("");
+  const [continentName, setContinentName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [continentLoading, setContinentLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -51,28 +53,84 @@ export default function ContinentResidencesPage() {
   const router = useRouter();
   const params = useParams();
   const continentSlug = params.slug as string;
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [brandId, setBrandId] = useState<string>("");
 
-  // Fetch continent data
+  // Nova funkcija za fetch svih kontinenata i pronalaženje ID-ja po slugu
+  const fetchAndSetContinentId = async (slug: string) => {
+    setContinentLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      const url = `${baseUrl}/api/${apiVersion}/continents`;
+      const response = await fetch(url);
+      const data = await response.json();
+      // Pronađi kontinent po formatiranom slugu
+      const continent = data.data.find((c: any) =>
+        c.name.toLowerCase().replace(/\s+/g, "-") === slug.toLowerCase()
+      );
+      if (continent) {
+        setContinentId(continent.id);
+        setContinentName(continent.name);
+      } else {
+        setContinentId("");
+        setContinentName("");
+      }
+    } catch (e) {
+      setContinentId("");
+      setContinentName("");
+    } finally {
+      setContinentLoading(false);
+    }
+  };
+
+  // Fetch continent ID by slug
   useEffect(() => {
     if (continentSlug) {
-      fetchContinent(continentSlug);
+      fetchAndSetContinentId(continentSlug);
     }
+    // eslint-disable-next-line
   }, [continentSlug]);
+
+  // Fetch brendova na mount-u
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      setBrandsLoading(true);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+      const url = new URL(`${baseUrl}/api/${apiVersion}/public/brands`);
+      url.searchParams.set("limit", "100");
+      const response = await fetch(url.toString());
+      const data: BrandsResponse = await response.json();
+      setBrands(data.data);
+    } catch (error) {
+      setBrands([]);
+    } finally {
+      setBrandsLoading(false);
+    }
+  };
 
   // Handle URL params and fetch residences
   useEffect(() => {
     const page = searchParams.get("page") || "1";
     const query = searchParams.get("query") || "";
     const status = searchParams.get("developmentStatus") || "";
+    const brand = searchParams.get("brandId") || "";
 
     setCurrentPage(Number.parseInt(page));
     setSearch(query);
     setDevelopmentStatus(status);
+    setBrandId(brand);
 
-    if (continent) {
-      fetchResidences(Number.parseInt(page), query, status);
+    if (continentId) {
+      fetchResidences(Number.parseInt(page), query, status, brand);
     }
-  }, [searchParams, continent]);
+  }, [searchParams, continentId]);
 
   // Handle search changes
   useEffect(() => {
@@ -80,7 +138,7 @@ export default function ContinentResidencesPage() {
   }, [debouncedSearch]);
 
   // Manage filter animation
-  const hasActiveFilters = search || developmentStatus;
+  const hasActiveFilters = search || developmentStatus || brandId;
 
   useEffect(() => {
     if (hasActiveFilters) {
@@ -93,33 +151,8 @@ export default function ContinentResidencesPage() {
     }
   }, [hasActiveFilters]);
 
-  const fetchContinent = async (slug: string) => {
-    try {
-      setContinentLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-      const url = `${baseUrl}/api/${apiVersion}/continents/${slug}`;
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch continent: ${response.status}`);
-      }
-
-      const data: ContinentResponse = await response.json();
-      if (!data.data?.id) {
-        throw new Error("Continent ID not found");
-      }
-      setContinent(data.data);
-    } catch (error) {
-      console.error("Error fetching continent:", error);
-      setContinent(null); // Reset continent on error
-    } finally {
-      setContinentLoading(false);
-    }
-  };
-
-  const fetchResidences = async (page: number, query = "", status = "") => {
-    if (!continent?.id) {
+  const fetchResidences = async (page: number, query = "", status = "", brand = "") => {
+    if (!continentId) {
       console.warn("Cannot fetch residences: continent ID is missing");
       setResidences([]);
       setLoading(false);
@@ -135,13 +168,16 @@ export default function ContinentResidencesPage() {
       // Add query parameters
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", "12");
-      url.searchParams.set("continentId", continent.id); // Use continent ID
+      url.searchParams.set("continentId", continentId);
 
       if (query) {
         url.searchParams.set("query", query);
       }
       if (status) {
         url.searchParams.set("developmentStatus", status);
+      }
+      if (brand) {
+        url.searchParams.set("brandId", brand);
       }
 
       const response = await fetch(url.toString());
@@ -169,6 +205,9 @@ export default function ContinentResidencesPage() {
     if (developmentStatus) {
       params.set("developmentStatus", developmentStatus);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -194,9 +233,27 @@ export default function ContinentResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const handleBrandChange = (value: string) => {
+    const newBrandId = value === "ALL" ? "" : value;
+    setBrandId(newBrandId);
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    if (newBrandId) {
+      params.set("brandId", newBrandId);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   const clearFilters = () => {
     setSearch("");
     setDevelopmentStatus("");
+    setBrandId("");
     const params = new URLSearchParams();
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -230,10 +287,21 @@ export default function ContinentResidencesPage() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const getContinentName = () => {
-    if (continentLoading) return "Loading...";
-    if (!continent) return continentSlug.replace(/-/g, " ");
-    return continent.name;
+  const clearBrandFilter = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setBrandId("");
+    const params = new URLSearchParams();
+    params.set("page", "1");
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch);
+    }
+    if (developmentStatus) {
+      params.set("developmentStatus", developmentStatus);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const formatContinentName = (name: string) => {
@@ -243,8 +311,8 @@ export default function ContinentResidencesPage() {
       .join(" ");
   };
 
-  const activeFiltersCount = [search, developmentStatus].filter(Boolean).length;
-  const displayContinentName = continent?.name || formatContinentName(continentSlug);
+  const activeFiltersCount = [search, developmentStatus, brandId].filter(Boolean).length;
+  const displayContinentName = continentName || formatContinentName(continentSlug);
 
   return (
     <>
@@ -252,7 +320,7 @@ export default function ContinentResidencesPage() {
         <div className="page-header flex flex-col gap-6 w-full">
           <p className="text-md uppercase text-left lg:text-center text-primary">PROPERTIES IN {displayContinentName.toUpperCase()}</p>
           <h1 className="text-4xl font-bold text-left lg:text-center xl:max-w-[50svw] xl:m-auto">
-            Meet the Elite Residence Properties {displayContinentName}
+            Meet the Elite Residence Properties in {displayContinentName}
           </h1>
           <p className="text-lg text-left lg:text-center text-muted-foreground max-w-3xl mx-auto">
             Discover the finest luxury branded residences across {displayContinentName} — where exceptional design meets unparalleled lifestyle.
@@ -286,6 +354,19 @@ export default function ContinentResidencesPage() {
                       <SelectItem value="PLANNED">Planned</SelectItem>
                       <SelectItem value="UNDER_CONSTRUCTION">Under Construction</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={brandId} onValueChange={handleBrandChange}>
+                    <SelectTrigger className="w-full lg:w-[180px]">
+                      <SelectValue placeholder="Brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">All brands</SelectItem>
+                      {brandsLoading ? (
+                        <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                      ) : brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -335,6 +416,24 @@ export default function ContinentResidencesPage() {
                       </Select>
                     </div>
 
+                    {/* Brand filter */}
+                    <div className="space-y-2 flex flex-col">
+                      <label className="text-sm font-medium">Brand</label>
+                      <Select value={brandId} onValueChange={handleBrandChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select brand" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">All brands</SelectItem>
+                          {brandsLoading ? (
+                            <SelectItem value="LOADING" disabled>Loading brands...</SelectItem>
+                          ) : brands.map((brand) => (
+                            <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     {/* Active filters in drawer */}
                     {hasActiveFilters && (
                       <div className="space-y-2">
@@ -346,6 +445,18 @@ export default function ContinentResidencesPage() {
                               <button
                                 onClick={clearDevelopmentStatusFilter}
                                 className="h-4 w-4 ml-1 flex items-center justify-center"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </Badge>
+                          )}
+                          {brandId && (
+                            <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm">
+                              Brand: {brands.find((b) => b.id === brandId)?.name}
+                              <button
+                                onClick={clearBrandFilter}
+                                className="h-4 w-4 ml-1 flex items-center justify-center"
+                                aria-label="Clear brand filter"
                               >
                                 <X className="h-4 w-4" />
                               </button>
@@ -400,6 +511,18 @@ export default function ContinentResidencesPage() {
                         </button>
                       </Badge>
                     )}
+                    {brandId && (
+                      <Badge variant="secondary" className="flex items-center gap-1 py-2 px-3 text-sm transition-all hover:shadow-sm">
+                        Brand: {brands.find((b) => b.id === brandId)?.name}
+                        <button
+                          onClick={clearBrandFilter}
+                          className="h-4 w-4 ml-1 flex items-center justify-center"
+                          aria-label="Clear brand filter"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>
@@ -409,7 +532,7 @@ export default function ContinentResidencesPage() {
               <div className="flex justify-center items-center h-40">
                 <p className="text-xl text-muted-foreground">Loading continent information...</p>
               </div>
-            ) : !continent ? (
+            ) : !continentId ? (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
                 <p className="text-xl font-medium mb-2">Continent not found</p>
                 <p className="text-muted-foreground mb-6">The requested continent does not exist.</p>

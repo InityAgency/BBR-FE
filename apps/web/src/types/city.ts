@@ -5,6 +5,7 @@ export interface Country {
 }
 
 export interface City {
+    slug: string;
     id: string;
     name: string;
     asciiName: string;
