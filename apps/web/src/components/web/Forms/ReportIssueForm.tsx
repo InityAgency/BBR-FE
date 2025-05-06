@@ -170,8 +170,8 @@ export default function ReportIssueForm() {
           <div>
             <FileUpload
               label="Upload files"
-              description="PDF, DOC, DOCX, JPG, JPEG, PNG, MP4, AVI, MOV formats are supported."
-              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG", "MP4", "AVI", "MOV"]}
+              description="PDF, DOC, DOCX, JPG, JPEG, PNG formats are supported."
+              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG"]}
               maxSize={10}
               onChange={(file) => handleFilesChange(file ? [file] : [])}
               value={uploadedFiles[0] || null}
