@@ -1,11 +1,10 @@
 "use client";
 
 import { motion, useMotionValue, useAnimation } from "framer-motion";
-import Image from "next/image";
 import React, { useState } from "react";
 
 type VerticalCarouselProps = {
-  items: string[];
+  items: React.ReactNode[];
 };
 
 const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ items }) => {
@@ -41,19 +40,15 @@ const VerticalCarousel: React.FC<VerticalCarouselProps> = ({ items }) => {
         animate={controls}
         className="flex flex-col items-center justify-center cursor-grab w-full"
       >
-        {/* Top item */}
-        <motion.div className="h-[150px] w-[90%] my-1 bg-red-100 rounded-md flex items-center justify-center text-xl text-gray-400 opacity-60">
+        <motion.div className="w-[90%] my-1 rounded-md flex items-center justify-center text-xl text-gray-400 opacity-60">
           {getItemAt(index - 1)}
         </motion.div>
 
-        {/* Center item */}
-        <motion.div className="flex flex-col h-[170px] w-full my-[-30px] rounded-md flex items-center justify-center text-xl font-bold text-blue-600 bg-white shadow-md scale-110 z-10">
+        <motion.div className="flex flex-col w-full my-[-400px] md:my-[-30px] rounded-md flex bg-white shadow-md z-10 p-[14px]">
           {getItemAt(index)}
-          <Image src="/bbr-score.png" alt={""} width={170} height={170} />
         </motion.div>
 
-        {/* Bottom item */}
-        <motion.div className="h-[150px] w-[90%] my-1 bg-yellow-100  rounded-md flex items-center justify-center text-xl text-gray-400 opacity-60">
+        <motion.div className="w-[90%] my-1 rounded-md flex items-center justify-center text-xl text-gray-400 opacity-60">
           {getItemAt(index + 1)}
         </motion.div>
       </motion.div>

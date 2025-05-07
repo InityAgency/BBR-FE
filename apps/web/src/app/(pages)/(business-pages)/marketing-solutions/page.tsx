@@ -3,11 +3,69 @@ import FaqBlock from "@/components/web/Faq/FaqBlock";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
 import VerticalCarousel from "@/components/web/VerticalCarousel/VerticalCarousel";
-import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 import Link from "next/link";
 
-const items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"];
+// #region Vertical Carousel related things
+const VerticalCarouselItem = ({
+  title,
+  description,
+  imgSrc,
+}: {
+  title: string;
+  description: string;
+  imgSrc: string;
+}) => {
+  return (
+    <div className="flex flex-col lg:flex-row gap-[15px] h-full">
+      <div className="flex flex-col lg:flex-row lg:flex-row gap-[15px]">
+        <Image
+          src={imgSrc}
+          alt="bb-score"
+          width={200}
+          height={140}
+          className="w-full lg:max-w-[200px]"
+        />
+        <div className="place-self-center">
+          <h2 className="text-black text-[17px]">{title}</h2>
+          <p className="text-black text-[8px]">{description}</p>
+          <div className="flex items-center mt-1">
+            <p className="text-black mr-4 text-[8px]">View more</p>
+            <p className="text-[8px] p-2 items-center justify-center rounded-sm text-sm font-medium bg-primary text-primary-foreground w-fit">
+              Request information
+            </p>
+          </div>
+        </div>
+      </div>
+      <Image
+        src="/bbr-score-white.png"
+        alt="bb-score"
+        width={200}
+        height={140}
+        className="w-full lg:max-w-[200px]"
+      />
+    </div>
+  );
+};
+
+const verticalCarouseItems: React.ReactNode[] = [
+  <VerticalCarouselItem
+    title="Missoni Baia Miami, Luxury Biscayne Bay Condos, Miami"
+    description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
+    imgSrc="/marketing-residence-1.png"
+  />,
+  <VerticalCarouselItem
+    title="Bentley residences, Sunny Isles Beach"
+    description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
+    imgSrc="/marketing-residence-2.png"
+  />,
+  <VerticalCarouselItem
+    title="Fendi Chateau Residences, Miami"
+    description="Boasting breathtaking ocean views and direct beach access, this luxury residence features expansive terraces and unparalleled amenities."
+    imgSrc="/marketing-residence-3.png"
+  />,
+];
+// #endregion
 
 const MarketingSolutionsPage = () => {
   return (
@@ -339,11 +397,11 @@ const MarketingSolutionsPage = () => {
               <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
                 Targeted Marketing Tools
               </h2>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px] mb-[20px]">
                 Ensure your properties are seen by the right buyers at the right
                 time.
               </p>
-              <VerticalCarousel items={items} />
+              <VerticalCarousel items={verticalCarouseItems} />
             </div>
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-1/3">
               <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
