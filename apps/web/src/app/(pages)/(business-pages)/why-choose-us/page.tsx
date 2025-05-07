@@ -1,4 +1,4 @@
-import BrandsBlock from "@/components/web/Brands/BrandsBlock";
+import BrandSlider from "@/components/web/Brands/BrandSlider";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
 import SlidesPerViewCarousel from "@/components/web/SlidesPerViewCarousel/SlidesPerViewCarousel";
@@ -692,7 +692,7 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* EIGHT SECTION */}
-      <BrandsBlock />
+      <BrandSlider />
     </div>
   );
 }

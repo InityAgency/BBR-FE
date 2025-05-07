@@ -1,4 +1,4 @@
-import BrandsBlock from "@/components/web/Brands/BrandsBlock";
+import BrandSlider from "@/components/web/Brands/BrandSlider";
 import FaqBlock from "@/components/web/Faq/FaqBlock";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
@@ -50,16 +50,19 @@ const VerticalCarouselItem = ({
 
 const verticalCarouseItems: React.ReactNode[] = [
   <VerticalCarouselItem
+    key={1}
     title="Missoni Baia Miami, Luxury Biscayne Bay Condos, Miami"
     description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
     imgSrc="/marketing-residence-1.png"
   />,
   <VerticalCarouselItem
+    key={2}
     title="Bentley residences, Sunny Isles Beach"
     description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
     imgSrc="/marketing-residence-2.png"
   />,
   <VerticalCarouselItem
+    key={3}
     title="Fendi Chateau Residences, Miami"
     description="Boasting breathtaking ocean views and direct beach access, this luxury residence features expansive terraces and unparalleled amenities."
     imgSrc="/marketing-residence-3.png"
@@ -488,7 +491,7 @@ const MarketingSolutionsPage = () => {
       <FaqBlock themeLight />
 
       {/* SEVENTH SECTION */}
-      <BrandsBlock />
+      <BrandSlider />
     </div>
   );
 };
