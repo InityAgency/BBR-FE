@@ -120,6 +120,7 @@ export default function LoginPage() {
               )}
             />
             {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
+            <Link href="/reset-password-request" className="text-sm text-primary hover:underline transition-all mb-2 inline-block">Forgot your password?</Link>
             <Button type="submit" className="w-full mt-2" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}
             </Button>
