@@ -155,9 +155,9 @@ export default function ClientCommonInfoForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="self-end w-[125px]"
+            className="self-end h-[46px] w-[185px] mt-[20px]"
           >
-            {isLoading ? "Sending..." : "Start"}
+            {isLoading ? "Sending..." : "Send contact request"}
           </Button>
         </form>
       </Form>

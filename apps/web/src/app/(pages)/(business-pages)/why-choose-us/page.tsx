@@ -1,3 +1,4 @@
+import BrandsBlock from "@/components/web/Brands/BrandsBlock";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
 import SlidesPerViewCarousel from "@/components/web/SlidesPerViewCarousel/SlidesPerViewCarousel";
@@ -272,101 +273,18 @@ const clientTestimonials = [
 ];
 // #endregion
 
-// #region BRANDS
-const Brands = ({
-  brandImages,
-}: {
-  brandImages: {
-    imageUrl: string;
-    imageAlt: string;
-  }[];
-}) => {
-  return (
-    <div className="flex flex-wrap gap-[16px] lg:gap-[32px] justify-between items-center">
-      {brandImages.map((image, index) => (
-        <Image
-          key={index}
-          src={image.imageUrl}
-          alt={image.imageAlt}
-          width={330}
-          height={135}
-          className="place-self-center max-w-[330px] w-[180px] h-[80px] lg:w-[330px] lg:h-[135px]"
-        />
-      ))}
-    </div>
-  );
-};
-const brandImages = [
-  {
-    imageUrl: "/brands/ritz-carlton.png",
-    imageAlt: "brand-image1",
-  },
-  {
-    imageUrl: "/brands/one-and-only.png",
-    imageAlt: "brand-image2",
-  },
-  {
-    imageUrl: "/brands/aman.png",
-    imageAlt: "brand-image3",
-  },
-  {
-    imageUrl: "/brands/recidences.png",
-    imageAlt: "brand-image4",
-  },
-  {
-    imageUrl: "/brands/buggati.png",
-    imageAlt: "brand-image5",
-  },
-  {
-    imageUrl: "/brands/baccarat.png",
-    imageAlt: "brand-image6",
-  },
-  {
-    imageUrl: "/brands/six-senses-recidences.png",
-    imageAlt: "brand-image7",
-  },
-  {
-    imageUrl: "/brands/four-seasons.png",
-    imageAlt: "brand-image8",
-  },
-  {
-    imageUrl: "/brands/stregis.png",
-    imageAlt: "brand-image9",
-  },
-  {
-    imageUrl: "/brands/bulgari.png",
-    imageAlt: "brand-image10",
-  },
-  {
-    imageUrl: "/brands/bentley.png",
-    imageAlt: "brand-image11",
-  },
-  {
-    imageUrl: "/brands/palazzo-vercase.png",
-    imageAlt: "brand-image12",
-  },
-];
-
-// TODO: ADD MORE BRANDS INSTEAD OF DUPLICATING
-const brandSlides = [
-  <Brands key={1} brandImages={brandImages} />,
-  <Brands key={2} brandImages={brandImages} />,
-  <Brands key={3} brandImages={brandImages} />,
-];
-// #endregion
-
 // #region MAIN COMPONENT
 export default function WhyChooseUsPage() {
   return (
     <div>
       {/* FIRST SECTION */}
-      <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
-        <div className="flex flex-col gap-6 w-full rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
           <Image
             src="/why-choose-us-hero.png"
             alt="about-us"
             fill
-            className="w-full h-full object-cover opacity-40"
+            className="w-full h-full object-cover opacity-40 rounded-xl"
           />
           <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] lg:gap-[140px]">
             <div className="flex flex-col justify-center gap-[16px]">
@@ -774,11 +692,7 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* EIGHT SECTION */}
-      <div className="bg-tertiary bg-secondary">
-        <SectionLayout>
-          <SlidesPerViewCarousel slides={brandSlides} oneElementPerView />
-        </SectionLayout>
-      </div>
+      <BrandsBlock />
     </div>
   );
 }

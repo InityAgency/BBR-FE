@@ -357,3 +357,33 @@
   height: 35%;
 }
 /* #endregion */
+
+/* #region Vertical Carousel */
+.embla_vertical {
+  margin: auto;
+  margin-top: 30px;
+  background-color: red;
+}
+.embla__viewport_vertical {
+  overflow: hidden;
+}
+.embla__container_vertical {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  touch-action: pan-y pinch-zoom;
+}
+.embla__slide_vertical {
+  transform: translate3d(0, 0, 0);
+  flex: 0 0 30%;
+  min-width: 30%;
+  padding-left: 1rem;
+  height: fit-content;
+}
+.embla__slide__img_vertical {
+  border-radius: 1.8rem;
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+/* #endregion */

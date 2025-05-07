@@ -177,13 +177,13 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          {/* <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-primary-link">
               Business Solutions
             </h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/#">Marketing Solutions</Link>
+                <Link href="/marketing-solutions">Marketing Solutions</Link>
               </li>
               <li>
                 <Link href="/#">Features</Link>
@@ -204,7 +204,7 @@ export default function Footer() {
                 <Link href="/#">Let’s talk</Link>
               </li>
             </ul>
-          </div> */}
+          </div>
 
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-primary-link">
