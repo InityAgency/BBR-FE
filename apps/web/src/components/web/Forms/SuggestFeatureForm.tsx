@@ -25,7 +25,7 @@ const formSchema = z.object({
   link: z.string().optional(),
   description: z.string().min(1, "Description is required"),
   termsAccepted: z.boolean().refine(val => val, { message: "You must accept the terms" }),
-  files: z.any().optional(), // array of files
+  files: z.any().optional(), 
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -61,14 +61,12 @@ export default function SuggestFeatureForm() {
         uploadedFiles.forEach((file) => {
           formData.append("media", file);
         });
-        // TODO: zameni baseUrl/apiVersion pravim vrednostima
-        const uploadRes = await fetch(`/api/v1/media?type=SUGGEST_FEATURE`, {
+        const uploadRes = await fetch(`/api/v1/media?type=CONTACT_FORM`, {
           method: "POST",
           body: formData,
         });
         if (!uploadRes.ok) throw new Error("File upload failed");
         const uploadData = await uploadRes.json();
-        // Pretpostavljamo da je response niz ID-jeva
         attachmentId = Array.isArray(uploadData) ? uploadData[0] : uploadData.attachmentId;
       }
       const payload = {
@@ -91,7 +89,6 @@ export default function SuggestFeatureForm() {
       setUploadedFiles([]);
     } catch (error) {
       toast.error("Failed to send suggestion");
-      // eslint-disable-next-line no-console
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -99,7 +96,7 @@ export default function SuggestFeatureForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4">
+    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4 w-full lg:max-w-2xl lg:m-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -172,8 +169,8 @@ export default function SuggestFeatureForm() {
           <div>
             <FileUpload
               label="Upload files"
-              description="PDF, DOC, DOCX, JPG, JPEG, PNG, MP4, AVI, MOV formats are supported."
-              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG", "MP4", "AVI", "MOV"]}
+              description="PDF, DOC, DOCX, JPG, JPEG, PNG formats are supported."
+              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG"]}
               maxSize={10}
               onChange={(file) => handleFilesChange(file ? [file] : [])}
               value={uploadedFiles[0] || null}

@@ -61,7 +61,7 @@ export default function ReportIssueForm() {
         uploadedFiles.forEach((file) => {
           formData.append("media", file);
         });
-        const uploadRes = await fetch(`/api/v1/media?type=REPORT_ISSUE`, {
+        const uploadRes = await fetch(`/api/v1/media?type=CONTACT_FORM`, {
           method: "POST",
           body: formData,
         });
@@ -97,7 +97,7 @@ export default function ReportIssueForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4">
+    <div className="flex flex-col gap-4 p-4 lg:p-8 h-full items-center justify-center border rounded-lg custom-card contact-form mt-4 w-full lg:max-w-2xl lg:m-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -170,8 +170,8 @@ export default function ReportIssueForm() {
           <div>
             <FileUpload
               label="Upload files"
-              description="PDF, DOC, DOCX, JPG, JPEG, PNG, MP4, AVI, MOV formats are supported."
-              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG", "MP4", "AVI", "MOV"]}
+              description="PDF, DOC, DOCX, JPG, JPEG, PNG formats are supported."
+              supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG"]}
               maxSize={10}
               onChange={(file) => handleFilesChange(file ? [file] : [])}
               value={uploadedFiles[0] || null}
