@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { PuffLoader } from 'react-spinners';
@@ -24,6 +24,8 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -35,13 +37,16 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      if (user.role?.name === "developer") {
-        router.push('/developer/dashboard');
+      if (returnUrl) {
+        // Ako postoji returnUrl, preusmeriti korisnika na tu adresu i zamijeniti history (replace)
+        router.replace(returnUrl);
+      } else if (user.role?.name === "developer") {
+        router.replace('/developer/dashboard');
       } else if (user.role?.name === "buyer") {
-        router.push('/buyer/dashboard');
+        router.replace('/buyer/dashboard');
       }
     }
-  }, [user, router]);
+  }, [user, router, returnUrl]);
 
   const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
     setErrorMessage(null);
@@ -53,7 +58,7 @@ export default function LoginPage() {
   };
 
   if (user) {
-    return <div className="flex items-center justify-center  min-h-[30svh]">
+    return <div className="flex items-center justify-center min-h-[30svh]">
       <PuffLoader color="#b3804c" size={60} />
     </div>;
   }

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Residence } from "@/types/residence";
 import SectionLayout from "@/components/web/SectionLayout";
@@ -11,6 +11,8 @@ import { ArrowRight, Lock } from "lucide-react";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { RequestInformationModal } from "@/components/web/Modals/RequestInformationModal";
+import { useAuth } from "@/contexts/AuthContext";
+import { ClaimRequestModal } from "@/components/web/Modals/ClaimRequestModal";
 
 interface MediaImage {
     id: string;
@@ -41,10 +43,27 @@ export default function ResidencePage() {
     const [similarResidences, setSimilarResidences] = useState<Residence[]>([]);
     const [loadingSimilar, setLoadingSimilar] = useState(false);
     const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
+    const [isClaimProfileModalOpen, setIsClaimProfileModalOpen] = useState(false);
     
     const params = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { user } = useAuth();
     const residenceSlug = params.slug as string;
     
+    useEffect(() => {
+        // Ako je korisnik preusmeren sa login stranice i postoji "fromClaim" parametar
+        const fromClaim = searchParams.get('fromClaim');
+        if (user && fromClaim === 'true') {
+            setIsClaimProfileModalOpen(true);
+            
+            // Očisti URL parametar bez osvježavanja stranice - replace history
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete('fromClaim');
+            window.history.replaceState({}, '', newUrl.toString());
+        }
+    }, [user, searchParams]);
+
     useEffect(() => {
         const fetchResidence = async () => {
             try {
@@ -52,7 +71,6 @@ export default function ResidencePage() {
                 const data = await response.json();
                 setResidence(data.data);
                 
-                // Pripremamo slike za galeriju kada dobijemo podatke
                 const images: MediaImage[] = [];
                 
                 if (data.data.featuredImage) {
@@ -60,7 +78,6 @@ export default function ResidencePage() {
                 }
                 
                 if (data.data.mainGallery && Array.isArray(data.data.mainGallery)) {
-                    // Dodajemo slike iz galerije, izbegavajući duplikate
                     data.data.mainGallery.forEach((img: MediaImage) => {
                         if (img && img.id && !images.some(existingImg => existingImg.id === img.id)) {
                             images.push(img);
@@ -70,7 +87,6 @@ export default function ResidencePage() {
                 
                 setGalleryImages(images);
                 
-                // Nakon učitavanja rezidencije, dohvatamo slične rezidencije po brandu
                 if (data.data?.brand?.id) {
                     fetchSimilarResidences(data.data.brand.id, data.data.id);
                 }
@@ -82,20 +98,16 @@ export default function ResidencePage() {
         };
 
         fetchResidence();
-        // Uklonjen dependency array da se fetch poziva samo pri inicijalnom učitavanju
     }, [residenceSlug]);
     
-    // Funkcija za dohvatanje sličnih rezidencija po brandu
     const fetchSimilarResidences = async (brandId: string, currentResidenceId: string) => {
         try {
             setLoadingSimilar(true);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?brandId=${brandId}&limit=3`);
             const data = await response.json();
             
-            // Filtriramo trenutnu rezidenciju iz rezultata
             const filteredResidences = data.data.filter((res: Residence) => res.id !== currentResidenceId);
             
-            // Ograničavamo na 3 slične rezidencije
             setSimilarResidences(filteredResidences.slice(0, 3));
         } catch (error) {
             console.error('Error fetching similar residences:', error);  
@@ -104,13 +116,21 @@ export default function ResidencePage() {
         }
     };
 
+    const handleClaimProfile = () => {
+        if (user) {
+            // Ako je korisnik već prijavljen, otvoriti modal
+            setIsClaimProfileModalOpen(true);
+        } else {
+            // Ako nije prijavljen, preusmeriti na login stranicu sa parametrom za povratak
+            const returnUrl = `/residences/${residenceSlug}?fromClaim=true`;
+            router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        }
+    };
     
-    // Helper funkcija za dobijanje URL-a slike
     const getMediaUrl = (mediaId: string): string => {
         return `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${mediaId}/content`;
     };
 
-    // Otvaranje galerije sa određenim početnim slajdom
     const openGallery = (index: number): void => {
         setInitialSlide(index);
         setShowGallery(true);
@@ -124,27 +144,22 @@ export default function ResidencePage() {
         return <div className="flex justify-center items-center min-h-[50vh]">Residence not found</div>;
     }
 
-    // Sortiramo highlightedAmenities po orderu ako postoje
     const sortedHighlightedAmenities = residence.highlightedAmenities 
         ? [...residence.highlightedAmenities].sort((a, b) => a.order - b.order) 
         : [];
 
     const getYouTubeEmbedUrl = (url: string): string => {
-        // Ako je već embed URL, vraćamo ga
         if (url.includes('youtube.com/embed/')) {
             return url;
         }
         
-        // Pronalazimo ID videa iz standardnog YouTube URL-a
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         const match = url.match(regExp);
         
-        // Ako imamo poklapanje, vraćamo embed URL
         if (match && match[2].length === 11) {
             return `https://www.youtube.com/embed/${match[2]}`;
         }
         
-        // Ako ne možemo da parsiramo URL, vraćamo originalni
         return url;
     };
     return(
@@ -154,6 +169,17 @@ export default function ResidencePage() {
                     <div className="w-full">
                         <p className="text-primary">{residence.city.name}, {residence.country.name}</p>
                         <h1 className="text-4xl font-bold mt-2">{residence.name}</h1>
+                        {residence.company ? (
+                            <div id="company-info" className="flex flex-row gap-2 items-center text-md font-medium mt-4">
+                                <p>Managed by</p>
+                                <span className="text-primary">{residence.company.name}</span>
+                            </div>
+                        ) : (
+                            <div id="claim-profile" className="flex flex-row gap-2 items-center text-md font-medium mt-4">
+                                <p>Own the residence?</p>
+                                <button onClick={handleClaimProfile} className="text-primary">Claim your profile</button>
+                            </div>
+                        )}
                         <div className="rankings mt-4">
                             <div className="bg-white/5 py-2 px-3 rounded-full w-fit flex gap-2 items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 22 18" fill="none">
@@ -172,7 +198,7 @@ export default function ResidencePage() {
                                 </svg>
                                 #1 Top Rated Worldwide
                             </div>
-                        </div>
+                        </div>                      
                     </div>
                     <div className="w-full lg:w-fit flex gap-2 mb-4 lg:mb-0">
                         <button 
@@ -184,10 +210,8 @@ export default function ResidencePage() {
                     </div>
                 </div>
 
-                {/* Gallery Grid */}
                 <div className="gallery-grid w-full">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[550px]">
-                        {/* Glavna slika (featured) - zauzima 2 kolone i punu visinu */}
                         {galleryImages.length > 0 && (
                             <div 
                                 className="md:col-span-2 row-span-2 rounded-lg overflow-hidden cursor-pointer relative group h-full"
@@ -268,6 +292,9 @@ export default function ResidencePage() {
                 type="MORE_INFORMATION" 
                 buttonText="Request More Information"
             />
+            
+            {/* Modal za Claim Profile */}
+            <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
                         
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />

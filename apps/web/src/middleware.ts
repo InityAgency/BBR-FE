@@ -14,7 +14,12 @@ export function middleware(request: NextRequest) {
     const user = request.cookies.get('user');
     
     if (!session || !user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      // Sačuvaj trenutnu putanju kao returnUrl za povratak nakon logina
+      const returnUrl = request.nextUrl.pathname + request.nextUrl.search;
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('returnUrl', returnUrl);
+      
+      return NextResponse.redirect(loginUrl);
     }
     
     try {
@@ -30,8 +35,12 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/developer/dashboard', request.url));
       }
     } catch (error) {
-      // Ako je došlo do greške pri parsiranju user podataka
-      return NextResponse.redirect(new URL('/login', request.url));
+      // Ako je došlo do greške pri parsiranju user podataka, vrati na login uz čuvanje returnUrl
+      const returnUrl = request.nextUrl.pathname + request.nextUrl.search;
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('returnUrl', returnUrl);
+      
+      return NextResponse.redirect(loginUrl);
     }
   }
   
