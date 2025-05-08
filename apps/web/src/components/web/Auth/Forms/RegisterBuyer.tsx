@@ -85,11 +85,11 @@ export default function RegisterBuyerForm() {
 
             // Successful registration
             toast.success("Registration successful!", {
-                description: "You can now log in with your credentials.",
+                description: "Please check your email to verify your account.",
             });
 
-            // Redirect to login page
-            router.push("/login");
+            // Redirect to verify email page
+            router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
         } catch (error) {
             toast.error("Registration error", {
                 description: error instanceof Error ? error.message : "An unexpected error occurred",
