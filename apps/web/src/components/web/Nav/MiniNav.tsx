@@ -91,7 +91,10 @@ export default function MiniNav() {
         <Link href="/" className="hover:text-primary transition-all">
           Schedule a demo
         </Link>
-        <Link href="/" className="hover:text-primary transition-all">
+        <Link
+          href="/developer-solutions"
+          className="hover:text-primary transition-all"
+        >
           Developer features
         </Link>
         <Link
@@ -99,12 +102,6 @@ export default function MiniNav() {
           className="hover:text-primary transition-all"
         >
           Marketing solutions
-        </Link>
-        <Link
-          href="/developer-solutions"
-          className="hover:text-primary transition-all"
-        >
-          Developer solutions
         </Link>
         <div className="flex flex-col sm:flex-row gap-2 relative">
           {user ? (
