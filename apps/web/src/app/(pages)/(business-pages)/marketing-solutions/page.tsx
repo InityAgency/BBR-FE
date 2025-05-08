@@ -82,13 +82,13 @@ const MarketingSolutionsPage = () => {
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
           />
-          <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] 2xl:gap-[140px]">
+          <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] ">
             <div className="flex flex-col justify-center gap-[16px]">
               <p className="text-primary text-[16px]">TRUSTED PLATFORM</p>
-              <h1 className="text-[30px] lg:text-[42px] 2xl:text-[56px]">
+              <h1 className="text-[30px] lg:text-[42px] ">
                 Reach Affluent Buyers Seeking Opulent Branded Residences
               </h1>
-              <p className="text-[18px] 2xl:text-[22px] text-white/60">
+              <p className="text-[18px] text-white/60">
                 Showcase your branded residences to affluent individuals
                 actively seeking their next high-end property, helping you close
                 deals faster and with confidence.
@@ -123,7 +123,7 @@ const MarketingSolutionsPage = () => {
               <p className="text-black text-primary xl:text-[18px]">
                 MAXIMIZE IMPACT
               </p>
-              <h1 className="text-black text-[30px] xl:text-[40px] 2xl:text-[56px]">
+              <h1 className="text-black text-[30px] xl:text-[40px]">
                 Accelerate Your Sales
               </h1>
             </div>
@@ -169,17 +169,15 @@ const MarketingSolutionsPage = () => {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[22px] xl:text-[30px]">
+                  <h2 className="text-black text-[22px]">
                     Global Reach and Premium Exposure
                   </h2>
-                  <p className="text-black/80 text-[16px] 2xl:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     Showcase your luxury residences to a worldwide audience of
                     high-net-worth buyers.
                   </p>
                   <Link className="flex gap-[10px] mt-[15px]" href="/#">
-                    <p className="text-primary text-[16px] 2xl:text-[20px]">
-                      Read More
-                    </p>
+                    <p className="text-primary text-[16px]">Read More</p>
                     <Image
                       src="/icons/arrow-up-right.svg"
                       alt="arrow-icon"
@@ -200,17 +198,15 @@ const MarketingSolutionsPage = () => {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[22px] xl:text-[30px]">
+                  <h2 className="text-black text-[22px]">
                     High-Quality Leads That Convert
                   </h2>
-                  <p className="text-black/80 text-[16px] 2xl:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     Drive faster sales with serious buyers seeking branded
                     residences.
                   </p>
                   <Link className="flex gap-[10px] mt-[15px]" href="/#">
-                    <p className="text-primary text-[16px] 2xl:text-[20px]">
-                      Read More
-                    </p>
+                    <p className="text-primary text-[16px]">Read More</p>
                     <Image
                       src="/icons/arrow-up-right.svg"
                       alt="arrow-icon"
@@ -231,17 +227,15 @@ const MarketingSolutionsPage = () => {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[22px] xl:text-[30px]">
+                  <h2 className="text-black text-[22px]">
                     Seamless Setup with Quick Results
                   </h2>
-                  <p className="text-black/80 text-[16px] 2xl:text-[20px]">
+                  <p className="text-black/80 text-[16px] ">
                     Enjoy a hassle-free setup process, supported by our
                     dedicated team.
                   </p>
                   <Link className="flex gap-[10px] mt-[15px]" href="/#">
-                    <p className="text-primary text-[16px] 2xl:text-[20px]">
-                      Read More
-                    </p>
+                    <p className="text-primary text-[16px]">Read More</p>
                     <Image
                       src="/icons/arrow-up-right.svg"
                       alt="arrow-icon"
@@ -262,13 +256,13 @@ const MarketingSolutionsPage = () => {
         <SectionLayout>
           <div className="flex flex-col gap-[30px] lg:gap-[58px]">
             <div className="flex flex-col gap-[10px] lg:w-[65%] place-self-center">
-              <p className="text-primary text-center tracking-widest text-[14px] xl:text-[16px] 2xl:text-[20px]">
+              <p className="text-primary text-center tracking-widest text-[14px] xl:text-[16px]">
                 FIND YOUR FIT
               </p>
-              <h1 className="text-black text-center text-[30px] lg:text-[40px] 2xl:text-[56px]">
+              <h1 className="text-black text-center text-[30px] lg:text-[40px]">
                 Flexible Plans Tailored to Your Success
               </h1>
-              <p className="text-[#4D4D4D] text-center text-[16px] lg:text-[18px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-center text-[16px] lg:text-[18px]">
                 Whether you're just getting started or need a fully customized
                 solution, our plans are designed to help you reach affluent
                 buyers and maximize results.
@@ -282,36 +276,36 @@ const MarketingSolutionsPage = () => {
             </div>
             <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px]">
               <div className="flex flex-1 flex-col p-[16px] lg:p-[40px] border border-primary/60 rounded-xl">
-                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px] 2xl:text-[18px]">
+                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px]">
                   IT'S FREE
                 </p>
-                <h2 className="text-black text-[24px] lg:text-[30px] 2xl:text-[42px]">
+                <h2 className="text-black text-[24px] lg:text-[30px]">
                   Basic Plan
                 </h2>
-                <p className="text-[#777777] text-[16px] lg:text-[18px] 2xl:text-[22px]">
+                <p className="text-[#777777] text-[16px] lg:text-[18px]">
                   Great for those who’re just starting out and have tiny teams
                 </p>
               </div>
               <div className="flex flex-1 flex-col p-[16px] lg:p-[40px] bg-beigeVariant4 rounded-xl">
-                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px] 2xl:text-[18px]">
+                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px]">
                   SUGGESTED
                 </p>
-                <h2 className="text-black text-[24px] lg:text-[30px] 2xl:text-[42px]">
+                <h2 className="text-black text-[24px] lg:text-[30px]">
                   Premium Plan
                 </h2>
-                <p className="text-[#777777] text-[16px] lg:text-[18px] 2xl:text-[22px]]">
+                <p className="text-[#777777] text-[16px] lg:text-[18px]">
                   Unlock advanced tools and dedicated support to elevate your
                   listings and drive serious leads.
                 </p>
               </div>
               <div className="flex flex-1 flex-col p-[16px] lg:p-[40px] border border-primary/60 rounded-xl">
-                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px] 2xl:text-[18px]">
+                <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px]">
                   CUSTOM
                 </p>
-                <h2 className="text-black text-[24px] lg:text-[30px] 2xl:text-[42px]">
+                <h2 className="text-black text-[24px] lg:text-[30px] ">
                   Bespoke Plan
                 </h2>
-                <p className="text-[#777777] text-[16px] lg:text-[18px] 2xl:text-[22px]">
+                <p className="text-[#777777] text-[16px] lg:text-[18px] ">
                   A personalized solution built for your unique needs, offering
                   exclusive features designed for maximum growth.
                 </p>
@@ -326,13 +320,13 @@ const MarketingSolutionsPage = () => {
         <SectionLayout>
           <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px]">
             <div>
-              <p className="text-primary text-[14px] lg:text-[18px] 2xl:text-[20px] tracking-widest">
+              <p className="text-primary text-[14px] lg:text-[18px] tracking-widest">
                 BOOST PERFORMANCE 
               </p>
-              <h1 className="text-black text-[30px] lg:text-[40px] 2xl:text-[52px]">
+              <h1 className="text-black text-[30px] lg:text-[40px] ">
                 Powerful Tools for Maximum Exposure 
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px]">
                 Discover the essential tools and features that empower
                 developers to reach affluent buyers, generate qualified leads,
                 and close deals faster. Whether you're listing a single property
@@ -350,13 +344,13 @@ const MarketingSolutionsPage = () => {
 
           <div className="flex flex-col lg:flex-row w-full gap-[24px]">
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-1/3">
-              <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
+              <h2 className="text-black text-[22px] lg:text-[28px] ">
                 Global Audience Reach
               </h2>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px]">
                 Access high-net-worth buyers worldwide.
               </p>
-              <p className="text-primary text-[16px] lg:text-[16px] 2xl:text-[18px] bg-beigeVariant4 w-fit p-[4px] lg:p-[8px] rounded mt-1 mb-1 lg:mt-4 lg:mb-2">
+              <p className="text-primary text-[16px] lg:text-[16px] bg-beigeVariant4 w-fit p-[4px] lg:p-[8px] rounded mt-1 mb-1 lg:mt-4 lg:mb-2">
                 100+ countries
               </p>
               <Image
@@ -368,10 +362,10 @@ const MarketingSolutionsPage = () => {
               />
             </div>
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-2/3">
-              <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
+              <h2 className="text-black text-[22px] lg:text-[28px] ">
                 Advanced Analytics
               </h2>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] ">
                 Track and optimize your listings with real-time performance
                 data.
               </p>
@@ -397,20 +391,20 @@ const MarketingSolutionsPage = () => {
 
           <div className="flex flex-col lg:flex-row w-full gap-[24px]">
             <div className="flex flex-col p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-2/3">
-              <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
+              <h2 className="text-black text-[22px] lg:text-[28px]">
                 Targeted Marketing Tools
               </h2>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px] mb-[20px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px]mb-[20px]">
                 Ensure your properties are seen by the right buyers at the right
                 time.
               </p>
               <VerticalCarousel items={verticalCarouseItems} />
             </div>
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-1/3">
-              <h2 className="text-black text-[22px] lg:text-[28px] 2xl:text-[34px]">
+              <h2 className="text-black text-[22px] lg:text-[28px]">
                 Dedicated Marketing Support
               </h2>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[16px]">
                 Work with a marketing expert to maximize your property’s
                 visibility.
               </p>
@@ -431,13 +425,13 @@ const MarketingSolutionsPage = () => {
       <div className="bg-beigeVariant4">
         <SectionLayout>
           <div className="flex flex-col gap-[10px] lg:w-[65%] place-self-center">
-            <p className="text-primary text-center tracking-widest text-[14px] lg:text-[18px] 2xl:text-[22px]">
+            <p className="text-primary text-center tracking-widest text-[14px] lg:text-[18px]]">
               WHY CHOOSE US
             </p>
-            <h1 className="text-black text-center text-[30px] lg:text-[40px] 2xl:text-[52px]">
+            <h1 className="text-black text-center text-[30px] lg:text-[40px]">
               Why Partner With Best Branded Residences?
             </h1>
-            <p className="text-[#4D4D4D] text-center text-[16px] lg:text-[18px] 2xl:text-[22px]">
+            <p className="text-[#4D4D4D] text-center text-[16px] lg:text-[18px]">
               We connect developers with a global audience of high-end buyers,
               providing premium marketing solutions that maximize exposure and
               drive sales.
@@ -452,34 +446,34 @@ const MarketingSolutionsPage = () => {
 
           <div className="flex flex-col lg:flex-row gap-[10px] bg-beigeVariant6 rounded-xl p-[16px] lg:p-[54px] w-full">
             <div className="flex flex-col">
-              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] 2xl:text-[75px] text-center">
+              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] text-center">
                 95%
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px] text-center">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px]  text-center">
                 Our clients experience a 95% satisfaction rate
               </p>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] 2xl:text-[75px] text-center">
+              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] text-center">
                 1M+
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px] text-center">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] text-center">
                 Each over a million potential buyer through platform
               </p>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] 2xl:text-[75px] text-center">
+              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px]  text-center">
                 80+
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px] text-center">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] text-center">
                 Showcasing luxury residences in over 80 countries
               </p>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] 2xl:text-[75px] text-center">
+              <h1 className="text-[#0F172A] text-[50px] lg:text-[60px]  text-center">
                 80+
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px] text-center">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] text-center">
                 Showcasing luxury residences in over 80 countries
               </p>
             </div>

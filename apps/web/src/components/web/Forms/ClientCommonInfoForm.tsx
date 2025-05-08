@@ -50,11 +50,11 @@ export default function ClientCommonInfoForm() {
 
   return (
     <div className="flex w-full flex-col gap-4 p-4 lg:p-8 h-full flex-col items-center justify-center gap-6 lg:gap-12 border rounded-lg custom-card contact-form">
-      <div>
+      <div className="flex flex-col w-full">
         <h2 className="text-[20px] lg:text-[34px] font-bold w-full">
           Ready to Maximize Your Exposure?
         </h2>
-        <p className="text-[12px] lg-text-[18px]">
+        <p className="text-[12px] lg:text-[18px]">
           Submit your details and let us help you unlock the full potential of
           your project.
         </p>

@@ -86,9 +86,9 @@ const ClientTestimonials = () => {
   ];
   return (
     <>
-      <div className="flex flex-col gap-[10px] lg:gap-[22px] lg:w-[70%] items-center">
+      <div className="flex flex-col gap-[10px] lg:gap-[22px] lg:w-[70%] items-center w-full">
         <p className="text-primary text-center">WHAT PEOPLE SAY ABOUT US</p>
-        <h1 className="text-[30px] lg:text-[40px] 2xl:text-[52px] text-center">
+        <h1 className="text-[30px] lg:text-[40px] 2xl:text-[40px] text-center">
           Success Stories from Leading Developers
         </h1>
       </div>
