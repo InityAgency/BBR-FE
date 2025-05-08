@@ -6,6 +6,7 @@ import FaqBlock from "@/components/web/Faq/FaqBlock";
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
 import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
+import SectionLayout from "@/components/web/SectionLayout";
 
 const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
 const CAROUSEL_CARDS = [
@@ -97,7 +98,7 @@ export default function EvaluationCriteriaPage() {
                 </linearGradient>
               </defs>
             </svg>
-            <h1 className="text-[52px] text-left lg:text-center w-full lg:w-[55%] mx-auto">
+            <h1 className="text-[30px] 2xl:text-[40px] text-left lg:text-center w-full lg:w-[55%] mx-auto">
               Shaping the Future of Luxury Real Estate Discovery
             </h1>
             <p className="font-normal lg:text-xl w-full text-left lg:text-center mx-auto text-white">
@@ -136,10 +137,10 @@ export default function EvaluationCriteriaPage() {
               className="h-full w-[100%] lg:w-[40%] rounded mt-[24px]"
             />
             <div className="flex flex-col w-[100%] lg:w-[60%] gap-[24px]">
-              <h1 className="2xl:text-[56px] text-[40px] mx-auto">
+              <h1 className="text-[24px] lg:text-[36px]">
                 What Makes a Top Residence?
               </h1>
-              <p className="text-md text-justify text-[20px] mx-auto text-white">
+              <p className="text-md text-justify text-[16px] mx-auto text-white">
                 We don’t just list properties—we evaluate them. Every ranked
                 residence is scored through a dynamic system that adapts to
                 context, location, lifestyle, and value potential. Our model
@@ -168,7 +169,7 @@ export default function EvaluationCriteriaPage() {
 
       {/* THIRD SECTION */}
       <div className="bg-beigeVariant1 pl-[30px] py-[20px] lg:pl-[120px] lg:py-[96px] overflow-hidden">
-        <h1 className="text-secondary text-4xl lg:text-6xl mb-[24px]">
+        <h1 className="text-secondary text-[40px] mb-[24px]">
           Our Ranking Evaluation Pillars
         </h1>
         <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px]">
@@ -227,7 +228,7 @@ export default function EvaluationCriteriaPage() {
       <div className="bg-white px-[30px] py-[20px] lg:px-[120px] lg:py-[84px]">
         <div className="flex flex-col gap-[56px] bg-beigeVariant2 rounded-xl p-[32px] lg:p-[64px]">
           <div className="flex flex-col lg:flex-row gap-[48px]">
-            <h1 className="text-4xl lg:text-6xl text-black lg:w-[50%]">
+            <h1 className="text-4xl text-[36px] lg:text-[40px] text-black lg:w-[50%]">
               The Evaluation Process
               <span className="text-primary"> AI-Powered.</span> Expert-Curated
             </h1>
@@ -251,10 +252,10 @@ export default function EvaluationCriteriaPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-[24px] text-blackBlueVariant1">
+                  <h2 className="text-[16px] text-blackBlueVariant1">
                     Developers Submit their Residences
                   </h2>
-                  <h3 className="text-[18px] text-blackBlueVariant1">
+                  <h3 className="text-[14px] text-blackBlueVariant1">
                     Developers submit detailed profiles of their branded
                     residences, showcasing their unique features, amenities, and
                     lifestyle offerings to be considered for ranking.
@@ -271,10 +272,10 @@ export default function EvaluationCriteriaPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-[24px] text-blackBlueVariant1">
+                  <h2 className="text-[16px] text-blackBlueVariant1">
                     BBR Evaluates and Ranks with AI Empowerment
                   </h2>
-                  <h3 className="text-[18px] text-blackBlueVariant1">
+                  <h3 className="text-[14px] text-blackBlueVariant1">
                     Developers submit detailed profiles of their branded
                     residences, showcasing their unique features, amenities, and
                     lifestyle offerings to be considered for ranking.
@@ -291,10 +292,10 @@ export default function EvaluationCriteriaPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-[24px] text-blackBlueVariant1">
+                  <h2 className="text-[16px] text-blackBlueVariant1">
                     You Explore the Top-Ranked Residences
                   </h2>
-                  <h3 className="text-[18px] text-blackBlueVariant1">
+                  <h3 className="text-[14px] text-blackBlueVariant1">
                     Developers submit detailed profiles of their branded
                     residences, showcasing their unique features, amenities, and
                     lifestyle offerings to be considered for ranking.
@@ -302,9 +303,9 @@ export default function EvaluationCriteriaPage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col bg-white rounded-xl px-[20px] py-[16px] lg:px-[32px] lg:py-[24px] min-w-[200px] gap-[24px]">
-              <h1 className="text-[28px] text-blackBlueVariant1">Benefits</h1>
-              <div className="flex gap-[12px]">
+            <div className="flex flex-col bg-white rounded-xl px-[20px] py-[16px] lg:px-[32px] lg:py-[24px] min-w-[200px] gap-[16px]">
+              <h1 className="text-[26px] text-blackBlueVariant1">Benefits</h1>
+              <div className="flex gap-2">
                 <Image
                   src="/icons/evaluation-star.svg"
                   width={18}
@@ -312,12 +313,12 @@ export default function EvaluationCriteriaPage() {
                   alt="home-icon"
                   className="place-self-center"
                 />
-                <p className="text-blackBlueVariant1">
+                <p className="text-blackBlueVariant1 text-[14px]">
                   Gain confidence in the quality and value of potential
                   properties.
                 </p>
               </div>
-              <div className="flex gap-[12px]">
+              <div className="flex gap-2">
                 <Image
                   src="/icons/evaluation-star.svg"
                   width={18}
@@ -325,7 +326,7 @@ export default function EvaluationCriteriaPage() {
                   alt="home-icon"
                   className="place-self-center"
                 />
-                <p className="text-blackBlueVariant1">
+                <p className="text-blackBlueVariant1 text-[14px]">
                   Compare residences based on transparent and expert-led
                   assessments.
                 </p>
@@ -338,7 +339,7 @@ export default function EvaluationCriteriaPage() {
                   alt="home-icon"
                   className="place-self-center"
                 />
-                <p className="text-blackBlueVariant1">
+                <p className="text-blackBlueVariant1 text-[14px]">
                   Focus on properties that match your specific lifestyle,
                   preferences, and needs.
                 </p>
@@ -351,7 +352,7 @@ export default function EvaluationCriteriaPage() {
                   alt="home-icon"
                   className="place-self-center"
                 />
-                <p className="text-blackBlueVariant1">
+                <p className="text-blackBlueVariant1 text-[14px]">
                   Access a curated list of top-performing branded residences in
                   your desired location.
                 </p>
@@ -374,7 +375,7 @@ export default function EvaluationCriteriaPage() {
           className="h-full lg:w-[50%] rounded mt-[24px]"
         />
         <div className="flex flex-col lg:w-[50%] gap-[24px]">
-          <h1 className="text-center text-black 2xl:text-[56px] text-[40px] text-left mx-auto">
+          <h1 className="text-center text-black 2xl:text-[40px] text-[26px] text-left mx-auto">
             Custom Rankings. Relevant Comparisons.
           </h1>
           <p className="text-md text-black text-justify text-[20px] mx-auto">
@@ -405,7 +406,7 @@ export default function EvaluationCriteriaPage() {
       {/* SIXTH SECTION */}
       <div className="bg-beigeVariant3 px-[40px] py-[24px] lg:px-[120px] lg:py-[96px]">
         <div className="flex flex-col lg:flex-row justify-between">
-          <h1 className="text-xl lg:text-6xl text-black">
+          <h1 className="text-xl text-[36px] 2xl:text-[40px] text-black">
             Built for Buyers, Brokers and Developers Who Demand Clarity
           </h1>
           <div className="flex flex-col rounded-xl bg-beigeVariant4 p-[24px] gap-[24px]">
@@ -468,36 +469,42 @@ export default function EvaluationCriteriaPage() {
       <FaqBlock />
 
       {/* EIGHTH SECTION */}
-      <div className="flex gap-[80px] bg-secondary px-[32px] py-[16px] lg:py-[130px] lg:px-[176px]">
-        <div className="contact-form-wrapper w-full lg:w-[80%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px]">
-          <div className="flex flex-col gap-4">
-            <p className="text-[16px] text-primary">GET IN TOUCH</p>
-            <h1 className="text-3xl lg:text-6xl">Connect with Our Experts</h1>
-            <p className="text-[18px] text-justify">
-              Have questions or need personalized assistance? Our dedicated
-              consultants provide tailored guidance, ensuring you make the right
-              investment choices with confidence.
-            </p>
-            <p className="text-[18px] text-justify">
-              Whether you are looking for a luxury home, a profitable
-              investment, or an exclusive lifestyle experience, our consultants
-              are here to help.
-            </p>
-            <Button onClick={() => {}} className="place-self-start">
-              Schedule a consultation
-            </Button>
-            <Image
-              src="/connect-with-experts.png"
-              width={2800}
-              height={1600}
-              alt="Connect With Experts"
-              className="w-full h-full"
-            />
+      <div className="bg-secondary">
+        <SectionLayout>
+          <div className="flex gap-[80px]">
+            <div className="contact-form-wrapper w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px]">
+              <div className="flex flex-col gap-4">
+                <p className="text-[16px] text-primary">GET IN TOUCH</p>
+                <h1 className="text-[30px] lg:text-[40px]">
+                  Connect with Our Experts
+                </h1>
+                <p className="text-[18px] text-justify">
+                  Have questions or need personalized assistance? Our dedicated
+                  consultants provide tailored guidance, ensuring you make the
+                  right investment choices with confidence.
+                </p>
+                <p className="text-[18px] text-justify">
+                  Whether you are looking for a luxury home, a profitable
+                  investment, or an exclusive lifestyle experience, our
+                  consultants are here to help.
+                </p>
+                <Button onClick={() => {}} className="place-self-start">
+                  Schedule a consultation
+                </Button>
+                <Image
+                  src="/connect-with-experts.png"
+                  width={2800}
+                  height={1600}
+                  alt="Connect With Experts"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <RequestConsultationForm />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col gap-4">
-            <RequestConsultationForm />
-          </div>
-        </div>
+        </SectionLayout>
       </div>
     </div>
   );

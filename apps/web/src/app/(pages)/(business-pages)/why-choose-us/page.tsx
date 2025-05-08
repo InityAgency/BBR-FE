@@ -2,7 +2,6 @@ import BrandSlider from "@/components/web/Brands/BrandSlider";
 import ClientTestimonials from "@/components/web/ClientTestimonials/ClientTestimonials";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
-import SlidesPerViewCarousel from "@/components/web/SlidesPerViewCarousel/SlidesPerViewCarousel";
 import WhyChooseUsTabs from "@/components/web/WhyChooseUs/WhyChooseUsTabs";
 import Image from "next/image";
 import Link from "next/link";
@@ -207,10 +206,10 @@ export default function WhyChooseUsPage() {
           <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] lg:gap-[140px]">
             <div className="flex flex-col justify-center gap-[16px]">
               <p className="text-primary text-[16px]">WHY CHOOSE US</p>
-              <h1 className="text-[30px] xl:text-[56px]">
+              <h1 className="text-[36px] 2xl:text-[40px]">
                 Reach Affluent Buyers Seeking Opulent Branded Residences
               </h1>
-              <p className="text-[18px] lg:text-[22px]">
+              <p className="text-[18px] 2xl:text-[22px]">
                 Lorem ipsum dolor sit amet consectetur. Dolor auctor nunc odio
                 sagittis ornare. Faucibus bibendum eget erat purus ultrices
                 blandit tempus duis. Auctor ultricies ut quam elit amet quis. Mi
@@ -230,20 +229,20 @@ export default function WhyChooseUsPage() {
           <p className="text-primary text-[20px] text-center w-full">
             WHY CHOOSE BEST BRANDED RESIDENCES?
           </p>
-          <h1 className="text-[30px] xl:text-[52px] text-black place-self-center text-center lg:w-[70%]">
+          <h1 className="text-[36px] 2xl:text-[40px] text-black place-self-center text-center lg:w-[70%]">
             Align Your Development with the Industry Leader in Luxury Branded
             Residences
           </h1>
-          <div className="flex flex-col xl:flex-row bg-beigeVariant5 mt-[25px] xl:mt-[56px] rounded-2xl p-[24px] lg:p-[48px] gap-[32px]">
+          <div className="flex flex-col xl:flex-row bg-beigeVariant5 mt-[25px] 2xl:mt-[56px] rounded-2xl p-[24px] lg:p-[48px] gap-[32px]">
             <Image
               src="/why-choose-us-best.png"
               alt="why-choose-us-best"
-              width={700}
-              height={740}
-              className="rounded-2xl w-full xl:w-[50%]"
+              width={500}
+              height={300}
+              className="rounded-2xl flex-1 flex"
             />
 
-            <div className="flex flex-col justify-between gap-[20px] xl:w-[50%]">
+            <div className="flex flex-1 flex-col justify-between gap-[10px] xl:w-[50%]">
               <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
                 <Image
                   src="/icons/why-choose-us-boost.svg"
@@ -253,10 +252,10 @@ export default function WhyChooseUsPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[16px] lg:text-[28px]">
+                  <h2 className="text-black text-[22px]">
                     Boost Credibility & Trust
                   </h2>
-                  <p className="text-black/80 text-[12px] lg:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     Enhance your property’s reputation with strategic rankings,
                     giving your development the credibility needed to convert
                     more leads into buyers.
@@ -272,10 +271,10 @@ export default function WhyChooseUsPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[16px] lg:text-[28px]">
+                  <h2 className="text-black text-[22px]">
                     Stand Out with Global Rankings
                   </h2>
-                  <p className="text-black/80 text-[12px] lg:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     Gain higher visibility through our platform’s ranking
                     system, positioning your property for premium exposure and
                     trust with buyers.
@@ -292,10 +291,10 @@ export default function WhyChooseUsPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[16px] lg:text-[28px]">
+                  <h2 className="text-black text-[22px]">
                     Elevate Your Property's Value
                   </h2>
-                  <p className="text-black/80 text-[12px] lg:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     Secure premium pricing and greater demand by aligning with
                     our ranking system, driving unmatched visibility and
                     credibility for your property.
@@ -312,10 +311,10 @@ export default function WhyChooseUsPage() {
                   className="place-self-start"
                 />
                 <div>
-                  <h2 className="text-black text-[16px] lg:text-[28px]">
+                  <h2 className="text-black text-[22px]">
                     Expand Global Reach
                   </h2>
-                  <p className="text-black/80 text-[12px] lg:text-[20px]">
+                  <p className="text-black/80 text-[16px]">
                     SAccess a worldwide network of affluent buyers, positioning
                     your property for international visibility and higher sales
                     velocity.
@@ -330,14 +329,14 @@ export default function WhyChooseUsPage() {
       {/* THIRD SECTION */}
       <div className="flex flex-col gap-[56px] bg-beigeVariant8 border-3 border-beigeVariant7">
         <SectionLayout>
-          <div className="flex flex-col xl:flex-row gap-[30px] xl:gap-[100px]">
+          <div className="flex flex-col xl:flex-row gap-[30px] xl:gap-[70px]">
             <div className="w-full xl:w-[50%]">
-              <p className="text-primary text-center">WHY THEY CHOOSE US</p>
-              <h1 className="text-[30px] xl:text-[52px] w-full text-center xl:text-start text-black">
+              <p className="text-primary text-left">WHY THEY CHOOSE US</p>
+              <h1 className="text-[30px] xl:text-[40px] w-full text-center xl:text-start text-black">
                 Why Developers Choose BBRA Strategic Necessity
               </h1>
             </div>
-            <p className="text-black/70 text-[20px] xl:w-[50%]">
+            <p className="text-black/70 text-[16px] xl:w-[50%]">
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
               ever since the 1500s, when anLorem Ipsum is simply dummy text of
@@ -363,10 +362,10 @@ export default function WhyChooseUsPage() {
                 </p>
               </div>
               <div>
-                <h2 className="text-black text-[28px]">
+                <h2 className="text-black text-[22px]">
                   Stand Out with Global Rankings
                 </h2>
-                <p className="text-black/80 text-[20px]">
+                <p className="text-black/80 text-[16px]">
                   Gain higher visibility through our platform’s ranking system,
                   positioning your property for premium exposure and trust with
                   buyers.
@@ -381,8 +380,8 @@ export default function WhyChooseUsPage() {
                 </p>
               </div>
               <div>
-                <h2 className="text-black text-[28px]">Maximized ROI</h2>
-                <p className="text-black/80 text-[20px]">
+                <h2 className="text-black text-[22px]">Maximized ROI</h2>
+                <p className="text-black/80 text-[16px]">
                   Our developers consistently achieve premium pricing and
                   reduced marketing costs, resulting in a higher return on
                   investment.
@@ -397,8 +396,8 @@ export default function WhyChooseUsPage() {
                 </p>
               </div>
               <div>
-                <h2 className="text-black text-[28px]">Thought Leadership</h2>
-                <p className="text-black/80 text-[20px]">
+                <h2 className="text-black text-[22px]">Thought Leadership</h2>
+                <p className="text-black/80 text-[16px]">
                   Align with BBR to stay ahead of industry trends, future-proof
                   your developments, and build long-term market resilience.
                 </p>
@@ -412,10 +411,10 @@ export default function WhyChooseUsPage() {
                 </p>
               </div>
               <div>
-                <h2 className="text-black text-[28px]">
+                <h2 className="text-black text-[22px]">
                   Future-Proofing Your Brand
                 </h2>
-                <p className="text-black/80 text-[20px]">
+                <p className="text-black/80 text-[16px]">
                   By aligning with BBR, developers position themselves to
                   succeed not just today, but in the future. Our team
                   continually monitors market
@@ -430,10 +429,10 @@ export default function WhyChooseUsPage() {
                 </p>
               </div>
               <div>
-                <h2 className="text-black text-[28px]">
+                <h2 className="text-black text-[22px]">
                   A Partner for the Long Term
                 </h2>
-                <p className="text-black/80 text-[20px]">
+                <p className="text-black/80 text-[16px]">
                   We don’t just provide a platform—we offer ongoing strategic
                   advice, ensuring that developers have the tools and expertise
                   needed for sustained growth.
@@ -447,38 +446,34 @@ export default function WhyChooseUsPage() {
       {/* FOURTH SECTION */}
       <div className="bg-beigeVariant8">
         <SectionLayout>
-          <h1 className="text-black text-[30px] xl:text-[52px] text-center">
+          <h1 className="text-black text-[30px] xl:text-[40px] text-center">
             Our Core team
           </h1>
-          <p className="text-black text-[18px] text-start xl:text-center">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry
-          </p>
-          <div className="relative flex flex-col md:flex-row gap-[48px] mt-[20px]">
+          <div className="relative flex flex-col md:flex-row gap-[36px]">
             <div className="flex flex-col gap-[10px]">
               <div className="relative flex">
                 <Image
                   alt="Mountains"
                   src="/robert-fox.png"
                   quality={100}
-                  height={424}
-                  width={410}
-                  className="rounded-xl"
+                  height={300}
+                  width={300}
+                  className="rounded-xl max-h-[300px]"
                 />
                 <Link href="https://www.linkedin.com/">
                   <Image
                     src="/icons/linkedin-rounded.svg"
-                    width={62}
-                    height={62}
+                    width={40}
+                    height={40}
                     alt="home-icon"
-                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[62px] xl:h-[62px]"
+                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[40px] xl:h-[40px]"
                   />
                 </Link>
               </div>
-              <h1 className="text-black text-center text-[20px] xl:text-[36px]">
+              <h1 className="text-black text-center text-[20px] xl:text-[28px]">
                 Robert Fox
               </h1>
-              <p className="text-black/60 text-center text-[12px] xl:text-[20px]">
+              <p className="text-black/60 text-center text-[12px] xl:text-[16px]">
                 Software Developer
               </p>
             </div>
@@ -488,24 +483,24 @@ export default function WhyChooseUsPage() {
                   alt="Mountains"
                   src="/cammeron.png"
                   quality={100}
-                  height={424}
-                  width={410}
+                  height={300}
+                  width={300}
                   className="rounded-xl"
                 />
                 <Link href="https://www.linkedin.com/">
                   <Image
                     src="/icons/linkedin-rounded.svg"
-                    width={62}
-                    height={62}
+                    width={40}
+                    height={40}
                     alt="home-icon"
-                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[62px] xl:h-[62px]"
+                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[40px] xl:h-[40px]"
                   />
                 </Link>
               </div>
-              <h1 className="text-black text-center text-[20px] xl:text-[36px]">
+              <h1 className="text-black text-center text-[20px] xl:text-[28px]">
                 Cameron Williamson
               </h1>
-              <p className="text-black/60 text-center text-[12px] xl:text-[20px]">
+              <p className="text-black/60 text-center text-[12px] xl:text-[16px]">
                 President of Sales
               </p>
             </div>
@@ -515,24 +510,24 @@ export default function WhyChooseUsPage() {
                   alt="Mountains"
                   src="/jenny.png"
                   quality={100}
-                  height={424}
-                  width={410}
+                  height={300}
+                  width={300}
                   className="rounded-xl"
                 />
                 <Link href="https://www.linkedin.com/">
                   <Image
                     src="/icons/linkedin-rounded.svg"
-                    width={62}
-                    height={62}
+                    width={40}
+                    height={40}
                     alt="home-icon"
-                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[62px] xl:h-[62px]"
+                    className="absolute right-2 bottom-2 w-[30px] h-[30px] xl:w-[40px] xl:h-[40px]"
                   />
                 </Link>
               </div>
-              <h1 className="text-black text-center text-[20px] xl:text-[36px]">
+              <h1 className="text-black text-center text-[20px] xl:text-[28px]">
                 Jenny Wilson
               </h1>
-              <p className="text-black/60 text-center text-[12px] xl:text-[20px]">
+              <p className="text-black/60 text-center text-[12px] xl:text-[16px]">
                 Software Tester
               </p>
             </div>
@@ -543,20 +538,20 @@ export default function WhyChooseUsPage() {
       {/* FIFTH SECTION */}
       <div className="bg-beigeVariant8 border-3 border-beigeVariant7">
         <SectionLayout>
-          <div className="flex flex-col xl:w-[50%] place-self-center">
-            <p className="text-primary text-[16px] xl:text-[20px] text-center">
+          <div className="flex flex-col gap-4 xl:w-[50%] place-self-center">
+            <p className="text-primary text-[16px] text-center">
               WHY THEY CHOOSE US
             </p>
-            <h1 className="text-black text-[32px] xl:text-[52px] text-center">
+            <h1 className="text-black text-[32px] xl:text-[40px] text-center">
               Why Developers Choose BBRA Strategic Necessity
             </h1>
-            <p className="text-black/60 text-[16px] lg:text-[20px] text-center">
+            <p className="text-black/60 text-[16px] text-center">
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
               ever
             </p>
           </div>
-          <WhyChooseUsTabs tabs={tabs} className="mt-[56px]" />
+          <WhyChooseUsTabs tabs={tabs} />
         </SectionLayout>
       </div>
 
@@ -570,10 +565,10 @@ export default function WhyChooseUsPage() {
               fill
               className="w-full h-full object-cover opacity-40"
             />
-            <h1 className="text-black text-[24px] lg:text-[52px] lg:w-[50%] text-center">
+            <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
               Join the Best and Elevate Your Branded Residence
             </h1>
-            <p className="text-black text-[14px] lg:text-[18px] lg:w-[50%] text-center">
+            <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
               Aligning with Best Branded Residences means partnering with the
               leading platform for luxury developments. You’ll benefit from
               exclusive access to affluent buyers, industry expertise, and a
@@ -598,7 +593,9 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* EIGHT SECTION */}
-      <BrandSlider />
+      <SectionLayout>
+        <BrandSlider />
+      </SectionLayout>
     </div>
   );
 }

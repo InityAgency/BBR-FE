@@ -220,16 +220,16 @@ const MarketingSolutionsPage = () => {
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
           />
-          <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] 2xl:gap-[140px]">
+          <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px]">
             <div className="flex flex-col justify-center gap-[16px]">
               <p className="text-primary text-[16px]">
                 UNLOCK YOUR PROJECT’S FULL POTENTIAL
               </p>
-              <h1 className="text-[30px] lg:text-[42px] 2xl:text-[56px]">
+              <h1 className="text-[30px] lg:text-[36px]">
                 Transform Your Branded Residences with the Best Real Estate
                 Network
               </h1>
-              <p className="text-[18px] 2xl:text-[22px] text-white/60">
+              <p className="text-[18px] text-white/60">
                 From showcasing your properties to affluent buyers to ensuring
                 your property ranks among the best, BBR provides everything
                 developers need to succeed. Connect with high-net-worth buyers,
@@ -391,7 +391,7 @@ const MarketingSolutionsPage = () => {
               fill
               className="w-full h-full object-cover opacity-40"
             />
-            <h1 className="text-black text-[24px] lg:text-[40px] 2xl:[52px] lg:w-[70%] text-center">
+            <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
               Leverage performance-based marketing campaigns
             </h1>
             <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
@@ -416,13 +416,13 @@ const MarketingSolutionsPage = () => {
         <SectionLayout>
           <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px]">
             <div>
-              <p className="text-primary text-[14px] lg:text-[18px] 2xl:text-[20px] tracking-widest">
+              <p className="text-primary text-[14px] lg:text-[18px] tracking-widest">
                 OUR SUGGESTION
               </p>
-              <h1 className="text-black text-[30px] lg:text-[40px] 2xl:text-[52px]">
+              <h1 className="text-black text-[30px] lg:text-[40px]">
                 Unlock your project’s Potential with BBR
               </h1>
-              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px] 2xl:text-[22px]">
+              <p className="text-[#4D4D4D] text-[16px] lg:text-[18px]">
                 As a developer in the competitive branded residences market, you
                 face challenges across multiple areas: reaching affluent buyers,
                 building your brand, shortening sales cycles, and managing
