@@ -1,4 +1,5 @@
 import BrandSlider from "@/components/web/Brands/BrandSlider";
+import ClientTestimonials from "@/components/web/ClientTestimonials/ClientTestimonials";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
 import SlidesPerViewCarousel from "@/components/web/SlidesPerViewCarousel/SlidesPerViewCarousel";
@@ -188,89 +189,6 @@ const tabs = [
 ];
 // #endregion
 
-// #region CLIENTS TESTIMONIALS
-const ClientTestimonial = ({
-  sentence,
-  fullName,
-  position,
-  imageUrl,
-  imageAlt,
-}: {
-  sentence: string;
-  fullName: string;
-  position: string;
-  imageUrl: string;
-  imageAlt: string;
-}) => {
-  return (
-    <div className="flex flex-col gap-[12px] lg:gap-[24px] bg-quaternary rounded-xl p-[12px] lg:p-[30px]">
-      <Image
-        src="/icons/gold-dots.svg"
-        alt="gold-dots"
-        width={37}
-        height={32}
-        className="w-[20px] h-[16px] lg:w-[37px] lg:h-[32px]"
-      />
-      <p className="text-[14px] lg:text-[28px]">{sentence}</p>
-      <div className="flex gap-[12px]">
-        <Image
-          src={imageUrl}
-          alt={imageAlt}
-          width={52}
-          height={52}
-          className="w-[36px] h-[36px] lg:w-[52px] lg:h-[52px] rounded lg:rounded-xl"
-        />
-        <div>
-          <p className="text-[14px] lg:text-[24px]">{fullName}</p>
-          <p className="text-[10px] lg:text-[16px]">{position}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const clientTestimonials = [
-  <ClientTestimonial
-    key={1}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Cameron Williamson"
-    position="DEVELOPER"
-    imageUrl="/woman-cammeron.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={2}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Arlene McCoy"
-    position="FOUNDER"
-    imageUrl="/arlene-mc-coy.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={3}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Jenny Wilson"
-    position="MANAGER"
-    imageUrl="/second-jenny-wilson.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={4}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Patrick Fox"
-    position="SALER"
-    imageUrl="/robert-fox.png"
-    imageAlt="client-testimonial1"
-  />,
-];
 // #endregion
 
 // #region MAIN COMPONENT
@@ -675,19 +593,7 @@ export default function WhyChooseUsPage() {
       {/* SEVENTH SECTION */}
       <div className="flex flex-col gap-[56px] bg-secondary bg-secondary items-center">
         <SectionLayout>
-          <div className="flex flex-col gap-[10px] lg:gap-[22px] lg:w-[50%] items-center">
-            <p className="text-primary text-center">WHAT PEOPLE SAY ABOUT US</p>
-            <h1 className="text-[30px] lg:text-[52px] text-center">
-              Client Testimonials
-            </h1>
-            <p className="text-[16px] lg:text-[22px] text-center">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industryLorem Ipsum is simply dummy text of the printing and
-              typesetting industry
-            </p>
-          </div>
-
-          <SlidesPerViewCarousel slides={clientTestimonials} />
+          <ClientTestimonials />
         </SectionLayout>
       </div>
 

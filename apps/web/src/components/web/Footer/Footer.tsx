@@ -186,6 +186,9 @@ export default function Footer() {
                 <Link href="/marketing-solutions">Marketing Solutions</Link>
               </li>
               <li>
+                <Link href="/developer-solutions">Developer Solutions</Link>
+              </li>
+              <li>
                 <Link href="/#">Features</Link>
               </li>
               <li>
