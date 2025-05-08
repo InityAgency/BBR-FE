@@ -13,22 +13,23 @@ export default function VerifyEmailPage() {
     const [isLoading, setIsLoading] = useState(false);
     const email = searchParams.get("email");
     const token = searchParams.get("token");
+    const [hasVerified, setHasVerified] = useState(false);
 
     useEffect(() => {
-        if (token) {
+        if (token && !hasVerified) {
+            setHasVerified(true);
             verifyEmail(token);
         }
-    }, [token]);
+    }, [token, hasVerified]);
 
     const verifyEmail = async (verificationToken: string) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/verify-email`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/users/${verificationToken}/verify-email`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: verificationToken }),
+                }
             });
 
             if (!response.ok) {
@@ -89,14 +90,14 @@ export default function VerifyEmailPage() {
                         We just sent you email to the address: <span className="font-medium text-foreground">{email}</span>. 
                         Please check your email and click on the provided link to verify your address
                     </p>
-                    <Button 
+                    {/* <Button 
                         onClick={handleResendVerification}
                         variant="default"
                         className="w-full"
                         disabled={isLoading}
                     >
                         {isLoading ? "Sending..." : "Resend verification email"}
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
         </div>
