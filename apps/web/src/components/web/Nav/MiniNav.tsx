@@ -149,30 +149,30 @@ export default function MiniNav() {
                       <User className="h-4 w-4" />
                       My Dashboard
                     </Link>
-                    <Link
+                    {/* <Link
                       href="/notifications"
                       className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
                       <BellRing className="h-4 w-4" />
                       Notifications
-                    </Link>
-                    <Link
+                    </Link> */}
+                    {/* <Link
                       href="/account-settings"
                       className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
                       <Settings className="h-4 w-4" />
                       Account Settings
-                    </Link>
-                    <Link
+                    </Link> */}
+                    {/* <Link
                       href="/help-support"
                       className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
                       <HelpCircle className="h-4 w-4" />
                       Help & Support
-                    </Link>
+                    </Link> */}
                   </div>
                   <div className="border-t border-border py-1">
                     <button

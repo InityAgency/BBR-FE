@@ -220,9 +220,9 @@ export default function Footer() {
               <li>
                 <Link href="/#">Apply for Rankings</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/#">Marketing Solutions</Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/#">Claim Your Profile</Link>
               </li>
