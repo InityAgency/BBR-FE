@@ -49,6 +49,7 @@
   --color-beigeVariant6: var(--beigeVariant6);
   --color-beigeVariant7: var(--beigeVariant7);
   --color-beigeVariant8: var(--beigeVariant8);
+  --color-beigeVariant9: var(--beigeVariant9);
   --color-blackBlueVariant1: var(--blackBlueVariant1);
 }
 
@@ -97,6 +98,7 @@
   --beigeVariant6: oklch(0.97 0.0082 91.48); /* #F8F6F0 */
   --beigeVariant7: oklch(0.94 0.0155 67.64 / 47.84%); /* #F1E8DF7A */
   --beigeVariant8: oklch(0.97 0.0068 67.74); /* #F8F4F0 */
+  --beigeVariant9: oklch(0.97 0.0051 67.76); /* #F1E8DF66 */
   --blackBlueVariant1: oklch(0.23 0.0132 243.49);
 }
 
@@ -144,6 +146,7 @@
   --beigeVariant6: oklch(0.97 0.0082 91.48); /* #F8F6F0 */
   --beigeVariant7: oklch(0.94 0.0155 67.64 / 47.84%); /* #F1E8DF7A */
   --beigeVariant8: oklch(0.97 0.0068 67.74); /* #F8F4F0 */
+  --beigeVariant9: oklch(0.97 0.0051 67.76); /* #F1E8DF66 */
   --blackBlueVariant1: oklch(0.23 0.0132 243.49);
 }
 
@@ -355,5 +358,35 @@
 .embla__button__svg_slides_per_view {
   width: 35%;
   height: 35%;
+}
+/* #endregion */
+
+/* #region Vertical Carousel */
+.embla_vertical {
+  margin: auto;
+  margin-top: 30px;
+  background-color: red;
+}
+.embla__viewport_vertical {
+  overflow: hidden;
+}
+.embla__container_vertical {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  touch-action: pan-y pinch-zoom;
+}
+.embla__slide_vertical {
+  transform: translate3d(0, 0, 0);
+  flex: 0 0 30%;
+  min-width: 30%;
+  padding-left: 1rem;
+  height: fit-content;
+}
+.embla__slide__img_vertical {
+  border-radius: 1.8rem;
+  display: block;
+  width: 100%;
+  object-fit: cover;
 }
 /* #endregion */

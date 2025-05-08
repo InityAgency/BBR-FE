@@ -1,3 +1,5 @@
+import BrandSlider from "@/components/web/Brands/BrandSlider";
+import ClientTestimonials from "@/components/web/ClientTestimonials/ClientTestimonials";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
 import SlidesPerViewCarousel from "@/components/web/SlidesPerViewCarousel/SlidesPerViewCarousel";
@@ -187,172 +189,6 @@ const tabs = [
 ];
 // #endregion
 
-// #region CLIENTS TESTIMONIALS
-const ClientTestimonial = ({
-  sentence,
-  fullName,
-  position,
-  imageUrl,
-  imageAlt,
-}: {
-  sentence: string;
-  fullName: string;
-  position: string;
-  imageUrl: string;
-  imageAlt: string;
-}) => {
-  return (
-    <div className="flex flex-col gap-[12px] lg:gap-[24px] bg-quaternary rounded-xl p-[12px] lg:p-[30px]">
-      <Image
-        src="/icons/gold-dots.svg"
-        alt="gold-dots"
-        width={37}
-        height={32}
-        className="w-[20px] h-[16px] lg:w-[37px] lg:h-[32px]"
-      />
-      <p className="text-[14px] lg:text-[28px]">{sentence}</p>
-      <div className="flex gap-[12px]">
-        <Image
-          src={imageUrl}
-          alt={imageAlt}
-          width={52}
-          height={52}
-          className="w-[36px] h-[36px] lg:w-[52px] lg:h-[52px] rounded lg:rounded-xl"
-        />
-        <div>
-          <p className="text-[14px] lg:text-[24px]">{fullName}</p>
-          <p className="text-[10px] lg:text-[16px]">{position}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const clientTestimonials = [
-  <ClientTestimonial
-    key={1}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Cameron Williamson"
-    position="DEVELOPER"
-    imageUrl="/woman-cammeron.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={2}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Arlene McCoy"
-    position="FOUNDER"
-    imageUrl="/arlene-mc-coy.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={3}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Jenny Wilson"
-    position="MANAGER"
-    imageUrl="/second-jenny-wilson.png"
-    imageAlt="client-testimonial1"
-  />,
-  <ClientTestimonial
-    key={4}
-    sentence="I created this platform to bring transparency and quality into the
-        branded residence market. With decades of experience in review systems
-        and a passion for architecture and real estate, I saw an oppor"
-    fullName="Patrick Fox"
-    position="SALER"
-    imageUrl="/robert-fox.png"
-    imageAlt="client-testimonial1"
-  />,
-];
-// #endregion
-
-// #region BRANDS
-const Brands = ({
-  brandImages,
-}: {
-  brandImages: {
-    imageUrl: string;
-    imageAlt: string;
-  }[];
-}) => {
-  return (
-    <div className="flex flex-wrap gap-[16px] lg:gap-[32px] justify-between items-center">
-      {brandImages.map((image, index) => (
-        <Image
-          key={index}
-          src={image.imageUrl}
-          alt={image.imageAlt}
-          width={330}
-          height={135}
-          className="place-self-center max-w-[330px] w-[180px] h-[80px] lg:w-[330px] lg:h-[135px]"
-        />
-      ))}
-    </div>
-  );
-};
-const brandImages = [
-  {
-    imageUrl: "/brands/ritz-carlton.png",
-    imageAlt: "brand-image1",
-  },
-  {
-    imageUrl: "/brands/one-and-only.png",
-    imageAlt: "brand-image2",
-  },
-  {
-    imageUrl: "/brands/aman.png",
-    imageAlt: "brand-image3",
-  },
-  {
-    imageUrl: "/brands/recidences.png",
-    imageAlt: "brand-image4",
-  },
-  {
-    imageUrl: "/brands/buggati.png",
-    imageAlt: "brand-image5",
-  },
-  {
-    imageUrl: "/brands/baccarat.png",
-    imageAlt: "brand-image6",
-  },
-  {
-    imageUrl: "/brands/six-senses-recidences.png",
-    imageAlt: "brand-image7",
-  },
-  {
-    imageUrl: "/brands/four-seasons.png",
-    imageAlt: "brand-image8",
-  },
-  {
-    imageUrl: "/brands/stregis.png",
-    imageAlt: "brand-image9",
-  },
-  {
-    imageUrl: "/brands/bulgari.png",
-    imageAlt: "brand-image10",
-  },
-  {
-    imageUrl: "/brands/bentley.png",
-    imageAlt: "brand-image11",
-  },
-  {
-    imageUrl: "/brands/palazzo-vercase.png",
-    imageAlt: "brand-image12",
-  },
-];
-
-// TODO: ADD MORE BRANDS INSTEAD OF DUPLICATING
-const brandSlides = [
-  <Brands key={1} brandImages={brandImages} />,
-  <Brands key={2} brandImages={brandImages} />,
-  <Brands key={3} brandImages={brandImages} />,
-];
 // #endregion
 
 // #region MAIN COMPONENT
@@ -360,13 +196,13 @@ export default function WhyChooseUsPage() {
   return (
     <div>
       {/* FIRST SECTION */}
-      <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
-        <div className="flex flex-col gap-6 w-full rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
           <Image
             src="/why-choose-us-hero.png"
             alt="about-us"
             fill
-            className="w-full h-full object-cover opacity-40"
+            className="w-full h-full object-cover opacity-40 rounded-xl"
           />
           <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] lg:gap-[140px]">
             <div className="flex flex-col justify-center gap-[16px]">
@@ -757,28 +593,12 @@ export default function WhyChooseUsPage() {
       {/* SEVENTH SECTION */}
       <div className="flex flex-col gap-[56px] bg-secondary bg-secondary items-center">
         <SectionLayout>
-          <div className="flex flex-col gap-[10px] lg:gap-[22px] lg:w-[50%] items-center">
-            <p className="text-primary text-center">WHAT PEOPLE SAY ABOUT US</p>
-            <h1 className="text-[30px] lg:text-[52px] text-center">
-              Client Testimonials
-            </h1>
-            <p className="text-[16px] lg:text-[22px] text-center">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industryLorem Ipsum is simply dummy text of the printing and
-              typesetting industry
-            </p>
-          </div>
-
-          <SlidesPerViewCarousel slides={clientTestimonials} />
+          <ClientTestimonials />
         </SectionLayout>
       </div>
 
       {/* EIGHT SECTION */}
-      <div className="bg-tertiary bg-secondary">
-        <SectionLayout>
-          <SlidesPerViewCarousel slides={brandSlides} oneElementPerView />
-        </SectionLayout>
-      </div>
+      <BrandSlider />
     </div>
   );
 }

@@ -183,7 +183,10 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/#">Marketing Solutions</Link>
+                <Link href="/developer-solutions">Developer Features</Link>
+              </li>
+              <li>
+                <Link href="/marketing-solutions">Marketing Solutions</Link>
               </li>
               <li>
                 <Link href="/#">Features</Link>
