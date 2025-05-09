@@ -293,7 +293,7 @@ export default function DeveloperOnboarding() {
             console.log("Notification preferences update successful:", response);
 
             toast.success('Onboarding completed successfully!');
-            router.push('/developer/dashboard');
+            router.push('/developer/onboarding/thank-you');
         } catch (error) {
             console.error('Error in final onboarding submit:', error);
             toast.error('Failed to complete onboarding. Please try again.');
@@ -323,7 +323,7 @@ export default function DeveloperOnboarding() {
     };
 
     return (
-        <div className="container max-w-2xl mx-auto py-8">
+        <div className="">
             <div className="space-y-6">
                 <Form {...form}>
                     <form onSubmit={handleSubmit} className="space-y-6 onboarding-form">
@@ -607,15 +607,10 @@ export default function DeveloperOnboarding() {
 
 
                         <div className="flex justify-between pt-4">
-                            {currentStep > 1 && (
-                                <Button type="button" variant="outline" onClick={prevStep}>
-                                    Previous
-                                </Button>
-                            )}
                             {currentStep < 3 ? (
                                 <Button
                                     type="submit"
-                                    className="ml-auto w-full"
+                                    className="w-full"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? "Saving..." : "Continue"}
@@ -623,7 +618,7 @@ export default function DeveloperOnboarding() {
                             ) : (
                                 <Button
                                     type="submit"
-                                    className="ml-auto"
+                                    className="w-full"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? "Completing..." : "Complete Onboarding"}

@@ -6,7 +6,7 @@ import {Proportions, Building, BookUser, MessageSquareDiff, Trophy, CreditCard, 
 export default function DeveloperSidebar() {
   const { user } = useAuth();
   return (
-    <div className="w-full lg:w-1/5 bg-secondary px-4 py-8 rounded-lg">
+    <div className="w-full lg:w-1/5 bg-secondary px-4 py-8 rounded-lg min-h-[50svh]">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Welcome {user?.fullName}</h1>

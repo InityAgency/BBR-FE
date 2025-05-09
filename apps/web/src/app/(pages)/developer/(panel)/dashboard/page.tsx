@@ -4,9 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function DeveloperDashboard() {
     const { user } = useAuth();
+    console.log(user);
+    console.log(user?.company);
     
     return (
-        <div className="p-8">
+        <div className="w-full">
             <h2 className="text-2xl font-bold mb-4">Welcome, {user?.fullName}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="rounded-lg border p-6 shadow-sm">

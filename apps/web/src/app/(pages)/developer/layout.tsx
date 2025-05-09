@@ -7,10 +7,8 @@ import PanelLayout from "@/components/web/PanelLayout";
 
 export default function DeveloperLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RouteGuard requiredRole="developer">
-      <PanelLayout>        
+    <RouteGuard requiredRole="developer">      
         {children}
-      </PanelLayout>
     </RouteGuard>
   );
 }
