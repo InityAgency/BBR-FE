@@ -56,13 +56,23 @@ async function wordpressFetch<T>(
   options: FetchOptions = {}
 ): Promise<T> {
   const userAgent = "Next.js WordPress Client";
+  const wpUsername = process.env.WORDPRESS_USERNAME;
+  const wpPassword = process.env.WORDPRESS_PASSWORD;
+
+  const headers: HeadersInit = {
+    "User-Agent": userAgent,
+  };
+
+  // Add Basic Auth if credentials are provided
+  if (wpUsername && wpPassword) {
+    const auth = Buffer.from(`${wpUsername}:${wpPassword}`).toString('base64');
+    headers['Authorization'] = `Basic ${auth}`;
+  }
 
   const response = await fetch(url, {
     ...defaultFetchOptions,
     ...options,
-    headers: {
-      "User-Agent": userAgent,
-    },
+    headers,
   });
 
   if (!response.ok) {
