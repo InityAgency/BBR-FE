@@ -244,7 +244,7 @@ const MarketingSolutionsPage = () => {
       </div>
 
       {/* SECOND SECTION */}
-      <div className="bg-beigeVariant9 py-4 xl:py-20">
+      <div className="bg-beigeVariant8 py-4 xl:py-20">
         <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16">
           <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
             OUR SOLUTIONS
