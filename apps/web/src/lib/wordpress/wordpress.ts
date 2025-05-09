@@ -56,23 +56,13 @@ async function wordpressFetch<T>(
   options: FetchOptions = {}
 ): Promise<T> {
   const userAgent = "Next.js WordPress Client";
-  const wpUsername = process.env.WORDPRESS_USERNAME;
-  const wpPassword = process.env.WORDPRESS_PASSWORD;
-
-  const headers: HeadersInit = {
-    "User-Agent": userAgent,
-  };
-
-  // Add Basic Auth if credentials are provided
-  if (wpUsername && wpPassword) {
-    const auth = Buffer.from(`${wpUsername}:${wpPassword}`).toString('base64');
-    headers['Authorization'] = `Basic ${auth}`;
-  }
 
   const response = await fetch(url, {
     ...defaultFetchOptions,
     ...options,
-    headers,
+    headers: {
+      "User-Agent": userAgent,
+    },
   });
 
   if (!response.ok) {
@@ -447,19 +437,24 @@ export async function revalidateWordPressData(tags: string[] = ["wordpress"]) {
 
 
 export async function getJobPostitions(): Promise<Post[]> {
-  const url = getUrl("/wp-json/wp/v2/career", { 
-    _embed: true,
-    per_page: 100 
-  });
-  
-  const response = await wordpressFetch<Post[]>(url, {
-    next: {
-      ...defaultFetchOptions.next,
-      tags: ["wordpress", "career"],
-    },
-  });
+  try {
+    const url = getUrl("/wp-json/wp/v2/career", { 
+      _embed: true,
+      per_page: 100 
+    });
+    
+    const response = await wordpressFetch<Post[]>(url, {
+      next: {
+        ...defaultFetchOptions.next,
+        tags: ["wordpress", "career"],
+      },
+    });
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error("Error fetching job positions:", error);
+    return [];
+  }
 }
 
 export async function getJobPostitionById(id: number): Promise<Post> {
