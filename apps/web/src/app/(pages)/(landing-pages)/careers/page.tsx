@@ -13,8 +13,10 @@ export default async function CareerPage() {
     
     try {
         jobPositions = await getJobPostitions();
+        console.log("Server fetched job positions:", jobPositions.length);
     } catch (error) {
         console.error("Error fetching job positions:", error);
+        jobPositions = [];
     }
     return (
 
