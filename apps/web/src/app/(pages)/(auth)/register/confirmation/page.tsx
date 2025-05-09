@@ -20,7 +20,7 @@ export default function RegistrationConfirmationPage() {
 
         setIsLoading(true);
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
             const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
             
             const response = await fetch(`${baseUrl}/api/${apiVersion}/auth/resend-verification`, {

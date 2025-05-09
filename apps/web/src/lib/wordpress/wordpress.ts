@@ -437,24 +437,19 @@ export async function revalidateWordPressData(tags: string[] = ["wordpress"]) {
 
 
 export async function getJobPostitions(): Promise<Post[]> {
-  try {
-    const url = getUrl("/wp-json/wp/v2/career", { 
-      _embed: true,
-      per_page: 100 
-    });
-    
-    const response = await wordpressFetch<Post[]>(url, {
-      next: {
-        ...defaultFetchOptions.next,
-        tags: ["wordpress", "career"],
-      },
-    });
+  const url = getUrl("/wp-json/wp/v2/career", { 
+    _embed: true,
+    per_page: 100 
+  });
+  
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", "career"],
+    },
+  });
 
-    return response;
-  } catch (error) {
-    console.error("Error fetching job positions:", error);
-    return [];
-  }
+  return response;
 }
 
 export async function getJobPostitionById(id: number): Promise<Post> {

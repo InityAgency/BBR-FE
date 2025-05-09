@@ -31,7 +31,7 @@ export default function VerifyEmailPage() {
         console.log("Verification started with token:", token);
         
         // Using correct URL schema according to your specification
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
         const verificationUrl = `${baseUrl}/api/${apiVersion}/users/${token}/verify-email`;
         
