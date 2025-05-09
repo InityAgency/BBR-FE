@@ -50,7 +50,7 @@ export default function RegisterDeveloperForm() {
             email: "",
             password: "",
             agreeToTerms: false,
-            receiveLuxuryInsights: false,
+            // receiveLuxuryInsights: false,
         },
     });
 
@@ -65,6 +65,7 @@ export default function RegisterDeveloperForm() {
                 companyName: data.companyName,
                 email: data.email,
                 password: data.password,
+                // receiveLuxuryInsights: data.receiveLuxuryInsights
             };
 
             // Definisanje API varijabli (u produkciji bi bile iz env fajla)
@@ -91,8 +92,8 @@ export default function RegisterDeveloperForm() {
                 description: "Please check your email to verify your account.",
             });
 
-            // Redirect to verify email page
-            router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+            // Redirect to confirmation page with email parameter
+            router.push(`/register/confirmation?email=${encodeURIComponent(data.email)}`);
         } catch (error) {
             toast.error("Registration error", {
                 description: error instanceof Error ? error.message : "An unexpected error occurred",

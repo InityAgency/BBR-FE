@@ -37,12 +37,14 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAccess: (path: string) => boolean;
+  loginWithToken: (token: string) => Promise<void>; 
+  setUser: (userData: User) => void; // Preimenovano iz setUserData za konzistentnost
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+        setUserState(parsedUser);
       } catch (error) {
         console.error('Error parsing user from localStorage:', error);
         localStorage.removeItem('user');
@@ -61,6 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
+  // Funkcija za direktno postavljanje podataka o korisniku
+  const setUser = (userData: User) => {
+    setUserState(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    document.cookie = `user=${JSON.stringify(userData)}; path=/`;
+  };
+
+  // Funkcija za prijavljivanje sa email-om i lozinkom
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -80,8 +90,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userData = response.data;
       
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      document.cookie = `user=${JSON.stringify(userData)}; path=/`;
       
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -104,6 +112,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Funkcija za prijavljivanje sa tokenom (nakon verifikacije)
+  const loginWithToken = async (token: string) => {
+    setIsLoading(true);
+    try {
+      // Postavljamo token u cookie (može biti korisno za API pozive)
+      document.cookie = `bbr-session=${token}; path=/`;
+      
+      // Dohvati podatke o korisniku sa tokenom
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to get user data with token');
+      }
+      
+      const userData = await res.json();
+      
+      // Postavlja korisnika u stanje i localStorage/cookie
+      setUser(userData.data);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Preusmeravanje na osnovu uloge
+      let targetPath;
+      if (userData.data?.role?.name === "developer") {
+        targetPath = '/developer/onboarding';
+      } else if (userData.data?.role?.name === "buyer") {
+        targetPath = '/buyer/onboarding';
+      } else {
+        targetPath = '/';
+      }
+      
+      if (pathname !== targetPath) {
+        router.replace(targetPath);
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error('Login with token error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -111,10 +170,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: 'POST',
         credentials: 'include',
       });
-      setUser(null);
+      setUserState(null);
       localStorage.removeItem('user');
-      document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      document.cookie = 'bbr-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      // document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      // document.cookie = 'bbr-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -143,7 +202,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAccess }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      login, 
+      logout, 
+      checkAccess, 
+      loginWithToken, 
+      setUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );
