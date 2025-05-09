@@ -195,7 +195,7 @@ export default function Footer() {
                 <Link href="/why-choose-us">Why Choose Us</Link>
               </li>
               <li>
-                <Link href="/#">How it Works</Link>
+                <Link href="/how-it-works">How it Works</Link>
               </li>
               <li>
                 <Link href="/pricing">Pricing</Link>
