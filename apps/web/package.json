@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "pnpm install typescript @types/node && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
