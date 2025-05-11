@@ -4,7 +4,13 @@ import { Plus, X } from "lucide-react";
 const MAX_SIZE_MB = 1;
 const SUPPORTED_FORMATS = ["image/png", "image/jpeg", "image/jpg"];
 
-export default function ImageUpload({ onFileChange }: { onFileChange: (file: File | null) => void }) {
+export default function ImageUpload({ 
+    onFileChange,
+    title = "Upload your company logo"
+}: { 
+    onFileChange: (file: File | null) => void;
+    title?: string;
+}) {
     const [preview, setPreview] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -78,7 +84,7 @@ export default function ImageUpload({ onFileChange }: { onFileChange: (file: Fil
                 />
             </div>
             <div>
-                <div className="text-white text-md font-medium mb-1">Upload your company logo</div>
+                <div className="text-white text-md font-medium mb-1">{title}</div>
                 <div className="text-muted-foreground text-sm">
                     JPG, JPEG, PNG, files are supported. Optimal dimensions 500×500 px. Optimal size – up to 1 MB.
                 </div>

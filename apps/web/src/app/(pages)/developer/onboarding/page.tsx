@@ -343,7 +343,7 @@ export default function DeveloperOnboarding() {
                                     </p>
                                 </div>
                                 <div className="space-y-6">
-                                    <ImageUpload onFileChange={setLogoFile} />
+                                    <ImageUpload onFileChange={setLogoFile} title="Upload your company logo" />
                                     <FormField
                                         control={form.control}
                                         name="address"

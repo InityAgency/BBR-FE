@@ -1,5 +1,15 @@
 .claim-request-form, .onboarding-form{
-    input, textarea{
+    input, textarea, select, button[data-slot="popover-trigger"]{
         background-color: transparent;
     }
 }
+
+    div[data-slot="command-item"]{
+        cursor: pointer;
+        &:hover{
+            background-color: #ffffff0a;
+        }
+    }
+    div[aria-selected="true"]{
+        background-color: #ffffff0a;
+    }
