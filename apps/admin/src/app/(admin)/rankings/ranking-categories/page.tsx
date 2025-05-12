@@ -64,23 +64,16 @@ export default function RankingCategoriesPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const queryParam = searchParams.get("query") || "";
 
-  // Parsiramo status iz URL parametara
+  // Parse status and categoryTypeId from URL parameters
   useEffect(() => {
     const statusValues = searchParams.getAll("status");
-    if (statusValues.length > 0) {
-      setSelectedStatuses(statusValues);
-    }
-  }, [searchParams]);
-
-  // Parsiramo categoryTypeId iz URL parametara
-  useEffect(() => {
     const categoryTypeIdValues = searchParams.getAll("categoryTypeId");
-    if (categoryTypeIdValues.length > 0) {
-      setSelectedCategoryTypeIds(categoryTypeIdValues);
-    }
+    
+    setSelectedStatuses(statusValues);
+    setSelectedCategoryTypeIds(categoryTypeIdValues);
   }, [searchParams]);
 
-  // Učitavamo tipove rankinga sa API-a
+  // Fetch ranking category types from API
   const fetchRankingCategoryTypes = async () => {
     try {
       setTypesLoading(true);
@@ -164,6 +157,7 @@ export default function RankingCategoriesPage() {
       setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
 
+      // Update URL to reflect the API's returned page, preserving filters
       const apiPage = data.pagination.page || page;
       if (apiPage !== page) {
         updateUrlParams({ page: apiPage });
@@ -179,66 +173,65 @@ export default function RankingCategoriesPage() {
   // Update URL with parameters
   const updateUrlParams = (params: {
     page?: number;
+    query?: string;
     statuses?: string[];
     categoryTypeIds?: string[];
   }) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams();
 
-    if (params.page !== undefined) {
-      newParams.set("page", params.page.toString());
+    // Always set page
+    newParams.set("page", (params.page ?? currentPage).toString());
+
+    // Set query if provided or preserve existing
+    if (params.query !== undefined) {
+      if (params.query.trim() !== "") {
+        newParams.set("query", params.query);
+      }
+    } else if (queryParam) {
+      newParams.set("query", queryParam);
     }
 
+    // Set statuses if provided or preserve existing
     if (params.statuses !== undefined) {
-      newParams.delete("status");
-      if (params.statuses && params.statuses.length > 0) {
-        params.statuses.forEach((status) => {
-          newParams.append("status", status);
-        });
-      }
+      params.statuses.forEach((status) => {
+        newParams.append("status", status);
+      });
+    } else {
+      selectedStatuses.forEach((status) => {
+        newParams.append("status", status);
+      });
     }
 
+    // Set categoryTypeIds if provided or preserve existing
     if (params.categoryTypeIds !== undefined) {
-      newParams.delete("categoryTypeId");
-      if (params.categoryTypeIds && params.categoryTypeIds.length > 0) {
-        params.categoryTypeIds.forEach((categoryTypeId) => {
-          newParams.append("categoryTypeId", categoryTypeId);
-        });
-      }
+      params.categoryTypeIds.forEach((categoryTypeId) => {
+        newParams.append("categoryTypeId", categoryTypeId);
+      });
+    } else {
+      selectedCategoryTypeIds.forEach((categoryTypeId) => {
+        newParams.append("categoryTypeId", categoryTypeId);
+      });
     }
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
-  // Efekat za učitavanje tipova
+  // Fetch category types on mount
   useEffect(() => {
     fetchRankingCategoryTypes();
   }, []);
 
-  // Efekat za ažuriranje URL-a kada se promene statusi
-  useEffect(() => {
-    if (selectedStatuses.length > 0) {
-      updateUrlParams({ statuses: selectedStatuses, page: 1 });
-    }
-  }, [selectedStatuses]);
-
-  // Efekat za ažuriranje URL-a kada se promene tipovi
-  useEffect(() => {
-    if (selectedCategoryTypeIds.length > 0) {
-      updateUrlParams({ categoryTypeIds: selectedCategoryTypeIds, page: 1 });
-    }
-  }, [selectedCategoryTypeIds]);
-
-  // Efekat za učitavanje kategorija
+  // Fetch categories when page, query, statuses, or categoryTypeIds change
   useEffect(() => {
     if (currentPage >= 1) {
       fetchRankingCategories(
         currentPage,
         queryParam || undefined,
-        searchParams.getAll("status"),
-        searchParams.getAll("categoryTypeId")
+        selectedStatuses,
+        selectedCategoryTypeIds
       );
     }
-  }, [currentPage, queryParam, searchParams]);
+  }, [currentPage, queryParam, selectedStatuses, selectedCategoryTypeIds]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {

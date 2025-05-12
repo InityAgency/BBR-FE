@@ -58,23 +58,16 @@ export default function UserManagementPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const queryParam = searchParams.get("query") || "";
 
-  // Parsiramo status iz URL parametara
+  // Parse status and roleId from URL parameters
   useEffect(() => {
     const statusValues = searchParams.getAll("status");
-    if (statusValues.length > 0) {
-      setSelectedStatuses(statusValues);
-    }
-  }, [searchParams]);
-
-  // Parsiramo roleId iz URL parametara
-  useEffect(() => {
     const roleIdValues = searchParams.getAll("roleId");
-    if (roleIdValues.length > 0) {
-      setSelectedRoleIds(roleIdValues);
-    }
+    
+    setSelectedStatuses(statusValues);
+    setSelectedRoleIds(roleIdValues);
   }, [searchParams]);
 
-  // Učitavamo uloge sa API-a
+  // Fetch roles from API
   const fetchRoles = async () => {
     try {
       setRolesLoading(true);
@@ -116,7 +109,7 @@ export default function UserManagementPage() {
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", ITEMS_PER_PAGE.toString());
 
-      if (query) {
+      if (query && query.trim() !== "") {
         url.searchParams.set("query", query);
       }
 
@@ -156,6 +149,12 @@ export default function UserManagementPage() {
       setUsers(data.data || []);
       setTotalPages(Math.ceil(data.pagination.total / ITEMS_PER_PAGE));
       setTotalItems(data.pagination.total);
+      
+      // Update URL to reflect the API's returned page, preserving filters
+      const apiPage = data.pagination.page || page;
+      if (apiPage !== page) {
+        updateUrlParams({ page: apiPage });
+      }
     } catch (error) {
       console.error("Error fetching users:", error);
       setUsers([]);
@@ -168,64 +167,65 @@ export default function UserManagementPage() {
 
   const updateUrlParams = (params: {
     page?: number;
+    query?: string;
     statuses?: string[];
     roleIds?: string[];
   }) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams();
 
-    if (params.page !== undefined) {
-      newParams.set("page", params.page.toString());
+    // Always set page
+    newParams.set("page", (params.page ?? currentPage).toString());
+
+    // Set query if provided or preserve existing
+    if (params.query !== undefined) {
+      if (params.query.trim() !== "") {
+        newParams.set("query", params.query);
+      }
+    } else if (queryParam) {
+      newParams.set("query", queryParam);
     }
 
+    // Set statuses if provided or preserve existing
     if (params.statuses !== undefined) {
-      newParams.delete("status");
-      if (params.statuses && params.statuses.length > 0) {
-        params.statuses.forEach((status) => {
-          newParams.append("status", status);
-        });
-      }
+      params.statuses.forEach((status) => {
+        newParams.append("status", status);
+      });
+    } else {
+      selectedStatuses.forEach((status) => {
+        newParams.append("status", status);
+      });
     }
 
+    // Set roleIds if provided or preserve existing
     if (params.roleIds !== undefined) {
-      newParams.delete("roleId");
-      if (params.roleIds && params.roleIds.length > 0) {
-        params.roleIds.forEach((roleId) => {
-          newParams.append("roleId", roleId);
-        });
-      }
+      params.roleIds.forEach((roleId) => {
+        newParams.append("roleId", roleId);
+      });
+    } else {
+      selectedRoleIds.forEach((roleId) => {
+        newParams.append("roleId", roleId);
+      });
     }
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
-  // Efekat za učitavanje uloga
+  // Fetch roles on mount
   useEffect(() => {
     fetchRoles();
   }, []);
 
-  // Efekat za ažuriranje URL-a kada se promene statusi
+  // Fetch users when page, query, statuses, or roleIds change
   useEffect(() => {
-    if (selectedStatuses.length > 0) {
-      updateUrlParams({ statuses: selectedStatuses, page: 1 });
+    if (currentPage >= 1) {
+      fetchUsers(
+        currentPage,
+        queryParam || undefined,
+        selectedStatuses,
+        selectedRoleIds
+      );
     }
-  }, [selectedStatuses]);
-
-  // Efekat za ažuriranje URL-a kada se promene uloge
-  useEffect(() => {
-    if (selectedRoleIds.length > 0) {
-      updateUrlParams({ roleIds: selectedRoleIds, page: 1 });
-    }
-  }, [selectedRoleIds]);
-
-  // Efekat za učitavanje korisnika
-  useEffect(() => {
-    fetchUsers(
-      currentPage,
-      queryParam,
-      searchParams.getAll("status"),
-      searchParams.getAll("roleId")
-    );
-  }, [currentPage, queryParam, searchParams]);
+  }, [currentPage, queryParam, selectedStatuses, selectedRoleIds]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {

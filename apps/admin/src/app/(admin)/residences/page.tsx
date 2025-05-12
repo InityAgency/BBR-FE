@@ -39,7 +39,7 @@ export default function ResidencesPage() {
   const currentPage = Number(searchParams.get("page")) || 1;
   const queryParam = searchParams.get("query") || "";
 
-  // Parsiramo status iz URL parametara
+  // Parse status, cityId, and countryId from URL parameters
   useEffect(() => {
     const statusValues = searchParams.getAll("status");
     const cityIdValues = searchParams.getAll("cityId");
@@ -114,6 +114,7 @@ export default function ResidencesPage() {
       setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
 
+      // Update URL to reflect the API's returned page, preserving filters
       const apiPage = data.pagination.page || page;
       if (apiPage !== page) {
         updateUrlParams({ page: apiPage });
@@ -128,70 +129,73 @@ export default function ResidencesPage() {
 
   const updateUrlParams = (params: {
     page?: number;
+    query?: string;
     statuses?: string[];
     cityIds?: string[];
     countryIds?: string[];
   }) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams();
 
-    if (params.page !== undefined) {
-      newParams.set("page", params.page.toString());
+    // Always set page
+    newParams.set("page", (params.page ?? currentPage).toString());
+
+    // Set query if provided or preserve existing
+    if (params.query !== undefined) {
+      if (params.query.trim() !== "") {
+        newParams.set("query", params.query);
+      }
+    } else if (queryParam) {
+      newParams.set("query", queryParam);
     }
 
+    // Set statuses if provided or preserve existing
     if (params.statuses !== undefined) {
-      newParams.delete("status");
-      if (params.statuses && params.statuses.length > 0) {
-        params.statuses.forEach((status) => {
-          newParams.append("status", status);
-        });
-      }
+      params.statuses.forEach((status) => {
+        newParams.append("status", status);
+      });
+    } else {
+      selectedStatuses.forEach((status) => {
+        newParams.append("status", status);
+      });
     }
 
+    // Set cityIds if provided or preserve existing
     if (params.cityIds !== undefined) {
-      newParams.delete("cityId");
-      if (params.cityIds && params.cityIds.length > 0) {
-        params.cityIds.forEach((cityId) => {
-          newParams.append("cityId", cityId);
-        });
-      }
+      params.cityIds.forEach((cityId) => {
+        newParams.append("cityId", cityId);
+      });
+    } else {
+      selectedCityIds.forEach((cityId) => {
+        newParams.append("cityId", cityId);
+      });
     }
 
+    // Set countryIds if provided or preserve existing
     if (params.countryIds !== undefined) {
-      newParams.delete("countryId");
-      if (params.countryIds && params.countryIds.length > 0) {
-        params.countryIds.forEach((countryId) => {
-          newParams.append("countryId", countryId);
-        });
-      }
+      params.countryIds.forEach((countryId) => {
+        newParams.append("countryId", countryId);
+      });
+    } else {
+      selectedCountryIds.forEach((countryId) => {
+        newParams.append("countryId", countryId);
+      });
     }
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
-  // Efekat za učitavanje rezidencija
+  // Fetch residences when page, query, statuses, cityIds, or countryIds change
   useEffect(() => {
     if (currentPage >= 1) {
       fetchResidences(
         currentPage,
         queryParam || undefined,
-        searchParams.getAll("status"),
-        searchParams.getAll("cityId"),
-        searchParams.getAll("countryId")
+        selectedStatuses,
+        selectedCityIds,
+        selectedCountryIds
       );
     }
-  }, [currentPage, queryParam, searchParams]);
-
-  // Efekat za ažuriranje URL-a kada se promene filteri
-  useEffect(() => {
-    if (selectedStatuses.length > 0 || selectedCityIds.length > 0 || selectedCountryIds.length > 0) {
-      updateUrlParams({ 
-        statuses: selectedStatuses, 
-        cityIds: selectedCityIds, 
-        countryIds: selectedCountryIds,
-        page: 1 
-      });
-    }
-  }, [selectedStatuses, selectedCityIds, selectedCountryIds]);
+  }, [currentPage, queryParam, selectedStatuses, selectedCityIds, selectedCountryIds]);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
