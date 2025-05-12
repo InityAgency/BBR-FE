@@ -58,17 +58,32 @@ export default function SuggestFeatureForm() {
       let attachmentId = undefined;
       if (uploadedFiles && uploadedFiles.length > 0) {
         const formData = new FormData();
-        uploadedFiles.forEach((file) => {
-          formData.append("media", file);
-        });
-        const uploadRes = await fetch(`/api/v1/media?type=CONTACT_FORM`, {
-          method: "POST",
-          body: formData,
-        });
+        // Prilagođavanje imena polja za zahtev prema API-ju
+        formData.append("file", uploadedFiles[0]);
+        
+        // Korišćenje environment varijabli za API putanje
+        const uploadRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media?type=CONTACT_FORM`, 
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        
         if (!uploadRes.ok) throw new Error("File upload failed");
+        
         const uploadData = await uploadRes.json();
-        attachmentId = Array.isArray(uploadData) ? uploadData[0] : uploadData.attachmentId;
+        
+        // Pristupanje ID-u iz odgovora servera prema strukturi koju smo dobili
+        if (uploadData.data && uploadData.data.id) {
+          attachmentId = uploadData.data.id;
+        } else {
+          console.warn("Unexpected response format from media API:", uploadData);
+          // Pokušaj sa starim formatom za kompatibilnost
+          attachmentId = Array.isArray(uploadData) ? uploadData[0] : uploadData.attachmentId;
+        }
       }
+      
       const payload = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -78,12 +93,19 @@ export default function SuggestFeatureForm() {
         description: data.description,
         attachmentId: attachmentId,
       };
-      const res = await fetch(`/api/v1/public/contact-forms`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      
+      // Korišćenje environment varijabli za glavni API poziv
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/contact-forms`, 
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+      
       if (!res.ok) throw new Error("Failed to send suggestion");
+      
       toast.success("Feature suggestion sent successfully");
       form.reset();
       setUploadedFiles([]);
@@ -202,4 +224,4 @@ export default function SuggestFeatureForm() {
       </Form>
     </div>
   );
-} 
+}
