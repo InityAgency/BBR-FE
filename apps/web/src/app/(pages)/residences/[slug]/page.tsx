@@ -54,7 +54,7 @@ export default function ResidencePage() {
     useEffect(() => {
         // Ako je korisnik preusmeren sa login stranice i postoji "fromClaim" parametar
         const fromClaim = searchParams.get('fromClaim');
-        if (user && fromClaim === 'true') {
+        if (user && fromClaim === 'true' && user.role.name === "developer") {
             setIsClaimProfileModalOpen(true);
             
             // Očisti URL parametar bez osvježavanja stranice - replace history
@@ -117,13 +117,13 @@ export default function ResidencePage() {
     };
 
     const handleClaimProfile = () => {
-        if (user) {
-            // Ako je korisnik već prijavljen, otvoriti modal
-            setIsClaimProfileModalOpen(true);
-        } else {
+        if (!user) {
             // Ako nije prijavljen, preusmeriti na login stranicu sa parametrom za povratak
             const returnUrl = `/residences/${residenceSlug}?fromClaim=true`;
             router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        } else if (user.role.name === "developer") {
+            // Ako je developer, otvoriti modal
+            setIsClaimProfileModalOpen(true);
         }
     };
     
@@ -175,10 +175,12 @@ export default function ResidencePage() {
                                 <span className="text-primary">{residence.company.name}</span>
                             </div>
                         ) : (
-                            <div id="claim-profile" className="flex flex-row gap-2 items-center text-md font-medium mt-4">
-                                <p>Own the residence?</p>
-                                <button onClick={handleClaimProfile} className="text-primary">Claim your profile</button>
-                            </div>
+                            (!user || user?.role?.name === "developer") && (
+                                <div id="claim-profile" className="flex flex-row gap-2 items-center text-md font-medium mt-4">
+                                    <p>Own the residence?</p>
+                                    <button onClick={handleClaimProfile} className="text-primary">Claim your profile</button>
+                                </div>
+                            )
                         )}
                         <div className="rankings mt-4">
                             <div className="bg-white/5 py-2 px-3 rounded-full w-fit flex gap-2 items-center">
