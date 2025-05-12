@@ -195,12 +195,12 @@ export default function EvaluationCriteriaPage() {
             market does, powered by AI and verified by expert review.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[500px]">
-          <div className="flex flex-col bg-secondary max-w-[540px] mr-[30px] rounded-xl p-[16px] lg:p-[32px]">
-            <h1 className="text-xl lg:text-[36px] mb-[10px] lg:mb-[24px]">
+        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[400px]">
+          <div className="flex flex-col bg-secondary max-w-[350px] mr-[30px] rounded-xl p-[16px] lg:p-[32px]">
+            <h1 className="text-xl lg:text-[28px] mb-[10px] lg:mb-[24px]">
               Location & Area
             </h1>
-            <h2 className="text-justify text-[12px] lg:text-[18px]">
+            <h2 className="text-justify text-[12px] lg:text-[14px]">
               The foundation of every exceptional residence is where it stands.
               We assess the micro and macro context — proximity to landmarks,
               cultural richness, safety, connectivity, and long-term
