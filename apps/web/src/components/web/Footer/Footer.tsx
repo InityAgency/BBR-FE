@@ -1,15 +1,16 @@
 import { Separator } from "@/components/ui/separator";
 import {
-  Facebook,
-  Instagram,
   Mail,
   MapPin,
   Phone,
-  Twitter,
+  Lock,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import NewsletterForm from "../Forms/NewsletterForm";
+import { TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -139,22 +140,100 @@ export default function Footer() {
             <h3 className="text-xl font-bold text-primary-link">Rankings</h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/#">Worldwide</Link>
+                {/* <Link href="/#">Worldwide</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>Worldwide</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
               <li>
-                <Link href="/#">By Country</Link>
+                {/* <Link href="/#">By Country</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>By Country</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
               <li>
-                <Link href="/#">By City</Link>
+                {/* <Link href="/#">By City</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>By City</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
               <li>
-                <Link href="/#">By Lifestyle</Link>
+                {/* <Link href="/#">By Lifestyle</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>By Lifestyle</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
               <li>
-                <Link href="/#">By Property Type</Link>
+                {/* <Link href="/#">By Property Type</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>By Property Type</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
               <li>
-                <Link href="/#">By Brand</Link>
+                {/* <Link href="/#">By Brand</Link> */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                        <span>By Brand</span>
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Coming Soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
             </ul>
           </div>

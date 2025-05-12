@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { MegaMenuContent } from "./mega-menu-content";
 import { MobileMegaMenu } from "./mobile-mega-menu";
 import { navigationData, getNavigationDataWithCities } from "./navigation-data";
 import { usePathname } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type MobileMenuAnimation = "slide-right" | "slide-down";
 type NavigationData = typeof navigationData;
@@ -100,6 +101,19 @@ export function MegaMenu() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex flex-row gap-8 items-center">
+          <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                    <span>Best Residences</span>
+                    <Lock className="w-4 h-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Coming Soon</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {Object.keys(navData).map((menuName) => (
               <div
                 key={menuName}
@@ -131,12 +145,19 @@ export function MegaMenu() {
             >
               Evaluation Criteria
             </Link>
-            <Link
-              href="/deals"
-              className="text-white hover:text-[#b3804c] transition-colors"
-            >
-              Exclusive Deals
-            </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
+                    <span>Exclusive Deals</span>
+                    <Lock className="w-4 h-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Coming Soon</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Link
               href="/blog"
               className="text-white hover:text-[#b3804c] transition-colors"

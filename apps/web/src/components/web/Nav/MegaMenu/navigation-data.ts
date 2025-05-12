@@ -76,61 +76,61 @@ type NavigationData = {
 
 // Osnovni podaci navigacije bez gradova (biće dopunjeni dinamički)
 export const navigationData: NavigationData = {
-  bestResidences: {
-    title: "Best Residences",
-    href: "/best-residences",
-    tabs: [
-      "Exclusive Locations",
-      "Property Features",
-      "Lifestyle Options",
-      "Investment Value",
-      "Special Amenities",
-      "Family Friendly",
-    ],
-    content: {
-      "Exclusive Locations": [
-        { label: "Best of Newest Branded Residences", href: "/best/newest" },
-        { label: "Best of Investment Opportunities", href: "/best/investment" },
-        { label: "Best of Pet-Friendly Residences", href: "/best/pet-friendly" },
-        { label: "Best of Beachfront Living", href: "/best/beachfront" },
-        { label: "Best of Golf Living", href: "/best/golf" },
-        { label: "Best of Emerging Markets", href: "/best/emerging-markets" },
-        { label: "Best of Best for Couples", href: "/best/couples" },
-        { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
-        { label: "Best of Best for Families", href: "/best/families" },
-        { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
-        { label: "Best for Working Professionals", href: "/best/working-professionals" },
-        { label: "Best for Retirement Havens", href: "/best/retirement" },
-      ],
-      "Property Features": [
-        { label: "Best Infinity Pools", href: "/best/infinity-pools" },
-        { label: "Best Architectural Design", href: "/best/architecture" },
-        { label: "Best Smart Home Technology", href: "/best/smart-home" },
-        { label: "Best Private Gardens", href: "/best/gardens" },
-      ],
-      "Lifestyle Options": [
-        { label: "Best for Yacht Club", href: "/best/yacht-club" },
-        { label: "Best for Equestrian", href: "/best/equestrian" },
-        { label: "Best of Ski Resort Living", href: "/best/ski-resort" },
-        { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
-      ],
-      "Investment Value": [
-        { label: "Best ROI Properties", href: "/best/roi" },
-        { label: "Best Rental Income Potential", href: "/best/rental-income" },
-        { label: "Best Upcoming Areas", href: "/best/upcoming-areas" },
-      ],
-      "Special Amenities": [
-        { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
-        { label: "Best for Working Professionals", href: "/best/working-professionals" },
-        { label: "Best for Retirement Havens", href: "/best/retirement" },
-      ],
-      "Family Friendly": [
-        { label: "Best for Schools", href: "/best/schools" },
-        { label: "Best for Multigenerational Living", href: "/best/multigenerational" },
-        { label: "Best Child-Friendly Communities", href: "/best/child-friendly" },
-      ],
-    },
-  },
+  // bestResidences: {
+  //   title: "Best Residences",
+  //   href: "/best-residences",
+  //   tabs: [
+  //     "Exclusive Locations",
+  //     "Property Features",
+  //     "Lifestyle Options",
+  //     "Investment Value",
+  //     "Special Amenities",
+  //     "Family Friendly",
+  //   ],
+  //   content: {
+  //     "Exclusive Locations": [
+  //       { label: "Best of Newest Branded Residences", href: "/best/newest" },
+  //       { label: "Best of Investment Opportunities", href: "/best/investment" },
+  //       { label: "Best of Pet-Friendly Residences", href: "/best/pet-friendly" },
+  //       { label: "Best of Beachfront Living", href: "/best/beachfront" },
+  //       { label: "Best of Golf Living", href: "/best/golf" },
+  //       { label: "Best of Emerging Markets", href: "/best/emerging-markets" },
+  //       { label: "Best of Best for Couples", href: "/best/couples" },
+  //       { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
+  //       { label: "Best of Best for Families", href: "/best/families" },
+  //       { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
+  //       { label: "Best for Working Professionals", href: "/best/working-professionals" },
+  //       { label: "Best for Retirement Havens", href: "/best/retirement" },
+  //     ],
+  //     "Property Features": [
+  //       { label: "Best Infinity Pools", href: "/best/infinity-pools" },
+  //       { label: "Best Architectural Design", href: "/best/architecture" },
+  //       { label: "Best Smart Home Technology", href: "/best/smart-home" },
+  //       { label: "Best Private Gardens", href: "/best/gardens" },
+  //     ],
+  //     "Lifestyle Options": [
+  //       { label: "Best for Yacht Club", href: "/best/yacht-club" },
+  //       { label: "Best for Equestrian", href: "/best/equestrian" },
+  //       { label: "Best of Ski Resort Living", href: "/best/ski-resort" },
+  //       { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
+  //     ],
+  //     "Investment Value": [
+  //       { label: "Best ROI Properties", href: "/best/roi" },
+  //       { label: "Best Rental Income Potential", href: "/best/rental-income" },
+  //       { label: "Best Upcoming Areas", href: "/best/upcoming-areas" },
+  //     ],
+  //     "Special Amenities": [
+  //       { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
+  //       { label: "Best for Working Professionals", href: "/best/working-professionals" },
+  //       { label: "Best for Retirement Havens", href: "/best/retirement" },
+  //     ],
+  //     "Family Friendly": [
+  //       { label: "Best for Schools", href: "/best/schools" },
+  //       { label: "Best for Multigenerational Living", href: "/best/multigenerational" },
+  //       { label: "Best Child-Friendly Communities", href: "/best/child-friendly" },
+  //     ],
+  //   },
+  // },
   allResidences: {
     title: "All Residences",
     href: "/residences",
