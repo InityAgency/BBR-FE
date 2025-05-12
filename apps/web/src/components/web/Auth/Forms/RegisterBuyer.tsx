@@ -176,7 +176,7 @@ export default function RegisterBuyerForm() {
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
-                                    <FormLabel className="text-md font-normal">
+                                    <FormLabel className="text-md font-normal inline-block">
                                         I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                                     </FormLabel>
                                     <FormMessage />

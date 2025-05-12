@@ -164,7 +164,7 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/#">Create an account</Link>
+                <Link href="/register/buyer">Create an account</Link>
               </li>
               <li>
                 <Link href="/request-consultation">Request A Consultation</Link>
