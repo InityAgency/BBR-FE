@@ -1,15 +1,59 @@
-.claim-request-form, .onboarding-form{
-    input, textarea, select, button[data-slot="popover-trigger"]{
+.claim-request-form,
+.onboarding-form,
+.login-form, 
+.claim-request-form {
+
+    input,
+    textarea,
+    select,
+    button[data-slot="popover-trigger"] {
         background-color: transparent;
     }
 }
 
-    div[data-slot="command-item"]{
-        cursor: pointer;
-        &:hover{
-            background-color: #ffffff0a;
-        }
-    }
-    div[aria-selected="true"]{
+div[data-slot="command-item"] {
+    cursor: pointer;
+
+    &:hover {
         background-color: #ffffff0a;
     }
+}
+
+div[aria-selected="true"] {
+    background-color: #ffffff0a;
+}
+
+.custom-search{
+    svg{
+        margin-right: 0;
+    }
+    input{
+        background-color: transparent;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+.phone-code{
+    background-color: transparent;
+    button{
+        background-color: transparent;
+    }
+}
+
+// scrollbar style
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #191f24;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffffff0a;
+}

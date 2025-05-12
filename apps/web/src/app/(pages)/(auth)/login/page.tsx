@@ -77,7 +77,7 @@ export default function LoginPage() {
           </p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 login-form">
             <FormField
               control={form.control}
               name="email"
