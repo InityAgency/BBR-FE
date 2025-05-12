@@ -106,6 +106,7 @@ const B2BAboutUsPage = () => {
                 exceed these expectations.
               </p>
             </div>
+            <div className="flex flex-1/2">
             <Image
               src="/b2b-about-image-3.webp"
               alt="about-us"
@@ -113,6 +114,7 @@ const B2BAboutUsPage = () => {
               width={400}
               className="flex-1/2 w-full h-full rounded-xl"
             />
+            </div>
           </div>
         </SectionLayout>
       </div>

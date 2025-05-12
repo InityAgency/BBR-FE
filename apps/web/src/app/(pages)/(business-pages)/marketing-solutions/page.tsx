@@ -371,20 +371,24 @@ const MarketingSolutionsPage = () => {
               </p>
 
               <div className="flex flex-1 flex-col lg:flex-row mt-[16px] lg:mt-[40px] gap-[12px] lg:mx-[30px]">
-                <Image
-                  src="/marketing-chart-1.webp"
-                  alt="countries"
-                  width={500}
-                  height={300}
-                  className="w-full"
-                />
-                <Image
-                  src="/marketing-chart-2.webp"
-                  alt="countries"
-                  width={450}
-                  height={280}
-                  className="w-full"
-                />
+                <div>
+                  <Image
+                    src="/marketing-chart-1.webp"
+                    alt="countries"
+                    width={500}
+                    height={300}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Image
+                    src="/marketing-chart-2.webp"
+                    alt="countries"
+                    width={450}
+                    height={280}
+                    className="w-full"
+                  />
+                </div>
               </div>
             </div>
           </div>

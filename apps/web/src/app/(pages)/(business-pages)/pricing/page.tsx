@@ -436,13 +436,15 @@ const PricingPage = () => {
       <div className="bg-white">
         <SectionLayout>
           <div className="flex flex-col lg:flex-row gap-[40px]">
-            <Image
-              src="/property-placement.webp"
-              alt="Property placement"
-              width={500}
-              height={500}
-              className="flex-1 w-full"
-            />
+            <div className="flex flex-1">
+              <Image
+                src="/property-placement.webp"
+                alt="Property placement"
+                width={500}
+                height={500}
+                className="flex-1 w-full"
+              />
+            </div>
             <div className="flex flex-col flex-1 gap-4">
               <h1 className="text-[#101518] text-[36px]">
                 Featured Property Placements

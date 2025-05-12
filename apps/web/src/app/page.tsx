@@ -81,9 +81,9 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-4 mt-4 border rounded-2xl p-6 relative w-full">
-            <Image src="/ranking-criteria-1.webp" alt="Ranking Image" width={1000} height={1000} className="w-full rounded-lg object-cover" />
-            <Image src="/ranking-criteria-2.webp" alt="Ranking Image" width={1000} height={1000} className="w-full rounded-lg object-cover" />
-            <Image src="/ranking-criteria-3.webp" alt="Ranking Image" width={1000} height={1000} className="w-full rounded-lg object-cover" />
+            <Image src="/ranking-criteria-1.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
+            <Image src="/ranking-criteria-2.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
+            <Image src="/ranking-criteria-3.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
             <Image src="/stats.png" alt="Ranking Image" width={1000} height={1000} className="w-[55%] rounded-xl object-contain absolute -bottom-10 left-1/2 transform -translate-x-1/2" />
           </div>
         </SectionLayout>
