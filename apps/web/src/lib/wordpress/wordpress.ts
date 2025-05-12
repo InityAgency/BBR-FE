@@ -442,14 +442,32 @@ export async function getJobPostitions(): Promise<Post[]> {
     per_page: 100 
   });
   
-  const response = await wordpressFetch<Post[]>(url, {
-    next: {
-      ...defaultFetchOptions.next,
-      tags: ["wordpress", "career"],
-    },
-  });
-
-  return response;
+  let attempts = 0;
+  const maxAttempts = 3;
+  
+  while (attempts < maxAttempts) {
+    try {
+      const response = await wordpressFetch<Post[]>(url, {
+        next: {
+          ...defaultFetchOptions.next,
+          tags: ["wordpress", "career"],
+        },
+      });
+      return response || [];
+    } catch (error) {
+      attempts++;
+      console.error(`Attempt ${attempts}/${maxAttempts} failed:`, error);
+      
+      if (attempts >= maxAttempts) {
+        console.error("All attempts failed. Returning empty array.");
+        return []; 
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  
+  return []; 
 }
 
 export async function getJobPostitionById(id: number): Promise<Post> {

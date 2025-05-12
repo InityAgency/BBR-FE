@@ -9,6 +9,10 @@
 @import './components/newsletterBlock.scss';
 @import './page/singleResidence.scss';
 @import './components/forms.scss';
+
+body{
+    scroll-behavior: smooth;
+}
 button, a{
     cursor: pointer;
 }
