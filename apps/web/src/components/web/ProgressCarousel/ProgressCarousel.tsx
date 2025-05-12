@@ -42,8 +42,8 @@ const ProgressCarousel: React.FC<EmblaCarouselProps> = ({
               key={index}
             >
               <div className="embla__slide__content py-[30px] px-[32px] rounded-2xl border border-gray-200">
-                <h1 className="text-[36px]">{slide.title}</h1>
-                <p className="text-[18px]">{slide.description}</p>
+                <h1 className="text-[24px]">{slide.title}</h1>
+                <p className="text-[16px]">{slide.description}</p>
               </div>
             </div>
           ))}

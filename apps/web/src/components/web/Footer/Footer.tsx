@@ -201,7 +201,7 @@ export default function Footer() {
                 <Link href="/pricing">Pricing</Link>
               </li>
               <li>
-                <Link href="/#">About Us</Link>
+                <Link href="/b2b-about-us">About Us</Link>
               </li>
               <li>
                 <Link href="/#">Let’s talk</Link>
