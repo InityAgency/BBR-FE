@@ -215,7 +215,7 @@ const MarketingSolutionsPage = () => {
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
         <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
           <Image
-            src="/why-choose-us-from-outside.png"
+            src="/why-choose-us-from-outside.webp"
             alt="about-us"
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
@@ -386,7 +386,7 @@ const MarketingSolutionsPage = () => {
         <SectionLayout>
           <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
             <Image
-              src="/texture.png"
+              src="/texture.webp"
               alt="about-us"
               fill
               className="w-full h-full object-cover opacity-40"
@@ -445,14 +445,14 @@ const MarketingSolutionsPage = () => {
 
               <div className="flex w-full flex-1 flex-col lg:flex-row mt-[16px] lg:mt-[40px] gap-[12px]">
                 <Image
-                  src="/developer-solutions-res-1.png"
+                  src="/developer-solutions-res-1.webp"
                   alt="countries"
                   width={300}
                   height={100}
                   className="flex flex-1"
                 />
                 <Image
-                  src="/developer-solutions-res-2.png"
+                  src="/developer-solutions-res-2.webp"
                   alt="countries"
                   width={300}
                   height={100}
@@ -467,7 +467,7 @@ const MarketingSolutionsPage = () => {
               </h2>
 
               <Image
-                src="/bbr-score-white.png"
+                src="/bbr-score-white.webp"
                 alt="countries"
                 width={300}
                 height={200}
@@ -482,7 +482,7 @@ const MarketingSolutionsPage = () => {
                 Enhanced Residence Scoring
               </h2>
               <Image
-                src="/residence-scoring.png"
+                src="/residence-scoring.webp"
                 alt="countries"
                 width={400}
                 height={400}
@@ -494,7 +494,7 @@ const MarketingSolutionsPage = () => {
                 Track your residences growth
               </h2>
               <Image
-                src="/residence-growth.png"
+                src="/residence-growth.webp"
                 alt="countries"
                 width={400}
                 height={400}
@@ -506,7 +506,7 @@ const MarketingSolutionsPage = () => {
                 Get Matched with AI
               </h2>
               <Image
-                src="/ai-match.png"
+                src="/ai-match.webp"
                 alt="countries"
                 width={400}
                 height={400}

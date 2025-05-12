@@ -11,7 +11,7 @@ const HowItWorksPage = () => {
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 xl:px-12 py-12 gap-4 xl:gap-12 mb-8 xl:mb-10">
         <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 xl:p-8 py-12 xl:py-[50px] relative overflow">
           <Image
-            src="/how-it-works-hero.png"
+            src="/how-it-works-hero.webp"
             alt="about-us"
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
@@ -94,7 +94,7 @@ const HowItWorksPage = () => {
                 <div className="w-full px-10 flex gap-4 items-center">
                   <hr className="hidden xl:block flex-1 border-t-2 mr-6 border-primary min-w-[150px]" />
                   <Image
-                    src="/how-img-step-1.png"
+                    src="/how-img-step-1.webp"
                     alt="how-img-1"
                     width={350}
                     height={350}
@@ -123,7 +123,7 @@ const HowItWorksPage = () => {
               <div className="flex relative text-black justify-center items-center xl:border-b-1 xl:border-primary mx-10">
                 <div className="w-full px-10 flex gap-4 items-center">
                   <Image
-                    src="/how-img-step-2.png"
+                    src="/how-img-step-2.webp"
                     alt="how-img-1"
                     width={350}
                     height={350}
@@ -237,7 +237,7 @@ const HowItWorksPage = () => {
                 <div className="w-full px-10 flex gap-4 items-center">
                   <hr className="flex-1 border-t-2 mr-6 border-primary" />
                   <Image
-                    src="/how-img-step-3.png"
+                    src="/how-img-step-3.webp"
                     alt="how-img-1"
                     width={350}
                     height={350}
@@ -266,7 +266,7 @@ const HowItWorksPage = () => {
               <div className="flex relative text-black justify-center items-center mx-10">
                 <div className="w-full px-10 flex gap-4 items-center">
                   <Image
-                    src="/how-img-step-4.png"
+                    src="/how-img-step-4.webp"
                     alt="how-img-1"
                     width={350}
                     height={350}

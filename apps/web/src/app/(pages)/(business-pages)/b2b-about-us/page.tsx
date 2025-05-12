@@ -10,7 +10,7 @@ const B2BAboutUsPage = () => {
       <div className="relative flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
         <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-2 lg:p-8 py-2 lg:py-[50px] relative overflow">
           <Image
-            src="/b2b-about-us-hero.png"
+            src="/b2b-about-us-hero.webp"
             alt="about-us"
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
@@ -63,7 +63,7 @@ const B2BAboutUsPage = () => {
             </Link>
           </div>
           <Image
-            src="/b2b-about-us-developers.png"
+            src="/b2b-about-us-developers.webp"
             alt="about-us"
             height={550}
             width={1500}
@@ -107,7 +107,7 @@ const B2BAboutUsPage = () => {
               </p>
             </div>
             <Image
-              src="/b2b-about-image-3.png"
+              src="/b2b-about-image-3.webp"
               alt="about-us"
               height={550}
               width={400}
@@ -138,7 +138,7 @@ const B2BAboutUsPage = () => {
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             <div className="flex flex-1/2">
               <Image
-                src="/b2b-about-img-4.png"
+                src="/b2b-about-img-4.webp"
                 alt="img"
                 width={640}
                 height={440}
@@ -266,7 +266,7 @@ const B2BAboutUsPage = () => {
               </p>
               <div className="flex gap-[12px] items-center">
                 <Image
-                  src="/bbr-logo-circle.png"
+                  src="/bbr-logo-circle.webp"
                   alt="bbr-logo"
                   width={40}
                   height={40}
@@ -278,7 +278,7 @@ const B2BAboutUsPage = () => {
               </div>
             </div>
             <Image
-              src="/b2b-about-img-4.png"
+              src="/b2b-about-img-4.webp"
               alt="img"
               width={600}
               height={450}

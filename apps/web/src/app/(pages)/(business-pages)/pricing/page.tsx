@@ -12,7 +12,7 @@ const PricingPage = () => {
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
         <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
           <Image
-            src="/pricing-hero.png"
+            src="/pricing-hero.webp"
             alt="about-us"
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
@@ -400,7 +400,7 @@ const PricingPage = () => {
               </div>
             </div>
             <Image
-              src="/pricing-residence.png"
+              src="/pricing-residence.webp"
               alt="residence"
               width={450}
               height={550}
@@ -422,7 +422,7 @@ const PricingPage = () => {
               more attention from potential buyers.
             </p>
             <Image
-              src="/property-verification.png"
+              src="/property-verification.webp"
               alt="Property verification"
               width={1600}
               height={400}
@@ -437,7 +437,7 @@ const PricingPage = () => {
         <SectionLayout>
           <div className="flex flex-col lg:flex-row gap-[40px]">
             <Image
-              src="/property-placement.png"
+              src="/property-placement.webp"
               alt="Property placement"
               width={500}
               height={500}

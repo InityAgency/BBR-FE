@@ -68,7 +68,7 @@ const tabs = [
         secondaryDescription="Developers gain access to a platform designed to amplify luxury and
             brand-driven appeal. Your property will be part of an elite
             selection trusted by high-net-worth buyers."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -82,7 +82,7 @@ const tabs = [
         primaryDescription="BBR provides developers with category-specific rankings (e.g., Best in Beach, Best in Golf) that act as third-party validation, boosting your property’s credibility in the eyes of affluent buyers."
         secondaryTitle="Why This Matters"
         secondaryDescription="Rankings elevate your development's trustworthiness and visibility, helping you stand out in a crowded marketplace. Buyers see your property as a top-tier choice, accelerating the decision-making process"
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -96,7 +96,7 @@ const tabs = [
         primaryDescription="BBR offers branded residences-specific marketing strategies, including targeted SEO, PPC, and bespoke campaigns designed to attract the right buyers. Unlike broader platforms, we focus on generating high-quality leads specifically for branded residences"
         secondaryTitle="How This Benefits You"
         secondaryDescription="Gain exposure to qualified, high-net-worth leads actively seeking branded residences. Our marketing tools ensure that inquiries turn into serious buyer conversions."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -110,7 +110,7 @@ const tabs = [
         primaryDescription="BBR opens doors to a highly specialized network of affluent, globally mobile buyers. These are individuals actively seeking high-end branded properties and who recognize the value of the brands we represent."
         secondaryTitle="What This Means for You"
         secondaryDescription="Your development is seen by buyers who have the means and intent to purchase high-value branded residences. This ensures that your marketing efforts are laser-focused on the right audience, leading to faster and more significant sales."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -124,7 +124,7 @@ const tabs = [
         primaryDescription="Our team consists of industry veterans with decades of experience in luxury real estate and branded developments. We understand what drives success in this niche market, offering strategic insights that other platforms simply cannot provide."
         secondaryTitle="Why This Matters"
         secondaryDescription="Our expertise ensures your project is positioned for maximum impact and is aligned with the latest market trends. You receive personalized guidance tailored to the unique challenges of branded residences"
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -138,7 +138,7 @@ const tabs = [
         primaryDescription="BBR is trusted by some of the world’s most prestigious luxury brands and developers. Featuring your development on BBR instantly enhances your credibility, as our platform is globally recognized as the authority in branded residences."
         secondaryTitle="What This Means for Your Development"
         secondaryDescription="Being associated with BBR elevates your project’s prestige, making it more attractive to discerning buyers. Buyers trust that properties listed on BBR are of the highest quality, accelerating visibility and creating buyer urgency."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -152,7 +152,7 @@ const tabs = [
         primaryDescription="BBR is more than just a listing platform—we offer hands-on support throughout your development’s journey. From personalized marketing strategy development to ongoing consultations, our team is committed to ensuring your property’s success."
         secondaryTitle="What This Means for You"
         secondaryDescription="You benefit from one-on-one support, helping you optimize your listings and strategies. Our team ensures that your development performs well across all metrics, leading to long-term success."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -166,7 +166,7 @@ const tabs = [
         primaryDescription="BBR has a proven track record of helping developers achieve exceptional results. With data-driven strategies and targeted marketing, our developers have seen significant improvements in lead quality, sales performance, and global presence."
         secondaryTitle="Why You Should Care"
         secondaryDescription="Developers who partner with BBR consistently achieve faster sales cycles and higher visibility. Our history of success ensures that BBR will transform your development’s potential into measurable results."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -180,7 +180,7 @@ const tabs = [
         primaryDescription="At BBR, we’re always looking ahead. We provide developers with the insights and tools they need to stay ahead of market trends, ensuring your development remains competitive as the branded residences market evolves."
         secondaryTitle="What This Means for Your Project"
         secondaryDescription="Gain access to forward-thinking strategies that keep your development relevant in a rapidly changing market. By partnering with BBR, your project is positioned for long-term success."
-        imageUrl="/why-choose-us-from-outside.png"
+        imageUrl="/why-choose-us-from-outside.webp"
         imageAlt="from-outside"
       />
     ),
@@ -198,7 +198,7 @@ export default function WhyChooseUsPage() {
       <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
         <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
           <Image
-            src="/why-choose-us-hero.png"
+            src="/why-choose-us-hero.webp"
             alt="about-us"
             fill
             className="w-full h-full object-cover opacity-40 rounded-xl"
@@ -235,7 +235,7 @@ export default function WhyChooseUsPage() {
           </h1>
           <div className="flex flex-col xl:flex-row bg-beigeVariant5 mt-[25px] 2xl:mt-[56px] rounded-2xl p-[24px] lg:p-[48px] gap-[32px]">
             <Image
-              src="/why-choose-us-best.png"
+              src="/why-choose-us-best.webp"
               alt="why-choose-us-best"
               width={500}
               height={300}
@@ -348,7 +348,7 @@ export default function WhyChooseUsPage() {
             </p>
           </div>
           <Image
-            src="/living-room-view.png"
+            src="/living-room-view.webp"
             alt="living-room-view"
             width={1680}
             height={400}
@@ -454,7 +454,7 @@ export default function WhyChooseUsPage() {
               <div className="relative flex">
                 <Image
                   alt="Mountains"
-                  src="/robert-fox.png"
+                  src="/robert-fox.webp"
                   quality={100}
                   height={300}
                   width={300}
@@ -481,7 +481,7 @@ export default function WhyChooseUsPage() {
               <div className="relative flex">
                 <Image
                   alt="Mountains"
-                  src="/cammeron.png"
+                  src="/cammeron.webp"
                   quality={100}
                   height={300}
                   width={300}
@@ -508,7 +508,7 @@ export default function WhyChooseUsPage() {
               <div className="relative flex">
                 <Image
                   alt="Mountains"
-                  src="/jenny.png"
+                  src="/jenny.webp"
                   quality={100}
                   height={300}
                   width={300}
@@ -560,7 +560,7 @@ export default function WhyChooseUsPage() {
         <SectionLayout>
           <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
             <Image
-              src="/texture.png"
+              src="/texture.webp"
               alt="about-us"
               fill
               className="w-full h-full object-cover opacity-40"

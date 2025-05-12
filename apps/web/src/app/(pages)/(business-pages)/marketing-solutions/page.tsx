@@ -38,7 +38,7 @@ const VerticalCarouselItem = ({
         </div>
       </div>
       <Image
-        src="/bbr-score-white.png"
+        src="/bbr-score-white.webp"
         alt="bb-score"
         width={200}
         height={140}
@@ -53,19 +53,19 @@ const verticalCarouseItems: React.ReactNode[] = [
     key={1}
     title="Missoni Baia Miami, Luxury Biscayne Bay Condos, Miami"
     description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
-    imgSrc="/marketing-residence-1.png"
+    imgSrc="/marketing-residence-1.webp"
   />,
   <VerticalCarouselItem
     key={2}
     title="Bentley residences, Sunny Isles Beach"
     description="Overlooking Biscayne Bay, these luxurious condos boast stunning water views, expansive outdoor spaces, and exclusive amenities like a private marina."
-    imgSrc="/marketing-residence-2.png"
+    imgSrc="/marketing-residence-2.webp"
   />,
   <VerticalCarouselItem
     key={3}
     title="Fendi Chateau Residences, Miami"
     description="Boasting breathtaking ocean views and direct beach access, this luxury residence features expansive terraces and unparalleled amenities."
-    imgSrc="/marketing-residence-3.png"
+    imgSrc="/marketing-residence-3.webp"
   />,
 ];
 // #endregion
@@ -152,7 +152,7 @@ const MarketingSolutionsPage = () => {
           <div className="flex flex-col lg:flex-row w-full">
             <div className="flex flex-1/2">
               <Image
-                src="/accelerate.png"
+                src="/accelerate.webp"
                 alt="accelerate-img"
                 width={640}
                 height={440}
@@ -354,7 +354,7 @@ const MarketingSolutionsPage = () => {
                 100+ countries
               </p>
               <Image
-                src="/countries.png"
+                src="/countries.webp"
                 alt="countries"
                 width={300}
                 height={200}
@@ -372,14 +372,14 @@ const MarketingSolutionsPage = () => {
 
               <div className="flex flex-1 flex-col lg:flex-row mt-[16px] lg:mt-[40px] gap-[12px] lg:mx-[30px]">
                 <Image
-                  src="/marketing-chart-1.png"
+                  src="/marketing-chart-1.webp"
                   alt="countries"
                   width={500}
                   height={300}
                   className="w-full"
                 />
                 <Image
-                  src="/marketing-chart-2.png"
+                  src="/marketing-chart-2.webp"
                   alt="countries"
                   width={450}
                   height={280}
@@ -410,7 +410,7 @@ const MarketingSolutionsPage = () => {
               </p>
 
               <Image
-                src="/marketing-support.png"
+                src="/marketing-support.webp"
                 alt="countries"
                 width={400}
                 height={400}
