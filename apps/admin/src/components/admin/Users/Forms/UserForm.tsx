@@ -49,7 +49,7 @@ import {
   userStatuses 
 } from "@/app/schemas/user";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
-import { Eye, EyeOff, Wand2, X, CircleMinus, Mail } from "lucide-react";
+import { Eye, EyeOff, Wand2, X, CircleMinus, Mail, Trash2 } from "lucide-react";
 import { usersService } from "@/lib/api/services/users.service";
 
 // Type for role from API
@@ -666,11 +666,23 @@ const UserForm: React.FC<UserFormProps> = ({
         title={isEditing ? `${initialData.fullName || ""}` : "Add new user"}
         titleContent={renderStatusBadge()}
         titleActions={renderStatusActions()}
-        onSave={handleSave} // Make sure this reference is correct
+        onSave={handleSave}
         onDiscard={handleDiscardClick}
         saveButtonText={isEditing ? "Save changes" : "Add new user"}
         saveButtonDisabled={!formIsValid || isSubmitting}
         isSubmitting={isSubmitting}
+        customButtons={
+          isEditing ? (
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              className="cursor-pointer transition-colors"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete User
+            </Button>
+          ) : null
+        }
       />
       
       <Form {...form}>
@@ -913,6 +925,30 @@ const UserForm: React.FC<UserFormProps> = ({
               >
                 <CircleMinus className="h-4 w-4 mr-2" />
                 Suspend User
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {/* Delete User Confirmation Modal - only shown in edit mode */}
+      {isEditing && (
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete User</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this user? This action cannot be undone. All user data will be permanently removed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDelete}
+                className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete User
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

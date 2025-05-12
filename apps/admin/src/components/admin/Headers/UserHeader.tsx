@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Send } from "lucide-react";
+import { Pencil, Send, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,7 @@ import {
 import FormHeader from "@/components/admin/Headers/FormHeader";
 import { User } from "@/lib/api/services/types";
 import { usersService } from "@/lib/api/services";
+import { ConfirmationModal } from "@/components/admin/Modals/ConfirmationModal";
 
 const ALLOWED_STATUSES = ["ACTIVE", "INACTIVE", "INVITED", "UNKNOWN"] as const;
 type UserStatus = typeof ALLOWED_STATUSES[number];
@@ -57,6 +58,7 @@ export function UserHeader({
   const [status, setStatus] = useState<UserStatus>("UNKNOWN");
   const [isResendingInvitation, setIsResendingInvitation] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Set the initial status once user data is loaded
   useEffect(() => {
@@ -118,6 +120,19 @@ export function UserHeader({
     }
   };
 
+  const handleDelete = async () => {
+    if (!user?.id) return;
+    
+    try {
+      await usersService.deleteUser(user.id);
+      toast.success("User deleted successfully");
+      router.push("/user-management");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error(error instanceof Error ? error.message : "Error deleting user. Please try again.");
+    }
+  };
+
   const renderStatusBadge = () => {
     return (
       <div className="flex items-center gap-2">
@@ -161,21 +176,45 @@ export function UserHeader({
   };
 
   return (
-    <FormHeader
-      title={user.fullName || "Unnamed User"}
-      titleContent={renderStatusBadge()}
-      hideDefaultButtons={true}
-      customButtons={
-        <Button
-          variant="outline"
-          onClick={() => router.push(`/user-management/${user.id}/edit`)}
-          className="cursor-pointer transition-colors"
-        >
-          <Pencil className="h-4 w-4 mr-1" />
-          Edit User
-        </Button>
-      }
-    />
+    <>
+      <FormHeader
+        title={user.fullName || "Unnamed User"}
+        titleContent={renderStatusBadge()}
+        hideDefaultButtons={true}
+        customButtons={
+          <div className="flex gap-2">
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              className="cursor-pointer transition-colors"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete User
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/user-management/${user.id}/edit`)}
+              className="cursor-pointer transition-colors"
+            >
+              <Pencil className="h-4 w-4 mr-1" />
+              Edit User
+            </Button>
+            
+          </div>
+        }
+      />
+
+      <ConfirmationModal
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete User"
+        description="Are you sure you want to delete this user? This action cannot be undone. All user data will be permanently removed."
+        actionLabel="Delete User"
+        actionIcon={Trash2}
+        actionVariant="destructive"
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }
 
