@@ -165,7 +165,15 @@ export default function DeveloperOnboarding() {
             if (profileImageFile) {
                 try {
                     const uploadResponse = await uploadFile(profileImageFile, 'USER');
-                    imageId = uploadResponse?.id;
+                    console.log("Profile image upload response:", uploadResponse);
+                    
+                    // Extract the id from the nested data object
+                    if (uploadResponse.data && uploadResponse.data.id) {
+                        imageId = uploadResponse.data.id;
+                    } else {
+                        throw new Error("Image ID not found in upload response");
+                    }
+                    
                     console.log("Profile image upload successful, imageId:", imageId);
                 } catch (uploadError) {
                     console.error("Profile image upload failed:", uploadError);
@@ -180,7 +188,7 @@ export default function DeveloperOnboarding() {
                 currentLocation: data.currentLocation,
                 phoneNumber: data.phoneNumber,
                 preferredContactMethod: data.preferredContactMethod,
-                imageId: imageId,
+                imageId: imageId, // Include the imageId in the payload
             };
 
             console.log("Submitting buyer data:", buyerData);
@@ -200,7 +208,7 @@ export default function DeveloperOnboarding() {
 
     const handleStep2Submit = async () => {
         setIsLoading(true);
-
+    
         try {
             // Validate specific fields for this step
             await form.trigger([
@@ -210,7 +218,7 @@ export default function DeveloperOnboarding() {
                 "budgetRangeFrom",
                 "budgetRangeTo"
             ]);
-
+    
             // Check for validation errors in step 2 fields
             const step2Fields = [
                 "unitTypes",
@@ -223,31 +231,56 @@ export default function DeveloperOnboarding() {
                 const error = form.formState.errors[field as keyof typeof form.formState.errors];
                 return !!error;
             });
-
+    
             if (hasErrors) {
                 console.error("Validation errors:", form.formState.errors);
                 toast.error("Please fix the form errors before continuing");
                 setIsLoading(false);
                 return;
             }
-
+    
             // Get current form data
             const data = form.getValues();
-
-            // Submit preferences data
+    
+            // Upload profile image if provided
+            let imageId = undefined;
+            if (profileImageFile) {
+                try {
+                    const uploadResponse = await uploadFile(profileImageFile, 'USER');
+                    console.log("Profile image upload response:", uploadResponse);
+                    
+                    // Access ID from server response based on structure
+                    if (uploadResponse.data && uploadResponse.data.id) {
+                        imageId = uploadResponse.data.id;
+                    } else {
+                        // Fallback for compatibility with other response formats
+                        imageId = uploadResponse.id;
+                    }
+                    
+                    console.log("Profile image upload successful, imageId:", imageId);
+                } catch (uploadError) {
+                    console.error("Profile image upload failed:", uploadError);
+                    toast.error("Failed to upload profile image. Please try again.");
+                    setIsLoading(false);
+                    return;
+                }
+            }
+    
+            // Submit preferences data with imageId
             const preferencesData = {
                 unitTypes: data.unitTypes,
                 preferredResidenceLocation: data.preferredResidenceLocation,
                 lifestyles: data.lifestyles,
                 budgetRangeFrom: Number(data.budgetRangeFrom),
-                budgetRangeTo: Number(data.budgetRangeTo)
+                budgetRangeTo: Number(data.budgetRangeTo),
+                imageId: imageId
             };
-
+    
             console.log("Submitting preferences data:", preferencesData);
-
+    
             const response = await apiRequest('users/me', 'PUT', preferencesData);
             console.log("Step 2 submit successful:", response);
-
+    
             toast.success('Preferences saved!');
             setCurrentStep(3);
         } catch (error) {

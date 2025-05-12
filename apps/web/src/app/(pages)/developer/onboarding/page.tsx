@@ -162,7 +162,16 @@ export default function DeveloperOnboarding() {
             if (logoFile) {
                 try {
                     const uploadResponse = await uploadFile(logoFile, 'COMPANY');
-                    imageId = uploadResponse?.id;
+                    console.log("Logo upload response:", uploadResponse);
+                    
+                    // Pristupamo ID-u iz odgovora servera prema strukturi
+                    if (uploadResponse.data && uploadResponse.data.id) {
+                        imageId = uploadResponse.data.id;
+                    } else {
+                        // Fallback za kompatibilnost sa drugim formatima
+                        imageId = uploadResponse.id;
+                    }
+                    
                     console.log("Logo upload successful, imageId:", imageId);
                 } catch (uploadError) {
                     console.error("Logo upload failed:", uploadError);
@@ -235,7 +244,16 @@ export default function DeveloperOnboarding() {
             if (profileImageFile) {
                 try {
                     const uploadResponse = await uploadFile(profileImageFile, 'USER');
-                    imageId = uploadResponse?.id;
+                    console.log("Profile image upload response:", uploadResponse);
+                    
+                    // Pristupamo ID-u iz odgovora servera prema strukturi
+                    if (uploadResponse.data && uploadResponse.data.id) {
+                        imageId = uploadResponse.data.id;
+                    } else {
+                        // Fallback za kompatibilnost sa drugim formatima
+                        imageId = uploadResponse.id;
+                    }
+                    
                     console.log("Profile image upload successful, imageId:", imageId);
                 } catch (uploadError) {
                     console.error("Profile image upload failed:", uploadError);
@@ -406,7 +424,7 @@ export default function DeveloperOnboarding() {
                                 </div>
 
                                 <div className="space-y-6">
-                                    <ImageUpload onFileChange={setProfileImageFile} />
+                                    <ImageUpload onFileChange={setProfileImageFile}  title="Upload your avatar "/>
                                     <FormField
                                         control={form.control}
                                         name="contactPersonFullName"

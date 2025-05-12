@@ -112,7 +112,15 @@ export default function MiniNav() {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src={user.company?.image_id || ""}
+                    src={
+                      user.role?.name === 'developer'
+                        ? user.company?.image_id
+                          ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image_id}/content`
+                          : ""
+                        : user.buyer?.image_id
+                          ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.buyer?.image_id}/content`
+                          : ""
+                    }
                     alt={user.fullName}
                   />
                   <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>

@@ -28,6 +28,23 @@ interface User {
   fullName: string;
   email: string;
   company?: Company;
+  buyer?: {
+    image_id: string | null;
+    budgetRangeFrom: number | null;
+    budgetRangeTo: number | null;
+    phoneNumber: string | null;
+    preferredContactMethod: string | null;
+    currentLocation: {
+      id: string | null;
+      name: string | null;
+      code: string | null;
+    };
+    preferredResidenceLocation: {
+      id: string | null;
+      name: string | null;
+      code: string | null;
+    };
+  } | null;
   role: Role;
 }
 
@@ -39,6 +56,7 @@ interface AuthContextType {
   checkAccess: (path: string) => boolean;
   loginWithToken: (token: string) => Promise<void>; 
   setUser: (userData: User) => void; // Preimenovano iz setUserData za konzistentnost
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,14 +81,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  // Funkcija za direktno postavljanje podataka o korisniku
   const setUser = (userData: User) => {
     setUserState(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     document.cookie = `user=${JSON.stringify(userData)}; path=/`;
   };
 
-  // Funkcija za prijavljivanje sa email-om i lozinkom
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -201,6 +217,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return true;
   };
 
+  const refreshUser = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+  };
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -209,7 +231,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout, 
       checkAccess, 
       loginWithToken, 
-      setUser 
+      setUser,
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

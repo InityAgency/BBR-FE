@@ -1,9 +1,13 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useEffect } from "react";
 export default function BuyerDashboard() {
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
+
+    useEffect(() => {
+        refreshUser();
+    }, []);
     
     return (
         <div className="p-8">

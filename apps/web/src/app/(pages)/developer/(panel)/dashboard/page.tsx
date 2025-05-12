@@ -1,11 +1,16 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export default function DeveloperDashboard() {
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     console.log(user);
     console.log(user?.company);
+    
+    useEffect(() => {
+        refreshUser();
+    }, []);
     
     return (
         <div className="w-full">
