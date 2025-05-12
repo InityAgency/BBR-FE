@@ -88,7 +88,7 @@ export default function MiniNav() {
         </Link>
       </div>
       <div className="flex flex-row gap-6 items-center">
-        <Link href="/" className="hover:text-primary transition-all">
+        <Link href="/schedule-a-demo" className="hover:text-primary transition-all">
           Schedule a demo
         </Link>
         <Link

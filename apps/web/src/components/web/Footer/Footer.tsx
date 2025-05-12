@@ -134,7 +134,7 @@ export default function Footer() {
       </div>
       <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)]  mx-auto px-4 py-8 flex flex-col gap-16">
         <Separator orientation="horizontal" />
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-primary-link">Rankings</h3>
             <ul className="flex flex-col gap-1">
@@ -170,7 +170,10 @@ export default function Footer() {
                 <Link href="/request-consultation">Request A Consultation</Link>
               </li>
               <li>
-                <Link href="/#">Matchmaking Tool</Link>
+                <Link href="/residences">All Residences</Link>
+              </li>
+              <li>
+                <Link href="/brands">All Brands</Link>
               </li>
               <li>
                 <Link href="/faq-buyer">Buyer FAQs</Link>
@@ -189,9 +192,6 @@ export default function Footer() {
                 <Link href="/marketing-solutions">Marketing Solutions</Link>
               </li>
               <li>
-                <Link href="/#">Features</Link>
-              </li>
-              <li>
                 <Link href="/why-choose-us">Why Choose Us</Link>
               </li>
               <li>
@@ -204,30 +204,7 @@ export default function Footer() {
                 <Link href="/b2b-about-us">About Us</Link>
               </li>
               <li>
-                <Link href="/#">Let’s talk</Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xl font-bold text-primary-link">
-              Developer Hub
-            </h3>
-            <ul className="flex flex-col gap-1">
-              <li>
-                <Link href="/#">Register Your Residence</Link>
-              </li>
-              <li>
-                <Link href="/#">Apply for Rankings</Link>
-              </li>
-              {/* <li>
-                <Link href="/#">Marketing Solutions</Link>
-              </li> */}
-              <li>
-                <Link href="/#">Claim Your Profile</Link>
-              </li>
-              <li>
-                <Link href="/#">Developer FAQs</Link>
+                <Link href="/register/developer">Register Your Residence</Link>
               </li>
             </ul>
           </div>
@@ -236,13 +213,16 @@ export default function Footer() {
             <h3 className="text-xl font-bold text-primary-link">Support</h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/#">Customer Support</Link>
+                <Link href="/request-consultation">Request A Consultation</Link>
               </li>
               <li>
                 <Link href="/suggest-feature">Suggest A Feature</Link>
               </li>
               <li>
                 <Link href="/report-issue">Report An Error</Link>
+              </li>
+              <li>
+                <Link href="/schedule-a-demo">Schedule A Demo</Link>
               </li>
             </ul>
           </div>
@@ -262,6 +242,9 @@ export default function Footer() {
               <li>
                 <Link href="/contact">Contact Us</Link>
               </li>
+              <li>
+                <Link href="/criteria">Evaluation Criteria</Link>
+              </li>
             </ul>
           </div>
           <div className="flex flex-col gap-2">
@@ -276,7 +259,9 @@ export default function Footer() {
               <li>
                 <Link href="/gdpr-compliance">GDPR Compliance</Link>
               </li>
-              {/* <li><Link href="/user-agreement">User Agreement</Link></li> */}
+              <li><Link href="/license-info">License Info</Link></li>
+              <li><Link href="/accessibility-statement">Accessibility Statement</Link></li>
+              <li><Link href="/user-agreement">User Agreement</Link></li>
             </ul>
           </div>
         </div>
