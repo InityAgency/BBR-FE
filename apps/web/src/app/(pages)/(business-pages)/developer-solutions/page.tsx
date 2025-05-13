@@ -389,7 +389,7 @@ const MarketingSolutionsPage = () => {
               src="/texture.webp"
               alt="about-us"
               fill
-              className="w-full h-full object-cover opacity-40"
+              className="w-full h-full object-cover opacity-80"
             />
             <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
               Leverage performance-based marketing campaigns

@@ -1,10 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import {
-  Mail,
-  MapPin,
-  Phone,
-  Lock,
-} from "lucide-react";
+import { Mail, MapPin, Phone, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import NewsletterForm from "../Forms/NewsletterForm";
@@ -338,9 +333,22 @@ export default function Footer() {
               <li>
                 <Link href="/gdpr-compliance">GDPR Compliance</Link>
               </li>
-              <li><Link href="/license-info">License Info</Link></li>
-              <li><Link href="/accessibility-statement">Accessibility Statement</Link></li>
-              <li><Link href="/user-agreement">User Agreement</Link></li>
+              <li>
+                <Link href="/license-info">License Info</Link>
+              </li>
+              <li>
+                <Link href="/accessibility-statement">
+                  Accessibility Statement
+                </Link>
+              </li>
+              <li>
+                <Link href="/user-agreement">User Agreement</Link>
+              </li>
+              <li>
+                <Link href="/corporate-responsibility-legal">
+                  Corporate Responsibility Legal
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
