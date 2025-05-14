@@ -36,10 +36,21 @@ button, a{
 }
 
 .residence-filters, .unit-filters{
-    input, select, button {
+    input, select, button:not([type="submit"]):not([role="switch"]):not([role="checkbox"]) {
         background-color: #101417;
         color: #fff;
         border-color: oklch(1 0 0 / 5%);
+    }
+}
+.custom-form{
+    input, select, button:not([type="submit"]):not([role="switch"]):not([role="checkbox"]) {
+        background-color: transparent;
+        color: #fff;
+    }
+    span[data-slot="badge"]{
+        margin-bottom: 0;
+        background-color: #1c252b;
+        border-radius: 8px;
     }
 }
 .search-wrapper{

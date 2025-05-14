@@ -61,7 +61,7 @@ export default function ResetPasswordRequestPage() {
     };
 
     return (
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full custom-form">
             <div className="w-full py-6 lg:p-8">
                 <div className="flex flex-col gap-3 mb-1">
                     <Link href="/login" className="text-balance cursor-pointer text-md font-medium text-primary-foreground flex items-center gap-1 hover:text-primary transition-all mb-3">

@@ -27,6 +27,7 @@ interface MultiSelectProps {
   maxItems?: number
   required?: boolean
   error?: string
+  initialOptions?: { id: string; name: string }[]
 }
 
 // Cache for storing options data
@@ -44,9 +45,10 @@ export function MultiSelect({
   maxItems,
   required = false,
   error,
+  initialOptions = [],
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false)
-  const [options, setOptions] = useState<Option[]>([])
+  const [options, setOptions] = useState<Option[]>(initialOptions)
   const [search, setSearch] = useState("")
   const [debouncedSearch] = useDebounce(search, 500)
   const [loading, setLoading] = useState(false)
@@ -55,7 +57,7 @@ export function MultiSelect({
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const queryRunningRef = useRef(false)
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([])
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(initialOptions.filter(opt => value.includes(opt.id)))
 
   // Create a cache key based on endpoint and search term
   const cacheKey = useMemo(() => `${apiEndpoint}-${debouncedSearch}`, [apiEndpoint, debouncedSearch]);

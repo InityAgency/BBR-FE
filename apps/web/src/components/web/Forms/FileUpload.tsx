@@ -146,7 +146,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       ) : (
         <div 
           onClick={handleClick}
-          className={`flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 cursor-pointer hover:bg-muted/50 transition-colors ${error ? 'border-destructive bg-destructive/5' : ''}`}
+          className={`flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 cursor-pointer hover:bg-secondary transition-colors ${error ? 'border-destructive bg-destructive/5' : ''}`}
         >
           <Upload className={`h-8 w-8 ${error ? 'text-destructive' : 'text-muted-foreground'}`} />
           <div className="text-sm text-center">

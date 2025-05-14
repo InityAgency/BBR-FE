@@ -6,15 +6,26 @@ const SUPPORTED_FORMATS = ["image/png", "image/jpeg", "image/jpg"];
 
 export default function ImageUpload({ 
     onFileChange,
-    title = "Upload your company logo"
+    title = "Upload your company logo",
+    preview,
+    onRemove
 }: { 
     onFileChange: (file: File | null) => void;
     title?: string;
+    preview?: string;
+    onRemove?: () => void;
 }) {
-    const [preview, setPreview] = useState<string | null>(null);
+    const [previewState, setPreviewState] = useState<string | null>(preview || null);
     const [file, setFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Sync preview prop if it changes
+    React.useEffect(() => {
+        if (!file) {
+            setPreviewState(preview || null);
+        }
+    }, [preview]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setError(null);
@@ -33,17 +44,18 @@ export default function ImageUpload({
         }
 
         setFile(file);
-        setPreview(URL.createObjectURL(file));
+        setPreviewState(URL.createObjectURL(file));
         onFileChange(file);
     };
 
     const handleRemove = (e: React.MouseEvent) => {
         e.stopPropagation();
         setFile(null);
-        setPreview(null);
+        setPreviewState(preview || null);
         setError(null);
         if (inputRef.current) inputRef.current.value = '';
         onFileChange(null);
+        if (onRemove) onRemove();
     };
 
     const handleCardClick = (e: React.MouseEvent) => {
@@ -58,9 +70,9 @@ export default function ImageUpload({
             onClick={handleCardClick}
         >
             <div className="logo-upload relative w-[100px] h-[100px] min-w-[100px] min-h-[100px] max-w-[100px] max-h-[100px] flex items-center justify-center border border-dashed rounded-lg bg-secondary">
-                {preview ? (
+                {previewState ? (
                     <div className="relative w-full h-full flex items-center justify-center">
-                        <img src={preview} alt="Logo preview" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 8 }} />
+                        <img src={previewState} alt="Logo preview" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 8 }} />
                         <button
                             type="button"
                             onClick={handleRemove}

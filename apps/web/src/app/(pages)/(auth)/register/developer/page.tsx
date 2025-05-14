@@ -4,7 +4,7 @@ import RegisterDeveloperForm from "@/components/web/Auth/Forms/RegisterDeveloper
 
 const RegisterDeveloper = () => {
     return (
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center w-full custom-form">
             <div className="w-full py-6 lg:p-8">
                 <div className="flex flex-col gap-3 mb-1">
                     <div className="flex w-full flex-row items-center justify-between">
