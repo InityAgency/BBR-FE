@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { PuffLoader } from 'react-spinners';
+import { FcGoogle } from 'react-icons/fc';
 
 const LoginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -55,6 +56,10 @@ export default function LoginPage() {
     } catch (error: any) {
       setErrorMessage(error.message || "Login failed. Please check your credentials.");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/google`;
   };
 
   if (user) {
@@ -131,6 +136,28 @@ export default function LoginPage() {
             </Button>
           </form>
         </Form>
+        <div className="mt-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full mt-4"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+          >
+            <FcGoogle className="mr-2 h-4 w-4" />
+            Continue with Google
+          </Button>
+        </div>
         <div className="mt-4 text-center text-md flex items-center gap-2 justify-center">
           Don't have an account? <a href="/register" className="text-primary underline flex items-center gap-1 text-md">Sign up <ArrowRight width={16} height={16}/></a>
         </div>

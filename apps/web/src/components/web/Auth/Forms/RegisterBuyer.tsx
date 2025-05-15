@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FcGoogle } from 'react-icons/fc';
 
 // Validation schema for buyer form
 const buyerFormSchema = z.object({
@@ -98,6 +99,12 @@ export default function RegisterBuyerForm() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleGoogleSignup = () => {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+        const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+        window.location.href = `${baseUrl}/api/${apiVersion}/auth/google?role=buyer`;
     };
 
     return (
@@ -218,6 +225,28 @@ export default function RegisterBuyerForm() {
                         ) : (
                             "Create BBR account"
                         )}
+                    </Button>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                            Or continue with
+                        </span>
+                        </div>
+                    </div>
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleGoogleSignup}
+                        disabled={isLoading}
+                    >
+                        <FcGoogle className="mr-2 h-4 w-4" />
+                        Sign up with Google
                     </Button>
                 </form>
             </Form>

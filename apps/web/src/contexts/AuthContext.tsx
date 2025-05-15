@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 interface Company {
   id: string;
@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -80,6 +81,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setIsLoading(false);
   }, []);
+
+  // Dodajemo useEffect za rukovanje Google callback-om
+  useEffect(() => {
+    const handleGoogleCallback = async () => {
+      const code = searchParams.get('code');
+      if (code && pathname === '/api/v1/auth/google/callback') {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/google/callback?code=${code}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (!response.ok) {
+            throw new Error('Google authentication failed');
+          }
+
+          const data = await response.json();
+          if (data.data) {
+            setUser(data.data);
+            localStorage.setItem('user', JSON.stringify(data.data));
+            
+            // Preusmeravanje na osnovu uloge
+            const targetPath = data.data.role?.name === "developer" 
+              ? '/developer/dashboard' 
+              : data.data.role?.name === "buyer" 
+                ? '/buyer/dashboard' 
+                : '/';
+                
+            router.replace(targetPath);
+          }
+        } catch (error) {
+          console.error('Google callback error:', error);
+          router.replace('/login');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    handleGoogleCallback();
+  }, [searchParams, pathname, router]);
 
   const setUser = (userData: User) => {
     setUserState(userData);
