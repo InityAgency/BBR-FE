@@ -44,6 +44,7 @@ import { rankingCategorySchema, RankingCategoryFormValues, initialRankingCategor
 import { Trash2 } from "lucide-react";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { RankingCategory, RankingCategoryType, RankingCategoryStatus } from "@/app/types/models/RankingCategory";
+import RankingCriteriaWeights, { CriteriaWeight } from "./RankingCriteriaWeights";
 
 // Define interface for ranking category type from API
 interface RankingCategoryTypeApiResponse {
@@ -100,6 +101,8 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
   const [imageChanged, setImageChanged] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [criteriaWeights, setCriteriaWeights] = useState<CriteriaWeight[]>([]);
+  const [loadingCriteriaWeights, setLoadingCriteriaWeights] = useState(false);
   
   const form = useForm<RankingCategoryFormValues>({
     resolver: zodResolver(rankingCategorySchema),
@@ -257,6 +260,83 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
       setImageChanged(true);
     }
   }, [featuredImageId, initialData.featuredImageId]);
+
+  useEffect(() => {
+    const fetchExistingCriteriaWeights = async () => {
+      if (!isEditing || !initialData.id) return;
+      
+      try {
+        setLoadingCriteriaWeights(true);
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${initialData.id}/criteria-weights`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch criteria weights: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.data && Array.isArray(data.data)) {
+          setCriteriaWeights(data.data);
+        }
+      } catch (error) {
+        toast.error('Failed to load criteria weights');
+      } finally {
+        setLoadingCriteriaWeights(false);
+      }
+    };
+  
+    fetchExistingCriteriaWeights();
+  }, [isEditing, initialData.id]);
+
+  const saveCriteriaWeights = async (rankingCategoryId: string) => {
+    try {
+      // Proverite da li je ukupna težina kriterijuma tačno 100%
+      const totalWeight = criteriaWeights.reduce((sum, item) => sum + item.weight, 0);
+      if (totalWeight !== 100) {
+        toast.error('Total weight of all criteria must be exactly 100%');
+        return false;
+      }
+      
+      // Proverite da li je označeno maksimalno 5 default kriterijuma
+      const defaultCount = criteriaWeights.filter(c => c.isDefault).length;
+      if (defaultCount > 5) {
+        toast.error('You can select a maximum of 5 default criteria');
+        return false;
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${rankingCategoryId}/criteria-weights`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          criteria: criteriaWeights.map(c => ({
+            rankingCriteriaId: c.rankingCriteriaId,
+            weight: c.weight,
+            isDefault: c.isDefault
+          }))
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to save criteria weights: ${response.status}`);
+      }
+      
+      return true;
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to save criteria weights');
+      }
+      return false;
+    }
+  };
 
   const onSubmit = async (data: RankingCategoryFormValues) => {
     try {
@@ -707,7 +787,11 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
 
         {/* Other infos */}
         <div>
-         
+        <RankingCriteriaWeights
+            onChange={setCriteriaWeights}
+            initialCriteria={criteriaWeights}
+            rankingCategoryId={initialData.id}
+          />
         </div>
       </div>
 
