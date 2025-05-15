@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import {Proportions, Building, BookUser, MessageSquareDiff, Trophy, CreditCard, ToyBrick, BadgeCheck} from "lucide-react";
+import {Proportions, Building, BookUser, MessageSquareDiff, Trophy, CreditCard, ToyBrick, BadgeCheck, CircleUser} from "lucide-react";
 export default function DeveloperSidebar() {
   const { user } = useAuth();
   return (
@@ -39,6 +39,10 @@ export default function DeveloperSidebar() {
           <Link href="/developer/marketing" className="text-md font-medium flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/5 transition-all duration-300">
             <ToyBrick width={20} height={20}/>
             Marketing Add-ons
+          </Link>
+          <Link href="/developer/settings" className="text-md font-medium flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/5 transition-all duration-300">
+            <CircleUser width={20} height={20}/>
+            Account Settings
           </Link>
           <Link href="/developer/marketing-collateral" className="text-md font-medium flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/5 transition-all duration-300">
             <BadgeCheck width={20} height={20}/>
