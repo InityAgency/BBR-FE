@@ -228,7 +228,7 @@ export default function RequestDetailsPage() {
                         {formatTypeName(m)}
                       </Badge>
                     ))
-                  : (request.lead?.preferredContactMethod ? formatTypeName(request.lead.preferredContactMethod) : '-')}
+                  : (typeof request.lead?.preferredContactMethod === 'string' ? formatTypeName(request.lead.preferredContactMethod) : '-')}
               </div>
             </div>
             <div className="w-1/2">
