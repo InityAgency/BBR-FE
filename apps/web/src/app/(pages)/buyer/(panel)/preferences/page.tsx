@@ -75,29 +75,6 @@ export default function Preferences() {
         return await response.json();
     };
 
-    // Helper function to fetch options by IDs
-    const fetchOptionsByIds = async (endpoint: string, ids: string[]) => {
-        if (!ids.length) return [];
-        
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-            const apiVersion = process.env.NEXT_PUBLIC_API_VERSION;
-            const idsParam = ids.join(",");
-            const url = `${baseUrl}/api/${apiVersion}/${endpoint}/byIds?ids=${idsParam}`;
-
-            const res = await fetch(url, { credentials: "include" });
-            const data = await res.json();
-
-            if (Array.isArray(data.data)) {
-                return data.data.map((item: any) => ({ id: item.id, name: item.name }));
-            }
-            return [];
-        } catch (error) {
-            console.error(`Error fetching ${endpoint}:`, error);
-            return [];
-        }
-    };
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {

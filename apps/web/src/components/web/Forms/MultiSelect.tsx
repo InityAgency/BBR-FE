@@ -192,18 +192,19 @@ export function MultiSelect({
         return;
       }
 
-      // Otherwise fetch the missing options
+      // Otherwise fetch the missing options using the main endpoint
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
         const apiVersion = process.env.NEXT_PUBLIC_API_VERSION;
-        const idsParam = missingIds.join(",");
-        const url = `${baseUrl}/api/${apiVersion}/${apiEndpoint}/byIds?ids=${idsParam}`;
+        const url = `${baseUrl}/api/${apiVersion}/${apiEndpoint}?limit=100`;
 
         const res = await fetch(url, { credentials: "include" });
         const data = await res.json();
 
         if (Array.isArray(data.data)) {
-          const fetchedOptions = data.data.map((item: any) => ({ id: item.id, name: item.name }));
+          const fetchedOptions = data.data
+            .filter((item: any) => missingIds.includes(item.id))
+            .map((item: any) => ({ id: item.id, name: item.name }));
           const allSelectedOptions = [...existingOptions, ...fetchedOptions];
           setSelectedOptions(allSelectedOptions);
         }

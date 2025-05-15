@@ -19,6 +19,10 @@ import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import FileUpload from "../Forms/FileUpload";
 
+// Constants for file upload
+const MAX_FILE_SIZE = 5; // in MB
+const SUPPORTED_FORMATS = ["PDF", "DOCX"];
+
 // Validaciona šema za formu
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -40,16 +44,18 @@ const formSchema = z.object({
     .refine((file) => file instanceof File, {
       message: "Please upload your resume.",
     })
-    .refine((file) => file instanceof File && file.size <= 5 * 1024 * 1024, {
-      message: "File must be less than 5MB.",
+    .refine((file) => file instanceof File && file.size <= MAX_FILE_SIZE * 1024 * 1024, {
+      message: `File must be less than ${MAX_FILE_SIZE}MB.`,
     })
     .refine(
       (file) => 
         file instanceof File && 
-        (file.type === "application/pdf" || 
-         file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        SUPPORTED_FORMATS.some(format => 
+          file.type === `application/${format.toLowerCase()}` || 
+          file.type === `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+        ),
       {
-        message: "File must be PDF or DOCX format.",
+        message: `File must be ${SUPPORTED_FORMATS.join(' or ')} format.`,
       }
     ),
 });
@@ -235,8 +241,8 @@ export function CareerApplicationForm({ position, pageUrl }: CareerApplicationFo
                     value={value}
                     onChange={onChange}
                     required={true}
-                    maxSize={5}
-                    supportedFormats={["PDF", "DOCX"]}
+                    maxSize={MAX_FILE_SIZE}
+                    supportedFormats={SUPPORTED_FORMATS}
                   />
                 </FormControl>
                 <FormMessage />
