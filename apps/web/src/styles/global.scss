@@ -43,7 +43,7 @@ button, a{
     }
 }
 .custom-form{
-    input, select, button:not([type="submit"]):not([role="switch"]):not([role="checkbox"]) {
+    input, select,textarea, button:not([type="submit"]):not([role="switch"]):not([role="checkbox"]) {
         background-color: transparent;
         color: #fff;
     }
