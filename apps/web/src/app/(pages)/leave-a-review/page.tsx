@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,16 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+
+import { format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 const RATING_CATEGORIES = [
     { key: 'buildQuality', label: 'Build Quality' },
@@ -49,6 +59,7 @@ function RatingBar({ value, onChange, label }: { value: number, onChange: (v: nu
 export default function LeaveAReviewPage() {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     // State za rezidencije
     const [residences, setResidences] = useState([]);
@@ -77,6 +88,8 @@ export default function LeaveAReviewPage() {
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const preselectedResidenceId = searchParams.get('residenceId');
 
     useEffect(() => {
         if (!isLoading) {
@@ -213,6 +226,17 @@ export default function LeaveAReviewPage() {
         }
     };
 
+    // Preselect residenceId from query param
+    useEffect(() => {
+        if (
+            preselectedResidenceId &&
+            residences.length > 0 &&
+            residences.some((r: { id: string }) => r.id === preselectedResidenceId)
+        ) {
+            setSelectedResidence(preselectedResidenceId);
+        }
+    }, [preselectedResidenceId, residences]);
+
     if (isLoading || !user || user.role?.name !== 'buyer') {
         return null;
     }
@@ -287,12 +311,34 @@ export default function LeaveAReviewPage() {
                     {/* Date of purchase */}
                     <div className='flex flex-col gap-2'>
                         <label className="text-md font-medium mt-4">Date of Purchase</label>
-                        <Input
-                            type="date"
-                            value={dateOfPurchase}
-                            onChange={e => setDateOfPurchase(e.target.value)}
-                            className="w-full"
-                        />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !dateOfPurchase && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateOfPurchase ? format(new Date(dateOfPurchase), "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 bg-secondary" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={dateOfPurchase ? new Date(dateOfPurchase) : undefined}
+                                    onSelect={(day) => {
+                                        if (day) {
+                                            setDateOfPurchase(format(day, "yyyy-MM-dd"))
+                                        } else {
+                                            setDateOfPurchase("")
+                                        }
+                                    }}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
                         {errors.dateOfPurchase && <span className="text-destructive text-sm">{errors.dateOfPurchase}</span>}
                     </div>
 

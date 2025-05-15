@@ -244,6 +244,9 @@ export default function Footer() {
                 <Link href="/request-consultation">Request A Consultation</Link>
               </li>
               <li>
+                <Link href="/leave-a-review">Leave a Review</Link>
+              </li>
+              <li>
                 <Link href="/residences">All Residences</Link>
               </li>
               <li>

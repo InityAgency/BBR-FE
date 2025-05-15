@@ -23,5 +23,10 @@
       "apps/admin",
       "packages/*"
     ]
+  },
+  "dependencies": {
+    "@radix-ui/react-popover": "^1.1.6",
+    "date-fns": "^4.1.0",
+    "react-day-picker": "^9.7.0"
   }
 }

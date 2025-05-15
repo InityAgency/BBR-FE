@@ -483,7 +483,9 @@ export default function ResidencePage() {
                                 Send us a review
                             </h2>
                         </div>
-                        <Link href="#" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit z-4">
+                        <Link 
+                            href={`/leave-a-review?residenceId=${residence.id}`}
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit z-4">
                             Submit a review
                             <ArrowRight />
                         </Link>
