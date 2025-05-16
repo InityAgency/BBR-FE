@@ -58,6 +58,7 @@ import {
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MultiSelect from "../../Forms/MultiSelect";
+import { CountryAndCity } from "@/components/admin/Forms/CountryAndCity";
 
 interface ResidenceFormProps {
   initialData?: Partial<ResidenceFormValues>;
@@ -445,6 +446,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
             const data = json.data;
 
             console.log("Loaded residence data:", data); // Dodajemo logove za lakše debugiranje
+            
 
             // 2. Učitavamo brendove paralelno
             let brandsPromise = Promise.resolve();
@@ -552,6 +554,8 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
             await brandsPromise;
 
             // 7. Resetujemo formu NAKON što smo učitali sve potrebno
+            let countryIdToSet = data.country?.id || (data.city?.countryId ?? "");
+            let cityIdToSet = data.city?.id || "";
             form.reset({
               ...initialResidenceValues,
               name: data.name || "",
@@ -564,8 +568,8 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               address: data.address || "",
               latitude: data.latitude || 0,
               longitude: data.longitude || 0,
-              countryId: data.country?.id || "",
-              cityId: data.city?.id || "",
+              countryId: countryIdToSet,
+              cityId: cityIdToSet,
               brandId: data.brand?.id || "",
               rentalPotential: data.rentalPotential || "",
               websiteUrl: data.websiteUrl || "",
@@ -904,24 +908,24 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Handler za brisanje
   const handleDelete = async () => {
     const residenceId = params?.id;
-    
+
     if (!residenceId) {
       console.error("Residence ID is missing - cannot delete residence");
       toast.error("Cannot delete: residence ID is missing");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
       const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to delete residence');
       }
-  
+
       toast.success('Residence deleted successfully');
       router.push('/residences');
       router.refresh();
@@ -962,21 +966,21 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
     // Umesto provere initialData?.id koja može sprečiti izvršavanje,
     // koristi params?.id koji će uvek biti dostupan u edit modu
     const residenceId = params?.id;
-    
+
     if (!residenceId) {
       console.error("Residence ID is missing - cannot update status");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
-  
+
       console.log("Sending status update:", {
         residenceId,
         newStatus,
         url: `${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}/status`
       });
-  
+
       const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}/status`, {
         method: 'PATCH',
         credentials: 'include',
@@ -985,13 +989,13 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
         },
         body: JSON.stringify({ status: newStatus })
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Status update failed:", errorText);
         throw new Error(`Failed to update status: ${response.status}`);
       }
-  
+
       // Ažuriraj vrednost u formi
       form.setValue("status", newStatus, { shouldDirty: true });
       toast.success(`Residence status updated to ${newStatus}`);
@@ -1006,9 +1010,9 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Render status bedža
   const renderStatusBadge = () => {
     if (!isEditing) return null;
-  
+
     const allowedStatuses = ["DRAFT", "ACTIVE", "PENDING", "DELETED"] as const;
-  
+
     return (
       <FormField
         control={form.control}
@@ -1021,7 +1025,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               // Direktno prosleđujemo value bez provere
               handleStatusChange(newStatus as "DRAFT" | "ACTIVE" | "DELETED" | "PENDING");
             }}
-            value={field.value || ""} 
+            value={field.value || ""}
             disabled={isSubmitting}
           >
             <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
@@ -1109,7 +1113,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Render dugmeta za brisanje
   const renderDeleteButton = () => {
     if (!isEditing || form.watch("status") === "DELETED") return null;
-  
+
     return (
       <>
         <Button
@@ -1289,172 +1293,24 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        key={`country-field-${form.watch("countryId") || "empty"}`}
-                        control={form.control}
-                        name="countryId"
-                        render={({ field }) => (
-                          <FormItem className="w-full">
-                            <FormLabel>Country <span className="text-destructive">*</span></FormLabel>
-                            <Select
-                              onValueChange={(value) => {
-                                console.log("Country changed to:", value);
-                                field.onChange(value);
-                                // Resetuj grad kada se promeni država
-                                form.setValue("cityId", "");
-                              }}
-                              value={field.value || ""}
-                              onOpenChange={(open) => {
-                                if (open && countrySearchInputRef.current) {
-                                  setTimeout(() => {
-                                    countrySearchInputRef.current?.focus();
-                                  }, 100);
-                                }
-                              }}
-                            >
-                              <FormControl className="w-full">
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a country" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <div className="px-2 py-2 sticky top-0 bg-background z-10">
-                                  <Input
-                                    ref={countrySearchInputRef}
-                                    placeholder="Search countries..."
-                                    value={countrySearchQuery || ""}
-                                    onChange={(e) => setCountrySearchQuery(e.target.value)}
-                                    className="h-8"
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                  />
-                                </div>
-                                <div
-                                  className="max-h-[300px] overflow-y-auto"
-                                  onScroll={handleCountryScroll}
-                                >
-                                  {isLoadingCountries && countries.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      Loading countries...
-                                    </div>
-                                  ) : countries.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      No countries found
-                                    </div>
-                                  ) : (
-                                    countries.map((country) => (
-                                      <SelectItem
-                                        key={country.id}
-                                        value={country.id}
-                                        className="cursor-pointer"
-                                      >
-                                        <div className="flex items-center justify-between w-full">
-                                          <div className="flex items-center gap-2">
-                                            <img
-                                              src={country.flag}
-                                              alt={`${country.name} flag`}
-                                              className="w-4 h-4 rounded-sm object-cover"
-                                            />
-                                            <span>{country.name}</span>
-                                          </div>
-                                          <span className="text-xs text-muted-foreground">
-                                            {country.code}
-                                          </span>
-                                        </div>
-                                      </SelectItem>
-                                    ))
-                                  )}
-                                  {isLoadingCountries && countries.length > 0 && (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                                      Loading more countries...
-                                    </div>
-                                  )}
-                                </div>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                    <FormItem className="w-full col-span-2">
+                      <FormLabel>Location <span className="text-destructive">*</span></FormLabel>
+                      <CountryAndCity
+                        defaultCountryId={form.watch("countryId")}
+                        defaultCityId={form.watch("cityId")}
+                        onCountrySelect={(countryId) => {
+                          console.log("Country selected:", countryId);
+                          form.setValue("countryId", countryId, { shouldValidate: true, shouldDirty: true });
+                          // Resetujemo grad kada se promeni država
+                          form.setValue("cityId", "", { shouldValidate: true, shouldDirty: true });
+                        }}
+                        onCitySelect={(cityId) => {
+                          console.log("City selected:", cityId);
+                          form.setValue("cityId", cityId, { shouldValidate: true, shouldDirty: true });
+                        }}
                       />
-
-                      <FormField
-                        key={`city-field-${form.watch("cityId") || "empty"}`}
-                        control={form.control}
-                        name="cityId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              City <span className="text-destructive">*</span>
-                            </FormLabel>
-                            <Select
-                              onValueChange={(value) => {
-                                console.log("City changed to:", value);
-                                field.onChange(value);
-                              }}
-                              value={field.value || ""}
-                              disabled={!form.watch("countryId")}
-                              onOpenChange={(open) => {
-                                if (open && citySearchInputRef.current) {
-                                  setTimeout(() => {
-                                    citySearchInputRef.current?.focus();
-                                  }, 100);
-                                }
-                              }}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder={form.watch("countryId") ? "Select a city" : "Please select a country first"} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <div className="px-2 py-2 sticky top-0 bg-background z-10">
-                                  <Input
-                                    ref={citySearchInputRef}
-                                    placeholder="Search cities..."
-                                    value={citySearchQuery || ""}
-                                    onChange={(e) => setCitySearchQuery(e.target.value)}
-                                    className="h-8"
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                  />
-                                </div>
-                                <div
-                                  className="max-h-[300px] overflow-y-auto"
-                                  onScroll={handleCityScroll}
-                                >
-                                  {isLoadingCities && cities.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      Loading cities...
-                                    </div>
-                                  ) : cities.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      No cities found
-                                    </div>
-                                  ) : (
-                                    cities.map((city) => (
-                                      <SelectItem
-                                        key={city.id}
-                                        value={city.id}
-                                        className="cursor-pointer"
-                                      >
-                                        <div className="flex items-center gap-2">
-                                          <span>{city.name}</span>
-                                        </div>
-                                      </SelectItem>
-                                    ))
-                                  )}
-                                  {isLoadingCities && cities.length > 0 && (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                                      Loading more cities...
-                                    </div>
-                                  )}
-                                </div>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                      <FormMessage />
+                    </FormItem>
 
                     <h2 className="text-xl font-semibold mb-4 mt-8">Brief Overview</h2>
 

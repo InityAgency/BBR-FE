@@ -10,14 +10,12 @@ export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    // Postaviti timeout koji će ažurirati debounce-ovanu vrednost nakon definisanog delay-a
-    const handler = setTimeout(() => {
+    const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
-    // Očistiti timeout ako se vrednost promeni pre nego što istekne delay
     return () => {
-      clearTimeout(handler);
+      clearTimeout(timer);
     };
   }, [value, delay]);
 
