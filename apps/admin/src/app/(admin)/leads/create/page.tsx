@@ -1,9 +1,10 @@
 import AdminLayout from "../../AdminLayout";
+import LeadForm from "@/components/admin/Leads/Forms/LeadForm";
 
-export default function LeadsCreate() {
+export default function LeadsCreatePage() {
     return (
         <AdminLayout>
-            Create Lead
+            <LeadForm isEditing={false} />
         </AdminLayout>
     );
 }
