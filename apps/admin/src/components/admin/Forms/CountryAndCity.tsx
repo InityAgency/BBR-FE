@@ -211,6 +211,10 @@ export function CountryAndCity({
   const [cityErrors, setCityErrors] = React.useState<Partial<Record<keyof AddCityFormData, string>>>({});
   const [continents, setContinents] = React.useState<Continent[]>([]);
   const [isContinentsLoading, setIsContinentsLoading] = React.useState(false);
+  
+  // Tracking whether we've loaded initial data
+  const [countriesLoaded, setCountriesLoaded] = React.useState(false);
+  const [defaultsHandled, setDefaultsHandled] = React.useState(false);
 
   const fetchCountries = React.useCallback(async (query = "", page = 1, append = false) => {
     setIsCountryLoading(true);
@@ -230,13 +234,17 @@ export function CountryAndCity({
       }
       setHasMoreCountries(page < data.pagination.totalPages);
       setCountryCurrentPage(page);
+      
+      if (!countriesLoaded) {
+        setCountriesLoaded(true);
+      }
     } catch (err) {
       console.error(err);
       if (!append) setCountries([]);
     } finally {
       setIsCountryLoading(false);
     }
-  }, []);
+  }, [countriesLoaded]);
 
   const fetchCities = React.useCallback(async (countryId: string, query = "", page = 1, append = false) => {
     if (!countryId) return;
@@ -267,18 +275,21 @@ export function CountryAndCity({
     }
   }, []);
 
+  // Load countries when popover opens or search changes
   React.useEffect(() => {
-    if (countryOpen) {
+    if (countryOpen && !isCountryLoading) {
       fetchCountries(debouncedCountrySearch, 1, false);
     }
   }, [debouncedCountrySearch, countryOpen, fetchCountries]);
 
+  // Load cities when popover opens or search changes
   React.useEffect(() => {
-    if (cityOpen && countryValue) {
+    if (cityOpen && countryValue && !isCityLoading) {
       fetchCities(countryValue, debouncedCitySearch, 1, false);
     }
   }, [debouncedCitySearch, cityOpen, countryValue, fetchCities]);
 
+  // Clear search when popovers close
   React.useEffect(() => {
     if (!countryOpen) {
       setCountrySearchQuery("");
@@ -291,89 +302,90 @@ export function CountryAndCity({
     }
   }, [cityOpen]);
 
+  // Load initial countries when component mounts
   React.useEffect(() => {
-    const initializeWithDefaults = async () => {
-      // Inicijalizacija države
+    if (!countriesLoaded && !isCountryLoading) {
+      fetchCountries("", 1, false);
+    }
+  }, [countriesLoaded, isCountryLoading, fetchCountries]);
+
+  // Handle default values ONLY after countries are loaded
+  React.useEffect(() => {
+    const handleDefaults = async () => {
+      if (!countriesLoaded || defaultsHandled) return;
+
+      // Handle default country
       if (defaultCountryId && defaultCountryId !== countryValue) {
+        console.log(`Setting default country: ${defaultCountryId}`);
         setCountryValue(defaultCountryId);
         
-        // Pronađi državu u listi ili je dohvati sa API-ja
+        // Check if country exists in loaded list
         const existingCountry = countries.find(c => c.id === defaultCountryId);
         if (existingCountry) {
           setSelectedCountry(existingCountry);
         } else {
+          // Fetch country details if not in list
           try {
-            console.log(`Fetching country with ID: ${defaultCountryId}`);
             const res = await fetch(`${API_BASE_URL}/api/${API_VERSION}/countries/${defaultCountryId}`, { 
               credentials: "include" 
             });
             
-            if (!res.ok) throw new Error("Failed to fetch country");
-            
-            const response = await res.json();
-            const countryData = response.data || response;
-            
-            if (countryData && countryData.id) {
-              console.log("Found country data:", countryData);
-              setSelectedCountry(countryData);
-              setCountries(prev => {
-                if (prev.some(c => c.id === countryData.id)) return prev;
-                return [...prev, countryData];
-              });
+            if (res.ok) {
+              const response = await res.json();
+              const countryData = response.data || response;
+              
+              if (countryData && countryData.id) {
+                setSelectedCountry(countryData);
+                setCountries(prev => {
+                  if (prev.some(c => c.id === countryData.id)) return prev;
+                  return [countryData, ...prev];
+                });
+              }
             }
           } catch (error) {
-            console.error("Error fetching country:", error);
+            console.error("Error fetching default country:", error);
           }
         }
       }
       
-      // Inicijalizacija grada (samo ako imamo državu)
+      // Handle default city ONLY if we have a country
       if (defaultCityId && defaultCountryId) {
+        console.log(`Setting default city: ${defaultCityId}`);
         setCityValue(defaultCityId);
         
-        // Pronađi grad u listi ili ga dohvati sa API-ja
-        const existingCity = cities.find(c => c.id === defaultCityId);
-        if (existingCity) {
-          setSelectedCity(existingCity);
-        } else {
-          try {
-            console.log(`Fetching city with ID: ${defaultCityId}`);
-            const res = await fetch(`${API_BASE_URL}/api/${API_VERSION}/cities/${defaultCityId}`, { 
-              credentials: "include" 
-            });
-            
-            if (!res.ok) throw new Error("Failed to fetch city");
-            
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/${API_VERSION}/cities/${defaultCityId}`, { 
+            credentials: "include" 
+          });
+          
+          if (res.ok) {
             const response = await res.json();
             const cityData = response.data || response;
             
             if (cityData && cityData.id) {
-              console.log("Found city data:", cityData);
               setSelectedCity(cityData);
               setCities(prev => {
                 if (prev.some(c => c.id === cityData.id)) return prev;
-                return [...prev, cityData];
+                return [cityData, ...prev];
               });
             }
-          } catch (error) {
-            console.error("Error fetching city:", error);
           }
-        }
-        
-        // Također učitaj i sve gradove za ovu državu
-        if (cities.length === 0 || !cities.some(c => c.countryId === defaultCountryId)) {
-          fetchCities(defaultCountryId, "", 1, false);
+        } catch (error) {
+          console.error("Error fetching default city:", error);
         }
       }
+      
+      setDefaultsHandled(true);
     };
-    
-    initializeWithDefaults();
-  }, [defaultCountryId, defaultCityId, countryValue, cityValue, countries, cities, fetchCities]);
 
+    handleDefaults();
+  }, [countriesLoaded, defaultsHandled, defaultCountryId, defaultCityId, countryValue, countries]);
+
+  // Infinite scrolling for countries
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMoreCountries && !isCountryLoading) {
+        if (entries[0].isIntersecting && hasMoreCountries && !isCountryLoading && countryOpen) {
           fetchCountries(debouncedCountrySearch, countryCurrentPage + 1, true);
         }
       },
@@ -382,12 +394,13 @@ export function CountryAndCity({
 
     if (countryObserverRef.current) observer.observe(countryObserverRef.current);
     return () => observer.disconnect();
-  }, [debouncedCountrySearch, countryCurrentPage, hasMoreCountries, isCountryLoading, fetchCountries]);
+  }, [debouncedCountrySearch, countryCurrentPage, hasMoreCountries, isCountryLoading, countryOpen, fetchCountries]);
 
+  // Infinite scrolling for cities
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMoreCities && !isCityLoading && countryValue) {
+        if (entries[0].isIntersecting && hasMoreCities && !isCityLoading && cityOpen && countryValue) {
           fetchCities(countryValue, debouncedCitySearch, cityCurrentPage + 1, true);
         }
       },
@@ -396,8 +409,9 @@ export function CountryAndCity({
 
     if (cityObserverRef.current) observer.observe(cityObserverRef.current);
     return () => observer.disconnect();
-  }, [debouncedCitySearch, cityCurrentPage, hasMoreCities, isCityLoading, countryValue, fetchCities]);
+  }, [debouncedCitySearch, cityCurrentPage, hasMoreCities, isCityLoading, cityOpen, countryValue, fetchCities]);
 
+  // Load continents
   React.useEffect(() => {
     const fetchContinents = async () => {
       setIsContinentsLoading(true);
@@ -443,7 +457,7 @@ export function CountryAndCity({
       if (!res.ok) throw new Error("Failed to add country");
 
       const data = await res.json();
-      setCountries(prev => [...prev, data]);
+      setCountries(prev => [data, ...prev]);
       setNewCountry({
         name: "",
         code: "",
@@ -509,7 +523,7 @@ export function CountryAndCity({
       });
       if (!res.ok) throw new Error("Failed to add city");
       const data = await res.json();
-      setCities(prev => [...prev, data]);
+      setCities(prev => [data, ...prev]);
       setNewCity({
         name: "",
         asciiName: "",
@@ -526,6 +540,25 @@ export function CountryAndCity({
       console.error(error);
       toast.error("Failed to add city");
     }
+  };
+
+  const handleCountrySelect = (currentValue: string) => {
+    const country = countries.find(c => c.id === currentValue);
+    setCountryValue(currentValue);
+    setSelectedCountry(country || null);
+    setCityValue("");
+    setSelectedCity(null);
+    setCities([]);
+    setCountryOpen(false);
+    onCountrySelect?.(currentValue);
+  };
+
+  const handleCitySelect = (currentValue: string) => {
+    const city = cities.find(c => c.id === currentValue);
+    setCityValue(currentValue);
+    setSelectedCity(city || null);
+    setCityOpen(false);
+    onCitySelect?.(currentValue);
   };
 
   return (
@@ -548,15 +581,7 @@ export function CountryAndCity({
                     <CommandItem
                       key={country.id}
                       value={country.id}
-                      onSelect={(currentValue) => {
-                        setCountryValue(currentValue);
-                        setSelectedCountry(country);
-                        setCityValue("");
-                        setSelectedCity(null);
-                        setCities([]);
-                        setCountryOpen(false);
-                        onCountrySelect?.(currentValue);
-                      }}
+                      onSelect={handleCountrySelect}
                     >
                       <div className="flex items-center gap-2">
                         <img src={country.flag} alt={country.name} className="w-4 h-3 object-cover" />
@@ -776,12 +801,7 @@ export function CountryAndCity({
                     <CommandItem
                       key={city.id || `${city.name}-${index}`}
                       value={city.id}
-                      onSelect={(currentValue) => {
-                        setCityValue(currentValue);
-                        setSelectedCity(city);
-                        setCityOpen(false);
-                        onCitySelect?.(currentValue);
-                      }}
+                      onSelect={handleCitySelect}
                     >
                       {city.name}
                       <Check className={cn("ml-auto h-4 w-4", cityValue === city.id ? "opacity-100" : "opacity-0")} />

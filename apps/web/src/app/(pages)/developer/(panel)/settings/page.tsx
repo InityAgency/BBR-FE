@@ -29,6 +29,7 @@ export default function DeveloperSettingsPage() {
                 </TabsContent>
 
                 <TabsContent value="user">
+                    <PersonalInformation />
                 </TabsContent>
 
                 <TabsContent value="notifications">
