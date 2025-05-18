@@ -139,6 +139,8 @@ export default function RequestDetailsPage() {
     );
   }
 
+  console.log(request);
+
   return (
     <AdminLayout>
       {/* HEADER */}
@@ -220,7 +222,7 @@ export default function RequestDetailsPage() {
           </div>
           <div className="mb-2 flex gap-4">
             <div className="w-1/2">
-              <div className="text-xs text-muted-foreground">Preferred contact method</div>
+              <div className="text-xs text-muted-foreground mb-1">Preferred contact method</div>
               <div className="font-medium flex flex-wrap gap-2">
                 {Array.isArray(request.lead?.preferredContactMethod) && request.lead.preferredContactMethod.length > 0
                   ? request.lead.preferredContactMethod.map((m: string) => (

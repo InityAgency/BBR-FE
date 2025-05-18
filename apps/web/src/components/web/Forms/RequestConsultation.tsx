@@ -30,6 +30,7 @@ interface RequestConsultationFormProps {
   entityId?: string;
   type?: "CONSULTATION" | "MORE_INFORMATION" | "CONTACT_US";
   buttonText?: string;
+  onSuccess?: () => void;
 }
 
 export default function RequestConsultationForm({
@@ -38,7 +39,8 @@ export default function RequestConsultationForm({
   customTitle = "Contact our expert",
   entityId,
   type = "CONSULTATION", 
-  buttonText = "Send Message" 
+  buttonText = "Send Message",
+  onSuccess
 }: RequestConsultationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,6 +66,7 @@ export default function RequestConsultationForm({
       await contactService.sendMessage(data);
       toast.success("Message sent successfully");
       form.reset(); // Reset form after successful submission
+      if (onSuccess) onSuccess();
     } catch (error) {
       toast.error("Failed to send message");
       console.error("Error sending message:", error);
@@ -241,7 +244,7 @@ export default function RequestConsultationForm({
           />
 
           <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? "Sending..." : buttonText} {/* Koristimo buttonText ovde */}
+            {isLoading ? "Sending..." : buttonText}
           </Button>
         </form>
       </Form>

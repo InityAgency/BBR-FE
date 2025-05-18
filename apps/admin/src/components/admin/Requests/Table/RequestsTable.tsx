@@ -99,7 +99,6 @@ export function RequestsTable({
   const queryParam = searchParams.get('query');
   const [search, setSearch] = useState(queryParam || "");
 
-  // Koristimo generički hook za tabelu
   const {
     table,
     setGlobalFilter: setTableGlobalFilter,
@@ -108,14 +107,11 @@ export function RequestsTable({
     columns: enhancedColumns(fetchRequests, currentPage),
     initialSorting: [{ id: "createdAt", desc: true }],
     globalFilterFn: (row, columnId, value, addMeta) => {
-      // Koristimo našu univerzalnu funkciju
       const result = fuzzyFilter(row, columnId, value, addMeta);
       
-      // Dodatno proveravamo ID polje eksplicitno
       const id = row.original.id || "";
       const searchValue = String(value).toLowerCase();
       
-      // Vraćamo true ako je univerzalna pretraga uspela ILI ako ID sadrži traženi tekst
       return result || id.toLowerCase().includes(searchValue);
     },
     initialPageSize: ITEMS_PER_PAGE,
@@ -123,7 +119,6 @@ export function RequestsTable({
     pageCount: totalPages,
   });
 
-  // Sinhronizujemo globalFilter sa tabelom
   React.useEffect(() => {
     setTableGlobalFilter(search);
   }, [search, setTableGlobalFilter]);
@@ -140,14 +135,12 @@ export function RequestsTable({
     statusAccessor: "status",
   });
 
-  // Sinhronizujemo stanje sa URL parametrom
   useEffect(() => {
     if (queryParam !== search) {
       setSearch(queryParam || "");
     }
   }, [queryParam]);
 
-  // Helper funkcije za stilizovanje redova i ćelija
   const getRowClassName = (row: any) => {
     const status = row.original.status;
     if (status === "CANCELLED") return "opacity-60";
@@ -157,7 +150,6 @@ export function RequestsTable({
 
   return (
     <div className="w-full">
-      {/* Filteri */}
       <RequestsFilters
         globalFilter={search}
         setGlobalFilter={setSearch}
@@ -171,7 +163,6 @@ export function RequestsTable({
         setTypeSearchValue={setTypeSearchValue}
       />
 
-      {/* Tabela */}
       <div className="hidden lg:block">
         {loading ? (
           <TableSkeleton />

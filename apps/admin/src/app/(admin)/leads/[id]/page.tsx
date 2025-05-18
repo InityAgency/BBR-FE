@@ -36,6 +36,8 @@ const getStatusBadgeStyle = (status: string) => {
             return "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50 text-sm";
         case "LOST":
             return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50 text-sm";
+        case "CANCELLED":
+            return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50 text-sm";
         default:
             return "";
     }
@@ -146,6 +148,8 @@ export default function LeadDetailsPage() {
             toast.error("Failed to delete lead");
         }
     };
+
+    console.log(lead);
 
     if (loading) {
         return (
@@ -341,13 +345,20 @@ export default function LeadDetailsPage() {
                     {lead.requests && lead.requests.length > 0 ? (
                         <div className="divide-y divide-border">
                             {lead.requests.map((request) => (
-                                <div key={request.id} className="py-4 flex items-center justify-between border p-4 rounded-lg hover:bg-white/5 transition-colors">
+                                <div key={request.id} className="py-4 mb-2 flex items-center justify-between border p-4 rounded-lg hover:bg-white/5 transition-colors">
                                     <div>
-                                        <div className="font-medium">{request.subject}</div>
-                                        <p className="text-sm text-muted-foreground">
-                                            {request.message}
-                                        </p>
-
+                                        {request.subject ? (
+                                            <div className="font-medium">{request.subject}</div>
+                                        ) : (
+                                            <div className="font-medium">No subject</div>
+                                        )}
+                                        {request.message ? (
+                                            <p className="text-sm text-muted-foreground">
+                                                {request.message}
+                                            </p>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">No message</p>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Badge variant="outline" className="text-sm px-2 py-0.5 inline-block capitalize">

@@ -10,18 +10,25 @@ import { Request } from "../../../../app/types/models/Request";
 import { format } from "date-fns";
 
 // Helper funkcije za renderovanje ćelija
-const renderRequestTypeCell = (type: string, id: string) => (
-  <div className="flex items-center gap-3 max-w-[300px]">
-    <div>
-      <div className="font-medium text-foreground truncate block" title={type}>
-        {type}
-      </div>
-      <div className="text-xs text-muted-foreground truncate">
-        {id}
+const renderRequestTypeCell = (type: string, id: string) => {
+  const formattedType = type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  return (
+    <div className="flex items-center gap-3 max-w-[300px]">
+      <div>
+        <div className="font-medium text-foreground truncate block" title={type}>
+          {formattedType}
+        </div>
+        <div className="text-xs text-muted-foreground truncate">
+          {id}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const renderLeadCell = (lead: any) => (
   <div className="max-w-[300px]">
