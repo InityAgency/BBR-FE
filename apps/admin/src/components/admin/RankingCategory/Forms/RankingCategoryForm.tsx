@@ -84,7 +84,6 @@ interface CriteriaWeightApiResponse {
   id: string;
   rankingCriteriaId: string;
   weight: number;
-  isDefault: boolean;
   rankingCriteria: {
     id: string;
     name: string;
@@ -180,8 +179,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
     return criteriaWeights.some(current => {
       const initial = initialCriteriaWeightsState.find(init => init.rankingCriteriaId === current.rankingCriteriaId);
       return !initial || 
-             initial.weight !== current.weight || 
-             initial.isDefault !== current.isDefault;
+             initial.weight !== current.weight;
     });
   }, [criteriaWeights, initialCriteriaWeightsState]);
 
@@ -195,14 +193,9 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
     }
     
     const totalWeight = criteriaWeights.reduce((sum, criteria) => sum + criteria.weight, 0);
-    const defaultCount = criteriaWeights.filter(c => c.isDefault).length;
     
     if (totalWeight !== 100) {
       return { isValid: false, message: "Total weight must be exactly 100%" };
-    }
-    
-    if (defaultCount > 5) {
-      return { isValid: false, message: "Maximum 5 default criteria allowed" };
     }
     
     return { isValid: true, message: "" };
@@ -256,7 +249,6 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
       const criteriaWeights: CriteriaWeight[] = (data.data || []).map((item: CriteriaWeightApiResponse) => ({
         rankingCriteriaId: item.rankingCriteriaId,
         weight: item.weight,
-        isDefault: item.isDefault,
         name: item.rankingCriteria.name,
       }));
 
@@ -318,7 +310,6 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
         criteria: criteriaWeights.map(criteria => ({
           rankingCriteriaId: criteria.rankingCriteriaId,
           weight: criteria.weight,
-          isDefault: criteria.isDefault,
         }))
       };
 
@@ -354,7 +345,6 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
         criteria: criteriaWeights.map(criteria => ({
           rankingCriteriaId: criteria.rankingCriteriaId,
           weight: criteria.weight,
-          isDefault: criteria.isDefault,
         }))
       };
 

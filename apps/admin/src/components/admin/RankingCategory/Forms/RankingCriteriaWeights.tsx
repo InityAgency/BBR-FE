@@ -34,7 +34,6 @@ interface RankingCriteria {
 export interface CriteriaWeight {
   rankingCriteriaId: string;
   weight: number;
-  isDefault: boolean;
   name?: string; // Added for display purposes
 }
 
@@ -58,7 +57,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
   const [newCriteriaName, setNewCriteriaName] = useState<string>("");
   const [newCriteriaDescription, setNewCriteriaDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [defaultCount, setDefaultCount] = useState<number>(0);
 
   // Fetch available criteria on component mount
   useEffect(() => {
@@ -72,13 +70,10 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
     }
   }, [initialCriteria]);
 
-  // Calculate total weight and default count whenever selected criteria change
+  // Calculate total weight whenever selected criteria change
   useEffect(() => {
     const total = selectedCriteria.reduce((sum, item) => sum + item.weight, 0);
     setTotalWeight(total);
-    
-    const defaultCriteriaCount = selectedCriteria.filter(c => c.isDefault).length;
-    setDefaultCount(defaultCriteriaCount);
     
     // Notify parent component about the change
     onChange(selectedCriteria);
@@ -196,7 +191,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       {
         rankingCriteriaId: criteriaId,
         weight: 0,
-        isDefault: false,
         name,
       },
     ]);
@@ -228,26 +222,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       prev.map(c => 
         c.rankingCriteriaId === criteriaId 
           ? { ...c, weight } 
-          : c
-      )
-    );
-  };
-
-  // Toggle default status
-  const toggleDefault = (criteriaId: string) => {
-    const criteria = selectedCriteria.find(c => c.rankingCriteriaId === criteriaId);
-    const isCurrentlyDefault = criteria?.isDefault || false;
-    
-    // If trying to set as default but already have 5 defaults, prevent it
-    if (!isCurrentlyDefault && defaultCount >= 5) {
-      toast.error("You can select a maximum of 5 default criteria");
-      return;
-    }
-    
-    setSelectedCriteria(prev => 
-      prev.map(c => 
-        c.rankingCriteriaId === criteriaId 
-          ? { ...c, isDefault: !c.isDefault } 
           : c
       )
     );
@@ -304,14 +278,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       <div className="space-y-4">
         {selectedCriteria.map(criteria => (
           <div key={criteria.rankingCriteriaId} className="flex items-center space-x-4 p-3 border rounded-md bg-muted/20">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                checked={criteria.isDefault} 
-                onCheckedChange={() => toggleDefault(criteria.rankingCriteriaId)}
-                disabled={defaultCount >= 5 && !criteria.isDefault}
-              />
-            </div>
-            
             <div className="flex-grow">
               <span className="font-medium">{criteria.name}</span>
             </div>

@@ -61,10 +61,9 @@ export default async function EditRankingCategoryPage({
     const formData = apiToFormRankingCategory(rankingCategory);
 
     // Map existing criteria weights to the format expected by RankingCriteriaWeights
-    const existingCriteriaWeights: CriteriaWeight[] = (rankingCategory.rankingCriteria || []).map((criteria: { id: any; weight: any; isDefault: any; name: any; }) => ({
+    const existingCriteriaWeights: CriteriaWeight[] = (rankingCategory.rankingCriteria || []).map((criteria: { id: any; weight: any; name: any; }) => ({
         rankingCriteriaId: criteria.id,
         weight: criteria.weight,
-        isDefault: criteria.isDefault,
         name: criteria.name,
     }));
 

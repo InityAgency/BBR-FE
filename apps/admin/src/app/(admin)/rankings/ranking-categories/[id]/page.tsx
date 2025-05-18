@@ -200,134 +200,105 @@ export default function RankingCategoryPage({ params }: PageProps) {
 
   // Calculate total weight for validation display
   const totalWeight = rankingCategory.rankingCriteria?.reduce((sum: any, criteria: { weight: any; }) => sum + criteria.weight, 0) || 0;
-  const defaultCriteriaCount = rankingCategory.rankingCriteria?.filter((c: { isDefault: any; }) => c.isDefault).length || 0;
 
   const renderOverviewTab = () => (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-    <Card className="border-none bg-foreground/5 col-span-full md:col-span-4 h-full">
+      <Card className="border-none bg-foreground/5 col-span-full md:col-span-4 h-full">
         <CardContent className="h-full flex flex-col">
-        <h2 className="text-lg font-semibold mb-4">General Information</h2>
-        <div className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow">
+          <h2 className="text-lg font-semibold mb-4">General Information</h2>
+          <div className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow">
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Ranking Name</p>
-            <p className="text-sm font-medium">{rankingCategory.name}</p>
+              <p className="text-sm text-muted-foreground mb-1">Ranking Name</p>
+              <p className="text-sm font-medium">{rankingCategory.name}</p>
             </div>
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Category Type</p>
-            <p className="text-sm font-medium">{rankingCategory.rankingCategoryType?.name || '-'}</p>
+              <p className="text-sm text-muted-foreground mb-1">Category Type</p>
+              <p className="text-sm font-medium">{rankingCategory.rankingCategoryType?.name || '-'}</p>
             </div>
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Description</p>
-            <p className="text-sm font-medium">{rankingCategory.description || '-'}</p>
+              <p className="text-sm text-muted-foreground mb-1">Description</p>
+              <p className="text-sm font-medium">{rankingCategory.description || '-'}</p>
             </div>
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Residence Limitation</p>
-            <p className="text-sm font-medium">{rankingCategory.residenceLimitation?.toLocaleString() || '-'}</p>
+              <p className="text-sm text-muted-foreground mb-1">Residence Limitation</p>
+              <p className="text-sm font-medium">{rankingCategory.residenceLimitation?.toLocaleString() || '-'}</p>
             </div>
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Ranking Price</p>
-            <p className="text-sm font-medium">{formatCurrency(rankingCategory.rankingPrice)}</p>
+              <p className="text-sm text-muted-foreground mb-1">Ranking Price</p>
+              <p className="text-sm font-medium">{formatCurrency(rankingCategory.rankingPrice)}</p>
             </div>
             <div>
-            <p className="text-sm text-muted-foreground mb-1">Last Updated</p>
-            <p className="text-sm font-medium">
+              <p className="text-sm text-muted-foreground mb-1">Last Updated</p>
+              <p className="text-sm font-medium">
                 {new Date(rankingCategory.updatedAt || Date.now()).toLocaleDateString()}
-            </p>
-            </div>
-        </div>
-        </CardContent>
-    </Card>
-
-    <Card className="border-none bg-foreground/5 col-span-full md:col-span-5 h-full">
-        <CardContent className="h-full flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Ranking Criteria</h2>
-          <div className="flex gap-2">
-            <Badge 
-              variant={totalWeight === 100 ? "info" : "destructive"}
-              className="text-xs"
-            >
-              Total: {totalWeight}%
-            </Badge>
-            <Badge 
-              variant="outline"
-              className="text-xs"
-            >
-              Default: {defaultCriteriaCount}/5
-            </Badge>
-          </div>
-        </div>
-        <div className="flex-grow">
-          {rankingCategory.rankingCriteria && rankingCategory.rankingCriteria.length > 0 ? (
-            <Table className="text-white">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Criteria</TableHead>
-                  <TableHead>Weight</TableHead>
-                  <TableHead>Default</TableHead>
-                </TableRow>
-              </TableHeader>  
-              <TableBody>
-                {rankingCategory.rankingCriteria.map((criteria: { id: React.Key | null | undefined; name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; weight: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; isDefault: any; }) => (
-                  <TableRow key={criteria.id}>
-                    <TableCell className="font-medium">{criteria.name}</TableCell>
-                    <TableCell>{criteria.weight}%</TableCell>
-                    <TableCell>
-                      {criteria.isDefault && (
-                        <Badge variant="outline" className="text-xs">
-                          Default
-                        </Badge>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-              {totalWeight !== 100 && (
-                <TableFooter>
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center text-destructive text-sm">
-                      Warning: Total weight is {totalWeight}% (should be 100%)
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              )}
-            </Table>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-              <Trophy className="h-8 w-8 mb-2 opacity-50" />
-              <p className="text-sm text-center">No ranking criteria defined</p>
-              <p className="text-xs text-center mt-1">
-                Criteria can be added when editing this ranking category
               </p>
             </div>
-          )}
-        </div>
+          </div>
         </CardContent>
-    </Card>
+      </Card>
 
-    <div className="col-span-full md:col-span-3 grid grid-rows-3 gap-6 h-full">
+      <Card className="border-none bg-foreground/5 col-span-full md:col-span-5 h-full">
+        <CardContent className="h-full flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Ranking Criteria</h2>
+            <div className="flex gap-2">
+              <Badge 
+                variant={totalWeight === 100 ? "info" : "destructive"}
+                className="text-xs"
+              >
+                Total: {totalWeight}%
+              </Badge>
+            </div>
+          </div>
+          <div className="flex-grow">
+            {rankingCategory.rankingCriteria && rankingCategory.rankingCriteria.length > 0 ?
+              <Table className="text-white">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Criteria</TableHead>
+                    <TableHead>Weight</TableHead>
+                  </TableRow>
+                </TableHeader>  
+                <TableBody>
+                  {rankingCategory.rankingCriteria.map((criteria: { id: React.Key | null | undefined; name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; weight: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }) => (
+                    <TableRow key={criteria.id}>
+                      <TableCell className="font-medium">{criteria.name}</TableCell>
+                      <TableCell>{criteria.weight}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No ranking criteria defined</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="col-span-full md:col-span-3 grid grid-rows-3 gap-4 h-full">
         <Card className="border-none bg-foreground/5">
-        <CardContent className="flex flex-col justify-center h-full">
+          <CardContent className="flex flex-col justify-center h-full">
             <h2 className="text-xl font-medium">132</h2>
             <p className="text-sm text-muted-foreground">Total views</p>
-        </CardContent>
+          </CardContent>
         </Card>
 
         <Card className="border-none bg-foreground/5">    
-        <CardContent className="flex flex-col justify-center h-full">
+          <CardContent className="flex flex-col justify-center h-full">
             <h2 className="text-xl font-medium">2</h2>
             <p className="text-sm text-muted-foreground">Average time spent</p>
-        </CardContent>
+          </CardContent>
         </Card>
 
         <Card className="border-none bg-foreground/5">    
-        <CardContent className="flex flex-col justify-center h-full">
+          <CardContent className="flex flex-col justify-center h-full">
             <h2 className="text-xl font-medium">9 / 10</h2>
             <p className="text-sm text-muted-foreground">Engagement score</p>
-        </CardContent>
+          </CardContent>
         </Card>
-    </div>
+      </div>
     </div>
   );
 
