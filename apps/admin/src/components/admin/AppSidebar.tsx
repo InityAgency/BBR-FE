@@ -84,6 +84,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Ranking Category Types",
           url: "/rankings/ranking-category-types",
+        },
+        {
+          title: "Ranking Criteria",
+          url: "/rankings/ranking-criteria",
         }
       ]
     },

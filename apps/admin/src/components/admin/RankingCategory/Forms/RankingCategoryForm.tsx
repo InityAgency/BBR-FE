@@ -68,6 +68,7 @@ interface RankingCategoryFormProps {
   initialData?: Partial<RankingCategoryFormData>;
   isEditing?: boolean;
   initialCriteriaWeights?: CriteriaWeight[];
+  onSubmitSuccess?: () => void;
 }
 
 interface EntityState {
@@ -112,7 +113,8 @@ const ITEMS_PER_PAGE = 20;
 const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ 
   initialData = {}, 
   isEditing = false,
-  initialCriteriaWeights = []
+  initialCriteriaWeights = [],
+  onSubmitSuccess
 }) => {
   const router = useRouter();
 
@@ -657,87 +659,71 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
   };
 
   const onSubmit = async (data: RankingCategoryFormValues) => {
-    if (!validateForm()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
-      const hasCriteriaChanges = isEditing ? criteriaWeightsChanged : criteriaWeights.length > 0;
-      setIsCreatingWithCriteria(hasCriteriaChanges);
+      if (isEditing && initialData.id) {
+        // Update existing ranking category
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${initialData.id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      let imageId = typeof initialData.featuredImageId === "string" ? initialData.featuredImageId : undefined;
-      if (imageChanged && data.featuredImageId instanceof File) {
-        try {
-          const uploadResult = await uploadImage(data.featuredImageId);
-          imageId = uploadResult.id;
-        } catch (error) {
-          toast.error("Failed to upload image");
-          return;
+        if (!response.ok) {
+          throw new Error(`Failed to update ranking category: ${response.status}`);
         }
-      }
 
-      const payload = {
-        name: data.name.trim(),
-        description: data.description?.trim() || undefined,
-        rankingCategoryTypeId: data.rankingCategoryTypeId,
-        residenceLimitation: data.residenceLimitation,
-        rankingPrice: data.rankingPrice,
-        status: isEditing ? data.status : "ACTIVE",
-        title: data.title.trim(),
-        entityId: data.entityId || undefined,
-        featuredImageId: imageId,
-      };
+        // Update criteria weights if they have changed
+        if (criteriaWeightsChanged) {
+          await updateCriteriaWeights(initialData.id);
+        }
 
-      // Step 1: Create/Update ranking category
-      const apiUrl = isEditing
-        ? `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${initialData.id}`
-        : `${API_BASE_URL}/api/${API_VERSION}/ranking-categories`;
-
-      const response = await fetch(apiUrl, {
-        method: isEditing ? "PUT" : "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to ${isEditing ? "update" : "create"} ranking category`);
-      }
-
-      const rankingCategoryResponse = await response.json();
-      const rankingCategoryId = isEditing ? initialData.id : rankingCategoryResponse.data.id;
-
-      // Step 2: Create/Update criteria weights if there are changes
-      if (hasCriteriaChanges) {
-        try {
-          if (isEditing) {
-            await updateCriteriaWeights(rankingCategoryId);
-          } else {
-            await createCriteriaWeights(rankingCategoryId);
-          }
-          toast.success(`Ranking category and criteria weights ${isEditing ? "updated" : "created"} successfully!`);
-        } catch (error) {
-          // If criteria creation/update fails, we still have the ranking category created/updated
-          toast.error(`Ranking category ${isEditing ? "updated" : "created"}, but failed to ${isEditing ? "update" : "create"} criteria weights. You can modify them later.`);
-          console.error("Criteria weights operation failed:", error);
+        toast.success("Ranking category updated successfully");
+        if (onSubmitSuccess) {
+          onSubmitSuccess();
+        } else {
+          router.push("/rankings/ranking-categories");
         }
       } else {
-        toast.success(`Ranking category ${isEditing ? "updated" : "created"} successfully!`);
-      }
+        // Create new ranking category
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      router.push(isEditing ? `/rankings/ranking-categories/${initialData.id}` : "/rankings/ranking-categories");
+        if (!response.ok) {
+          throw new Error(`Failed to create ranking category: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        
+        // Create criteria weights if any are selected
+        if (criteriaWeights.length > 0) {
+          await createCriteriaWeights(responseData.data.id);
+        }
+
+        toast.success("Ranking category created successfully");
+        if (onSubmitSuccess) {
+          onSubmitSuccess();
+        } else {
+          router.push("/rankings/ranking-categories");
+        }
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save ranking category");
+      toast.error("Failed to save ranking category");
     } finally {
       setIsSubmitting(false);
-      setIsCreatingWithCriteria(false);
     }
   };
 

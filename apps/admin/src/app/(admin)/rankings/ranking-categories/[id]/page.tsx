@@ -355,7 +355,8 @@ export default function RankingCategoryPage({ params }: PageProps) {
       <RankingCategoryHeader 
         category={rankingCategory} 
         onStatusChange={handleStatusChange} 
-        onDelete={handleDelete} 
+        onDelete={handleDelete}
+        onEditSuccess={fetchRankingCategory}
       />
       
       <Tabs defaultValue="overview">
