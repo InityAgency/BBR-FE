@@ -23,6 +23,7 @@ import {
     TableHeader,
     TableRow, 
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 function formatCurrency(value: string | number | undefined): string {
   if (!value) return "-";
@@ -88,6 +89,8 @@ export default function RankingCategoryPage({ params }: PageProps) {
       fetchRankingCategory();
     }
   }, [id]);
+
+  console.log(rankingCategory);
 
   const handleStatusChange = async (newStatus: RankingCategoryStatus) => {
     try {
@@ -158,10 +161,14 @@ export default function RankingCategoryPage({ params }: PageProps) {
     return null;
   }
 
+  // Calculate total weight for validation display
+  const totalWeight = rankingCategory.rankingCriteria?.reduce((sum: any, criteria: { weight: any; }) => sum + criteria.weight, 0) || 0;
+  const defaultCriteriaCount = rankingCategory.rankingCriteria?.filter((c: { isDefault: any; }) => c.isDefault).length || 0;
+
   const renderOverviewTab = () => (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-    <Card className="border-none bg-foreground/5 col-span-full md:col-span-5 h-full">
+    <Card className="border-none bg-foreground/5 col-span-full md:col-span-4 h-full">
         <CardContent className="h-full flex flex-col">
         <h2 className="text-lg font-semibold mb-4">General Information</h2>
         <div className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow">
@@ -195,44 +202,69 @@ export default function RankingCategoryPage({ params }: PageProps) {
         </CardContent>
     </Card>
 
-    <Card className="border-none bg-foreground/5 col-span-full md:col-span-4 h-full">
+    <Card className="border-none bg-foreground/5 col-span-full md:col-span-5 h-full">
         <CardContent className="h-full flex flex-col">
-        <h2 className="text-lg font-semibold mb-4">Ranking Criteria</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Ranking Criteria</h2>
+          <div className="flex gap-2">
+            <Badge 
+              variant={totalWeight === 100 ? "info" : "destructive"}
+              className="text-xs"
+            >
+              Total: {totalWeight}%
+            </Badge>
+            <Badge 
+              variant="outline"
+              className="text-xs"
+            >
+              Default: {defaultCriteriaCount}/5
+            </Badge>
+          </div>
+        </div>
         <div className="flex-grow">
+          {rankingCategory.rankingCriteria && rankingCategory.rankingCriteria.length > 0 ? (
             <Table className="text-white">
-            <TableHeader>
+              <TableHeader>
                 <TableRow>
-                <TableHead>Criteria</TableHead>
-                <TableHead>Weight</TableHead>
+                  <TableHead>Criteria</TableHead>
+                  <TableHead>Weight</TableHead>
+                  <TableHead>Default</TableHead>
                 </TableRow>
-            </TableHeader>  
-            <TableBody>
-                <TableRow>
-                <TableCell>Location / Area</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell>Service Quality</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell>Amenities / Facilities</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell>Value / Investment Opportunity</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell>Design / Architecture</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell>Exclusivity and Prestige</TableCell>
-                <TableCell>15%</TableCell>
-                </TableRow>
-            </TableBody>
+              </TableHeader>  
+              <TableBody>
+                {rankingCategory.rankingCriteria.map((criteria: { id: React.Key | null | undefined; name: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; weight: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; isDefault: any; }) => (
+                  <TableRow key={criteria.id}>
+                    <TableCell className="font-medium">{criteria.name}</TableCell>
+                    <TableCell>{criteria.weight}%</TableCell>
+                    <TableCell>
+                      {criteria.isDefault && (
+                        <Badge variant="outline" className="text-xs">
+                          Default
+                        </Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              {totalWeight !== 100 && (
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-destructive text-sm">
+                      Warning: Total weight is {totalWeight}% (should be 100%)
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              )}
             </Table>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+              <Trophy className="h-8 w-8 mb-2 opacity-50" />
+              <p className="text-sm text-center">No ranking criteria defined</p>
+              <p className="text-xs text-center mt-1">
+                Criteria can be added when editing this ranking category
+              </p>
+            </div>
+          )}
         </div>
         </CardContent>
     </Card>

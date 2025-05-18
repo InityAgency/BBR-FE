@@ -16,6 +16,8 @@ export interface RankingCategoryImage {
 }
 
 export interface RankingCategory {
+  rankingCriteria: any;
+  entityId: string;
   title: any;
   entity: object | undefined;
   id: string;

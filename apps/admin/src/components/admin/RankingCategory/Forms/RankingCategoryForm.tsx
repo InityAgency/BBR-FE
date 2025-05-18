@@ -37,6 +37,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Import RankingCriteriaWeights component
+import RankingCriteriaWeights, { type CriteriaWeight } from "@/components/admin/RankingCategory/Forms/RankingCriteriaWeights";
+
 // Types
 interface RankingCategoryTypeApiResponse {
   id: string;
@@ -64,6 +67,7 @@ interface MediaUploadResponse {
 interface RankingCategoryFormProps {
   initialData?: Partial<RankingCategoryFormData>;
   isEditing?: boolean;
+  initialCriteriaWeights?: CriteriaWeight[];
 }
 
 interface EntityState {
@@ -73,6 +77,19 @@ interface EntityState {
   loading: boolean;
   searching: boolean;
   searchQuery: string;
+}
+
+// New interface for criteria weights API response
+interface CriteriaWeightApiResponse {
+  id: string;
+  rankingCriteriaId: string;
+  weight: number;
+  isDefault: boolean;
+  rankingCriteria: {
+    id: string;
+    name: string;
+    description?: string;
+  };
 }
 
 // Constants
@@ -93,7 +110,11 @@ const ENTITY_API_ROUTES: Record<string, string> = {
 const ALLOWED_STATUSES: RankingCategoryStatus[] = ["DRAFT", "ACTIVE", "DELETED"];
 const ITEMS_PER_PAGE = 20;
 
-const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData = {}, isEditing = false }) => {
+const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ 
+  initialData = {}, 
+  isEditing = false,
+  initialCriteriaWeights = []
+}) => {
   const router = useRouter();
 
   // State
@@ -105,6 +126,12 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
   const [imageChanged, setImageChanged] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [entityComboboxOpen, setEntityComboboxOpen] = useState(false);
+  
+  // State for criteria weights
+  const [criteriaWeights, setCriteriaWeights] = useState<CriteriaWeight[]>(initialCriteriaWeights);
+  const [initialCriteriaWeightsState, setInitialCriteriaWeightsState] = useState<CriteriaWeight[]>(initialCriteriaWeights);
+  const [isLoadingCriteriaWeights, setIsLoadingCriteriaWeights] = useState(false);
+  const [isCreatingWithCriteria, setIsCreatingWithCriteria] = useState(false);
   
   // Entity state - consolidated
   const [entityState, setEntityState] = useState<EntityState>({
@@ -146,8 +173,40 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
     return entityState.options.find((option) => option.id === selectedEntityId);
   }, [entityState.options, selectedEntityId]);
 
-  const hasUnsavedChanges = form.formState.isDirty || imageChanged;
+  // Check if criteria weights have changed
+  const criteriaWeightsChanged = useMemo(() => {
+    if (initialCriteriaWeightsState.length !== criteriaWeights.length) return true;
+    
+    return criteriaWeights.some(current => {
+      const initial = initialCriteriaWeightsState.find(init => init.rankingCriteriaId === current.rankingCriteriaId);
+      return !initial || 
+             initial.weight !== current.weight || 
+             initial.isDefault !== current.isDefault;
+    });
+  }, [criteriaWeights, initialCriteriaWeightsState]);
+
+  const hasUnsavedChanges = form.formState.isDirty || imageChanged || criteriaWeightsChanged;
   const requiresEntity = selectedCategoryType && ENTITY_API_ROUTES[selectedCategoryType];
+
+  // Validation for criteria weights
+  const criteriaValidation = useMemo(() => {
+    if (criteriaWeights.length === 0) {
+      return { isValid: true, message: "" };
+    }
+    
+    const totalWeight = criteriaWeights.reduce((sum, criteria) => sum + criteria.weight, 0);
+    const defaultCount = criteriaWeights.filter(c => c.isDefault).length;
+    
+    if (totalWeight !== 100) {
+      return { isValid: false, message: "Total weight must be exactly 100%" };
+    }
+    
+    if (defaultCount > 5) {
+      return { isValid: false, message: "Maximum 5 default criteria allowed" };
+    }
+    
+    return { isValid: true, message: "" };
+  }, [criteriaWeights]);
 
   const isFormValid = useMemo(() => {
     const values = form.getValues();
@@ -158,13 +217,58 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
 
     const hasValidImage = isEditing || imageValid;
     const hasRequiredEntity = !requiresEntity || values.entityId;
+    
+    // For any mode, criteria must be valid if any are added/exist
+    const criteriaValid = criteriaWeights.length === 0 || criteriaValidation.isValid;
 
-    return hasRequiredFields && hasValidImage && hasRequiredEntity;
-  }, [form.watch(), imageValid, isEditing, requiresEntity]);
+    return hasRequiredFields && hasValidImage && hasRequiredEntity && criteriaValid;
+  }, [form.watch(), imageValid, isEditing, requiresEntity, criteriaValidation.isValid, criteriaWeights.length]);
 
   const canSave = useMemo(() => {
     return isFormValid && hasUnsavedChanges && !isSubmitting;
   }, [isFormValid, hasUnsavedChanges, isSubmitting]);
+
+  // Fetch existing criteria weights for edit mode
+  const fetchCriteriaWeights = useCallback(async (rankingCategoryId: string) => {
+    if (!rankingCategoryId) return;
+
+    try {
+      setIsLoadingCriteriaWeights(true);
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${rankingCategoryId}/criteria-weights`,
+        {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No criteria weights found - this is okay
+          setInitialCriteriaWeightsState(initialCriteriaWeights);
+          setCriteriaWeights(initialCriteriaWeights);
+          return;
+        }
+        throw new Error(`Failed to fetch criteria weights: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const criteriaWeights: CriteriaWeight[] = (data.data || []).map((item: CriteriaWeightApiResponse) => ({
+        rankingCriteriaId: item.rankingCriteriaId,
+        weight: item.weight,
+        isDefault: item.isDefault,
+        name: item.rankingCriteria.name,
+      }));
+
+      setInitialCriteriaWeightsState(criteriaWeights);
+      setCriteriaWeights(criteriaWeights);
+    } catch (error) {
+      console.error("Error fetching criteria weights:", error);
+      toast.error("Failed to load ranking criteria");
+    } finally {
+      setIsLoadingCriteriaWeights(false);
+    }
+  }, []);
 
   // Entity fetching logic
   const fetchEntities = useCallback(async (
@@ -202,6 +306,89 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
       return [];
     }
   }, []);
+
+  // Function to create criteria weights
+  const createCriteriaWeights = async (rankingCategoryId: string) => {
+    if (criteriaWeights.length === 0) {
+      return true; // No criteria to create
+    }
+
+    try {
+      const payload = {
+        criteria: criteriaWeights.map(criteria => ({
+          rankingCriteriaId: criteria.rankingCriteriaId,
+          weight: criteria.weight,
+          isDefault: criteria.isDefault,
+        }))
+      };
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${rankingCategoryId}/criteria-weights`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to create criteria weights");
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error creating criteria weights:", error);
+      throw error;
+    }
+  };
+
+  // Function to update criteria weights
+  const updateCriteriaWeights = async (rankingCategoryId: string) => {
+    try {
+      const payload = {
+        criteria: criteriaWeights.map(criteria => ({
+          rankingCriteriaId: criteria.rankingCriteriaId,
+          weight: criteria.weight,
+          isDefault: criteria.isDefault,
+        }))
+      };
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${rankingCategoryId}/criteria-weights`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update criteria weights");
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error updating criteria weights:", error);
+      throw error;
+    }
+  };
+
+  // Fetch criteria weights when editing (but only if not passed as props)
+  useEffect(() => {
+    if (isEditing && initialData.id && initialCriteriaWeights.length === 0) {
+      fetchCriteriaWeights(initialData.id);
+    }
+  }, [isEditing, initialData.id, fetchCriteriaWeights, initialCriteriaWeights.length]);
 
   // Load initial entities when category type changes
   useEffect(() => {
@@ -470,6 +657,12 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
       isValid = false;
     }
 
+    // Validate criteria if provided
+    if (criteriaWeights.length > 0 && !criteriaValidation.isValid) {
+      toast.error(criteriaValidation.message);
+      isValid = false;
+    }
+
     return isValid;
   };
 
@@ -481,6 +674,8 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
 
     try {
       setIsSubmitting(true);
+      const hasCriteriaChanges = isEditing ? criteriaWeightsChanged : criteriaWeights.length > 0;
+      setIsCreatingWithCriteria(hasCriteriaChanges);
 
       let imageId = typeof initialData.featuredImageId === "string" ? initialData.featuredImageId : undefined;
       if (imageChanged && data.featuredImageId instanceof File) {
@@ -505,10 +700,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
         featuredImageId: imageId,
       };
 
-      // Debug log to check what's being sent
-      console.log("Form submission payload:", payload);
-      console.log("Form data:", data);
-
+      // Step 1: Create/Update ranking category
       const apiUrl = isEditing
         ? `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${initialData.id}`
         : `${API_BASE_URL}/api/${API_VERSION}/ranking-categories`;
@@ -528,13 +720,34 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
         throw new Error(errorData.message || `Failed to ${isEditing ? "update" : "create"} ranking category`);
       }
 
-      toast.success(`Ranking category ${isEditing ? "updated" : "created"} successfully!`);
-      router.push("/rankings/ranking-categories");
+      const rankingCategoryResponse = await response.json();
+      const rankingCategoryId = isEditing ? initialData.id : rankingCategoryResponse.data.id;
+
+      // Step 2: Create/Update criteria weights if there are changes
+      if (hasCriteriaChanges) {
+        try {
+          if (isEditing) {
+            await updateCriteriaWeights(rankingCategoryId);
+          } else {
+            await createCriteriaWeights(rankingCategoryId);
+          }
+          toast.success(`Ranking category and criteria weights ${isEditing ? "updated" : "created"} successfully!`);
+        } catch (error) {
+          // If criteria creation/update fails, we still have the ranking category created/updated
+          toast.error(`Ranking category ${isEditing ? "updated" : "created"}, but failed to ${isEditing ? "update" : "create"} criteria weights. You can modify them later.`);
+          console.error("Criteria weights operation failed:", error);
+        }
+      } else {
+        toast.success(`Ranking category ${isEditing ? "updated" : "created"} successfully!`);
+      }
+
+      router.push(isEditing ? `/rankings/ranking-categories/${initialData.id}` : "/rankings/ranking-categories");
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error instanceof Error ? error.message : "Failed to save ranking category");
     } finally {
       setIsSubmitting(false);
+      setIsCreatingWithCriteria(false);
     }
   };
 
@@ -598,6 +811,8 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
         toast.error("Please upload a featured image");
       } else if (!hasUnsavedChanges) {
         toast.error("No changes have been made");
+      } else if (!criteriaValidation.isValid && criteriaWeights.length > 0) {
+        toast.error(criteriaValidation.message);
       } else {
         toast.error("Please fill in all required fields correctly");
       }
@@ -605,7 +820,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
     }
 
     onSubmit(form.getValues());
-  }, [canSave, form, onSubmit, isEditing, imageValid, hasUnsavedChanges]);
+  }, [canSave, form, onSubmit, isEditing, imageValid, hasUnsavedChanges, criteriaValidation]);
 
   // Setup discard warning hook
   const { showDiscardModal, handleConfirmDiscard, handleCancelDiscard, navigateTo } = useDiscardWarning({
@@ -690,7 +905,15 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
         extraButtons={renderDeleteButton()}
         onSave={handleSave}
         onDiscard={handleDiscard}
-        saveButtonText={isEditing ? "Save changes" : "Add Ranking Category"}
+        saveButtonText={
+          isCreatingWithCriteria 
+            ? isEditing 
+              ? "Updating category and criteria..." 
+              : "Creating category and criteria..." 
+            : isEditing 
+              ? "Save changes" 
+              : "Add Ranking Category"
+        }
         saveButtonDisabled={!canSave}
         isSubmitting={isSubmitting}
       />
@@ -952,6 +1175,21 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ initialData =
               )}
             />
           </Form>
+        </div>
+        
+        <div>
+          {/* Show criteria weights for both creation and editing */}
+          {isLoadingCriteriaWeights ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            </div>
+          ) : (
+            <RankingCriteriaWeights
+              onChange={setCriteriaWeights}
+              initialCriteria={criteriaWeights}
+              rankingCategoryId={isEditing ? initialData.id : undefined}
+            />
+          )}
         </div>
       </div>
 

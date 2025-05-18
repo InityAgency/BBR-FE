@@ -65,6 +65,13 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
     fetchRankingCriteria();
   }, []);
 
+  // Update selected criteria when initialCriteria prop changes
+  useEffect(() => {
+    if (initialCriteria.length > 0) {
+      setSelectedCriteria(initialCriteria);
+    }
+  }, [initialCriteria]);
+
   // Calculate total weight and default count whenever selected criteria change
   useEffect(() => {
     const total = selectedCriteria.reduce((sum, item) => sum + item.weight, 0);
@@ -96,16 +103,20 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       if (data && data.data && Array.isArray(data.data)) {
         setAvailableCriteria(data.data);
         
-        // Update names in selected criteria
+        // Update names in selected criteria if they don't have names yet
         if (selectedCriteria.length > 0) {
           const updatedCriteria = selectedCriteria.map(selected => {
-            const criteria = data.data.find(
-              (c: RankingCriteria) => c.id === selected.rankingCriteriaId
-            );
-            return {
-              ...selected,
-              name: criteria?.name || "Unknown",
-            };
+            // Only update if name is missing
+            if (!selected.name) {
+              const criteria = data.data.find(
+                (c: RankingCriteria) => c.id === selected.rankingCriteriaId
+              );
+              return {
+                ...selected,
+                name: criteria?.name || "Unknown",
+              };
+            }
+            return selected;
           });
           setSelectedCriteria(updatedCriteria);
         }
@@ -279,7 +290,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
         <div className={`relative w-full h-2 rounded-full ${isValidTotalWeight ? 'bg-green-900/20' : 'bg-red-900/20'}`}>
           <div
             className={`absolute left-0 top-0 h-full rounded-full max-w-full ${isValidTotalWeight ? 'bg-green-500' : 'bg-red-500'}`}
-            style={{ width: `${totalWeight}%` }}
+            style={{ width: `${Math.min(totalWeight, 100)}%` }}
           />
         </div>
         {!isValidTotalWeight && (
@@ -299,9 +310,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
                 onCheckedChange={() => toggleDefault(criteria.rankingCriteriaId)}
                 disabled={defaultCount >= 5 && !criteria.isDefault}
               />
-              <span className="text-sm">
-                Default
-              </span>
             </div>
             
             <div className="flex-grow">
@@ -311,7 +319,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
             <div className="w-32 flex items-center space-x-1">
               <Input
                 type="number"
-                min="0"
                 max="100"
                 value={criteria.weight}
                 onChange={(e) => updateWeight(criteria.rankingCriteriaId, e.target.value)}
@@ -324,12 +331,19 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
               variant="ghost"
               size="icon"
               onClick={() => removeCriteria(criteria.rankingCriteriaId)}
-              className="h-8 w-8 text-destructive"
+              className="h-8 w-8 text-white hover:text-red-400 hover:bg-destructive/20 transition-colors duration-200 cursor-pointer"
             >
               <X size={16} />
             </Button>
           </div>
         ))}
+        
+        {selectedCriteria.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            <p className="text-sm">No ranking criteria selected</p>
+            <p className="text-xs">Select criteria from the dropdown below to get started</p>
+          </div>
+        )}
       </div>
       
       {/* Add Criteria Dropdown */}
@@ -346,7 +360,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
           </SelectContent>
         </Select>
       </div>
-      
       
       {/* Create New Criteria Modal */}
       <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>

@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RankingCategorySkeleton } from "@/components/admin/RankingCategories/Skeleton/RankingCategorySkeleton";
 import { SingleRankingCategoryApiResponse } from "@/app/types/models/RankingCategory";
 import { apiToFormRankingCategory } from "@/lib/utils/formMapping";
+import { CriteriaWeight } from "@/components/admin/RankingCategory/Forms/RankingCriteriaWeights";
 
 async function getRankingCategory(id: string) {
     try {
@@ -58,16 +59,46 @@ export default async function EditRankingCategoryPage({
 
     // Koristimo postojeću apiToFormRankingCategory funkciju za mapiranje
     const formData = apiToFormRankingCategory(rankingCategory);
-    console.log(formData);
+
+    // Map existing criteria weights to the format expected by RankingCriteriaWeights
+    const existingCriteriaWeights: CriteriaWeight[] = (rankingCategory.rankingCriteria || []).map((criteria: { id: any; weight: any; isDefault: any; name: any; }) => ({
+        rankingCriteriaId: criteria.id,
+        weight: criteria.weight,
+        isDefault: criteria.isDefault,
+        name: criteria.name,
+    }));
+
+    // Add criteria weights to form data
+    const formDataWithCriteria = {
+        ...formData,
+        criteriaWeights: existingCriteriaWeights,
+    };
 
     return (
         <AdminLayout>
             <Suspense fallback={<RankingCategorySkeleton />}>
-                <RankingCategoryForm 
-                    initialData={formData}
+                <RankingCriteriaFormWithData 
+                    initialData={formDataWithCriteria}
                     isEditing={true} 
                 />
             </Suspense>
         </AdminLayout>
+    );
+}
+
+// Wrapper component to handle the criteria weights initialization
+function RankingCriteriaFormWithData({ 
+    initialData, 
+    isEditing 
+}: { 
+    initialData: any;
+    isEditing: boolean;
+}) {
+    return (
+        <RankingCategoryForm 
+            initialData={initialData}
+            isEditing={isEditing}
+            initialCriteriaWeights={initialData.criteriaWeights || []}
+        />
     );
 }
