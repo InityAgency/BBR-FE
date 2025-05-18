@@ -2,8 +2,7 @@
 
 import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Request } from "../../../../app/types/models/Request";
@@ -110,68 +109,36 @@ export const columns: ColumnDef<Request>[] = [
   },
   {
     accessorKey: "type",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="w-full justify-between"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Request Type
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Request Type",
     cell: ({ row }) => renderRequestTypeCell(row.getValue("type"), row.original.id),
+    enableSorting: false, // Disable sorting since we use server-side sorting
     meta: {
       width: "w-[300px]"
     }
   },
   {
     accessorKey: "lead",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="w-full justify-between"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Lead
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Lead",
     cell: ({ row }) => renderLeadCell(row.getValue("lead")),
+    enableSorting: false, // Disable sorting since we use server-side sorting
     meta: {
       width: "w-[300px]"
     }
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="w-full justify-between"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Application Date
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Application Date",
     cell: ({ row }) => renderDateCell(row.getValue("createdAt")),
+    enableSorting: false, // Disable sorting since we use server-side sorting
     meta: {
       width: "w-[180px]"
     }
   },
   {
     accessorKey: "status",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="w-full justify-between"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Status
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Status",
     cell: ({ row }) => renderStatusCell(row.getValue("status")),
+    enableSorting: false, // Disable sorting since we use server-side sorting
     meta: {
       width: "w-[100px]"
     }
@@ -189,8 +156,9 @@ export const columns: ColumnDef<Request>[] = [
       </button>
     ),
     enableHiding: false,
+    enableSorting: false,
     meta: {
       width: "w-[60px]"
     }
   },
-]; 
+];

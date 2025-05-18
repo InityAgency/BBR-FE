@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/admin/Table/BaseTable";
@@ -10,34 +10,34 @@ import { Request } from "../../../../app/types/models/Request";
 import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { RequestsActions } from "./RequestsActions";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TablePagination } from "@/components/admin/Table/TablePagination";
-import { useSearchParams } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
-// Popravka za kolone da koriste RequestsActions
-const enhancedColumns = (fetchRequests: (page: number, query?: string, statuses?: string[], types?: string[]) => Promise<void>, currentPage: number) => columns.map(column => {
+// Enhanced columns with actions and disabled sorting
+const enhancedColumns = columns.map(column => {
+  const modifiedColumn = {
+    ...column,
+    enableSorting: false, // Disable sorting on all columns
+  };
+  
   if (column.id === "actions") {
     return {
-      ...column,
+      ...modifiedColumn,
       cell: (props: CellContext<Request, unknown>) => (
-        <RequestsActions 
-          row={props.row} 
-          // onDelete={() => fetchRequests(currentPage)}
-        />
+        <RequestsActions row={props.row} />
       )
     };
   }
-  return column;
+  return modifiedColumn;
 });
 
-// Skeleton loader za tabelu
+// Table skeleton loader
 const TableSkeleton = () => {
   return (
     <div className="w-full border rounded-md">
-      {/* Skelet za header tabele */}
+      {/* Header skeleton */}
       <div className="border-b px-4 py-3 flex">
         <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
         <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
@@ -48,16 +48,16 @@ const TableSkeleton = () => {
         <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
       </div>
       
-      {/* Skelet za redove tabele */}
+      {/* Row skeletons */}
       {[...Array(ITEMS_PER_PAGE)].map((_, index) => (
         <div key={index} className="border-b px-4 py-3 flex items-center">
-            <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
-            <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
+          <Skeleton className="h-6 w-8 rounded-md mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-1/4 rounded-md ml-2 mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-1/6 rounded-md ml-2 mr-2 bg-muted/20" />
+          <Skeleton className="h-6 w-40 rounded-md ml-2 bg-muted/20" />
         </div>
       ))}
     </div>
@@ -70,14 +70,21 @@ interface RequestsTableProps {
   totalItems: number;
   totalPages: number;
   currentPage: number;
+  queryParam: string;
   goToNextPage: () => void;
   goToPreviousPage: () => void;
   goToPage: (page: number) => void;
   selectedStatuses: string[];
-  onStatusesChange: React.Dispatch<React.SetStateAction<string[]>>;
+  onStatusesChange: (statuses: string[]) => void;
   selectedTypes: string[];
-  onTypesChange: React.Dispatch<React.SetStateAction<string[]>>;
-  fetchRequests: (page: number, query?: string, statuses?: string[], types?: string[]) => Promise<void>;
+  onTypesChange: (types: string[]) => void;
+  onQueryChange: (query: string) => void;
+  updateUrlParams: (params: {
+    page?: number;
+    query?: string;
+    statuses?: string[];
+    types?: string[];
+  }) => void;
 }
 
 export function RequestsTable({
@@ -86,6 +93,7 @@ export function RequestsTable({
   totalItems,
   totalPages,
   currentPage,
+  queryParam,
   goToNextPage,
   goToPreviousPage,
   goToPage,
@@ -93,36 +101,28 @@ export function RequestsTable({
   onStatusesChange,
   selectedTypes,
   onTypesChange,
-  fetchRequests
+  onQueryChange,
+  updateUrlParams
 }: RequestsTableProps) {
-  const searchParams = useSearchParams();
-  const queryParam = searchParams.get('query');
-  const [search, setSearch] = useState(queryParam || "");
-
-  const {
-    table,
-    setGlobalFilter: setTableGlobalFilter,
-  } = useTable<Request>({
+  
+  // Table setup with enhanced columns (NO client-side sorting)
+  const { table } = useTable<Request>({
     data: requests,
-    columns: enhancedColumns(fetchRequests, currentPage),
-    initialSorting: [{ id: "createdAt", desc: true }],
+    columns: enhancedColumns,
     globalFilterFn: (row, columnId, value, addMeta) => {
       const result = fuzzyFilter(row, columnId, value, addMeta);
-      
       const id = row.original.id || "";
       const searchValue = String(value).toLowerCase();
-      
       return result || id.toLowerCase().includes(searchValue);
     },
     initialPageSize: ITEMS_PER_PAGE,
     manualPagination: true,
     pageCount: totalPages,
+    enableSorting: false, // Completely disable sorting
+    initialSorting: [], // No initial sorting
   });
 
-  React.useEffect(() => {
-    setTableGlobalFilter(search);
-  }, [search, setTableGlobalFilter]);
-
+  // Extract unique types and statuses for filters
   const {
     locationSearchValue: typeSearchValue,
     setLocationSearchValue: setTypeSearchValue,
@@ -135,12 +135,7 @@ export function RequestsTable({
     statusAccessor: "status",
   });
 
-  useEffect(() => {
-    if (queryParam !== search) {
-      setSearch(queryParam || "");
-    }
-  }, [queryParam]);
-
+  // Row styling based on status
   const getRowClassName = (row: any) => {
     const status = row.original.status;
     if (status === "CANCELLED") return "opacity-60";
@@ -151,8 +146,8 @@ export function RequestsTable({
   return (
     <div className="w-full">
       <RequestsFilters
-        globalFilter={search}
-        setGlobalFilter={setSearch}
+        globalFilter={queryParam}
+        setGlobalFilter={onQueryChange}
         selectedTypes={selectedTypes}
         setSelectedTypes={onTypesChange}
         selectedStatuses={selectedStatuses}
@@ -161,6 +156,7 @@ export function RequestsTable({
         uniqueTypes={filteredTypes}
         typeSearchValue={typeSearchValue}
         setTypeSearchValue={setTypeSearchValue}
+        updateUrlParams={updateUrlParams}
       />
 
       <div className="hidden lg:block">
@@ -186,4 +182,4 @@ export function RequestsTable({
       />
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import AdminLayout from "../../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
@@ -18,47 +18,57 @@ export default function LeadsRequestPage() {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const callInProgress = useRef(false);
 
+  // Parse URL parameters
   const currentPage = Number(searchParams.get("page")) || 1;
   const queryParam = searchParams.get("query") || "";
+  const selectedStatuses = searchParams.getAll("status");
+  const selectedTypes = searchParams.getAll("type");
 
-  // Parse status and type from URL parameters
-  useEffect(() => {
-    const statusValues = searchParams.getAll("status");
-    const typeValues = searchParams.getAll("type");
-    setSelectedStatuses(statusValues);
-    setSelectedTypes(typeValues);
-  }, [searchParams]);
+  // Create stable arrays for dependencies
+  const statusesKey = selectedStatuses.sort().join(",");
+  const typesKey = selectedTypes.sort().join(",");
 
-  const fetchRequests = async (
-    page: number,
-    query?: string,
-    statuses?: string[],
-    types?: string[]
-  ) => {
+  // Memoized fetch function
+  const fetchRequests = useCallback(async () => {
+    // Prevent duplicate calls
+    if (callInProgress.current) {
+      console.log("Call already in progress, skipping...");
+      return;
+    }
+    
+    callInProgress.current = true;
+    console.log("fetchRequests called with:", { currentPage, queryParam, selectedStatuses, selectedTypes });
+    
     setLoading(true);
     try {
       const url = new URL(`${API_BASE_URL}/api/${API_VERSION}/requests`);
+      
+      // Add sorting parameters first
+      url.searchParams.set("sortBy", "createdAt");
+      url.searchParams.set("sortOrder", "desc");
+      
+      // Add pagination
       url.searchParams.set("limit", ITEMS_PER_PAGE.toString());
-      url.searchParams.set("page", page.toString());
+      url.searchParams.set("page", currentPage.toString());
 
-      if (query && query.trim() !== "") {
-        url.searchParams.set("query", query);
+      // Add search query
+      if (queryParam && queryParam.trim() !== "") {
+        url.searchParams.set("query", queryParam);
       }
 
-      if (statuses && statuses.length > 0) {
-        statuses.forEach((status) => {
-          url.searchParams.append("status", status);
-        });
-      }
+      // Add status filters
+      selectedStatuses.forEach((status) => {
+        url.searchParams.append("status", status);
+      });
 
-      if (types && types.length > 0) {
-        types.forEach((type) => {
-          url.searchParams.append("type", type);
-        });
-      }
+      // Add type filters
+      selectedTypes.forEach((type) => {
+        url.searchParams.append("type", type);
+      });
+
+      console.log("Final URL:", url.toString());
 
       const response = await fetch(url.toString(), {
         credentials: "include",
@@ -72,15 +82,14 @@ export default function LeadsRequestPage() {
       }
 
       const data: RequestsApiResponse = await response.json();
+      console.log("API Response:", data);
 
-      const validTotal =
-        typeof data.pagination.total === "number" &&
-        data.pagination.total >= 0;
-      const validTotalPages =
-        typeof data.pagination.totalPages === "number" &&
-        data.pagination.totalPages >= 0;
-
-      if (!validTotal || !validTotalPages) {
+      if (
+        typeof data.pagination.total !== "number" ||
+        typeof data.pagination.totalPages !== "number" ||
+        data.pagination.total < 0 ||
+        data.pagination.totalPages < 0
+      ) {
         throw new Error("Invalid pagination data received from server");
       }
 
@@ -88,20 +97,25 @@ export default function LeadsRequestPage() {
       setTotalPages(Math.max(1, data.pagination.totalPages));
       setTotalItems(data.pagination.total);
 
-      // Update URL to reflect the API's returned page, preserving filters
-      const apiPage = data.pagination.page || page;
-      if (apiPage !== page) {
-        updateUrlParams({ page: apiPage });
-      }
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       setRequests([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
+      callInProgress.current = false;
     }
-  };
+  }, [currentPage, queryParam, statusesKey, typesKey]); // Use stable keys instead of arrays
 
-  const updateUrlParams = (params: {
+  // Single useEffect with detailed debugging
+  useEffect(() => {
+    console.log("useEffect triggered, dependencies:", { currentPage, queryParam, statusesKey, typesKey });
+    fetchRequests();
+  }, [fetchRequests]);
+
+  // Centralized URL update function
+  const updateUrlParams = useCallback((params: {
     page?: number;
     query?: string;
     statuses?: string[];
@@ -109,72 +123,61 @@ export default function LeadsRequestPage() {
   }) => {
     const newParams = new URLSearchParams();
 
-    // Always set page
+    // Set page
     newParams.set("page", (params.page ?? currentPage).toString());
 
-    // Set query if provided or preserve existing
-    if (params.query !== undefined) {
-      if (params.query.trim() !== "") {
-        newParams.set("query", params.query);
-      }
-    } else if (queryParam) {
-      newParams.set("query", queryParam);
+    // Set query
+    const query = params.query !== undefined ? params.query : queryParam;
+    if (query && query.trim() !== "") {
+      newParams.set("query", query);
     }
 
-    // Set statuses if provided or preserve existing
-    if (params.statuses !== undefined) {
-      params.statuses.forEach((status) => {
-        newParams.append("status", status);
-      });
-    } else {
-      selectedStatuses.forEach((status) => {
-        newParams.append("status", status);
-      });
-    }
+    // Set statuses
+    const statuses = params.statuses !== undefined ? params.statuses : selectedStatuses;
+    statuses.forEach((status) => {
+      newParams.append("status", status);
+    });
 
-    // Set types if provided or preserve existing
-    if (params.types !== undefined) {
-      params.types.forEach((type) => {
-        newParams.append("type", type);
-      });
-    } else {
-      selectedTypes.forEach((type) => {
-        newParams.append("type", type);
-      });
-    }
+    // Set types
+    const types = params.types !== undefined ? params.types : selectedTypes;
+    types.forEach((type) => {
+      newParams.append("type", type);
+    });
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
-  };
+  }, [router, pathname, currentPage, queryParam, selectedStatuses, selectedTypes]);
 
-  // Fetch requests when page, query, statuses, or types change
-  useEffect(() => {
-    if (currentPage >= 1) {
-      fetchRequests(
-        currentPage,
-        queryParam || undefined,
-        selectedStatuses,
-        selectedTypes
-      );
-    }
-  }, [currentPage, queryParam, selectedStatuses, selectedTypes]);
-
-  const goToNextPage = () => {
+  // Navigation functions
+  const goToNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       updateUrlParams({ page: currentPage + 1 });
     }
-  };
+  }, [currentPage, totalPages, updateUrlParams]);
 
-  const goToPreviousPage = () => {
+  const goToPreviousPage = useCallback(() => {
     if (currentPage > 1) {
       updateUrlParams({ page: currentPage - 1 });
     }
-  };
+  }, [currentPage, updateUrlParams]);
 
-  const goToPage = (page: number) => {
+  const goToPage = useCallback((page: number) => {
     if (page >= 1 && page <= totalPages) {
       updateUrlParams({ page });
     }
-  };
+  }, [totalPages, updateUrlParams]);
+
+  // Filter handlers with correct types
+  const handleStatusesChange = useCallback((statuses: string[]) => {
+    updateUrlParams({ page: 1, statuses });
+  }, [updateUrlParams]);
+
+  const handleTypesChange = useCallback((types: string[]) => {
+    updateUrlParams({ page: 1, types });
+  }, [updateUrlParams]);
+
+  const handleQueryChange = useCallback((query: string) => {
+    updateUrlParams({ page: 1, query });
+  }, [updateUrlParams]);
 
   return (
     <AdminLayout>
@@ -189,14 +192,16 @@ export default function LeadsRequestPage() {
         totalItems={totalItems}
         totalPages={totalPages}
         currentPage={currentPage}
+        queryParam={queryParam}
         goToNextPage={goToNextPage}
         goToPreviousPage={goToPreviousPage}
         goToPage={goToPage}
         selectedStatuses={selectedStatuses}
-        onStatusesChange={setSelectedStatuses}
+        onStatusesChange={handleStatusesChange}
         selectedTypes={selectedTypes}
-        onTypesChange={setSelectedTypes}
-        fetchRequests={fetchRequests}
+        onTypesChange={handleTypesChange}
+        onQueryChange={handleQueryChange}
+        updateUrlParams={updateUrlParams}
       />
     </AdminLayout>
   );

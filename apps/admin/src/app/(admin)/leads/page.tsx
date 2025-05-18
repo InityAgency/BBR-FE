@@ -89,7 +89,7 @@ export default function LeadsPage() {
       console.log("fetchLeadsStats called");
       const params = new URLSearchParams();
       params.set("page", "1");
-      params.set("limit", "10000");
+      params.set("limit", "10");
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/leads?${params.toString()}`
       );

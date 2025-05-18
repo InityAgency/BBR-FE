@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AdminLayout from "@/app/(admin)/AdminLayout";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
-import { AlertCircle, Building2, Trophy, Map } from "lucide-react";
+import { AlertCircle, Building2, Trophy, Map, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RankingCategorySkeleton } from "@/components/admin/RankingCategories/Skeleton/RankingCategorySkeleton";
 import { RankingCategory, RankingCategoryStatus, SingleRankingCategoryApiResponse } from "@/app/types/models/RankingCategory";
@@ -13,6 +13,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { RankingCategoryHeader } from "@/components/admin/Headers/RankingCategoryHeader";
+import { AddResidencesModal } from "@/components/admin/Modals/AddResidencesModal";
+import { Button } from "@/components/ui/button";
 import {   
     Table,
     TableBody,
@@ -50,6 +52,9 @@ export default function RankingCategoryPage({ params }: PageProps) {
   const [rankingCategory, setRankingCategory] = useState<RankingCategory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAddResidencesModalOpen, setIsAddResidencesModalOpen] = useState(false);
+  const [residences, setResidences] = useState<any[]>([]);
+  const [residencesLoading, setResidencesLoading] = useState(false);
   
   const fetchRankingCategory = async () => {
     try {
@@ -83,10 +88,42 @@ export default function RankingCategoryPage({ params }: PageProps) {
     }
   };
 
+  const fetchResidences = async () => {
+    try {
+      setResidencesLoading(true);
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${id}/residences`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.status === 404) {
+        // Ako nema rezidencija, postavljamo praznu listu
+        setResidences([]);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch residences");
+      }
+
+      const data = await response.json();
+      setResidences(data.data || []);
+    } catch (error) {
+      console.error("Error fetching residences:", error);
+      // Umesto prikazivanja greške, postavljamo praznu listu
+      setResidences([]);
+    } finally {
+      setResidencesLoading(false);
+    }
+  };
+
   // Koristimo useEffect sa id-em
   useEffect(() => {
     if (id) {
       fetchRankingCategory();
+      fetchResidences();
     }
   }, [id]);
 
@@ -295,9 +332,50 @@ export default function RankingCategoryPage({ params }: PageProps) {
   );
 
   const renderResidencesTab = () => (
-    <div className="text-center py-8 text-muted-foreground">
-      <p>No residences in this ranking category yet.</p>
-      <p>You can add residences from the "Add residence to ranking" button.</p>
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button
+          onClick={() => setIsAddResidencesModalOpen(true)}
+          className="gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Add Residences
+        </Button>
+      </div>
+
+      {residencesLoading ? (
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
+      ) : residences.length > 0 ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead>Country</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {residences.map((residence) => (
+              <TableRow key={residence.id}>
+                <TableCell className="font-medium">{residence.name}</TableCell>
+                <TableCell>{residence.city}</TableCell>
+                <TableCell>{residence.country}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">{residence.status}</Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>No residences in this ranking category yet.</p>
+          <p>You can add residences from the "Add residence to ranking" button.</p>
+        </div>
+      )}
     </div>
   );
 
@@ -321,6 +399,13 @@ export default function RankingCategoryPage({ params }: PageProps) {
           {renderResidencesTab()}
         </TabsContent>
       </Tabs>
+
+      <AddResidencesModal
+        open={isAddResidencesModalOpen}
+        onOpenChange={setIsAddResidencesModalOpen}
+        rankingCategoryId={id as string}
+        onSuccess={fetchResidences}
+      />
     </AdminLayout>
   );
 }
