@@ -14,18 +14,30 @@ import {
   CommandList,
   CommandEmpty,
 } from "@/components/ui/command";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 
 interface LeadsFiltersProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   selectedStatuses: string[];
-  setSelectedStatuses: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedStatuses: (statuses: string[]) => void;
   uniqueStatuses: string[];
+  updateUrlParams: (params: {
+    page?: number;
+    query?: string;
+    statuses?: string[];
+  }) => void;
 }
 
 const PREDEFINED_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "WON", "LOST", "INACTIVE"];
+
+const formatStatus = (status: string): string => {
+  if (!status) return "";
+  return status
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
 
 export function LeadsFilters({
   globalFilter,
@@ -33,50 +45,50 @@ export function LeadsFilters({
   selectedStatuses,
   setSelectedStatuses,
   uniqueStatuses,
+  updateUrlParams,
 }: LeadsFiltersProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+  
   const [localSearch, setLocalSearch] = useState(globalFilter);
   const debouncedSearch = useDebounce(localSearch, 500);
+
+  // Update search when debounced value changes
+  useEffect(() => {
+    if (debouncedSearch !== globalFilter) {
+      setGlobalFilter(debouncedSearch);
+    }
+  }, [debouncedSearch, globalFilter, setGlobalFilter]);
+
+  // Sync local search with external changes
+  useEffect(() => {
+    if (globalFilter !== localSearch) {
+      setLocalSearch(globalFilter);
+    }
+  }, [globalFilter]);
 
   const handleSearchChange = (value: string) => {
     setLocalSearch(value);
   };
 
-  useEffect(() => {
-    const currentQuery = searchParams.get("query") || "";
-    if (debouncedSearch !== currentQuery) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", "1");
-
-      if (debouncedSearch) {
-        params.set("query", debouncedSearch);
-      } else {
-        params.delete("query");
-      }
-
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    }
-  }, [debouncedSearch, router, pathname, searchParams]);
-
-  useEffect(() => {
-    const queryParam = searchParams.get("query");
-    if (queryParam !== localSearch) {
-      setLocalSearch(queryParam || "");
-    }
-  }, [searchParams]);
-
   const clearAllFilters = () => {
     setSelectedStatuses([]);
-    setGlobalFilter("");
     setLocalSearch("");
+    updateUrlParams({ page: 1, query: "", statuses: [] });
+  };
 
-    const params = new URLSearchParams();
-    params.set("page", "1");
+  const handleStatusChange = (status: string) => {
+    const newStatuses = selectedStatuses.includes(status)
+      ? selectedStatuses.filter((item) => item !== status)
+      : [...selectedStatuses, status];
+    setSelectedStatuses(newStatuses);
+  };
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  const clearStatuses = () => {
+    setSelectedStatuses([]);
+  };
+
+  const removeStatus = (status: string) => {
+    const newStatuses = selectedStatuses.filter((s) => s !== status);
+    setSelectedStatuses(newStatuses);
   };
 
   return (
@@ -112,21 +124,13 @@ export function LeadsFilters({
                 {PREDEFINED_STATUSES.map((status) => (
                   <CommandItem
                     key={status}
-                    onSelect={() => {
-                      setSelectedStatuses((prev) => {
-                        if (prev.includes(status)) {
-                          return prev.filter((item) => item !== status);
-                        } else {
-                          return [...prev, status];
-                        }
-                      });
-                    }}
+                    onSelect={() => handleStatusChange(status)}
                   >
                     <Checkbox
                       checked={selectedStatuses.includes(status)}
                       className="mr-2 h-4 w-4"
                     />
-                    <span className="capitalize">{status.toLowerCase()}</span>
+                    <span className="capitalize">{formatStatus(status)}</span>
                   </CommandItem>
                 ))}
               </CommandList>
@@ -136,17 +140,7 @@ export function LeadsFilters({
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => {
-                      const params = new URLSearchParams(
-                        searchParams.toString()
-                      );
-                      params.delete("status");
-                      params.set("page", "1");
-                      router.replace(`${pathname}?${params.toString()}`, {
-                        scroll: false,
-                      });
-                      setSelectedStatuses([]);
-                    }}
+                    onClick={clearStatuses}
                   >
                     Clear
                     <X className="h-4 w-4 ml-2" />
@@ -158,53 +152,39 @@ export function LeadsFilters({
         </Popover>
       </TableFilters>
 
-      {/* Prikaz aktivnih filtera */}
+      {/* Active filters display */}
       {selectedStatuses.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
-          {/* Oznake za statuse */}
+          {/* Status badges */}
           {selectedStatuses.map((status) => (
             <Badge
               key={`status-${status}`}
               variant="secondary"
               className="px-2 py-1"
             >
-              <span className="capitalize">{status.toLowerCase()}</span>
+              <span className="capitalize">{formatStatus(status)}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-2"
-                onClick={() => {
-                  const params = new URLSearchParams(searchParams.toString());
-                  const remainingStatuses = selectedStatuses.filter(
-                    (s) => s !== status
-                  );
-                  params.delete("status");
-                  remainingStatuses.forEach((s) => params.append("status", s));
-                  params.set("page", "1");
-                  router.replace(`${pathname}?${params.toString()}`, {
-                    scroll: false,
-                  });
-                  setSelectedStatuses(remainingStatuses);
-                }}
+                onClick={() => removeStatus(status)}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           ))}
 
-          {/* Dugme za brisanje svih filtera */}
-          {selectedStatuses.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2"
-              onClick={clearAllFilters}
-            >
-              Clear All
-            </Button>
-          )}
+          {/* Clear all button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2"
+            onClick={clearAllFilters}
+          >
+            Clear All
+          </Button>
         </div>
       )}
     </>
   );
-} 
+}
