@@ -210,13 +210,13 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
   };
 
   // Update weight for a criteria
-  const updateWeight = (criteriaId: string, weight: number) => {
-    const parsedWeight = parseInt(weight.toString(), 10) || 0;
+  const updateWeight = (criteriaId: string, value: string) => {
+    const weight = value === '' ? 0 : parseInt(value, 10) || 0;
     
     setSelectedCriteria(prev => 
       prev.map(c => 
         c.rankingCriteriaId === criteriaId 
-          ? { ...c, weight: parsedWeight } 
+          ? { ...c, weight } 
           : c
       )
     );
@@ -265,11 +265,11 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <h2 className="text-xl font-semibold">Ranking Criteria</h2>
       
       {/* Progress Bar */}
-      <div className="space-y-2">
+      <div className="space-y-2 w-full max-w-full">
         <div className="flex justify-between">
           <span className="text-sm font-medium">Total Weight</span>
           <span className={`text-sm font-medium ${isValidTotalWeight ? 'text-green-500' : 'text-red-500'}`}>
@@ -278,7 +278,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
         </div>
         <div className={`relative w-full h-2 rounded-full ${isValidTotalWeight ? 'bg-green-900/20' : 'bg-red-900/20'}`}>
           <div
-            className={`absolute left-0 top-0 h-full rounded-full ${isValidTotalWeight ? 'bg-green-500' : 'bg-red-500'}`}
+            className={`absolute left-0 top-0 h-full rounded-full max-w-full ${isValidTotalWeight ? 'bg-green-500' : 'bg-red-500'}`}
             style={{ width: `${totalWeight}%` }}
           />
         </div>
@@ -314,7 +314,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
                 min="0"
                 max="100"
                 value={criteria.weight}
-                onChange={(e) => updateWeight(criteria.rankingCriteriaId, parseInt(e.target.value, 10))}
+                onChange={(e) => updateWeight(criteria.rankingCriteriaId, e.target.value)}
                 className="h-8"
               />
               <span className="text-sm">%</span>

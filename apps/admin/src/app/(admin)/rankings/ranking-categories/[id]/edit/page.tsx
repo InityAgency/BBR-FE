@@ -37,9 +37,10 @@ async function getRankingCategory(id: string) {
 export default async function EditRankingCategoryPage({
     params,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }>; 
 }) {
-    const { rankingCategory, error } = await getRankingCategory(params.id);
+    const { id } = await params; 
+    const { rankingCategory, error } = await getRankingCategory(id);
 
     if (error || !rankingCategory) {
         return (
@@ -55,20 +56,18 @@ export default async function EditRankingCategoryPage({
         )
     }
 
-    // Konvertuj API podatke u format koji očekuje forma
+    // Koristimo postojeću apiToFormRankingCategory funkciju za mapiranje
     const formData = apiToFormRankingCategory(rankingCategory);
+    console.log(formData);
 
     return (
         <AdminLayout>
             <Suspense fallback={<RankingCategorySkeleton />}>
                 <RankingCategoryForm 
-                    initialData={{
-                        ...formData,
-                        featuredImageId: formData.featuredImageId as string | undefined
-                    }} 
+                    initialData={formData}
                     isEditing={true} 
                 />
             </Suspense>
         </AdminLayout>
-    )
+    );
 }

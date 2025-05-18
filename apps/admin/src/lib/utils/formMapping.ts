@@ -15,7 +15,10 @@ export const apiToFormRankingCategory = (apiData: RankingCategory): RankingCateg
     rankingPrice: typeof apiData.rankingPrice === 'string' 
       ? parseFloat(apiData.rankingPrice) 
       : (apiData.rankingPrice as unknown as number),
-    featuredImageId: apiData.featuredImage?.id
+    featuredImageId: apiData.featuredImage?.id,
+    entityId: (apiData.entity as any)?.id,
+    entity: apiData.entity as any,
+    title: apiData.title
   };
 };
 
