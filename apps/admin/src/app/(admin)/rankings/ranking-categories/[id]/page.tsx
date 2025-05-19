@@ -362,7 +362,7 @@ export default function RankingCategoryPage({ params }: PageProps) {
       <Tabs defaultValue="overview">
         <TabsList className="bg-foreground/5">
           <TabsTrigger value="overview" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Overview</TabsTrigger>
-          <TabsTrigger value="residences" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Residences</TabsTrigger>
+          <TabsTrigger value="residences" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent" disabled>Residences</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-6">
           {renderOverviewTab()}

@@ -56,17 +56,6 @@ export const columns: ColumnDef<RankingCategoryType>[] = [
         },
       },
       {
-        accessorKey: "createdAt",
-        header: "Created At",
-        
-        cell: ({ row }) => formatDate(row.getValue("createdAt")),
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Updated At",
-        cell: ({ row }) => formatDate(row.getValue("updatedAt")),
-      },
-      {
         id: "actions",
         header: "Actions",
         cell: () => null,

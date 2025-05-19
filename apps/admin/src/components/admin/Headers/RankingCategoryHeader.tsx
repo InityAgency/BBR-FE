@@ -28,6 +28,7 @@ interface RankingCategoryHeaderProps {
   category: RankingCategory;
   onStatusChange: (newStatus: RankingCategoryStatus) => Promise<void>;
   onDelete: () => Promise<void>;
+  onEditSuccess?: () => Promise<void>;
 }
 
 const getStatusBadgeStyle = (status: RankingCategoryStatus) => {
@@ -47,6 +48,7 @@ export function RankingCategoryHeader({
   category,
   onStatusChange,
   onDelete,
+  onEditSuccess,
 }: RankingCategoryHeaderProps) {
   const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

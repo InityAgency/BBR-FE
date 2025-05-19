@@ -107,7 +107,6 @@ export function RankingCategoryTypesTable({
     } = useTable<RankingCategoryType>({
         data: rankingCategoryTypes,
         columns: enhancedColumns(fetchRankingCategoryTypes, currentPage),
-        initialSorting: [{ id: "createdAt", desc: true }],
         initialPageSize: ITEMS_PER_PAGE,
         manualPagination: true,
         pageCount: totalPages,
