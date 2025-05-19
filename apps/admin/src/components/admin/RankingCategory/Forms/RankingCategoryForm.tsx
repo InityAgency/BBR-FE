@@ -659,11 +659,38 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
   };
 
   const onSubmit = async (data: RankingCategoryFormValues) => {
-    if (!validateForm()) return;
-
     setIsSubmitting(true);
 
     try {
+      let featuredImageId = data.featuredImageId;
+
+      // Provera da li je novi fajl
+      if (featuredImageId instanceof File) {
+        // Odredi type na osnovu konteksta (npr. proslediš kao prop ili izabereš iz forme)
+        const type = "RANKING_CATEGORY"; // ili dinamički
+        const formData = new FormData();
+        formData.append("file", featuredImageId);
+
+        const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/media?type=${type}`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const result = await response.json();
+        featuredImageId = result.data.id;
+      }
+
+      // Sada pripremiš payload sa ID-jem slike
+      const payload = {
+        ...data,
+        featuredImageId,
+      };
+
       if (isEditing && initialData.id) {
         // Update existing ranking category
         const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${initialData.id}`, {
@@ -672,7 +699,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
@@ -698,7 +725,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
