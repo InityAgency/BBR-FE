@@ -12,9 +12,12 @@ import { DeleteConfirmationModal } from "@/components/admin/Modals/DeleteConfirm
 import { CreateRankingCriteriaModal } from "@/components/admin/Modals/CreateRankingCriteriaModal";
 import { RankingCriteriaData } from "@/app/schemas/ranking-criteria";
 import { toast } from "sonner";
+import { TablePagination } from "@/components/admin/Table/TablePagination";
 
-async function getRankingCriteria() {
-    const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-criteria`, {
+const ITEMS_PER_PAGE = 12;
+
+async function getRankingCriteria(page: number = 1) {
+    const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/ranking-criteria?page=${page}&limit=${ITEMS_PER_PAGE}`, {
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
@@ -26,7 +29,11 @@ async function getRankingCriteria() {
     }
     
     const data = await response.json();
-    return data.data;
+    return {
+        data: data.data,
+        totalItems: data.pagination.total,
+        totalPages: data.pagination.totalPages
+    };
 }
 
 export default function RankingCriteriaPage() {
@@ -36,14 +43,19 @@ export default function RankingCriteriaPage() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [selectedCriteria, setSelectedCriteria] = useState<RankingCriteriaData | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Load data on component mount
     useEffect(() => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                const data = await getRankingCriteria();
+                const { data, totalItems, totalPages } = await getRankingCriteria(currentPage);
                 setRankingCriteria(data);
+                setTotalItems(totalItems);
+                setTotalPages(totalPages);
             } catch (error) {
                 console.error('Error loading ranking criteria:', error);
                 toast.error('Failed to load ranking criteria');
@@ -53,18 +65,36 @@ export default function RankingCriteriaPage() {
         };
 
         loadData();
-    }, []);
+    }, [currentPage]);
 
     // Reload data after successful edit
     const handleEditSuccess = async () => {
         try {
-            const data = await getRankingCriteria();
+            const { data, totalItems, totalPages } = await getRankingCriteria(currentPage);
             setRankingCriteria(data);
+            setTotalItems(totalItems);
+            setTotalPages(totalPages);
             toast.success('Ranking criteria updated successfully');
         } catch (error) {
             console.error('Error reloading data:', error);
             toast.error('Failed to reload data');
         }
+    };
+
+    const goToNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(prev => prev + 1);
+        }
+    };
+
+    const goToPreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(prev => prev - 1);
+        }
+    };
+
+    const goToPage = (page: number) => {
+        setCurrentPage(page);
     };
 
     // Open edit modal
@@ -168,9 +198,6 @@ export default function RankingCriteriaPage() {
                                             Not Default
                                         </Badge>
                                     )}
-                                    {/* <Button variant="outline" size="icon" onClick={() => handleDeleteClick(criteria)}>
-                                        <Trash2 className="w-4 h-4 text-red-400" />
-                                    </Button> */}
                                     <Button 
                                         variant="outline" 
                                         size="icon"
@@ -189,6 +216,17 @@ export default function RankingCriteriaPage() {
                         )}
                     </div>
                 </div>
+
+                <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    goToNextPage={goToNextPage}
+                    goToPreviousPage={goToPreviousPage}
+                    goToPage={goToPage}
+                    loading={loading}
+                />
             </div>
 
             {/* Edit Modal */}
