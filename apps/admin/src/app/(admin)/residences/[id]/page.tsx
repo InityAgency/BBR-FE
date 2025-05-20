@@ -7,6 +7,7 @@ import AdminLayout from "../../AdminLayout";
 import { residencesService } from "@/lib/api/services/residences";
 import { ResidenceHeader } from "@/components/admin/Residences/Headers/ResidenceHeader";
 import { ResidenceDetails } from "@/components/admin/Residences/Details/ResidenceDetails";
+import { ResidenceInventory } from "@/components/admin/Residences/Details/ResidenceInventory";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useBreadcrumb } from "@/components/admin/Breadcrumb";
@@ -101,7 +102,7 @@ export default function ResidencesSingle() {
           <ResidenceDetails residence={residence} />
         </TabsContent>
         <TabsContent value="inventory" className="mt-6">
-          <Card><CardContent className="py-8 text-center text-muted-foreground">Inventory content coming soon...</CardContent></Card>
+          <ResidenceInventory />
         </TabsContent>
         <TabsContent value="leads" className="mt-6">
           <Card><CardContent className="py-8 text-center text-muted-foreground">Leads are currently locked.</CardContent></Card>

@@ -46,37 +46,63 @@ export default function ResidenceScoring() {
         const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
         const residenceId = params.id;
 
-        // Fetch scores directly from this endpoint
-        try {
-          const scoresResponse = await fetch(
-            `${baseUrl}/api/${apiVersion}/residences/${residenceId}/scores`,
-            {
-              credentials: "include",
-            }
-          );
+        // Fetch both criteria and scores in parallel to optimize
+        const [criteriaResponse, scoresResponse] = await Promise.all([
+          fetch(`${baseUrl}/api/${apiVersion}/ranking-criteria`, {
+            credentials: "include",
+          }),
+          fetch(`${baseUrl}/api/${apiVersion}/residences/${residenceId}/scores`, {
+            credentials: "include",
+          })
+        ]);
 
-          if (!scoresResponse.ok) {
-            throw new Error(`Failed to fetch scoring data: ${scoresResponse.status}`);
-          }
+        // Handle criteria response
+        if (!criteriaResponse.ok) {
+          throw new Error(`Failed to fetch criteria: ${criteriaResponse.status}`);
+        }
+        
+        const criteriaData = await criteriaResponse.json();
+        if (!Array.isArray(criteriaData.data)) {
+          throw new Error("Invalid response format from criteria API");
+        }
+        
+        const allCriteria = criteriaData.data;
 
+        // Handle scores response
+        let scores: RankingCriteria[] = [];
+        if (scoresResponse.ok) {
           const scoresData = await scoresResponse.json();
-          
           if (Array.isArray(scoresData.data)) {
-            // Process the data
-            const processedData = scoresData.data.map((criteria: { rankingCategories: any; }) => ({
+            scores = scoresData.data.map((criteria: any) => ({
               ...criteria,
               rankingCategories: criteria.rankingCategories || [],
             }));
-            
-            setRankingCriteria(processedData);
           } else {
-            console.error("Unexpected response format:", scoresData);
-            throw new Error("Invalid response format from API");
+            console.error("Unexpected scores response format:", scoresData);
           }
-        } catch (err) {
-          console.error("Failed to fetch scores:", err);
-          throw err;
+        } else {
+          console.error(`Failed to fetch scoring data: ${scoresResponse.status}`);
         }
+
+        // Combine criteria with scores
+        const combinedCriteria: RankingCriteria[] = [];
+        
+        // Start with all criteria that have scores
+        const scoredCriteriaIds = new Set(scores.map(s => s.id));
+        combinedCriteria.push(...scores);
+        
+        // Add criteria that don't have scores yet
+        allCriteria.forEach((criteria: RankingCriteria) => {
+          if (!scoredCriteriaIds.has(criteria.id)) {
+            combinedCriteria.push({
+              ...criteria,
+              score: 0,
+              rankingCategories: []
+            });
+          }
+        });
+        
+        setRankingCriteria(combinedCriteria);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "An error occurred";
         setError(errorMessage);
