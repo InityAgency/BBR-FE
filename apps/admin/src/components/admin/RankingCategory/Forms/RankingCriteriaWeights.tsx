@@ -97,6 +97,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
 }) => {
   // State
   const [availableCriteria, setAvailableCriteria] = useState<RankingCriteria[]>([]);
+  const [filteredCriteria, setFilteredCriteria] = useState<RankingCriteria[]>([]); // New state for filtered criteria
   const [selectedCriteria, setSelectedCriteria] = useState<CriteriaWeight[]>(initialCriteria);
   const [selectedCriteriaId, setSelectedCriteriaId] = useState<string>("");
   const [totalWeight, setTotalWeight] = useState<number>(0);
@@ -105,12 +106,12 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
   const [newCriteriaDescription, setNewCriteriaDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
-  // New state for pagination and search
+  // State for pagination and search
   const [pagination, setPagination] = useState<PaginationInfo>({
     total: 0,
     totalPages: 0,
     page: 1,
-    limit: 12
+    limit: 20
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -120,6 +121,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
   // Add scroll position state
   const [scrollPosition, setScrollPosition] = useState(0);
   const debouncedScrollPosition = useDebounce(scrollPosition, 150);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Fetch available criteria on component mount
   useEffect(() => {
@@ -168,9 +170,27 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       const data: RankingCriteriaResponse = await response.json();
       
       if (data && data.data && Array.isArray(data.data)) {
-        // If reset is true, replace the existing criteria
-        // Otherwise, append to existing criteria
-        setAvailableCriteria(prev => reset ? data.data : [...prev, ...data.data]);
+        // Handle criteria data
+        if (reset) {
+          // If reset is true, completely replace the criteria
+          setAvailableCriteria(data.data);
+          setFilteredCriteria(data.data);
+        } else {
+          // Remove duplicates when appending (could happen with parallel requests)
+          const existingIds = new Set(availableCriteria.map(c => c.id));
+          const newCriteria = [...availableCriteria];
+          
+          data.data.forEach(criteria => {
+            if (!existingIds.has(criteria.id)) {
+              newCriteria.push(criteria);
+              existingIds.add(criteria.id);
+            }
+          });
+          
+          setAvailableCriteria(newCriteria);
+          setFilteredCriteria(newCriteria);
+        }
+        
         setPagination(data.pagination);
         
         // Update names in selected criteria if they don't have names yet
@@ -219,23 +239,17 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
     fetchRankingCriteria(nextPage, searchQuery);
   }, [isLoading, pagination.page, pagination.totalPages, searchQuery]);
 
-  // Search criteria
-  const searchCriteria = useCallback((query: string) => {
-    setSearchQuery(query);
-    setIsSearching(true);
-    fetchRankingCriteria(1, query, true);
-  }, []);
-
-  // Debounced search
+  // Use debounced search query to fetch data
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery !== undefined) {
-        searchCriteria(searchQuery);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, searchCriteria]);
+    if (debouncedSearchQuery !== undefined && comboboxOpen) {
+      setIsSearching(true);
+      // Small delay to allow the UI to show the loading state before making the API call
+      const timer = setTimeout(() => {
+        fetchRankingCriteria(1, debouncedSearchQuery, true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [debouncedSearchQuery, comboboxOpen]);
 
   // Create new ranking criteria
   const createRankingCriteria = async () => {
@@ -270,6 +284,7 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
         
         // Add to available criteria
         setAvailableCriteria(prev => [...prev, newCriteria]);
+        setFilteredCriteria(prev => [...prev, newCriteria]);
         
         // Auto-select the newly created criteria
         addCriteria(newCriteria.id, newCriteria.name);
@@ -315,16 +330,6 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
     setSelectedCriteriaId("");
   };
 
-  // Handle criteria selection from dropdown
-  const handleCriteriaSelect = (value: string) => {
-    if (value === "add_new") {
-      setIsAddingNew(true);
-    } else {
-      setSelectedCriteriaId(value);
-      addCriteria(value);
-    }
-  };
-
   // Remove criteria from selection
   const removeCriteria = (criteriaId: string) => {
     setSelectedCriteria(prev => prev.filter(c => c.rankingCriteriaId !== criteriaId));
@@ -354,15 +359,24 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
 
   // Add effect for handling debounced scroll
   useEffect(() => {
+    if (!comboboxOpen) return;
+    
     const el = document.querySelector('.command-list') as HTMLElement | null;
     if (!el) return;
     const { scrollHeight, clientHeight } = el;
     const scrollBottom = scrollHeight - debouncedScrollPosition - clientHeight;
 
-    if (scrollBottom < 100 && !isLoading && pagination.page < pagination.totalPages) {
+    if (scrollBottom < 50 && !isLoading && pagination.page < pagination.totalPages) {
       loadMoreCriteria();
     }
-  }, [debouncedScrollPosition, isLoading, pagination.page, pagination.totalPages, loadMoreCriteria]);
+  }, [debouncedScrollPosition, isLoading, pagination.page, pagination.totalPages, loadMoreCriteria, comboboxOpen]);
+
+  // Get the criteria that should be displayed in the dropdown (not already selected)
+  const getAvailableDropdownCriteria = () => {
+    return filteredCriteria.filter(
+      c => !selectedCriteria.some(sc => sc.rankingCriteriaId === c.id)
+    );
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -429,7 +443,22 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
       
       {/* Add Criteria Dropdown */}
       <div className="flex gap-2">
-        <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+        <Popover open={comboboxOpen} onOpenChange={(open) => {
+          // Prevent flickering by only changing state when actually changing
+          if (open !== comboboxOpen) {
+            setComboboxOpen(open);
+            
+            // Reset search when opening the dropdown
+            if (open) {
+              setSearchQuery("");
+              // Reset the filtered criteria to all available
+              setFilteredCriteria(availableCriteria);
+              // Also reset loading and searching states
+              setIsLoading(false);
+              setIsSearching(false);
+            }
+          }
+        }}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -445,47 +474,66 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0" align="start">
+          <PopoverContent className="w-full p-0" align="start" sideOffset={5}>
             <Command shouldFilter={false}>
               <CommandInput
                 placeholder="Search criteria..."
                 value={searchQuery}
                 onValueChange={setSearchQuery}
+                className="border-none focus:ring-0"
               />
-              <CommandList 
-                className="command-list max-h-[300px] overflow-y-auto"
-                onScroll={handleScroll}
-              >
-                <CommandEmpty>
-                  {isSearching ? "Searching..." : "No criteria found."}
-                </CommandEmpty>
-                <CommandGroup>
-                  {availableCriteria
-                    .filter(c => !selectedCriteria.some(sc => sc.rankingCriteriaId === c.id))
-                    .map(criteria => (
-                      <CommandItem
-                        key={criteria.id}
-                        value={criteria.id}
-                        onSelect={() => {
-                          addCriteria(criteria.id, criteria.name);
-                          setComboboxOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            selectedCriteriaId === criteria.id ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {criteria.name}
-                      </CommandItem>
-                    ))}
-                </CommandGroup>
-                {isLoading && (
-                  <div className="p-2 text-center text-sm text-muted-foreground">
-                    Loading...
-                  </div>
-                )}
+              <div className="relative">
+                <CommandList 
+                  className="command-list h-[300px] overflow-y-auto"
+                  onScroll={handleScroll}
+                >
+                  {/* Fixed height placeholder to prevent jumping */}
+                  {isSearching && getAvailableDropdownCriteria().length === 0 ? (
+                    <div className="flex items-center justify-center p-6 text-sm text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                        <span>Searching...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <CommandEmpty className="py-6 text-center text-sm">
+                        No matching criteria found
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {getAvailableDropdownCriteria().map(criteria => (
+                          <CommandItem
+                            key={criteria.id}
+                            value={criteria.id}
+                            className="flex items-center px-2 py-2 cursor-pointer hover:bg-accent"
+                            onSelect={() => {
+                              addCriteria(criteria.id, criteria.name);
+                              setComboboxOpen(false);
+                            }}
+                          >
+                            {/* <Check
+                              className={cn(
+                                "mr-2 h-4 w-4 flex-shrink-0 w-0",
+                                selectedCriteriaId === criteria.id ? "opacity-100" : "opacity-0"
+                              )}
+                            /> */}
+                            <span className="truncate">{criteria.name}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </>
+                  )}
+
+                  {/* Loading indicator at bottom when fetching more */}
+                  {isLoading && !isSearching && (
+                    <div className="flex items-center justify-center p-2 text-sm text-muted-foreground border-t">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2"></div>
+                      <span>Loading more...</span>
+                    </div>
+                  )}
+                </CommandList>
+
+                {/* Fixed footer */}
                 <div className="sticky bottom-0 border-t bg-background">
                   <CommandItem
                     value="add_new"
@@ -493,13 +541,13 @@ const RankingCriteriaWeights: React.FC<RankingCriteriaWeightsProps> = ({
                       setIsAddingNew(true);
                       setComboboxOpen(false);
                     }}
-                    className="text-primary"
+                    className="flex items-center px-2 py-2 cursor-pointer hover:bg-accent text-primary"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add New Criteria
+                    <Plus className="h-4 w-4 text-white" />
+                    <span className="text-white">Add New Criteria</span>
                   </CommandItem>
                 </div>
-              </CommandList>
+              </div>
             </Command>
           </PopoverContent>
         </Popover>
