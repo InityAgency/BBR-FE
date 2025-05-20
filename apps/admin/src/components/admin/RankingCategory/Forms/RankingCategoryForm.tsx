@@ -715,7 +715,7 @@ const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({
         if (onSubmitSuccess) {
           onSubmitSuccess();
         } else {
-          router.push("/rankings/ranking-categories");
+          router.push(`/rankings/ranking-categories/${initialData.id}`);
         }
       } else {
         // Create new ranking category
