@@ -160,9 +160,9 @@ export default function ResidencesTab({ categoryId }: { categoryId: string }) {
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1 flex flex-col gap-0.5">
-                    <p className="text-sm font-medium">{residence.company.contactPersonFullName}</p>
-                    <Link href={`mailto:${residence.company.contactPersonEmail}`} className="text-sm text-muted-foreground text-primary transition-colors">{residence.company.contactPersonEmail}</Link>
-                    <Link href={`tel:${residence.company.contactPersonPhoneNumber}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">{residence.company.contactPersonPhoneNumber}</Link>
+                    <p className="text-sm font-medium">{residence.company?.contactPersonFullName}</p>
+                    <Link href={`mailto:${residence.company?.contactPersonEmail}`} className="text-sm text-muted-foreground text-primary transition-colors">{residence.company?.contactPersonEmail}</Link>
+                    <Link href={`tel:${residence.company?.contactPersonPhoneNumber}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">{residence.company?.contactPersonPhoneNumber}</Link>
                   </div>
                 </TableCell>          
                 <TableCell className="text-center w-1/6">
@@ -171,7 +171,7 @@ export default function ResidencesTab({ categoryId }: { categoryId: string }) {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/residences/${residence.id}`}>
+                  <Link href={`/residences/${residence.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <Eye className="h-4 w-4" />
                     </Button>

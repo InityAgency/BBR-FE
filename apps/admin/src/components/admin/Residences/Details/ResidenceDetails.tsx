@@ -54,8 +54,8 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Associated Brand</h3>
                 {residence.brand && (
                   <div className="flex items-center gap-2">
-                    <p className="text-md">{residence.brand.name}</p>
-                    <Link href={`/brands/${residence.brand.id}`} className="text-md text-muted-foreground hover:text-primary transition-all">
+                    <p className="text-md">{residence.brand?.name}</p>
+                    <Link href={`/brands/${residence.brand?.id}`} className="text-md text-muted-foreground hover:text-primary transition-all">
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   </div>
@@ -67,11 +67,11 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">City</h3>
-                <p className="text-md">{residence.city.name}</p>
+                <p className="text-md">{residence.city?.name}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Country</h3>
-                <p className="text-md">{residence.country.name}</p>
+                <p className="text-md">{residence.country?.name}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>

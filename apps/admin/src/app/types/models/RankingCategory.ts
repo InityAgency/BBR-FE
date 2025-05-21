@@ -3,6 +3,7 @@ export type RankingCategoryStatus = "ACTIVE" | "DELETED" | "DRAFT";
 export interface RankingCategoryType {
   id: string;
   name: string;
+  key: string;
   createdAt?: string;
   updatedAt?: string;
 }
