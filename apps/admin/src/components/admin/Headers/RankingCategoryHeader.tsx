@@ -151,6 +151,7 @@ export function RankingCategoryHeader({
         onClose={() => setShowAddResidenceModal(false)}
         category={category}
         onSuccess={onEditSuccess}
+        rankingCategoryId={category.id}
       />
     </>
   );

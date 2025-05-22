@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import AdminLayout from "@/app/(admin)/AdminLayout";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { AlertCircle } from "lucide-react";
@@ -36,10 +36,32 @@ interface PageProps {
 export default function RankingCategoryPage({ params }: PageProps) {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [rankingCategory, setRankingCategory] = useState<RankingCategory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Dodajemo logiku za tab iz query parametra
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "overview");
+
+  // Sync tab sa query parametrom
+  useEffect(() => {
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  // Funkcija za promenu taba i update URL-a
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`?${params.toString()}`);
+  };
+
+  const [residencesRefreshKey, setResidencesRefreshKey] = useState(0);
+
   const fetchRankingCategory = async () => {
     try {
       setLoading(true);
@@ -120,6 +142,12 @@ export default function RankingCategoryPage({ params }: PageProps) {
       console.error("Error deleting ranking category:", error);
       toast.error("Failed to delete ranking category");
     }
+  };
+
+  // Funkcija koja se prosleđuje kao onEditSuccess u RankingCategoryHeader
+  const handleAddResidenceSuccess = async () => {
+    handleTabChange("residences");
+    setResidencesRefreshKey(prev => prev + 1);
   };
 
   if (loading) {
@@ -230,21 +258,21 @@ export default function RankingCategoryPage({ params }: PageProps) {
       <div className="col-span-full md:col-span-3 grid grid-rows-3 gap-4 h-full">
         <Card className="border-none bg-foreground/5">
           <CardContent className="flex flex-col justify-center h-full">
-            <h2 className="text-xl font-medium">132</h2>
+            <h2 className="text-xl font-medium">-</h2>
             <p className="text-sm text-muted-foreground">Total views</p>
           </CardContent>
         </Card>
 
         <Card className="border-none bg-foreground/5">    
           <CardContent className="flex flex-col justify-center h-full">
-            <h2 className="text-xl font-medium">2</h2>
+            <h2 className="text-xl font-medium">-</h2>
             <p className="text-sm text-muted-foreground">Average time spent</p>
           </CardContent>
         </Card>
 
         <Card className="border-none bg-foreground/5">    
           <CardContent className="flex flex-col justify-center h-full">
-            <h2 className="text-xl font-medium">9 / 10</h2>
+            <h2 className="text-xl font-medium">-</h2>
             <p className="text-sm text-muted-foreground">Engagement score</p>
           </CardContent>
         </Card>
@@ -258,9 +286,10 @@ export default function RankingCategoryPage({ params }: PageProps) {
         category={rankingCategory} 
         onStatusChange={handleStatusChange} 
         onDelete={handleDelete}
+        onEditSuccess={handleAddResidenceSuccess}
       />
       
-      <Tabs defaultValue="overview">
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="bg-foreground/5">
           <TabsTrigger value="overview" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Overview</TabsTrigger>
           <TabsTrigger value="residences" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Residences</TabsTrigger>
@@ -269,7 +298,7 @@ export default function RankingCategoryPage({ params }: PageProps) {
           {renderOverviewTab()}
         </TabsContent>
         <TabsContent value="residences" className="mt-6">
-          <ResidencesTab categoryId={id as string} />
+          <ResidencesTab categoryId={id as string} refreshKey={residencesRefreshKey} />
         </TabsContent>
       </Tabs>
     </AdminLayout>

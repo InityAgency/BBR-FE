@@ -42,6 +42,11 @@ interface PaginationInfo {
   limit: number;
 }
 
+interface ResidencesTabProps {
+  categoryId: string;
+  refreshKey?: number;
+}
+
 // Memoizovan TableSkeleton za bolju performansu
 const TableSkeleton = React.memo(() => {
   return (
@@ -76,7 +81,7 @@ const TableSkeleton = React.memo(() => {
   );
 });
 
-export default function ResidencesTab({ categoryId }: { categoryId: string }) {
+export default function ResidencesTab({ categoryId, refreshKey }: ResidencesTabProps) {
   const [data, setData] = useState<Residence[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,8 +111,12 @@ export default function ResidencesTab({ categoryId }: { categoryId: string }) {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [refreshKey, categoryId]);
+
+  useEffect(() => {
     fetchResidences(currentPage);
-  }, [categoryId, currentPage]);
+  }, [categoryId, currentPage, refreshKey]);
 
   const goToNextPage = () => {
     if (currentPage < pagination.totalPages) {
