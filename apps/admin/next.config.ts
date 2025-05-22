@@ -28,11 +28,9 @@ const nextConfig = {
     unoptimized: true,
   },
   eslint: {
-    // Isključujemo proveru ESLint grešaka tokom build procesa
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Isključujemo proveru TypeScript grešaka tokom build procesa
     ignoreBuildErrors: true,
   },
 };
