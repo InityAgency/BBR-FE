@@ -79,6 +79,19 @@ export function MobileMegaMenu({
     return "translate-x-full opacity-0 z-0"
   }
 
+  // Funkcija za prikazivanje linka "View all"
+  const getViewAllText = (menuName: string) => {
+    switch (menuName) {
+      case "allBrands":
+        return "View all Brands"
+      case "bestResidences":
+        return "View all Best Residences"
+      case "allResidences":
+      default:
+        return "View all Residences"
+    }
+  }
+
   // Klase za animaciju otvaranja/zatvaranja
   const menuAnimationClasses = cn(
     "fixed inset-0 bg-secondary text-white pt-4 z-50 lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
@@ -140,35 +153,45 @@ export function MobileMegaMenu({
                       <Link
                         href={navigationData[menuName].href}
                         className="text-lg font-medium text-white hover:text-[#b3804c] transition-colors"
+                        onClick={onClose}
                       >
                         {navigationData[menuName].title}
                       </Link>
-                      <button
-                        onClick={() => navigateForward("tabs", menuName)}
-                        className="flex items-center text-md text-[#b3804c] mt-2"
-                      >
-                        View subcategories <ChevronRight className="w-4 h-4 ml-1" />
-                      </button>
+                      {navigationData[menuName].tabs.length > 0 && (
+                        <button
+                          onClick={() => navigateForward("tabs", menuName)}
+                          className="flex items-center text-md text-[#b3804c] mt-2"
+                        >
+                          View subcategories <ChevronRight className="w-4 h-4 ml-1" />
+                        </button>
+                      )}
                     </div>
                   ))}
                   <Link
                     href="/criteria"
                     className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors"
+                    onClick={onClose}
                   >
                     Evaluation Criteria
                   </Link>
-                  <Link href="/deals" className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors">
+                  <Link 
+                    href="/deals" 
+                    className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors"
+                    onClick={onClose}
+                  >
                     Exclusive Deals
                   </Link>
                   <Link
                     href="/blog"
                     className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors"
+                    onClick={onClose}
                   >
                     Luxury Insights
                   </Link>
                   <Link
                     href="/contact"
                     className="block py-1 text-lg text-white hover:text-[#b3804c] transition-colors"
+                    onClick={onClose}
                   >
                     Contact Us
                   </Link>
@@ -205,8 +228,12 @@ export function MobileMegaMenu({
                     ))}
                   </div>
                   <div className="mt-8">
-                    <Link href={navigationData[activeMenu].href} className="flex items-center text-[#b3804c] text-lg">
-                      View all {activeMenu === "allBrands" ? "Brands" : "Residences"}{" "}
+                    <Link 
+                      href={navigationData[activeMenu].href} 
+                      className="flex items-center text-[#b3804c] text-lg"
+                      onClick={onClose}
+                    >
+                      {getViewAllText(activeMenu)}{" "}
                       <ChevronRight className="ml-1 w-4 h-4" />
                     </Link>
                   </div>
@@ -237,9 +264,9 @@ export function MobileMegaMenu({
                         onClick={onClose}
                       >
                         {item.label}
-                        {item.description && (
+                        {/* {item.description && (
                           <span className="block text-sm text-gray-400">{item.description}</span>
-                        )}
+                        )} */}
                       </Link>
                     ))}
                   </div>
@@ -247,8 +274,9 @@ export function MobileMegaMenu({
                     <Link
                       href={navigationData[activeMenu].href}
                       className="flex items-center text-[#b3804c] text-lg font-medium gap-2"
+                      onClick={onClose}
                     >
-                      View all {activeMenu === "allBrands" ? "Brands" : "Residences"}
+                      {getViewAllText(activeMenu)}
                       <ChevronRight className="w-5 h-5" />
                     </Link>
                   </div>

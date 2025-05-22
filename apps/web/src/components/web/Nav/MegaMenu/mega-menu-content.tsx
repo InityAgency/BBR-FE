@@ -26,6 +26,19 @@ export function MegaMenuContent({
 
   const tabContent = menuData.content[activeTab] || []
 
+  // Funkcija za prikazivanje linka "View all"
+  const getViewAllText = () => {
+    switch (activeMenu) {
+      case "allBrands":
+        return "View all Brands"
+      case "bestResidences":
+        return "View all Best Residences"
+      case "allResidences":
+      default:
+        return "View all Residences"
+    }
+  }
+
   return (
     <div className="flex flex-row">
       {/* Tabs sidebar */}
@@ -50,7 +63,7 @@ export function MegaMenuContent({
           href={menuData.href}
           className="flex items-center text-[#b3804c] mt-8 p-3 hover:translate-x-1 transition-all duration-200"
         >
-          View all {activeMenu === "allBrands" ? "Brands" : "Residences"} <ChevronRight className="ml-1 w-4 h-4" />
+          {getViewAllText()} <ChevronRight className="ml-1 w-4 h-4" />
         </Link>
       </div>
 
@@ -64,9 +77,9 @@ export function MegaMenuContent({
               className="text-white hover:text-[#b3804c] transition-all duration-200 hover:translate-x-1"
             >
               {item.label}
-              {item.description && (
+              {/* {item.description && (
                 <span className="block text-sm text-gray-400">{item.description}</span>
-              )}
+              )} */}
             </Link>
           ))}
         </div>
