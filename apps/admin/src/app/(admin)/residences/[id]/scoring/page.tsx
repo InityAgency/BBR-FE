@@ -51,7 +51,7 @@ export default function ResidenceScoring() {
           fetch(`${baseUrl}/api/${apiVersion}/ranking-criteria`, {
             credentials: "include",
           }),
-          fetch(`${baseUrl}/api/${apiVersion}/residences/${residenceId}/scores`, {
+          fetch(`${baseUrl}/api/${apiVersion}/residence-scores/${residenceId}`, {
             credentials: "include",
           })
         ]);
@@ -157,7 +157,7 @@ export default function ResidenceScoring() {
         }));
 
       const response = await fetch(
-        `${baseUrl}/api/${apiVersion}/residences/${residenceId}/scores`,
+        `${baseUrl}/api/${apiVersion}/residence-scores/${residenceId}`,
         {
           method: "POST",
           headers: {

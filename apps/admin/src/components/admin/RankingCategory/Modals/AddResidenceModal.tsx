@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Loader2, Search } from "lucide-react";
 import { RankingCategory } from "@/app/types/models/RankingCategory";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useInView } from "react-intersection-observer"; // Dodajte ovu biblioteku
 
 interface AddResidenceModalProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ interface AddResidenceModalProps {
 }
 
 interface Residence {
+  country: any;
+  city: any;
   id: string;
   name: string;
   description: string;
@@ -28,6 +31,7 @@ interface Residence {
 }
 
 export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddResidenceModalProps) {
+  // Stanja
   const [residences, setResidences] = useState<Residence[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,9 +39,23 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  
+  // Reference
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const isLoadingRef = useRef(false);
+  
+  // Koristimo react-intersection-observer za glatko učitavanje
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  });
 
-  const fetchResidences = async (pageNumber: number, isNewSearch: boolean = false) => {
+  const fetchResidences = useCallback(async (pageNumber: number, isNewSearch: boolean = false) => {
+    // Koristimo ref da sprečimo duplicirane zahteve
+    if (isLoadingRef.current) return;
+    
     try {
+      isLoadingRef.current = true;
       setLoading(true);
       
       let queryParams = new URLSearchParams();
@@ -57,7 +75,7 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
       }
       queryParams.append("status", "ACTIVE");
       queryParams.append("page", pageNumber.toString());
-      queryParams.append("limit", "10");
+      queryParams.append("limit", "20"); // Povećano za glađe iskustvo
 
       if (debouncedSearchQuery) {
         queryParams.append("query", debouncedSearchQuery);
@@ -85,30 +103,52 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
         setResidences(prev => [...prev, ...data.data]);
       }
       
-      setHasMore(data.data.length === 10);
+      setHasMore(data.data.length === 20); // Prilagođeno novom limitu
     } catch (error) {
       console.error("Error fetching residences:", error);
       toast.error("Failed to load residences");
     } finally {
       setLoading(false);
+      isLoadingRef.current = false;
     }
-  };
+  }, [category, debouncedSearchQuery]);
 
+  // Inicijalno učitavanje i pretraga
   useEffect(() => {
     if (isOpen) {
       setPage(1);
       setResidences([]);
       fetchResidences(1, true);
     }
-  }, [isOpen, debouncedSearchQuery]);
+  }, [isOpen, debouncedSearchQuery, fetchResidences]);
 
+  // Učitavanje na scroll
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !loading && hasMore) {
-      setPage(prev => prev + 1);
-      fetchResidences(page + 1);
+    if (scrollHeight - scrollTop <= clientHeight * 1.2 && !isLoadingRef.current && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchResidences(nextPage);
     }
-  }, [loading, hasMore, page]);
+  }, [fetchResidences, hasMore, page]);
+
+  // Učitavanje kada je element vidljiv
+  useEffect(() => {
+    if (inView && hasMore && !isLoadingRef.current) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchResidences(nextPage);
+    }
+  }, [inView, hasMore, fetchResidences, page]);
+
+  // Dugme za učitavanje više
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingRef.current && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchResidences(nextPage);
+    }
+  }, [fetchResidences, hasMore, page]);
 
   const handleAddResidences = async () => {
     try {
@@ -151,6 +191,23 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
     );
   };
 
+  // Brza funkcija za selekciju svih prikazanih rezidencija
+  const toggleAllResidences = (checked: boolean) => {
+    if (checked) {
+      // Izbegavamo duplikate
+      const allIds = [...new Set([...selectedResidences, ...residences.map(r => r.id)])];
+      setSelectedResidences(allIds);
+    } else {
+      // Uklanjamo samo trenutno prikazane
+      const displayedIds = residences.map(r => r.id);
+      setSelectedResidences(prev => prev.filter(id => !displayedIds.includes(id)));
+    }
+  };
+
+  // Računamo da li su svi trenutni elementi selektovani
+  const areAllCurrentSelected = residences.length > 0 && 
+    residences.every(residence => selectedResidences.includes(residence.id));
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl min-w-[800px]">
@@ -184,20 +241,18 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
             </Button>
           </div>
 
-          <div className="border rounded-md max-h-[500px] overflow-auto" onScroll={handleScroll}>
+          <div 
+            className="border rounded-md max-h-[500px] overflow-auto" 
+            onScroll={handleScroll}
+            ref={tableContainerRef}
+          >
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
                   <TableHead className="w-[50px]">
                     <Checkbox
-                      checked={selectedResidences.length === residences.length && residences.length > 0}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedResidences(residences.map((r) => r.id));
-                        } else {
-                          setSelectedResidences([]);
-                        }
-                      }}
+                      checked={areAllCurrentSelected}
+                      onCheckedChange={toggleAllResidences}
                     />
                   </TableHead>
                   <TableHead>Name</TableHead>
@@ -217,22 +272,45 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
                     </TableCell>
                   </TableRow>
                 ) : (
-                  residences.map((residence) => (
-                    <TableRow key={residence.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedResidences.includes(residence.id)}
-                          onCheckedChange={() => toggleResidenceSelection(residence.id)}
-                        />
-                      </TableCell>
-                      <TableCell>{residence.name}</TableCell>
-                    </TableRow>
-                  ))
+                  <>
+                    {residences.map((residence) => (
+                      <TableRow key={residence.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedResidences.includes(residence.id)}
+                            onCheckedChange={() => toggleResidenceSelection(residence.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="flex flex-row justify-between">
+                          <span>{residence.name}</span>
+                          <span className="text-xs text-muted-foreground">{residence.city?.name} - {residence.country?.name}</span></TableCell>
+                      </TableRow>
+                    ))}
+                  </>
                 )}
-                {loading && page > 1 && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-4">
-                      <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                
+                {/* Referenca za IntersectionObserver */}
+                {hasMore && (
+                  <TableRow ref={loadMoreRef}>
+                    <TableCell colSpan={4} className="text-center py-2">
+                      {loading ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-xs text-muted-foreground">Loading more residences...</span>
+                        </div>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleLoadMore}
+                          className="mx-auto flex items-center gap-1"
+                        >
+                          Load More
+                          <span className="text-xs text-muted-foreground ml-1">
+                            ({residences.length} loaded)
+                          </span>
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
@@ -243,4 +321,4 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess }: AddR
       </DialogContent>
     </Dialog>
   );
-} 
+}

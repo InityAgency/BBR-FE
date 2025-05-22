@@ -91,7 +91,7 @@ export default function ResidencesTab({ categoryId }: { categoryId: string }) {
     try {
       setLoading(true);
       const res = await fetch(
-        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${categoryId}/residences?page=${page}&limit=10`,
+        `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${categoryId}/residences?page=${page}&limit=12`,
         { credentials: "include", cache: "no-store" }
       );
       if (!res.ok) throw new Error();
@@ -148,12 +148,18 @@ export default function ResidencesTab({ categoryId }: { categoryId: string }) {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="relative w-16 h-12 rounded-md overflow-hidden border">
-                      <Image 
-                        src={`${API_BASE_URL}/api/${API_VERSION}/media/${residence.featuredImageId}/content`} 
-                        alt={residence.name} 
-                        fill 
-                        className="object-cover"
-                      />
+                      {residence.featuredImageId ? (
+                        <Image 
+                          src={`${API_BASE_URL}/api/${API_VERSION}/media/${residence.featuredImageId}/content`} 
+                          alt={residence.name} 
+                          fill 
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-12 rounded-md overflow-hidden border bg-muted/20 flex items-center justify-center">
+                          {residence.name.charAt(0)}
+                        </div>
+                      )}
                     </div>
                     <span className="font-medium">{residence.name}</span>
                   </div>
