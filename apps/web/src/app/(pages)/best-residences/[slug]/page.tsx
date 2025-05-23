@@ -344,7 +344,7 @@ export default function CategoryPage() {
 
             {/* Residences Section */}
             <SectionLayout>
-                <div className="w-full flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto">
+                <div className="w-full flex flex-col gap-6 xl:max-w-[1600px] mx-auto">
                     {residencesLoading ? (
                         // Residences loading skeleton
                         [1, 2, 3, 4, 5].map((i) => (
