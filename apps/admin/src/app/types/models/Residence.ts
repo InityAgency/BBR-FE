@@ -1,5 +1,35 @@
 export type ResidenceStatus = "DRAFT" | "ACTIVE" | "DELETED" | "PENDING";
 
+export interface KeyFeature {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Amenity {
+  id: string;
+  name: string;
+  description: string;
+  icon?: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  };
+  featuredImage?: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
 export interface Country {
   id: string;
   name: string;
@@ -27,13 +57,14 @@ export interface City {
   yCoordinate: string;
   createdAt: string;
   updatedAt: string;
-  deletedAt: string | null;
   countryId: string;
+  deletedAt: string | null;
 }
 
 export interface Brand {
   id: string;
   name: string;
+  slug: string;
   description: string;
   status: string;
   createdAt: string;
@@ -50,35 +81,54 @@ export interface Brand {
 export interface Residence {
   id: string;
   name: string;
-  status: ResidenceStatus;
+  slug: string;
+  status: string;
   developmentStatus: string;
   subtitle: string;
   description: string;
-  budgetStartRange: number;
-  budgetEndRange: number;
+  budgetStartRange: string;
+  budgetEndRange: string;
   address: string;
-  latitude: string;
-  longitude: string;
+  latitude: number;
+  longitude: number;
   country: Country;
   city: City;
   createdAt: string;
   updatedAt: string;
-  rentalPotential: number | null;
+  rentalPotential: string;
   websiteUrl: string;
-  yearBuilt: number | null;
-  floorSqft: number | null;
-  staffRatio: number | null;
-  avgPricePerUnit: number | null;
-  avgPricePerSqft: number | null;
+  yearBuilt: string;
+  floorSqft: string;
+  staffRatio: number;
+  avgPricePerUnit: string;
+  avgPricePerSqft: string;
   petFriendly: boolean;
   disabledFriendly: boolean;
   videoTourUrl: string | null;
   videoTour: string | null;
-  featuredImage: string | null;
-  keyFeatures: string[];
-  brand: Brand;
+  featuredImage?: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  };
+  keyFeatures: KeyFeature[];
+  brand: Brand | null;
   units: any[];
-  amenities: any[];
+  amenities: Amenity[];
   company: any | null;
-  mainGallery: any[];
+  mainGallery: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  }[];
+  secondaryGallery: any[];
+  highlightedAmenities: {
+    amenity: Amenity;
+    order: number;
+  }[];
+  totalScores: any[];
 }

@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RankingCategorySkeleton } from "@/components/admin/RankingCategories/Skeleton/RankingCategorySkeleton";
 import { SingleRankingCategoryApiResponse } from "@/app/types/models/RankingCategory";
 import { apiToFormRankingCategory } from "@/lib/utils/formMapping";
+import { CriteriaWeight } from "@/components/admin/RankingCategory/Forms/RankingCriteriaWeights";
 
 async function getRankingCategory(id: string) {
     try {
@@ -37,9 +38,10 @@ async function getRankingCategory(id: string) {
 export default async function EditRankingCategoryPage({
     params,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }>; 
 }) {
-    const { rankingCategory, error } = await getRankingCategory(params.id);
+    const { id } = await params; 
+    const { rankingCategory, error } = await getRankingCategory(id);
 
     if (error || !rankingCategory) {
         return (
@@ -55,20 +57,47 @@ export default async function EditRankingCategoryPage({
         )
     }
 
-    // Konvertuj API podatke u format koji očekuje forma
+    // Koristimo postojeću apiToFormRankingCategory funkciju za mapiranje
     const formData = apiToFormRankingCategory(rankingCategory);
+
+    // Map existing criteria weights to the format expected by RankingCriteriaWeights
+    const existingCriteriaWeights: CriteriaWeight[] = (rankingCategory.rankingCriteria || []).map((criteria: { id: any; weight: any; name: any; }) => ({
+        rankingCriteriaId: criteria.id,
+        weight: criteria.weight,
+        name: criteria.name,
+    }));
+
+    // Add criteria weights to form data
+    const formDataWithCriteria = {
+        ...formData,
+        criteriaWeights: existingCriteriaWeights,
+    };
 
     return (
         <AdminLayout>
             <Suspense fallback={<RankingCategorySkeleton />}>
-                <RankingCategoryForm 
-                    initialData={{
-                        ...formData,
-                        featuredImageId: formData.featuredImageId as string | undefined
-                    }} 
+                <RankingCriteriaFormWithData 
+                    initialData={formDataWithCriteria}
                     isEditing={true} 
                 />
             </Suspense>
         </AdminLayout>
-    )
+    );
+}
+
+// Wrapper component to handle the criteria weights initialization
+function RankingCriteriaFormWithData({ 
+    initialData, 
+    isEditing 
+}: { 
+    initialData: any;
+    isEditing: boolean;
+}) {
+    return (
+        <RankingCategoryForm 
+            initialData={initialData}
+            isEditing={isEditing}
+            initialCriteriaWeights={initialData.criteriaWeights || []}
+        />
+    );
 }

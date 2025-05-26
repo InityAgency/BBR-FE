@@ -15,8 +15,8 @@ export function BrandCard({ brand }: { brand: any }) {
       href={`/brands/${brand.slug}`}
       className="block group"
     >
-      <div className="flex flex-col gap-4 p-6 rounded-xl brand-card relative transition-transform duration-300 ease-in-out transform hover:-translate-y-2">
-        <div className="bg-secondary rounded-xl p-6 transition-shadow duration-300 ease-in-out group-hover:shadow-xl">
+      <div className="flex flex-col gap-4 p-6 rounded-xl brand-card relative transition-transform duration-300 ease-in-out transform hover:-translate-y-2 h-full">
+        <div className="bg-secondary rounded-xl p-6 transition-shadow duration-300 ease-in-out group-hover:shadow-xl h-full">
           <div className="relative w-full aspect-square rounded-lg overflow-hidden brand-card-image">
               {!imageError ? (
               <Image

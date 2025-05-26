@@ -6,6 +6,7 @@ import Notifications from "@/app/(pages)/buyer/(panel)/notifications/page";
 import Security from "@/app/(pages)/buyer/(panel)/security/page";
 import PersonalInformation from "@/app/(pages)/buyer/(panel)/personal-information/page";
 import CompanyInformation from "@/components/web/Panel/Developer/Forms/CompanyInformation/CompanyInformation";
+import PersonalInformationDeveloper from "@/components/web/Panel/Developer/Forms/PersonalInformationDeveloper";
 export default function DeveloperSettingsPage() {
     return (
         <div className="w-full py-8 xl:max-w-2xl space-y-6">
@@ -29,6 +30,7 @@ export default function DeveloperSettingsPage() {
                 </TabsContent>
 
                 <TabsContent value="user">
+                    <PersonalInformationDeveloper />
                 </TabsContent>
 
                 <TabsContent value="notifications">

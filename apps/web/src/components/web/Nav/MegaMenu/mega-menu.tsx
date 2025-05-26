@@ -26,21 +26,23 @@ export function MegaMenu() {
 
   const pathname = usePathname();
 
-  // Učitavanje gradova iz API-ja
+  // Učitavanje podataka iz API-ja
   useEffect(() => {
-    async function loadCities() {
+    async function loadNavigationData() {
       try {
         setIsLoading(true);
         const updatedNavData = await getNavigationDataWithCities();
         setNavData(updatedNavData);
       } catch (error) {
-        console.error("Failed to load cities:", error);
+        console.error("Failed to load navigation data:", error);
+        // U slučaju greške, koristi osnovne podatke
+        setNavData(navigationData);
       } finally {
         setIsLoading(false);
       }
     }
 
-    loadCities();
+    loadNavigationData();
   }, []);
 
   // Close menu when clicking outside
@@ -101,20 +103,7 @@ export function MegaMenu() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex flex-row gap-8 items-center">
-          <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                    <span>Best Residences</span>
-                    <Lock className="w-4 h-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Coming Soon</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {Object.keys(navData).map((menuName) => (
+            {!isLoading && Object.keys(navData).map((menuName) => (
               <div
                 key={menuName}
                 className="relative group"

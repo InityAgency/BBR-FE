@@ -17,7 +17,7 @@ export default function ResidencesSlider() {
       try {
         setLoading(true);
         setError(false);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/residences?sortBy=createdAt&sortOrder=desc`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?sortBy=createdAt&sortOrder=desc`);
         const data = await response.json();
         setResidences(data.data || []);
       } catch (e) {

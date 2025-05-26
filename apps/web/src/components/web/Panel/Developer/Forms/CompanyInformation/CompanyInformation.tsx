@@ -105,15 +105,16 @@ export default function CompanyInformation() {
                     
                     form.reset({
                         address: companyData.address || "",
-                        phoneNumber: companyData.phone_number || "",
+                        // Koristimo phoneNumber iz response-a (čak i ako je null ili undefined)
+                        phoneNumber: companyData.phoneNumber || "",
                         website: companyData.website || "",
                     });
                     
                     // Postavi postojeći logo ako postoji
-                    if (companyData.image_id) {
+                    if (companyData.image && companyData.image.id) {
                         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
                         const apiVersion = process.env.NEXT_PUBLIC_API_VERSION;
-                        setExistingLogo(`${baseUrl}/api/${apiVersion}/media/${companyData.image_id}/content`);
+                        setExistingLogo(`${baseUrl}/api/${apiVersion}/media/${companyData.image.id}/content`);
                     }
                 } else {
                     console.error('No company data in response:', response);
@@ -148,19 +149,21 @@ export default function CompanyInformation() {
                 }
             }
 
-            // Koristi snake_case za backend (usklađeno s API odgovorom)
+            // Pripremi podatke u formatu koji očekuje API
             const companyData = {
                 address: data.address,
-                phoneNumber: data.phoneNumber,
+                phoneNumber: data.phoneNumber, // Koristimo phoneNumber umesto phone_number
                 website: data.website || undefined,
             };
             
             // Dodaj image_id samo ako je nova slika postavljena
             if (imageId) {
-                (companyData as any).image_id = imageId;
+                // Server očekuje image: { id: 'image_id' } format
+                (companyData as any).image = { id: imageId };
             }
 
             await apiRequest('companies/me', 'PUT', companyData);
+            
             // Ažuriraj prikaz loga ako je postavljen novi
             if (imageId) {
                 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -179,6 +182,8 @@ export default function CompanyInformation() {
 
     const handleRemoveLogo = () => {
         setExistingLogo(null);
+        // Kada korisnik ukloni logo, treba postaviti image na null
+        // Ovo će se poslati u API samo ako korisnik klikne Save Changes
     };
 
     return (

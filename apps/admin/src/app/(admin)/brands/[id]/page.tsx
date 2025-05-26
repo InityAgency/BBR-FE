@@ -190,7 +190,8 @@ export default function BrandsSingle() {
   );
   
   const renderResidencesTab = () => (
-    <ResidencesTable />
+    // <ResidencesTable />
+    <></>
   );
 
   return (

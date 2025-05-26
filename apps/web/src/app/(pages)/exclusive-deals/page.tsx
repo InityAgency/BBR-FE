@@ -28,6 +28,8 @@ import {
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation"
 import Link from "next/link";
 import Image from "next/image";
+import { RequestInformationModal } from "@/components/web/Modals/RequestInformationModal";
+
 export default function ExclusiveDealsPage() {
   const [units, setUnits] = useState<Unit[]>([])
   const [unitTypes, setUnitTypes] = useState<UnitType[]>([])
@@ -40,6 +42,8 @@ export default function ExclusiveDealsPage() {
   const [unitTypeId, setUnitTypeId] = useState<string>("")
   const [filtersVisible, setFiltersVisible] = useState(false)
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
+  const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
   const debouncedSearch = useDebounce(search, 300)
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -528,7 +532,14 @@ export default function ExclusiveDealsPage() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mt-4">
                   {units.map((unit) => (
-                    <UnitCard key={unit.id} unit={unit} />
+                    <UnitCard 
+                      key={unit.id} 
+                      unit={unit} 
+                      onRequestInfo={(unit) => {
+                        setSelectedUnit(unit);
+                        setIsRequestInfoModalOpen(true);
+                      }}
+                    />
                   ))}
                 </div>
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
@@ -593,6 +604,17 @@ export default function ExclusiveDealsPage() {
         </SectionLayout>
       </section>
       <NewsletterBlock />
+      <RequestInformationModal 
+        isOpen={isRequestInfoModalOpen}
+        onClose={() => {
+          setIsRequestInfoModalOpen(false);
+          setSelectedUnit(null);
+        }}
+        entityId={selectedUnit?.id} 
+        type="MORE_INFORMATION" 
+        buttonText="Request More Information"
+        customTitle={selectedUnit ? `Would you like to know more about ${selectedUnit.name}?` : undefined}
+      />
     </>
   )
 }

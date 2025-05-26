@@ -22,6 +22,7 @@ interface UseTableProps<TData> {
   initialPageSize?: number;
   manualPagination?: boolean;
   pageCount?: number;
+  enableSorting?: boolean; // Add enableSorting option
 }
 
 export function useTable<TData>({
@@ -32,6 +33,7 @@ export function useTable<TData>({
   initialPageSize = 10,
   manualPagination = false,
   pageCount = 0,
+  enableSorting = true, // Default to true for backwards compatibility
 }: UseTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -46,12 +48,14 @@ export function useTable<TData>({
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // Only include getSortedRowModel if sorting is enabled
+    ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     manualPagination,
     pageCount,
+    enableSorting, // Pass enableSorting to useReactTable
     state: {
       sorting,
       columnFilters,

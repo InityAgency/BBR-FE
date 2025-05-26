@@ -1,55 +1,4 @@
-// Funkcija za učitavanje kontinenata
-async function fetchContinents(): Promise<ContinentApiResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
-  const apiUrl = `${baseUrl}/api/${apiVersion}/continents`;
-  
-  console.log(`Fetching continents from: ${apiUrl}`);
-  
-  const response = await fetch(apiUrl, {
-    cache: 'no-store', // Osigurava svež podatak
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Error fetching continents: ${response.status}`);
-  }
-  
-  return response.json();
-}
-
-// Funkcija za dobijanje kontinenata
-export async function getContinents(): Promise<MenuItem[]> {
-  try {
-    // Provera keša
-    const cachedContinents = getCachedData('continentsCache');
-    if (cachedContinents) {
-      console.log(`Returning ${cachedContinents.length} continents from cache`);
-      return cachedContinents;
-    }
-
-    // Učitaj kontinente
-    const continentsResponse = await fetchContinents();
-    const continents: Continent[] = continentsResponse.data;
-    
-    console.log(`Total continents collected: ${continents.length}`);
-    
-    // Transformacija u format za navigaciju
-    const continentMenuItems = continents
-      .map((continent) => ({
-        label: continent.name,
-        href: `/residences/continent/${continent.slug || continent.name.toLowerCase().replace(/\s+/g, '-')}`
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-    
-    // Keširaj rezultate - pošto se kontinenti retko menjaju, možemo ih trajno keširati
-    cacheData('continentsCache', continentMenuItems);
-    
-    return continentMenuItems;
-  } catch (error) {
-    console.error("Failed to fetch continents:", error);
-    return []; // Vrati prazan niz u slučaju greške
-  }
-}import { City, CityApiResponse } from "@/types/city";
+import { City, CityApiResponse } from "@/types/city";
 import { Country, CountryApiResponse } from "@/types/country";
 import { Brand, BrandsResponse } from "@/types/brand";
 import { Continent, ContinentApiResponse } from "@/types/continent";
@@ -74,63 +23,41 @@ type NavigationData = {
   [key: string]: NavigationItem
 }
 
+// Tipovi za ranking kategorije
+interface RankingCategoryType {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface RankingCategory {
+  id: string;
+  name: string;
+  slug: string;
+  categoryTypeId: string;
+}
+
+interface RankingCategoryTypeResponse {
+  data: RankingCategoryType[];
+}
+
+interface RankingCategoryResponse {
+  data: RankingCategory[];
+  pagination: {
+    totalPages: number;
+    currentPage: number;
+    totalItems: number;
+  };
+}
+
 // Osnovni podaci navigacije bez gradova (biće dopunjeni dinamički)
 export const navigationData: NavigationData = {
-  // bestResidences: {
-  //   title: "Best Residences",
-  //   href: "/best-residences",
-  //   tabs: [
-  //     "Exclusive Locations",
-  //     "Property Features",
-  //     "Lifestyle Options",
-  //     "Investment Value",
-  //     "Special Amenities",
-  //     "Family Friendly",
-  //   ],
-  //   content: {
-  //     "Exclusive Locations": [
-  //       { label: "Best of Newest Branded Residences", href: "/best/newest" },
-  //       { label: "Best of Investment Opportunities", href: "/best/investment" },
-  //       { label: "Best of Pet-Friendly Residences", href: "/best/pet-friendly" },
-  //       { label: "Best of Beachfront Living", href: "/best/beachfront" },
-  //       { label: "Best of Golf Living", href: "/best/golf" },
-  //       { label: "Best of Emerging Markets", href: "/best/emerging-markets" },
-  //       { label: "Best of Best for Couples", href: "/best/couples" },
-  //       { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
-  //       { label: "Best of Best for Families", href: "/best/families" },
-  //       { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
-  //       { label: "Best for Working Professionals", href: "/best/working-professionals" },
-  //       { label: "Best for Retirement Havens", href: "/best/retirement" },
-  //     ],
-  //     "Property Features": [
-  //       { label: "Best Infinity Pools", href: "/best/infinity-pools" },
-  //       { label: "Best Architectural Design", href: "/best/architecture" },
-  //       { label: "Best Smart Home Technology", href: "/best/smart-home" },
-  //       { label: "Best Private Gardens", href: "/best/gardens" },
-  //     ],
-  //     "Lifestyle Options": [
-  //       { label: "Best for Yacht Club", href: "/best/yacht-club" },
-  //       { label: "Best for Equestrian", href: "/best/equestrian" },
-  //       { label: "Best of Ski Resort Living", href: "/best/ski-resort" },
-  //       { label: "Best of Cultural Hotspots", href: "/best/cultural-hotspots" },
-  //     ],
-  //     "Investment Value": [
-  //       { label: "Best ROI Properties", href: "/best/roi" },
-  //       { label: "Best Rental Income Potential", href: "/best/rental-income" },
-  //       { label: "Best Upcoming Areas", href: "/best/upcoming-areas" },
-  //     ],
-  //     "Special Amenities": [
-  //       { label: "Best of Urban High-Rise", href: "/best/urban-high-rise" },
-  //       { label: "Best for Working Professionals", href: "/best/working-professionals" },
-  //       { label: "Best for Retirement Havens", href: "/best/retirement" },
-  //     ],
-  //     "Family Friendly": [
-  //       { label: "Best for Schools", href: "/best/schools" },
-  //       { label: "Best for Multigenerational Living", href: "/best/multigenerational" },
-  //       { label: "Best Child-Friendly Communities", href: "/best/child-friendly" },
-  //     ],
-  //   },
-  // },
+  bestResidences: {
+    title: "Best Residences",
+    href: "/best-residences",
+    tabs: [], // Biće popunjeno dinamički
+    content: {} // Biće popunjeno dinamički
+  },
   allResidences: {
     title: "All Residences",
     href: "/residences",
@@ -240,13 +167,58 @@ export const navigationData: NavigationData = {
   },
 }
 
+// Funkcija za učitavanje kontinenata
+async function fetchContinents(): Promise<ContinentApiResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/continents`;
+  
+  const response = await fetch(apiUrl, {
+    cache: 'no-store', // Osigurava svež podatak
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Error fetching continents: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Funkcija za dobijanje kontinenata
+export async function getContinents(): Promise<MenuItem[]> {
+  try {
+    // Provera keša
+    const cachedContinents = getCachedData<MenuItem[]>('continentsCache');
+    if (cachedContinents) {
+      return cachedContinents;
+    }
+
+    // Učitaj kontinente
+    const continentsResponse = await fetchContinents();
+    const continents: Continent[] = continentsResponse.data;
+    
+    // Transformacija u format za navigaciju
+    const continentMenuItems = continents
+      .map((continent) => ({
+        label: continent.name,
+        href: `/residences/continent/${continent.slug || continent.name.toLowerCase().replace(/\s+/g, '-')}`
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    
+    // Keširaj rezultate - pošto se kontinenti retko menjaju, možemo ih trajno keširati
+    cacheData('continentsCache', continentMenuItems);
+    
+    return continentMenuItems;
+  } catch (error) {
+    return []; // Vrati prazan niz u slučaju greške
+  }
+}
+
 // Funkcija za učitavanje jedne stranice gradova
 async function fetchCitiesPage(page: number): Promise<CityApiResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
   const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
   const apiUrl = `${baseUrl}/api/${apiVersion}/public/cities?page=${page}`;
-  
-  console.log(`Fetching cities page ${page} from: ${apiUrl}`);
   
   const response = await fetch(apiUrl);
   
@@ -263,8 +235,6 @@ async function fetchCountriesPage(page: number): Promise<CountryApiResponse> {
   const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
   const apiUrl = `${baseUrl}/api/${apiVersion}/public/countries?page=${page}`;
   
-  console.log(`Fetching countries page ${page} from: ${apiUrl}`);
-  
   const response = await fetch(apiUrl);
   
   if (!response.ok) {
@@ -280,8 +250,6 @@ async function fetchBrandsPage(page: number): Promise<BrandsResponse> {
   const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
   const apiUrl = `${baseUrl}/api/${apiVersion}/public/brands?sortBy=name&sortOrder=asc&withResidences=true&page=${page}`;
   
-  console.log(`Fetching brands page ${page} from: ${apiUrl}`);
-  
   const response = await fetch(apiUrl, {
     cache: 'no-store', // Osigurava svež podatak
   });
@@ -293,21 +261,64 @@ async function fetchBrandsPage(page: number): Promise<BrandsResponse> {
   return response.json();
 }
 
+// Funkcija za učitavanje tipova ranking kategorija
+async function fetchRankingCategoryTypes(): Promise<RankingCategoryTypeResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const apiUrl = `${baseUrl}/api/${apiVersion}/ranking-category-types`;
+  
+  const response = await fetch(apiUrl, {
+    cache: 'no-store',
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Error fetching ranking category types: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Funkcija za učitavanje ranking kategorija za određeni tip (sa paginacijom)
+async function fetchRankingCategoriesForType(categoryTypeId: string): Promise<RankingCategory[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  let page = 1;
+  let allCategories: RankingCategory[] = [];
+  let totalPages = 1;
+
+  do {
+    const apiUrl = `${baseUrl}/api/${apiVersion}/ranking-categories?limit=50&categoryTypeId=${categoryTypeId}&page=${page}`;
+    const response = await fetch(apiUrl, { cache: 'no-store' });
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching ranking categories for type ${categoryTypeId}: ${response.status}`);
+    }
+    
+    const data: RankingCategoryResponse = await response.json();
+    
+    if (data.data) {
+      allCategories = [...allCategories, ...data.data];
+    }
+    
+    totalPages = data.pagination?.totalPages || 1;
+    page++;
+  } while (page <= totalPages);
+
+  return allCategories;
+}
+
 // Funkcija za dobijanje svih gradova
 export async function getCities(): Promise<MenuItem[]> {
   try {
     // Provera keša
-    const cachedCities = getCachedData('citiesCache');
+    const cachedCities = getCachedData<MenuItem[]>('citiesCache');
     if (cachedCities) {
-      console.log(`Returning ${cachedCities.length} cities from cache`);
       return cachedCities;
     }
 
     // Učitaj prvu stranicu da bismo saznali ukupan broj stranica
     const firstPageResponse = await fetchCitiesPage(1);
     const { totalPages } = firstPageResponse.pagination;
-    
-    console.log(`Total pages: ${totalPages}, first page has ${firstPageResponse.data.length} cities`);
     
     let allCities: City[] = [...firstPageResponse.data];
     
@@ -322,12 +333,9 @@ export async function getCities(): Promise<MenuItem[]> {
       
       // Dodaj gradove iz ostalih stranica
       remainingPagesResponses.forEach((response, index) => {
-        console.log(`Page ${index + 2} has ${response.data.length} cities`);
         allCities = [...allCities, ...response.data];
       });
     }
-    
-    console.log(`Total cities collected: ${allCities.length}`);
     
     // Transformacija u format za navigaciju i sortiranje po abecednom redu
     const cityMenuItems = allCities
@@ -342,7 +350,6 @@ export async function getCities(): Promise<MenuItem[]> {
     
     return cityMenuItems;
   } catch (error) {
-    console.error("Failed to fetch cities:", error);
     return []; // Vrati prazan niz u slučaju greške
   }
 }
@@ -351,17 +358,14 @@ export async function getCities(): Promise<MenuItem[]> {
 export async function getCountries(): Promise<MenuItem[]> {
   try {
     // Provera keša
-    const cachedCountries = getCachedData('countriesCache');
+    const cachedCountries = getCachedData<MenuItem[]>('countriesCache');
     if (cachedCountries) {
-      console.log(`Returning ${cachedCountries.length} countries from cache`);
       return cachedCountries;
     }
 
     // Učitaj prvu stranicu da bismo saznali ukupan broj stranica
     const firstPageResponse = await fetchCountriesPage(1);
     const { totalPages } = firstPageResponse.pagination;
-    
-    console.log(`Total pages: ${totalPages}, first page has ${firstPageResponse.data.length} countries`);
     
     let allCountries: Country[] = [...firstPageResponse.data];
     
@@ -376,12 +380,9 @@ export async function getCountries(): Promise<MenuItem[]> {
       
       // Dodaj države iz ostalih stranica
       remainingPagesResponses.forEach((response, index) => {
-        console.log(`Page ${index + 2} has ${response.data.length} countries`);
         allCountries = [...allCountries, ...response.data];
       });
     }
-    
-    console.log(`Total countries collected: ${allCountries.length}`);
     
     // Transformacija u format za navigaciju i sortiranje po abecednom redu
     const countryMenuItems = allCountries
@@ -396,7 +397,6 @@ export async function getCountries(): Promise<MenuItem[]> {
     
     return countryMenuItems;
   } catch (error) {
-    console.error("Failed to fetch countries:", error);
     return []; // Vrati prazan niz u slučaju greške
   }
 }
@@ -405,17 +405,14 @@ export async function getCountries(): Promise<MenuItem[]> {
 export async function getBrands(): Promise<MenuItem[]> {
   try {
     // Provera keša
-    const cachedBrands = getCachedData('brandsCache');
+    const cachedBrands = getCachedData<MenuItem[]>('brandsCache');
     if (cachedBrands) {
-      console.log(`Returning ${cachedBrands.length} brands from cache`);
       return cachedBrands;
     }
 
     // Učitaj prvu stranicu da bismo saznali ukupan broj stranica
     const firstPageResponse = await fetchBrandsPage(1);
     const { totalPages } = firstPageResponse.pagination;
-    
-    console.log(`Total brand pages: ${totalPages}, first page has ${firstPageResponse.data.length} brands`);
     
     let allBrands: Brand[] = [...firstPageResponse.data];
     
@@ -430,12 +427,9 @@ export async function getBrands(): Promise<MenuItem[]> {
       
       // Dodaj brendove iz ostalih stranica
       remainingPagesResponses.forEach((response, index) => {
-        console.log(`Brand page ${index + 2} has ${response.data.length} brands`);
         allBrands = [...allBrands, ...response.data];
       });
     }
-    
-    console.log(`Total brands collected: ${allBrands.length}`);
     
     // Transformacija svih brendova u format za navigaciju
     const brandMenuItems = allBrands
@@ -450,13 +444,47 @@ export async function getBrands(): Promise<MenuItem[]> {
     
     return brandMenuItems;
   } catch (error) {
-    console.error("Failed to fetch brands:", error);
     return []; // Vrati prazan niz u slučaju greške
   }
 }
 
+// Funkcija za dobijanje ranking kategorija organizovanih po tipovima
+export async function getRankingCategories(): Promise<{ [key: string]: MenuItem[] }> {
+  try {
+    // Keširamo samo tipove kategorija, ne i same kategorije
+    let categoryTypes: RankingCategoryType[];
+    
+    const cachedCategoryTypes = getCachedData<RankingCategoryType[]>('rankingCategoryTypesCache');
+    if (cachedCategoryTypes) {
+      categoryTypes = cachedCategoryTypes;
+    } else {
+      // Učitaj tipove ranking kategorija i keširaj ih
+      const categoryTypesResponse = await fetchRankingCategoryTypes();
+      categoryTypes = categoryTypesResponse.data;
+      cacheData('rankingCategoryTypesCache', categoryTypes);
+    }
+
+    const categoriesByType: { [key: string]: MenuItem[] } = {};
+    
+    // Za svaki tip kategorije, uvek učitaj sveže kategorije (bez keša)
+    for (const type of categoryTypes) {
+      const categories = await fetchRankingCategoriesForType(type.id);
+      
+      categoriesByType[type.name] = categories.map(category => ({
+        label: category.name,
+        href: `/best-residences/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`
+      })).sort((a, b) => a.label.localeCompare(b.label));
+    }
+    
+    return categoriesByType;
+  } catch (error) {
+    console.error('Error loading ranking categories:', error);
+    return {}; // Vrati prazan objekat u slučaju greške
+  }
+}
+
 // Funkcije za keš
-function getCachedData(cacheKey: string): MenuItem[] | null {
+function getCachedData<T>(cacheKey: string): T | null {
   if (typeof window === 'undefined') return null;
   
   try {
@@ -475,12 +503,11 @@ function getCachedData(cacheKey: string): MenuItem[] | null {
     
     return items;
   } catch (error) {
-    console.error(`Error reading from ${cacheKey}:`, error);
     return null;
   }
 }
 
-function cacheData(cacheKey: string, items: MenuItem[]): void {
+function cacheData<T>(cacheKey: string, items: T): void {
   if (typeof window === 'undefined') return;
   
   try {
@@ -490,34 +517,38 @@ function cacheData(cacheKey: string, items: MenuItem[]): void {
     };
     
     localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-    console.log(`Cached ${items.length} items in ${cacheKey}`);
   } catch (error) {
-    console.error(`Error writing to ${cacheKey}:`, error);
+    console.error('Error caching data:', error);
   }
 }
 
-// Funkcija za dinamičko popunjavanje gradova, država, brendova i kontinenata u navigationData
+// Modifikovana funkcija za dinamičko popunjavanje podataka
 export async function getNavigationDataWithCities(): Promise<NavigationData> {
   // Pravimo kopiju osnovnih podataka
   const data = JSON.parse(JSON.stringify(navigationData));
   
-  // Dobavimo gradove, države, brendove i kontinente
-  const [cities, countries, brands, continents] = await Promise.all([
+  // Dobavimo sve potrebne podatke
+  const [cities, countries, brands, continents, rankingCategories] = await Promise.all([
     getCities(),
     getCountries(),
     getBrands(),
-    getContinents()
+    getContinents(),
+    getRankingCategories()
   ]);
-  
-  console.log(`Adding ${cities.length} cities, ${countries.length} countries, ${brands.length} brands, and ${continents.length} continents to navigation data`);
   
   // Postavimo gradove, države, brendove i kontinente u kopiju
   data.allResidences.content.City = cities;
   data.allResidences.content.Country = countries;
   data.allResidences.content.Brands = brands;
-  
-  // Postavimo kontinente u Geographical Area sekciju
   data.allResidences.content["Geographical Area"] = continents;
+
+  // Ažuriramo Best Residences sekciju sa ranking kategorijama
+  if (data.bestResidences) {
+    // Postavimo tabove na osnovu tipova kategorija (alfabetski sortiran)
+    data.bestResidences.tabs = Object.keys(rankingCategories).sort();
+    // Postavimo sadržaj za svaki tab
+    data.bestResidences.content = rankingCategories;
+  }
 
   return data;
 }

@@ -293,6 +293,7 @@ export default function ResidencePage() {
                 entityId={residence.id} 
                 type="MORE_INFORMATION" 
                 buttonText="Request More Information"
+                customTitle={`Would you like to know more about ${residence.name}?`}
             />
             
             {/* Modal za Claim Profile */}

@@ -23,11 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { AddResidenceModal } from "../RankingCategory/Modals/AddResidenceModal";
 
 interface RankingCategoryHeaderProps {
   category: RankingCategory;
   onStatusChange: (newStatus: RankingCategoryStatus) => Promise<void>;
   onDelete: () => Promise<void>;
+  onEditSuccess?: () => Promise<void>;
 }
 
 const getStatusBadgeStyle = (status: RankingCategoryStatus) => {
@@ -47,9 +49,11 @@ export function RankingCategoryHeader({
   category,
   onStatusChange,
   onDelete,
+  onEditSuccess,
 }: RankingCategoryHeaderProps) {
   const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAddResidenceModal, setShowAddResidenceModal] = useState(false);
 
   const handleStatusChange = async (value: string) => {
     // value će biti "ACTIVE", "DRAFT" ili "DELETED".
@@ -96,8 +100,10 @@ export function RankingCategoryHeader({
           <Trash2 className="h-4 w-4 mr-2" />
           Delete
         </Button>
-        {/* Dodatni taster – inicijalno disabled */}
-        <Button variant="default" disabled>
+        <Button 
+          variant="default" 
+          onClick={() => setShowAddResidenceModal(true)}
+        >
           <Plus className="h-4 w-4" />
           Add residence to ranking
         </Button>
@@ -139,6 +145,14 @@ export function RankingCategoryHeader({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AddResidenceModal
+        isOpen={showAddResidenceModal}
+        onClose={() => setShowAddResidenceModal(false)}
+        category={category}
+        onSuccess={onEditSuccess}
+        rankingCategoryId={category.id}
+      />
     </>
   );
 }

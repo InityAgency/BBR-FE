@@ -50,13 +50,13 @@ export default function Security() {
         
         try {
             // 1. Prvo proverimo trenutnu lozinku
-            const verifyCurrentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/verify-password`, {
+            const verifyCurrentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/users/verify-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    password: data.currentPassword,
+                    currentPassword: data.currentPassword,
                 }),
                 credentials: 'include',
             });
@@ -66,8 +66,8 @@ export default function Security() {
             }
 
             // 2. Ako je trenutna lozinka ispravna, direktno promenimo lozinku
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/change-password`, {
-                method: 'POST',
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/users/change-password`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },

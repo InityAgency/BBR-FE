@@ -1,4 +1,4 @@
-// ResidenceForm.tsx - ispravljena verzija
+// ResidenceForm.tsx - refaktorisana verzija bez duplirane logike
 
 "use client";
 
@@ -58,6 +58,7 @@ import {
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MultiSelect from "../../Forms/MultiSelect";
+import { CountryAndCity } from "@/components/admin/Forms/CountryAndCity";
 
 interface ResidenceFormProps {
   initialData?: Partial<ResidenceFormValues>;
@@ -73,19 +74,6 @@ interface Brand {
     id: string;
     originalFileName: string;
   };
-}
-
-interface Country {
-  id: string;
-  name: string;
-  code: string;
-  flag: string;
-}
-
-interface City {
-  id: string;
-  name: string;
-  countryId: string;
 }
 
 interface LocalEditModeImage {
@@ -131,24 +119,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   const searchInputRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // State za države
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [countrySearchQuery, setCountrySearchQuery] = useState("");
-  const [isLoadingCountries, setIsLoadingCountries] = useState(false);
-  const [countryCurrentPage, setCountryCurrentPage] = useState(1);
-  const [hasMoreCountries, setHasMoreCountries] = useState(true);
-  const countrySearchInputRef = useRef<HTMLInputElement>(null);
-  const debouncedCountrySearch = useDebounce(countrySearchQuery, 300);
-
-  // State za gradove
-  const [cities, setCities] = useState<City[]>([]);
-  const [citySearchQuery, setCitySearchQuery] = useState("");
-  const [isLoadingCities, setIsLoadingCities] = useState(false);
-  const [cityCurrentPage, setCityCurrentPage] = useState(1);
-  const [hasMoreCities, setHasMoreCities] = useState(true);
-  const citySearchInputRef = useRef<HTMLInputElement>(null);
-  const debouncedCitySearch = useDebounce(citySearchQuery, 300);
-
   // State za key features
   const [keyFeatures, setKeyFeatures] = useState<KeyFeature[]>([]);
   const [isLoadingKeyFeatures, setIsLoadingKeyFeatures] = useState(false);
@@ -160,7 +130,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   const [isLoadingAmenities, setIsLoadingAmenities] = useState(false);
 
   const [isLoadingResidence, setIsLoadingResidence] = useState(false);
-
 
   const form = useForm<ResidenceFormValues>({
     resolver: zodResolver(residenceSchema),
@@ -191,25 +160,9 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
     return form.formState.isDirty && !form.formState.isValidating && Object.keys(form.formState.errors).length === 0;
   }, [form.formState]);
 
-  // Funkcija za učitavanje brendova (sada deklarisana pre nego što se koristi)
+  // Funkcija za učitavanje brendova
   const fetchBrands = useCallback(async (page: number, search: string = "", reset: boolean = false) => {
-    const cacheKey = `brands-${page}-${search}`;
-    const cacheExpiry = 5 * 60 * 1000; // 5 minuta
-
     try {
-      // Prvo proverimo keš
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp, hasMore, currentPage } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheExpiry) {
-          setBrands(prev => reset ? data : [...prev, ...data]);
-          setHasMore(hasMore);
-          setCurrentPage(currentPage);
-          return;
-        }
-        localStorage.removeItem(cacheKey);
-      }
-
       setIsLoadingBrands(true);
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/brands?page=${page}&limit=100${search ? `&query=${search}` : ""}`,
@@ -223,15 +176,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
       }
 
       const data = await response.json();
-
-      // Keširamo rezultate
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: data.data,
-        hasMore: data.pagination.page < data.pagination.totalPages,
-        currentPage: data.pagination.page,
-        timestamp: Date.now()
-      }));
-
       setBrands(prev => reset ? data.data : [...prev, ...data.data]);
       setHasMore(data.pagination.page < data.pagination.totalPages);
       setCurrentPage(data.pagination.page);
@@ -242,189 +186,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
       setIsLoadingBrands(false);
     }
   }, []);
-
-  // Funkcija za učitavanje država (sada deklarisana pre nego što se koristi)
-  const fetchCountries = useCallback(async (page: number, search: string = "", reset: boolean = false) => {
-    const cacheKey = `countries-${page}-${search}`;
-    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 sata
-
-    try {
-      // Prvo proverimo keš
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp, hasMore, currentPage } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheExpiry) {
-          setCountries(prev => reset ? data : [...prev, ...data]);
-          setHasMoreCountries(hasMore);
-          setCountryCurrentPage(currentPage);
-          return;
-        }
-        localStorage.removeItem(cacheKey);
-      }
-
-      setIsLoadingCountries(true);
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/countries?page=${page}&limit=100${search ? `&query=${search}` : ""}`,
-        {
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch countries");
-      }
-
-      const data = await response.json();
-
-      // Keširamo rezultate
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: data.data,
-        hasMore: data.pagination.page < data.pagination.totalPages,
-        currentPage: data.pagination.page,
-        timestamp: Date.now()
-      }));
-
-      setCountries(prev => reset ? data.data : [...prev, ...data.data]);
-      setHasMoreCountries(data.pagination.page < data.pagination.totalPages);
-      setCountryCurrentPage(data.pagination.page);
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-      toast.error("Failed to load countries");
-    } finally {
-      setIsLoadingCountries(false);
-    }
-  }, []);
-
-  // Funkcija za učitavanje gradova (sada deklarisana pre nego što se koristi)
-  const fetchCities = useCallback(async (page: number, search: string = "", reset: boolean = false) => {
-    const countryId = form.watch("countryId");
-    if (!countryId) return;
-
-    const cacheKey = `cities-${countryId}-${page}-${search}`;
-    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 sata
-
-    try {
-      // Prvo proverimo keš
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp, hasMore, currentPage } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheExpiry) {
-          setCities(prev => reset ? data : [...prev, ...data]);
-          setHasMoreCities(hasMore);
-          setCityCurrentPage(currentPage);
-          return;
-        }
-        localStorage.removeItem(cacheKey);
-      }
-
-      setIsLoadingCities(true);
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/cities?page=${page}&limit=100${search ? `&query=${search}` : ""}&countryId=${countryId}`,
-        {
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cities");
-      }
-
-      const data = await response.json();
-
-      // Keširamo rezultate
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: data.data,
-        hasMore: data.pagination.page < data.pagination.totalPages,
-        currentPage: data.pagination.page,
-        timestamp: Date.now()
-      }));
-
-      setCities(prev => reset ? data.data : [...prev, ...data.data]);
-      setHasMoreCities(data.pagination.page < data.pagination.totalPages);
-      setCityCurrentPage(data.pagination.page);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-      toast.error("Failed to load cities");
-    } finally {
-      setIsLoadingCities(false);
-    }
-  }, [form]);
-
-
-
-  <FormField
-    control={form.control}
-    name="cityId"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>
-          City <span className="text-destructive">*</span>
-        </FormLabel>
-        <Select
-          onValueChange={field.onChange}
-          value={field.value || ""} // Osiguravamo da nikada nemamo null vrednost
-          disabled={!form.watch("countryId")}
-          onOpenChange={(open) => {
-            if (open && citySearchInputRef.current) {
-              setTimeout(() => {
-                citySearchInputRef.current?.focus();
-              }, 100);
-            }
-          }}
-        >
-          <FormControl>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={form.watch("countryId") ? "Select a city" : "Please select a country first"} />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            <div className="px-2 py-2 sticky top-0 bg-background z-10">
-              <Input
-                ref={citySearchInputRef}
-                placeholder="Search cities..."
-                value={citySearchQuery || ""} // Osiguravamo da nikada nemamo null vrednost
-                onChange={(e) => setCitySearchQuery(e.target.value)}
-                className="h-8"
-                onKeyDown={(e) => e.stopPropagation()}
-              />
-            </div>
-            <div
-              className="max-h-[300px] overflow-y-auto"
-              onScroll={handleCityScroll}
-            >
-              {isLoadingCities && cities.length === 0 ? (
-                <div className="px-2 py-2 text-sm text-muted-foreground">
-                  Loading cities...
-                </div>
-              ) : cities.length === 0 ? (
-                <div className="px-2 py-2 text-sm text-muted-foreground">
-                  No cities found
-                </div>
-              ) : (
-                cities.map((city) => (
-                  <SelectItem
-                    key={city.id}
-                    value={city.id}
-                    className="cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{city.name}</span>
-                    </div>
-                  </SelectItem>
-                ))
-              )}
-              {isLoadingCities && cities.length > 0 && (
-                <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                  Loading more cities...
-                </div>
-              )}
-            </div>
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
 
   useEffect(() => {
     const fetchResidenceData = async () => {
@@ -444,7 +205,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
             const json = await response.json();
             const data = json.data;
 
-            console.log("Loaded residence data:", data); // Dodajemo logove za lakše debugiranje
+            console.log("Loaded residence data:", data);
 
             // 2. Učitavamo brendove paralelno
             let brandsPromise = Promise.resolve();
@@ -452,79 +213,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               brandsPromise = fetchBrands(1, "", true);
             }
 
-            // 3. Direktno dohvatamo podatke o državi ako postoji
-            let countryData = null;
-            if (data.country?.id) {
-              try {
-                const countryResponse = await fetch(
-                  `${API_BASE_URL}/api/v1/countries/${data.country.id}`,
-                  { credentials: "include" }
-                );
-
-                if (countryResponse.ok) {
-                  const countryJson = await countryResponse.json();
-                  countryData = countryJson.data;
-                  console.log("Directly fetched country data:", countryData);
-
-                  // Ručno dodajemo državu u listu
-                  const newCountry: Country = {
-                    id: data.country.id,
-                    name: data.country.name,
-                    code: data.country.code,
-                    flag: data.country.flag
-                  };
-
-                  // Direktno postavljamo državu u state
-                  setCountries(prev => {
-                    // Ako je već u listi, ne dodajemo je
-                    if (prev.some(c => c.id === newCountry.id)) {
-                      return prev;
-                    }
-                    return [...prev, newCountry];
-                  });
-                }
-              } catch (error) {
-                setIsLoadingResidence(false);
-                console.error("Error fetching country:", error);
-              }
-            }
-
-            // 4. Direktno dohvatamo podatke o gradu ako postoji
-            let cityData = null;
-            if (data.city?.id) {
-              try {
-                const cityResponse = await fetch(
-                  `${API_BASE_URL}/api/v1/cities/${data.city.id}`,
-                  { credentials: "include" }
-                );
-
-                if (cityResponse.ok) {
-                  const cityJson = await cityResponse.json();
-                  cityData = cityJson.data;
-                  console.log("Directly fetched city data:", cityData);
-
-                  // Ručno dodajemo grad u listu
-                  const newCity: City = {
-                    id: data.city.id,
-                    name: data.city.name,
-                    countryId: data.country.id
-                  };
-
-                  // Direktno postavljamo grad u state
-                  setCities(prev => {
-                    // Ako je već u listi, ne dodajemo ga
-                    if (prev.some(c => c.id === newCity.id)) {
-                      return prev;
-                    }
-                    return [...prev, newCity];
-                  });
-                }
-              } catch (error) {
-                console.error("Error fetching city:", error);
-              }
-            }
-
-            // 5. Učitaj galeriju slika
+            // 3. Učitaj galeriju slika
             const galleryImages: EditModeImage[] = [];
             if (data.mainGallery && data.mainGallery.length > 0) {
               data.mainGallery.forEach((img: any, index: number) => {
@@ -548,10 +237,10 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               }
             }
 
-            // 6. Čekamo da se svi podaci učitaju
+            // 4. Čekamo da se svi podaci učitaju
             await brandsPromise;
 
-            // 7. Resetujemo formu NAKON što smo učitali sve potrebno
+            // 5. Resetujemo formu NAKON što smo učitali sve potrebno
             form.reset({
               ...initialResidenceValues,
               name: data.name || "",
@@ -587,26 +276,12 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               keepDefaultValues: false,
             });
 
-            // 8. Dodatno, nakon reseta forme, ponovo postavljamo ove vrednosti da budemo sigurni
-            // da su pravilno postavljene
-            if (data.country?.id) {
-              console.log("Setting country value:", data.country.id);
-              form.setValue("countryId", data.country.id, { shouldValidate: true });
-            }
-
-            if (data.city?.id) {
-              // Malo odlažemo postavljanje grada da bi React stigao da renderuje komponentu
-              setTimeout(() => {
-                console.log("Setting city value:", data.city.id);
-                form.setValue("cityId", data.city.id, { shouldValidate: true });
-              }, 300);
-            }
-
             setIsLoadingResidence(false);
 
           } catch (error) {
             toast.error("Failed to load residence details");
             console.error("Error in fetchResidenceData:", error);
+            setIsLoadingResidence(false);
           }
         }
       }
@@ -640,80 +315,9 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
     }
   }, [currentPage, fetchBrands, hasMore, isLoadingBrands, searchQuery]);
 
-  // Učitaj države kada se komponenta mountuje
-  useEffect(() => {
-    fetchCountries(1, "", true);
-  }, [fetchCountries]);
-
-  // Učitaj države kada se pretraga promijeni
-  useEffect(() => {
-    if (debouncedCountrySearch) {
-      setCountryCurrentPage(1);
-      fetchCountries(1, debouncedCountrySearch, true);
-    }
-  }, [debouncedCountrySearch, fetchCountries]);
-
-  // Handler za scroll (infinite loading) za države
-  const handleCountryScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    if (
-      target.scrollHeight - target.scrollTop <= target.clientHeight + 20 &&
-      !isLoadingCountries &&
-      hasMoreCountries
-    ) {
-      fetchCountries(countryCurrentPage + 1, countrySearchQuery);
-    }
-  }, [countryCurrentPage, fetchCountries, hasMoreCountries, isLoadingCountries, countrySearchQuery]);
-
-  // Učitaj gradove kada se promijeni država
-  useEffect(() => {
-    const countryId = form.watch("countryId");
-    console.log("Country changed in useEffect:", countryId);
-
-    if (countryId) {
-      console.log("Clearing cities and fetching new ones for country:", countryId);
-      setCities([]);
-      setCityCurrentPage(1);
-      fetchCities(1, "", true);
-    }
-  }, [form.watch("countryId"), fetchCities]);
-
-  // Učitaj gradove kada se pretraga promijeni
-  useEffect(() => {
-    if (form.watch("countryId")) {
-      setCityCurrentPage(1);
-      fetchCities(1, debouncedCitySearch, true);
-    }
-  }, [debouncedCitySearch, fetchCities, form]);
-
-  // Handler za scroll (infinite loading) za gradove
-  const handleCityScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    if (
-      target.scrollHeight - target.scrollTop <= target.clientHeight + 20 &&
-      !isLoadingCities &&
-      hasMoreCities
-    ) {
-      fetchCities(cityCurrentPage + 1, citySearchQuery);
-    }
-  }, [cityCurrentPage, fetchCities, hasMoreCities, isLoadingCities, citySearchQuery]);
-
-  // Funkcija za dohvaćanje key features sa keširanjem
+  // Funkcija za dohvaćanje key features
   const fetchKeyFeatures = useCallback(async () => {
-    const cacheKey = 'residence-key-features';
-    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 sata
-
     try {
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheExpiry) {
-          setKeyFeatures(data);
-          return;
-        }
-        localStorage.removeItem(cacheKey);
-      }
-
       setIsLoadingKeyFeatures(true);
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/key-features?limit=100&page=1`,
@@ -724,12 +328,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
 
       const data = await response.json();
       const features = data.data;
-
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: features,
-        timestamp: Date.now()
-      }));
-
       setKeyFeatures(features);
     } catch (error) {
       console.error("Error fetching key features:", error);
@@ -741,20 +339,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
 
   // Funkcija za dohvaćanje amenities
   const fetchAmenities = useCallback(async () => {
-    const cacheKey = 'residence-amenities';
-    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 sata
-
     try {
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheExpiry) {
-          setAmenities(data);
-          return;
-        }
-        localStorage.removeItem(cacheKey);
-      }
-
       setIsLoadingAmenities(true);
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/amenities?limit=100&page=1`,
@@ -765,12 +350,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
 
       const data = await response.json();
       const fetchedAmenities = data.data;
-
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: fetchedAmenities,
-        timestamp: Date.now()
-      }));
-
       setAmenities(fetchedAmenities);
     } catch (error) {
       console.error("Error fetching amenities:", error);
@@ -904,24 +483,24 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Handler za brisanje
   const handleDelete = async () => {
     const residenceId = params?.id;
-    
+
     if (!residenceId) {
       console.error("Residence ID is missing - cannot delete residence");
       toast.error("Cannot delete: residence ID is missing");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
       const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to delete residence');
       }
-  
+
       toast.success('Residence deleted successfully');
       router.push('/residences');
       router.refresh();
@@ -962,21 +541,21 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
     // Umesto provere initialData?.id koja može sprečiti izvršavanje,
     // koristi params?.id koji će uvek biti dostupan u edit modu
     const residenceId = params?.id;
-    
+
     if (!residenceId) {
       console.error("Residence ID is missing - cannot update status");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
-  
+
       console.log("Sending status update:", {
         residenceId,
         newStatus,
         url: `${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}/status`
       });
-  
+
       const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}/status`, {
         method: 'PATCH',
         credentials: 'include',
@@ -985,13 +564,13 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
         },
         body: JSON.stringify({ status: newStatus })
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Status update failed:", errorText);
         throw new Error(`Failed to update status: ${response.status}`);
       }
-  
+
       // Ažuriraj vrednost u formi
       form.setValue("status", newStatus, { shouldDirty: true });
       toast.success(`Residence status updated to ${newStatus}`);
@@ -1006,9 +585,9 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Render status bedža
   const renderStatusBadge = () => {
     if (!isEditing) return null;
-  
+
     const allowedStatuses = ["DRAFT", "ACTIVE", "PENDING", "DELETED"] as const;
-  
+
     return (
       <FormField
         control={form.control}
@@ -1021,7 +600,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
               // Direktno prosleđujemo value bez provere
               handleStatusChange(newStatus as "DRAFT" | "ACTIVE" | "DELETED" | "PENDING");
             }}
-            value={field.value || ""} 
+            value={field.value || ""}
             disabled={isSubmitting}
           >
             <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
@@ -1109,7 +688,7 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
   // Render dugmeta za brisanje
   const renderDeleteButton = () => {
     if (!isEditing || form.watch("status") === "DELETED") return null;
-  
+
     return (
       <>
         <Button
@@ -1289,172 +868,25 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        key={`country-field-${form.watch("countryId") || "empty"}`}
-                        control={form.control}
-                        name="countryId"
-                        render={({ field }) => (
-                          <FormItem className="w-full">
-                            <FormLabel>Country <span className="text-destructive">*</span></FormLabel>
-                            <Select
-                              onValueChange={(value) => {
-                                console.log("Country changed to:", value);
-                                field.onChange(value);
-                                // Resetuj grad kada se promeni država
-                                form.setValue("cityId", "");
-                              }}
-                              value={field.value || ""}
-                              onOpenChange={(open) => {
-                                if (open && countrySearchInputRef.current) {
-                                  setTimeout(() => {
-                                    countrySearchInputRef.current?.focus();
-                                  }, 100);
-                                }
-                              }}
-                            >
-                              <FormControl className="w-full">
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a country" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <div className="px-2 py-2 sticky top-0 bg-background z-10">
-                                  <Input
-                                    ref={countrySearchInputRef}
-                                    placeholder="Search countries..."
-                                    value={countrySearchQuery || ""}
-                                    onChange={(e) => setCountrySearchQuery(e.target.value)}
-                                    className="h-8"
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                  />
-                                </div>
-                                <div
-                                  className="max-h-[300px] overflow-y-auto"
-                                  onScroll={handleCountryScroll}
-                                >
-                                  {isLoadingCountries && countries.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      Loading countries...
-                                    </div>
-                                  ) : countries.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      No countries found
-                                    </div>
-                                  ) : (
-                                    countries.map((country) => (
-                                      <SelectItem
-                                        key={country.id}
-                                        value={country.id}
-                                        className="cursor-pointer"
-                                      >
-                                        <div className="flex items-center justify-between w-full">
-                                          <div className="flex items-center gap-2">
-                                            <img
-                                              src={country.flag}
-                                              alt={`${country.name} flag`}
-                                              className="w-4 h-4 rounded-sm object-cover"
-                                            />
-                                            <span>{country.name}</span>
-                                          </div>
-                                          <span className="text-xs text-muted-foreground">
-                                            {country.code}
-                                          </span>
-                                        </div>
-                                      </SelectItem>
-                                    ))
-                                  )}
-                                  {isLoadingCountries && countries.length > 0 && (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                                      Loading more countries...
-                                    </div>
-                                  )}
-                                </div>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                    
+                    <FormItem className="w-full col-span-2">
+                      <FormLabel>Location <span className="text-destructive">*</span></FormLabel>
+                      <CountryAndCity
+                        defaultCountryId={form.watch("countryId")}
+                        defaultCityId={form.watch("cityId")}
+                        onCountrySelect={(countryId) => {
+                          console.log("Country selected:", countryId);
+                          form.setValue("countryId", countryId, { shouldValidate: true, shouldDirty: true });
+                          // Resetujemo grad kada se promeni država
+                          form.setValue("cityId", "", { shouldValidate: true, shouldDirty: true });
+                        }}
+                        onCitySelect={(cityId) => {
+                          console.log("City selected:", cityId);
+                          form.setValue("cityId", cityId, { shouldValidate: true, shouldDirty: true });
+                        }}
                       />
-
-                      <FormField
-                        key={`city-field-${form.watch("cityId") || "empty"}`}
-                        control={form.control}
-                        name="cityId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              City <span className="text-destructive">*</span>
-                            </FormLabel>
-                            <Select
-                              onValueChange={(value) => {
-                                console.log("City changed to:", value);
-                                field.onChange(value);
-                              }}
-                              value={field.value || ""}
-                              disabled={!form.watch("countryId")}
-                              onOpenChange={(open) => {
-                                if (open && citySearchInputRef.current) {
-                                  setTimeout(() => {
-                                    citySearchInputRef.current?.focus();
-                                  }, 100);
-                                }
-                              }}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder={form.watch("countryId") ? "Select a city" : "Please select a country first"} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <div className="px-2 py-2 sticky top-0 bg-background z-10">
-                                  <Input
-                                    ref={citySearchInputRef}
-                                    placeholder="Search cities..."
-                                    value={citySearchQuery || ""}
-                                    onChange={(e) => setCitySearchQuery(e.target.value)}
-                                    className="h-8"
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                  />
-                                </div>
-                                <div
-                                  className="max-h-[300px] overflow-y-auto"
-                                  onScroll={handleCityScroll}
-                                >
-                                  {isLoadingCities && cities.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      Loading cities...
-                                    </div>
-                                  ) : cities.length === 0 ? (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground">
-                                      No cities found
-                                    </div>
-                                  ) : (
-                                    cities.map((city) => (
-                                      <SelectItem
-                                        key={city.id}
-                                        value={city.id}
-                                        className="cursor-pointer"
-                                      >
-                                        <div className="flex items-center gap-2">
-                                          <span>{city.name}</span>
-                                        </div>
-                                      </SelectItem>
-                                    ))
-                                  )}
-                                  {isLoadingCities && cities.length > 0 && (
-                                    <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                                      Loading more cities...
-                                    </div>
-                                  )}
-                                </div>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                      <FormMessage />
+                    </FormItem>
 
                     <h2 className="text-xl font-semibold mb-4 mt-8">Brief Overview</h2>
 
@@ -1822,8 +1254,6 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
                   </div>
                 </div>
               </div>
-
-              {/* Amenities Section */}
 
               {/* Amenities Section */}
               <div>

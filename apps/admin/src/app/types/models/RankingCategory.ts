@@ -3,6 +3,7 @@ export type RankingCategoryStatus = "ACTIVE" | "DELETED" | "DRAFT";
 export interface RankingCategoryType {
   id: string;
   name: string;
+  key: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -16,6 +17,10 @@ export interface RankingCategoryImage {
 }
 
 export interface RankingCategory {
+  rankingCriteria: any;
+  entityId: string;
+  title: any;
+  entity: object | undefined;
   id: string;
   name: string;
   description?: string;
@@ -29,6 +34,8 @@ export interface RankingCategory {
 }
 
 export interface RankingCategoryFormData {
+  entity: object | undefined;
+  entityId: string | undefined;
   id?: string;
   name: string;
   description?: string;
@@ -37,6 +44,7 @@ export interface RankingCategoryFormData {
   residenceLimitation: number;
   rankingPrice: number; // Ovde ostaje number jer u formi koristimo numerički input
   featuredImageId?: string | File;
+  title: string;
 }
 
 // Interface za API response
