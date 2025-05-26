@@ -272,7 +272,7 @@ export default function BestResidences() {
                     <div className="w-full xl:max-w-[1600px] mx-auto">
                         <h2 className="text-3xl font-bold w-full mb-12 text-left lg:text-center">Ranking Directory</h2>
 
-                        {/* <RankingDirectory /> */}
+                        <RankingDirectory />
                     </div>
                 </SectionLayout>
             </div>
