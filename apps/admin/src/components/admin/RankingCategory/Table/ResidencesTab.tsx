@@ -10,7 +10,18 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye,  Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RankingCriteriaScore {
   name: string;
@@ -134,6 +145,27 @@ export default function ResidencesTab({ categoryId, refreshKey }: ResidencesTabP
     setCurrentPage(page);
   };
 
+  const handleRemoveResidence = async (residenceId: string) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/residence-scores/${residenceId}/category/${categoryId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to remove residence from category');
+      }
+
+      toast.success('Residence successfully removed from category');
+      fetchResidences(currentPage);
+    } catch (error) {
+      toast.error('Failed to remove residence from category');
+    }
+  };
+
   if (loading) return <TableSkeleton />;
   if (!data.length) return <p className="text-sm text-muted-foreground">No residences found</p>;
 
@@ -186,11 +218,37 @@ export default function ResidencesTab({ categoryId, refreshKey }: ResidencesTabP
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/residences/${residence.id}`}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/residences/${residence.id}`}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-400 bg-red-900/30 hover:bg-red-700/30 transition-colors">
+                          <Trash2 className="h-4 w-4" />  
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action will remove the residence from this ranking category. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleRemoveResidence(residence.id)}
+                            className="bg-destructive text-white hover:bg-destructive/80 transition-colors"
+                          >
+                            Remove
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
