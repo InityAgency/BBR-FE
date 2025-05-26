@@ -43,7 +43,11 @@ export function ResidenceCard({ residence }: ResidenceCardProps) {
             <span className="text-xs font-medium text-primary">{residence.developmentStatus}</span>
           </div>
           <h3 className="text-xl text-white font-medium transition-all">{residence.name}</h3>
-          <p className="text-md text-muted-foreground">{residence.description}</p>
+          <p className="text-md text-muted-foreground">
+            {residence.description.length > 150 
+              ? `${residence.description.substring(0, 80)}...` 
+              : residence.description}
+          </p>
     </Link>
   )
 }

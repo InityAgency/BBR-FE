@@ -39,6 +39,22 @@ const getRentalPotentialBadgeStyle = (potential: string) => {
 // Helper for media URL
 const getMediaUrl = (id: string) => `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/content`;
 
+// Helper function to safely display values
+const safeValue = (value: any): string => {
+  if (value === null || value === undefined || value === "") {
+    return "-";
+  }
+  return String(value);
+};
+
+// Helper function for currency values
+const safeCurrencyValue = (value: any, currencyCode?: string): string => {
+  if (value === null || value === undefined || value === "") {
+    return "-";
+  }
+  return `${value} ${currencyCode || ""}`.trim();
+};
+
 export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -52,30 +68,38 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Associated Brand</h3>
-                {residence.brand && (
+                {residence.brand?.name ? (
                   <div className="flex items-center gap-2">
-                    <p className="text-md">{residence.brand?.name}</p>
-                    <Link href={`/brands/${residence.brand?.id}`} className="text-md text-muted-foreground hover:text-primary transition-all">
+                    <p className="text-md">{residence.brand.name}</p>
+                    <Link href={`/brands/${residence.brand.id}`} className="text-md text-muted-foreground hover:text-primary transition-all">
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   </div>
+                ) : (
+                  <p className="text-md">-</p>
                 )}
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Website URL</h3>
-                <Link href={residence.websiteUrl} className="text-md text-white hover:text-primary transition-all">{residence.websiteUrl}</Link>
+                {residence.websiteUrl ? (
+                  <Link href={residence.websiteUrl} className="text-md flex items-center gap-2 text-white hover:text-primary transition-all">
+                    Website Link <ExternalLink className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <p className="text-md">-</p>
+                )}
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">City</h3>
-                <p className="text-md">{residence.city?.name}</p>
+                <p className="text-md">{safeValue(residence.city?.name)}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Country</h3>
-                <p className="text-md">{residence.country?.name}</p>
+                <p className="text-md">{safeValue(residence.country?.name)}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Address</h3>
-                <p className="text-md">{residence.address}</p>
+                <p className="text-md">{safeValue(residence.address)}</p>
               </div>
             </div>
           </CardContent>
@@ -91,26 +115,33 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Budget Range</h3>
                 <p className="text-md">
-                  {residence.budgetStartRange} - {residence.budgetEndRange} {residence.country.currencyCode}
+                  {residence.budgetStartRange && residence.budgetEndRange ? 
+                    `${residence.budgetStartRange} - ${residence.budgetEndRange} ${residence.country?.currencyCode || ""}`.trim() : 
+                    "-"
+                  }
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Average Price per Unit</h3>
                 <p className="text-md">
-                  {residence.avgPricePerUnit} {residence.country.currencyCode}
+                  {safeCurrencyValue(residence.avgPricePerUnit, residence.country?.currencyCode)}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Average Price per Sqft</h3>
                 <p className="text-md">
-                  {residence.avgPricePerSqft} {residence.country.currencyCode}
+                  {safeCurrencyValue(residence.avgPricePerSqft, residence.country?.currencyCode)}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Rental Potential</h3>
-                <Badge className={getRentalPotentialBadgeStyle(residence.rentalPotential)}>
-                  {residence.rentalPotential}
-                </Badge>
+                {residence.rentalPotential ? (
+                  <Badge className={getRentalPotentialBadgeStyle(residence.rentalPotential)}>
+                    {residence.rentalPotential}
+                  </Badge>
+                ) : (
+                  <p className="text-md">-</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -125,15 +156,17 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Year Built</h3>
-                <p className="text-md">{residence.yearBuilt}</p>
+                <p className="text-md">{safeValue(residence.yearBuilt)}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Floor Area</h3>
-                <p className="text-md">{residence.floorSqft} sqft</p>
+                <p className="text-md">
+                  {residence.floorSqft ? `${residence.floorSqft} sqft` : "-"}
+                </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Staff Ratio</h3>
-                <p className="text-md">{residence.staffRatio}</p>
+                <p className="text-md">{safeValue(residence.staffRatio)}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Features</h3>
@@ -144,6 +177,9 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
                   {residence.disabledFriendly && (
                     <Badge variant="outline" className="text-sm">Disabled Friendly</Badge>
                   )}
+                  {!residence.petFriendly && !residence.disabledFriendly && (
+                    <p className="text-md">-</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -151,7 +187,7 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
         </Card>
 
         {/* Key Features */}
-        {residence.keyFeatures && residence.keyFeatures.length > 0 && (
+        {residence.keyFeatures && residence.keyFeatures.length > 0 ? (
           <Card className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm border-none bg-foreground/5 col-span-full md:col-span-4">
             <CardHeader>
               <CardTitle>Key Features</CardTitle>
@@ -160,16 +196,25 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
               <div className="flex flex-wrap gap-2">
                 {residence.keyFeatures.map((feature) => (
                   <Badge key={feature.id} variant="outline" className="text-sm">
-                    {feature.name}
+                    {feature.name || "-"}
                   </Badge>
                 ))}
               </div>
             </CardContent>
           </Card>
+        ) : (
+          <Card className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm border-none bg-foreground/5 col-span-full md:col-span-4">
+            <CardHeader>
+              <CardTitle>Key Features</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-md">-</p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Amenities */}
-        {residence.amenities && residence.amenities.length > 0 && (
+        {residence.amenities && residence.amenities.length > 0 ? (
           <Card className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm border-none bg-foreground/5 col-span-full md:col-span-4">
             <CardHeader>
               <CardTitle>Amenities</CardTitle>
@@ -178,17 +223,26 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {residence.amenities.map((amenity) => (
                   <div key={amenity.id} className="flex items-center gap-2">
-                    {amenity.icon && (
+                    {amenity.icon?.id && (
                       <img
                         src={getMediaUrl(amenity.icon.id)}
-                        alt={amenity.name}
+                        alt={amenity.name || "Amenity"}
                         className="w-6 h-6 object-contain"
                       />
                     )}
-                    <span className="text-sm">{amenity.name}</span>
+                    <span className="text-sm">{amenity.name || "-"}</span>
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm border-none bg-foreground/5 col-span-full md:col-span-4">
+            <CardHeader>
+              <CardTitle>Amenities</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-md">-</p>
             </CardContent>
           </Card>
         )}
@@ -240,4 +294,4 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
       </div>
     </div>
   );
-} 
+}
