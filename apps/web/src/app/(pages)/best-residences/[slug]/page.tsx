@@ -406,7 +406,7 @@ export default function CategoryPage() {
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
                                                 {residence.rankingCriteriaScores
-                                                    .filter((criteria) => criteria.isDefault)
+                                                    .filter((criteria) => criteria)
                                                     .map((criteria) => (
                                                         <div key={criteria.rankingCriteriaId} className="flex flex-col">
                                                             <span className="text-white text-xs lg:text-sm mb-1">

@@ -179,6 +179,7 @@ export default function BestResidences() {
                         <h2 className="text-3xl font-bold w-full mb-12">Top Branded Residences by Geographical Area</h2>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
                             {data.continents.map((category) => (
+                                console.log(category),
                                 <RankingCard
                                     key={category.id}
                                     category={category}
