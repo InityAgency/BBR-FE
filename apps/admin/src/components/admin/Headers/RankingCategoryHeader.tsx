@@ -40,6 +40,8 @@ const getStatusBadgeStyle = (status: RankingCategoryStatus) => {
       return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
     case "DELETED":
       return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
+    case "INACTIVE":
+      return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
     default:
       return "";
   }
@@ -60,7 +62,7 @@ export function RankingCategoryHeader({
     await onStatusChange(value as RankingCategoryStatus);
   };
 
-  const allowedStatuses: RankingCategoryStatus[] = ["ACTIVE", "DRAFT", "DELETED"];
+  const allowedStatuses: RankingCategoryStatus[] = ["ACTIVE", "DRAFT", "DELETED", "INACTIVE"];
 
   const renderStatusDropdown = () => {
     return (

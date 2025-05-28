@@ -5,13 +5,16 @@ export interface Unit {
   slug: string;
   price: number;
   size: number;
-  bedrooms: number;
+  bedroom: number;
   bathrooms: number;
   status: string;
   type: string;
   floor: number;
   view: string;
   features: string[];
+  exclusivePrice: number;
+  surface: number;
+  regularPrice: number;
   residence: {
     id: string;
     name: string;
@@ -27,16 +30,9 @@ export interface Unit {
         size: number;
       };
     };
-    city: {
-      id: string;
-      name: string;
-      country: {
-        id: string;
-        name: string;
-      };
-    };
+    address: string;
   };
-  featuredImage: {
+  featureImage: {
     id: string;
     originalFileName: string;
     mimeType: string;

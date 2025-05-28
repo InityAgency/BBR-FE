@@ -73,6 +73,10 @@ const renderStatusCell = (status: string) => {
             badgeVariant = "outline";
             badgeClass = "bg-gray-900/80 text-gray-300";
             break;
+        case "INACTIVE":
+            badgeVariant = "secondary";
+            badgeClass = "bg-yellow-900/55 text-yellow-300";
+            break;
         default:
             badgeVariant = "secondary";
             badgeClass = "";

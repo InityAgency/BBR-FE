@@ -1,4 +1,4 @@
-export type RankingCategoryStatus = "ACTIVE" | "DELETED" | "DRAFT";
+export type RankingCategoryStatus = "ACTIVE" | "DELETED" | "DRAFT" | "INACTIVE";
 
 export interface RankingCategoryType {
   id: string;

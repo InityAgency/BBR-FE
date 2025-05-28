@@ -134,19 +134,12 @@ export function MegaMenu() {
             >
               Evaluation Criteria
             </Link>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                    <span>Exclusive Deals</span>
-                    <Lock className="w-4 h-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Coming Soon</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Link
+              href="/exclusive-deals"
+              className="text-white hover:text-[#b3804c] transition-colors"
+            >
+              Exclusive Deals
+            </Link>
             <Link
               href="/blog"
               className="text-white hover:text-[#b3804c] transition-colors"

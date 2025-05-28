@@ -36,6 +36,8 @@ const getStatusBadgeStyle = (status: string): string => {
       return "bg-red-900/20 text-red-300 border-red-900/50";
     case "DRAFT":
       return "bg-gray-900/20 text-gray-300 border-gray-900/50";
+    case "INACTIVE":
+      return "bg-yellow-900/20 text-yellow-300 border-yellow-900/50";
     default:
       return "";
   }

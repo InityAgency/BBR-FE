@@ -9,10 +9,10 @@ import { toast } from "sonner";
 
 export default function EditUnitPage() {
   const params = useParams();
-  const unitId = params.unitId as string; // Koristi unitId parametar umesto id
-  const residenceId = params.id as string; // residenceId iz [id] foldera
-  
-  const [unitData, setUnitData] = useState(null);
+  const unitId = params.unitId as string;  // parametar [unitId]
+  const residenceId = params.id as string; // parametar [id] iz foldera
+
+  const [unitData, setUnitData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,20 +21,18 @@ export default function EditUnitPage() {
         setLoading(true);
         const response = await fetch(
           `${API_BASE_URL}/api/${API_VERSION}/units/${unitId}`,
-          {
-            credentials: 'include',
-          }
+          { credentials: "include" }
         );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch unit');
+          throw new Error("Failed to fetch unit");
         }
 
         const data = await response.json();
         setUnitData(data.data);
       } catch (error) {
-        toast.error('Failed to load unit data');
-        console.error('Error fetching unit:', error);
+        toast.error("Failed to load unit data");
+        console.error("Error fetching unit:", error);
       } finally {
         setLoading(false);
       }
@@ -45,24 +43,23 @@ export default function EditUnitPage() {
     }
   }, [unitId]);
 
-  if (loading) {
+  if (loading || !unitData) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[200px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-        </div>
+        <p>Loading...</p>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <UnitForm 
+      <UnitForm
         initialData={{
           ...(unitData || {}),
-          residenceId: residenceId,
-        }} 
-        isEditing={true} 
+          residenceId,
+          unitTypeId: unitData?.unitType?.id ?? "",
+        }}
+        isEditing
       />
     </AdminLayout>
   );

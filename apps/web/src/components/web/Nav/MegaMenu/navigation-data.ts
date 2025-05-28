@@ -287,7 +287,7 @@ async function fetchRankingCategoriesForType(categoryTypeId: string): Promise<Ra
   let totalPages = 1;
 
   do {
-    const apiUrl = `${baseUrl}/api/${apiVersion}/ranking-categories?limit=50&categoryTypeId=${categoryTypeId}&page=${page}`;
+    const apiUrl = `${baseUrl}/api/${apiVersion}/public/ranking-categories?limit=50&categoryTypeId=${categoryTypeId}&page=${page}`;
     const response = await fetch(apiUrl, { cache: 'no-store' });
     
     if (!response.ok) {

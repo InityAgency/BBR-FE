@@ -3,7 +3,7 @@ import Link from "next/link"
 import type { Unit } from "@/types/unit"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Info } from "lucide-react"
+import { Bath, Bed, Info, Square } from "lucide-react"
 
 interface UnitCardProps {
   unit: Unit
@@ -15,9 +15,9 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
     <div className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-4 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2">
       <Link href={`/exclusive-deals/${unit.slug}`} className="flex flex-col gap-4 h-full">
         <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
-          {unit.featuredImage ? (
+          {unit.featureImage ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${unit.featuredImage.id}/content`}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${unit.featureImage.id}/content`}
               alt={unit.name}
               width={1000}
               height={1000}
@@ -37,23 +37,29 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
             </div>
           )}
         </div>
-        <div className="mt-2 flex items-center gap-2 w-full justify-between">
-          {unit.residence.city && unit.residence.city.country ? (
-            <span className="text-xs text-muted-foreground">
-              {unit.residence.city.name}, {unit.residence.city.country.name}
+        <div className="flex items-center gap-2 w-full justify-between">
+          {unit.residence.address ? (
+            <span className="text-md text-muted-foreground">
+              {unit.residence.address}
             </span>
           ) : null}
-          <span className="text-xs font-medium text-primary">{unit.status}</span>
         </div>
         <h3 className="text-xl text-white font-medium transition-all">{unit.name}</h3>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <p className="text-md text-muted-foreground">{unit.description}</p>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <span>{unit.bedrooms} beds</span>
-            <span>{unit.bathrooms} baths</span>
-            <span>{unit.size}m²</span>
+          {unit.exclusivePrice ? (
+            <div className="flex flex-row items-center gap-2">
+            <p className="text-xl font-medium text-primary">${unit.exclusivePrice?.toLocaleString()}</p>
+            <p className="text-xl text-white line-through">${unit.regularPrice?.toLocaleString()}</p>
+            </div>
+          ) : (
+            <p className="text-xl font-medium text-primary">${unit.regularPrice?.toLocaleString()}</p>
+          )}
+          <div className="flex gap-4 text-md text-muted-foreground border-t pt-3 mt-2">
+            <span className="flex items-center gap-2"><Bed className="w-4 h-4" /> {unit.bedroom} beds</span>
+            <span className="flex items-center gap-2"><Bath className="w-4 h-4" /> {unit.bathrooms} baths</span>
+            <span className="flex items-center gap-2"><Square className="w-4 h-4" /> {unit.surface}m²</span>
           </div>
-          <p className="text-lg font-medium text-primary">${unit.price?.toLocaleString()}</p>
         </div>
       </Link>
       {onRequestInfo && (
