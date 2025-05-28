@@ -25,13 +25,15 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-secondary">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${unit.residence.brand.logo.id}/content`}
-                alt={unit.residence.brand.name}
-                width={100}
-                height={100}
-                className="object-cover w-[30%] h-auto"
-              />
+              {unit.residence?.brand?.logo?.id ? (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${unit.residence.brand.logo.id}/content`}
+                  alt={unit.residence.brand.name}
+                  width={100}
+                  height={100}
+                  className="object-cover w-[30%] h-auto"
+                />
+              ) : null}
             </div>
           )}
         </div>
@@ -51,7 +53,7 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
             <span>{unit.bathrooms} baths</span>
             <span>{unit.size}m²</span>
           </div>
-          <p className="text-lg font-medium text-primary">${unit.price.toLocaleString()}</p>
+          <p className="text-lg font-medium text-primary">${unit.price?.toLocaleString()}</p>
         </div>
       </Link>
       {onRequestInfo && (
