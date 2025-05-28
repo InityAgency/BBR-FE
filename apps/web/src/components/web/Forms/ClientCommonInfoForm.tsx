@@ -121,7 +121,7 @@ export default function ClientCommonInfoForm() {
     try {
       console.log("📤 Sending form data:", data);
       
-      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/b2b-form-submissions`, {
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/public/b2b-form-submissions`, {
         method: 'POST',
         credentials: 'include',
         headers: {
