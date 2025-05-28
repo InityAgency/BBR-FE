@@ -102,7 +102,7 @@ export default function ResidencesSingle() {
           <ResidenceDetails residence={residence} />
         </TabsContent>
         <TabsContent value="inventory" className="mt-6">
-          <ResidenceInventory />
+          <ResidenceInventory residenceId={residenceId} />
         </TabsContent>
         <TabsContent value="leads" className="mt-6">
           <Card><CardContent className="py-8 text-center text-muted-foreground">Leads are currently locked.</CardContent></Card>

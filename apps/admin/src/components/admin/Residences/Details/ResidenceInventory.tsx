@@ -1,11 +1,21 @@
-import { CardContent } from "@/components/ui/card";
+import { UnitsHeader } from "../Units/UnitsHeader";
+import { UnitsList } from "../Units/UnitsList";
+import { useState } from "react";
 
-import { Card } from "@/components/ui/card";
+interface ResidenceInventoryProps {
+  residenceId: string;
+}
 
-export function ResidenceInventory() {
+export function ResidenceInventory({ residenceId }: ResidenceInventoryProps) {
+  const [totalUnits, setTotalUnits] = useState(0);
+
   return (
-    <div>
-      <Card><CardContent className="py-8 text-center text-muted-foreground">Inventory content coming soon...</CardContent></Card>
+    <div className="space-y-6">
+      <UnitsHeader totalUnits={totalUnits} residenceId={residenceId} />
+      <UnitsList 
+        residenceId={residenceId} 
+        onTotalUnitsChange={setTotalUnits}
+      />
     </div>
   );
 }

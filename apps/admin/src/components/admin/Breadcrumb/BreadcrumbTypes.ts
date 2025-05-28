@@ -33,6 +33,13 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
     singleTitle: "Residence",
     hasDetailPage: true
   },
+  units: { 
+    title: "Units", 
+    isLinkable: true,
+    parent: "residences",
+    singleTitle: "Unit",
+    hasDetailPage: false 
+  },
   amenities: { 
     title: "Amenities", 
     isLinkable: true,

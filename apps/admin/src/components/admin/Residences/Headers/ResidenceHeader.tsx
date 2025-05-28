@@ -51,20 +51,40 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Lokalno stanje za status - inicijalno postaviti na residence.status
+  const [currentStatus, setCurrentStatus] = useState(residence.status);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
     try {
+      setIsUpdatingStatus(true);
+      
+      // Optimistično ažuriranje - odmah postaviti novi status
+      setCurrentStatus(newStatus);
+      
       await residencesService.updateResidenceStatus(residence.id, newStatus);
       toast.success(`Status updated to ${newStatus}`);
+      
+      // Opcionalno - refresh podatke u pozadini
       router.refresh();
     } catch (error) {
+      console.error("Failed to update status:", error);
+      
+      // Ako zahtev neuspešan, vrati stari status
+      setCurrentStatus(residence.status);
       toast.error("Failed to update status");
+    } finally {
+      setIsUpdatingStatus(false);
     }
   };
 
-  const handleApprove = () => handleStatusChange("ACTIVE");
-  const handleReject = () => {
-    handleStatusChange("DELETED");
+  const handleApprove = async () => {
+    await handleStatusChange("ACTIVE");
+  };
+  
+  const handleReject = async () => {
+    await handleStatusChange("DELETED");
     setShowRejectDialog(false);
   };
 
@@ -88,14 +108,16 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
     <div className="flex items-center gap-2">
       <Select
         onValueChange={handleStatusChange}
-        value={residence.status}
-        disabled={false}
+        value={currentStatus} // Koristiti currentStatus umesto residence.status
+        disabled={isUpdatingStatus} // Onemogući tokom ažuriranja
       >
         <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
           <Badge
-            className={`${getStatusBadgeStyle(residence.status)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80`}
+            className={`${getStatusBadgeStyle(currentStatus)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80 ${
+              isUpdatingStatus ? 'opacity-50' : ''
+            }`}
           >
-            {residence.status}
+            {isUpdatingStatus ? 'Updating...' : currentStatus}
           </Badge>
         </SelectTrigger>
         <SelectContent>
@@ -110,13 +132,14 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
           ))}
         </SelectContent>
       </Select>
-      {residence.status === "PENDING" && (
+      {currentStatus === "PENDING" && !isUpdatingStatus && (
         <div className="flex items-center gap-2">
           <Button
             size="sm"
             variant="outline"
             className="bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50 transition-all duration-300"
             onClick={handleApprove}
+            disabled={isUpdatingStatus}
           >
             <Check className="h-4 w-4 mr-2" />
             Approve
@@ -126,6 +149,7 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
             variant="outline"
             className="bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50 transition-all duration-300"
             onClick={() => setShowRejectDialog(true)}
+            disabled={isUpdatingStatus}
           >
             <X className="h-4 w-4 mr-2" />
             Reject
@@ -136,7 +160,7 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
   );
 
   const renderActionButtons = () => {
-    if (residence.status === "DELETED") return null;
+    if (currentStatus === "DELETED") return null; // Koristiti currentStatus
     return (
       <div className="flex items-center gap-2">
         <Button
@@ -167,6 +191,7 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
           variant="destructive"
           onClick={() => setShowDeleteDialog(true)}
           className="cursor-pointer transition-colors"
+          disabled={isUpdatingStatus}
         >
           <Trash2 className="h-4 w-4" />
           Delete
@@ -217,4 +242,4 @@ export function ResidenceHeader({ residence }: ResidenceHeaderProps) {
       </AlertDialog>
     </>
   );
-} 
+}
