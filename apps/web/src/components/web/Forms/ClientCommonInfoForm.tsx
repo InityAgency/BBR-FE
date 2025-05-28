@@ -12,15 +12,86 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useState } from "react";
-import {
-  clientCommonInfoFormSchema,
-  clientCommonInfoService,
-  type ClientCommonInfoFormValues,
-} from "@/app/api/contact/clientCommonInfoService";
+import { useState, useEffect } from "react";
+import { z } from "zod";
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
+import { usePathname } from "next/navigation";
+
+// Schema za form validaciju
+const clientCommonInfoFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  email: z.string().email("Please enter a valid email address"),
+  pageOrigin: z.string(), // Automatski se popunjava
+  companyName: z.string().min(1, "Company name is required"),
+  brandedResidencesName: z.string().min(1, "Name of branded residence is required"),
+  companyWebsite: z.string().url("Please enter a valid website URL").optional().or(z.literal("")),
+});
+
+type ClientCommonInfoFormValues = z.infer<typeof clientCommonInfoFormSchema>;
+
+// Funkcija za mapiranje error poruka
+const getErrorMessage = (status: number, defaultMessage: string): string => {
+  switch (status) {
+    case 400:
+      return "Please check your information and try again.";
+    case 401:
+      return "You are not authorized to perform this action.";
+    case 403:
+      return "Access denied. Please contact support.";
+    case 404:
+      return "We're unable to process your form at the moment. Please try again later.";
+    case 422:
+      return "Please check all required fields and try again.";
+    case 429:
+      return "Too many requests. Please wait a moment and try again.";
+    case 500:
+      return "We're unable to process your form at the moment. Please try again later.";
+    case 502:
+    case 503:
+    case 504:
+      return "We're unable to process your form at the moment. Please try again later.";
+    default:
+      return "We're unable to process your form at the moment. Please try again later.";
+  }
+};
+
+// Funkcija za parsiranje server error response-a
+const parseErrorResponse = async (response: Response): Promise<string> => {
+  // Za 404 i 500+ greške, uvek koristi našu custom poruku
+  if (response.status === 404 || response.status >= 500) {
+    return getErrorMessage(response.status, "We're unable to process your form at the moment. Please try again later.");
+  }
+  
+  try {
+    const contentType = response.headers.get('content-type');
+    
+    if (contentType && contentType.includes('application/json')) {
+      const errorData = await response.json();
+      
+      // Pokušaj da pronađe poruku u različitim formatima - samo za client errors (4xx)
+      if (response.status >= 400 && response.status < 500) {
+        if (errorData.message) {
+          return errorData.message;
+        } else if (errorData.error) {
+          return typeof errorData.error === 'string' ? errorData.error : errorData.error.message;
+        } else if (errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+          // Za validation errors
+          return errorData.errors.map((err: any) => err.message || err).join(', ');
+        }
+      }
+    }
+  } catch (parseError) {
+    console.error("Error parsing server response:", parseError);
+  }
+  
+  // Fallback na status-based poruku
+  return getErrorMessage(response.status, "We're unable to process your form at the moment. Please try again later.");
+};
 
 export default function ClientCommonInfoForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const pathname = usePathname();
 
   const form = useForm<ClientCommonInfoFormValues>({
     resolver: zodResolver(clientCommonInfoFormSchema),
@@ -28,21 +99,93 @@ export default function ClientCommonInfoForm() {
       name: "",
       phoneNumber: "",
       email: "",
+      pageOrigin: "",
       companyName: "",
-      nameOfBrandedResidence: "",
+      brandedResidencesName: "",
+      companyWebsite: "",
     },
   });
+
+  // Automatski popuni pageOrigin kada se komponenta mount-uje
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const currentUrl = window.location.href;
+      form.setValue('pageOrigin', currentUrl);
+      console.log("📍 Current page URL:", currentUrl);
+    }
+  }, [form, pathname]);
 
   const onSubmit = async (data: ClientCommonInfoFormValues) => {
     setIsLoading(true);
 
     try {
-      await clientCommonInfoService.sendInfo(data);
-      toast.success("Message sent successfully");
-      form.reset();
+      console.log("📤 Sending form data:", data);
+      
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/b2b-form-submissions`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      console.log("📋 Response status:", response.status);
+
+      if (!response.ok) {
+        const errorMessage = await parseErrorResponse(response);
+        console.error("❌ Form submission failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          message: errorMessage
+        });
+        
+        throw new Error(errorMessage);
+      }
+
+      const responseData = await response.json();
+      console.log("✅ Form submitted successfully:", responseData);
+
+      // Uspešna poruka
+      toast.success("Thank you! Your contact request has been sent successfully. We'll get back to you soon.", {
+        duration: 5000,
+      });
+      
+      // Reset forme i pageOrigin - SAMO pri uspešnom slanju
+      form.reset({
+        name: "",
+        phoneNumber: "",
+        email: "",
+        pageOrigin: typeof window !== 'undefined' ? window.location.href : "",
+        companyName: "",
+        brandedResidencesName: "",
+        companyWebsite: "",
+      });
+      
     } catch (error) {
-      toast.error("Failed to send message");
-      console.error("Error sending message:", error);
+      console.error("💥 Error sending form:", error);
+      
+      let errorMessage = "We're unable to process your form at the moment. Please try again later.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
+      // Network error handling
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = "We're unable to process your form at the moment. Please try again later.";
+      }
+      
+      // Prikaz error toast-a - podaci ostaju u formi
+      toast.error(errorMessage, {
+        duration: 6000,
+      });
+      
+      // NAMERNO NEMA form.reset() - podaci ostaju u formi kada je greška
+      
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +214,7 @@ export default function ClientCommonInfoForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>
-                    Name <p className="text-primary m-0">*</p>
+                    Name <span className="text-primary">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter your name" />
@@ -86,7 +229,9 @@ export default function ClientCommonInfoForm() {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>
+                    Phone Number <span className="text-primary">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter your phone number" />
                   </FormControl>
@@ -102,7 +247,7 @@ export default function ClientCommonInfoForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Email Address<p className="text-primary m-0">*</p>
+                  Email Address <span className="text-primary">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -115,6 +260,7 @@ export default function ClientCommonInfoForm() {
               </FormItem>
             )}
           />
+          
           <div className="flex flex-col lg:flex-row gap-4">
             <FormField
               control={form.control}
@@ -122,7 +268,7 @@ export default function ClientCommonInfoForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>
-                    Company Name <p className="text-primary m-0">*</p>
+                    Company Name <span className="text-primary">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter company name" />
@@ -134,12 +280,11 @@ export default function ClientCommonInfoForm() {
 
             <FormField
               control={form.control}
-              name="nameOfBrandedResidence"
+              name="brandedResidencesName"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>
-                    Name of Branded Residence{" "}
-                    <p className="text-primary m-0">*</p>
+                    Name of Branded Residence <span className="text-primary">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -152,6 +297,25 @@ export default function ClientCommonInfoForm() {
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="companyWebsite"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company Website</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="url"
+                    placeholder="https://www.yourcompany.com"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
           <Button
             type="submit"
             disabled={isLoading}

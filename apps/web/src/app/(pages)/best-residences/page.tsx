@@ -66,7 +66,7 @@ export default function BestResidences() {
 
             // Kreiraj promises za sve kategorije odjednom
             const promises = Object.entries(categoryTypes).map(async ([key, typeId]) => {
-                const url = `${baseUrl}/api/${apiVersion}/ranking-categories?limit=20&categoryTypeId=${typeId}`;
+                const url = `${baseUrl}/api/${apiVersion}/public/ranking-categories?limit=20&categoryTypeId=${typeId}`;
                 const response = await fetch(url);
 
                 if (!response.ok) {
