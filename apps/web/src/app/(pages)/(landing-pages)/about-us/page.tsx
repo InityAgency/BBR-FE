@@ -11,7 +11,7 @@ export default function AboutUsPage() {
     <div>
       {/* FIRST SECTION */}
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
-        <div className="flex flex-col gap-6 w-full rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-32 relative overflow-hidden">
+        <div className="flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-32 relative overflow-hidden">
           <Image
             src="/about-us-hero.png"
             alt="about-us"
@@ -38,7 +38,7 @@ export default function AboutUsPage() {
 
       {/* SECOND SECTION */}
       <SectionLayout className="ps-4 pe-4 lg:ps-0 lg:pe-0 m-auto mb-8 lg:mb-0">
-        <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 w-full h-[485px] sm:h-[350px] md:h-[400px] pt-8 lg:pt-12">
+        <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 w-full xl:max-w-[1600px] mx-auto h-[485px] sm:h-[350px] md:h-[400px] pt-8 lg:pt-12">
           <p className="text-md text-left lg:text-center text-primary z-10">
             OUR PURPOSE
           </p>
@@ -52,7 +52,7 @@ export default function AboutUsPage() {
             confidence to those who expect more.
           </p>
         </div>
-        <div className="flex w-full flex-col -mt-[200px] sm:-mt-[100px] md:-mt-[150px]">
+        <div className="flex w-full xl:max-w-[1600px] mx-auto flex-col -mt-[200px] sm:-mt-[100px] md:-mt-[150px]">
           <Image
             src="/why-we-exist.png"
             alt="why-we-exist"
@@ -71,54 +71,56 @@ export default function AboutUsPage() {
       </SectionLayout>
 
       {/* THIRD SECTION */}
-      <SectionLayout className="flex flex-col lg:flex-row gap-4 mb-8 lg:mb-20 ps-4 pe-4 lg:ps-0 lg:pe-0" >
-        <div className="min-w-full lg:min-w-[45%] min-h-[600px] lg:min-h-[650px] relative rounded-xl overflow-hidden">
-          <Image
-            src="/bbr-founder.png"
-            alt="why-we-exist"
-            fill
-            className="object-cover w-full h-full"
-          />
-        </div>
-        <div className="flex flex-col gap-8 justify-between">
-          <span className="text-md !font-bold lg:text-lg text-left text-primary w-full">
-            OUR STORY
-          </span>
-          <h1 className="text-4xl w-[100%] text-left mx-auto">
-            A Founder's Vision
-          </h1>
-          <p className="text-md lg:text-xl w-full text-justify text-white">
-            I created this platform to bring transparency and quality into the
-            branded residence market. With decades of experience in review
-            systems and a passion for architecture and real estate, I saw an
-            opportunity to raise the bar.I created this platform to bring
-            transparency and quality into the branded residence market.
-          </p>
-          <div className="flex flex-col bg-[#F9E6D2] rounded-xl px-[32px] py-[28px] gap-2">
-            <svg
-              width="25"
-              height="25"
-              viewBox="0 0 38 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 32L9.55419 0H17.6687L11.91 32H0ZM19.8937 32L29.4478 0H37.5624L31.8037 32H19.8937Z"
-                fill="#B3804C"
-              />
-            </svg>
-
-            <p className="text-justify text-md lg:text-xl text-[#0F172A] lg:text-3xl">
+      <div className="w-full xl:max-w-[1600px] mx-auto">
+        <SectionLayout className="flex flex-col lg:flex-row gap-4 mb-8 lg:mb-20 ps-4 pe-4 lg:ps-0 lg:pe-0" >
+          <div className="min-w-full lg:min-w-[45%] min-h-[600px] lg:min-h-[650px] relative rounded-xl overflow-hidden">
+            <Image
+              src="/bbr-founder.png"
+              alt="why-we-exist"
+              fill
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <div className="flex flex-col gap-8 justify-between">
+            <span className="text-md !font-bold lg:text-lg text-left text-primary w-full">
+              OUR STORY
+            </span>
+            <h1 className="text-4xl w-[100%] text-left mx-auto">
+              A Founder's Vision
+            </h1>
+            <p className="text-md lg:text-xl w-full text-justify text-white">
               I created this platform to bring transparency and quality into the
               branded residence market. With decades of experience in review
               systems and a passion for architecture and real estate, I saw an
               opportunity to raise the bar.I created this platform to bring
               transparency and quality into the branded residence market.
             </p>
-            <p className="text-[#0F172A] text-xl">Jeev Trika, Founder</p>
+            <div className="flex flex-col bg-[#F9E6D2] rounded-xl px-[32px] py-[28px] gap-2">
+              <svg
+                width="25"
+                height="25"
+                viewBox="0 0 38 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0 32L9.55419 0H17.6687L11.91 32H0ZM19.8937 32L29.4478 0H37.5624L31.8037 32H19.8937Z"
+                  fill="#B3804C"
+                />
+              </svg>
+
+              <p className="text-justify text-md lg:text-xl text-[#0F172A] lg:text-3xl">
+                I created this platform to bring transparency and quality into the
+                branded residence market. With decades of experience in review
+                systems and a passion for architecture and real estate, I saw an
+                opportunity to raise the bar.I created this platform to bring
+                transparency and quality into the branded residence market.
+              </p>
+              <p className="text-[#0F172A] text-xl">Jeev Trika, Founder</p>
+            </div>
           </div>
-        </div>
-      </SectionLayout>
+        </SectionLayout>
+      </div>
 
       {/* FOURTH SECTION */}
       <div className="flex flex-col bg-secondary mb-20 pb-20">
@@ -265,7 +267,7 @@ export default function AboutUsPage() {
       </div>
 
       {/* FIFTH SECTION */}
-      <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 mx-16 mb-20">
+      <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 w-full xl:max-w-[1600px] mx-auto mb-20">
         <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
           NEW SOLUTION
         </span>
@@ -463,7 +465,7 @@ export default function AboutUsPage() {
 
       {/* SIXTH SECTION */}
       <SectionLayout className="relative mb-20 rounded-xl overflow-hidden h-[400px]">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 w-full xl:max-w-[1600px] mx-auto rounded-xl overflow-hidden">
           <Image
             src="/explore-banner.webp"
             alt="about-us"
@@ -492,6 +494,7 @@ export default function AboutUsPage() {
       {/* SEVENTH SECTION */}
       <div className="flex flex-col bg-secondary mb-20">
        <SectionLayout>
+        <div className="w-full xl:max-w-[1600px] mx-auto">
           <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
             WHO WE SERVE
           </span>
@@ -607,6 +610,7 @@ export default function AboutUsPage() {
             height={400}
             className="w-full"
           />
+        </div>
        </SectionLayout>
       </div>
 

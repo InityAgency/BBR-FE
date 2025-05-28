@@ -42,7 +42,7 @@ export default function EvaluationCriteriaPage() {
     <div>
       {/* FIRST SECTION */}
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-20">
-        <div className="relative flex flex-col gap-6 w-full rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-32 relative overflow-hidden">
+        <div className="relative flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto rounded-xl bg-black/50 p-4 lg:p-8 py-12 lg:py-32 relative overflow-hidden">
           <Image
             src="/criteria-hero.jpg"
             alt="about-us"
@@ -127,7 +127,7 @@ export default function EvaluationCriteriaPage() {
 
       {/* SECOND SECTION */}
       <div className="relative mx-[30px] lg:mx-[120px] mb-20">
-        <div className="flex bg-secondary rounded-xl w-full">
+        <div className="flex bg-secondary rounded-xl w-full xl:max-w-[1600px] mx-auto">
           <div className="flex flex-col lg:flex-row px-[20px] lg:px-[70px] items-center py-[24px] lg:py-[64px] gap-[100px]">
             <Image
               src="/evaluation-top-residence.png"
@@ -168,11 +168,11 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* THIRD SECTION */}
-      <div className="bg-beigeVariant1 pl-[30px] py-[20px] lg:pl-[120px] lg:py-[96px] overflow-hidden">
-        <h1 className="text-secondary text-[40px] mb-[24px]">
+      <div className="bg-beigeVariant1 pl-[30px] py-[20px] lg:pl-[120px] lg:py-[96px] overflow-hidden ">
+        <h1 className="text-secondary text-[40px] mb-[24px] xl:max-w-[1600px] mx-auto">
           Our Ranking Evaluation Pillars
         </h1>
-        <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px]">
+        <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px] xl:max-w-[1600px] mx-auto">
           <div className="flex place-self-start gap-[12px] lg:place-self-end">
             <Button
               onClick={() => {}}
@@ -195,7 +195,7 @@ export default function EvaluationCriteriaPage() {
             market does, powered by AI and verified by expert review.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[400px]">
+        <div className="flex flex-col lg:flex-row mt-[56px] gap-[30px] lg:gap-[50px] lg:h-[400px] ">
           <div className="flex flex-col bg-secondary max-w-[350px] mr-[30px] rounded-xl p-[16px] lg:p-[32px]">
             <h1 className="text-xl lg:text-[28px] mb-[10px] lg:mb-[24px]">
               Location & Area
@@ -215,7 +215,7 @@ export default function EvaluationCriteriaPage() {
               className="max-h-[200px]  w-full rounded mt-[24px]"
             />
           </div>
-          <div className="text-black place-self-start h-full w-full overflow-hidden">
+          <div className="text-black place-self-start h-full w-full overflow-hidden ">
             <ProgressCarousel
               slides={CAROUSEL_CARDS}
               options={CAROUSEL_OPTIONS}
@@ -225,7 +225,7 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* FOURTH SECTION */}
-      <div className="bg-white px-[30px] py-[20px] lg:px-[120px] lg:py-[84px]">
+      <div className="bg-white px-[30px] py-[20px] lg:px-[120px] lg:py-[84px] ">
         <div className="flex flex-col gap-[56px] bg-beigeVariant2 rounded-xl p-[32px] lg:p-[64px]">
           <div className="flex flex-col lg:flex-row gap-[48px]">
             <h1 className="text-4xl text-[36px] lg:text-[40px] text-black lg:w-[50%]">
@@ -466,12 +466,14 @@ export default function EvaluationCriteriaPage() {
       </div>
 
       {/* SEVENTH SECTION */}
-      <FaqBlock />
+      <div className="xl:max-w-[1600px] mx-auto">
+        <FaqBlock />
+      </div>
 
       {/* EIGHTH SECTION */}
       <div className="bg-secondary">
         <SectionLayout>
-          <div className="flex gap-[80px]">
+          <div className="flex gap-[80px] xl:max-w-[1600px] mx-auto">
             <div className="contact-form-wrapper w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px]">
               <div className="flex flex-col gap-4">
                 <p className="text-[16px] text-primary">GET IN TOUCH</p>

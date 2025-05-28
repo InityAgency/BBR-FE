@@ -62,14 +62,14 @@ export default function BrandPage() {
                 </div>
             </div>
             <SectionLayout>
-                <div className="flex flex-col gap-2 w-full mb-12">
+                <div className="flex flex-col gap-2 w-full mb-12 w-full xl:max-w-[1600px] mx-auto">
                     <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">brand locations</span>
                     <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">{brand.name} Residence Collection</h2>
                 </div>
                 
                 {residences.length > 0 ? (
                     /* Prikazujemo rezidencije ako postoje */
-                    <div className="flex flex-col gap-6 w-full">
+                    <div className="flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                             {residences.slice(0, 2).map((residence) => (
                                 <div key={residence.id}>

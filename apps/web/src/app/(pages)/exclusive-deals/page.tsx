@@ -304,7 +304,7 @@ export default function ExclusiveDealsPage() {
         </div>
       </div>
       <SectionLayout>
-        <div ref={unitsSectionRef} className="w-full">
+        <div ref={unitsSectionRef} className="w-full xl:max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-1 lg:gap-4 w-full">
             <div>
               {/* Desktop filteri */}
@@ -567,7 +567,7 @@ export default function ExclusiveDealsPage() {
                 </p>
             </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full xl:max-w-[1600px] mx-auto">
             {/* Left side - Image and Schedule */}
             <div className="flex flex-col gap-4 items-stretch">
               <div className="border rounded-lg h-full p-4">

@@ -242,8 +242,8 @@ export default function LeaveAReviewPage() {
     }
 
     return (
-        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-12">
-            <div className="page-header flex flex-col gap-6 w-full">
+        <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-12 ">
+            <div className="page-header flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto">
                 <p className="text-md uppercase text-left lg:text-center text-primary">Leave review</p>
                 <h1 className="text-4xl font-bold text-left lg:text-center">We Value Your Review</h1>
                 <p className="text-left lg:text-center text-lg max-w-full lg:max-w-3xl mx-auto">
@@ -251,7 +251,7 @@ export default function LeaveAReviewPage() {
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className='custom-form-wrapper w-full lg:w-[80%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4'>
+            <form onSubmit={handleSubmit} className='custom-form-wrapper w-full lg:w-[80%] xl:max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4'>
                 {/* Leva strana */}
                 <div className="flex flex-col custom-form border rounded-lg p-4 lg:p-6">
                     {/* Select za rezidenciju sa pretragom (pretraga unutar SelectContent) */}

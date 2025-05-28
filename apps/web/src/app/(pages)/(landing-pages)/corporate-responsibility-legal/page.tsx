@@ -301,7 +301,7 @@ const CorporateResponsibilityLegal = () => {
     <div>
       {/* FIRST SECTION */}
       <div className="relative flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-2 lg:p-8 py-2 lg:py-[50px] relative overflow">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-2 lg:p-8 py-2 lg:py-[50px] relative overflow xl:max-w-[1600px] mx-auto">
           <Image
             src="/crl-hero.png"
             alt="about-us"
@@ -333,7 +333,7 @@ const CorporateResponsibilityLegal = () => {
       <div className="bg-beigeVariant11">
         <SectionLayout>
           <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-blog-content">
-            <div className="w-full flex gap-4 mx-auto space-y-8 relative">
+            <div className="w-full flex gap-4 mx-auto space-y-8 relative xl:max-w-[1600px] mx-auto">
               <TableOfContents
                 backgroundTheme="light"
                 contentSelector=".commitment"
@@ -349,28 +349,30 @@ const CorporateResponsibilityLegal = () => {
       <div className="bg-beigeVariant4">
         <SectionLayout>
           <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
-            <Image
-              src="/texture.webp"
-              alt="about-us"
-              fill
-              className="w-full h-full object-cover opacity-80"
-            />
-            <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
-              Join the Best and Elevate Your Branded Residence
-            </h1>
-            <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
-              BBR is a startup with a vision for the future. While we are in the
-              early stages, we are committed to building a platform that
-              promotes sustainability, ethical business practices, and social
-              impact. Join us as we grow, and together, we can create a better
-              future for the luxury real estate market and the world.
-            </p>
-            <Link
-              href="/#"
-              className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
-            >
-              Get Started -&gt;
-            </Link>
+            <div className="w-full xl:max-w-[1600px] mx-auto relative flex flex-col gap-[16px] lg:gap-[20px] px-[12px] py-[24px] lg:py-[66px] items-center">
+              <Image
+                src="/texture.webp"
+                alt="about-us"
+                fill
+                className="w-full h-full object-cover opacity-80"
+              />
+              <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
+                Join the Best and Elevate Your Branded Residence
+              </h1>
+              <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
+                BBR is a startup with a vision for the future. While we are in the
+                early stages, we are committed to building a platform that
+                promotes sustainability, ethical business practices, and social
+                impact. Join us as we grow, and together, we can create a better
+                future for the luxury real estate market and the world.
+              </p>
+              <Link
+                href="/#"
+                className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
+              >
+                Get Started -&gt;
+              </Link>
+            </div>
           </div>
         </SectionLayout>
       </div>

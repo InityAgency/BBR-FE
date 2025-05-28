@@ -329,7 +329,7 @@ export default function CountryResidencesPage() {
         </div>
       </div>
       <SectionLayout>
-        <div className="w-full">
+        <div className="w-full xl:max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-1 lg:gap-4 w-full">
             <div>
               {/* Desktop filters */}

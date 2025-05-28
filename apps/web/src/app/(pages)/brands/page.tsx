@@ -90,7 +90,7 @@ export default function BrandsPage() {
                 </div>
             </div>
             <SectionLayout>
-                <div ref={brandsSectionRef} className="w-full">
+                <div ref={brandsSectionRef} className="w-full xl:max-w-[1600px] mx-auto">
                     <div className="flex flex-col gap-1 lg:gap-8 w-full">
                         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center justify-between w-full">
                             <h2 className="text-4xl font-bold text-left">Top Branded Residences by Brands</h2>

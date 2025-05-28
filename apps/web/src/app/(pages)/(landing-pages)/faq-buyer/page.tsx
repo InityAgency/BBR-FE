@@ -46,7 +46,7 @@ export default function FAQBuyerPage() {
       {/* Contact Expert Section */}
       <section className="bg-secondary">
         <SectionLayout>
-            <div className="flex flex-col gap-4 mb-8 items-start lg:max-w-[55%] lg:m-auto mb-4 lg:mb-12">
+            <div className="flex flex-col gap-4 mb-8 items-start lg:max-w-[55%] lg:m-auto mb-4 lg:mb-12 ">
                 <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">still have any questions?</span>
                 <h2 className="text-4xl font-bold text-left lg:text-center w-full">
                     Connect with our team of branded residence experts

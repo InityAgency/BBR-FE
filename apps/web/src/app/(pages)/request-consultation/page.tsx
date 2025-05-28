@@ -8,7 +8,7 @@ export default function RequestAConsultationPage() {
     return (
         <>
             <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-12">
-                <div className="page-header flex flex-col gap-6 w-full">
+                <div className="page-header flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto">
                     <p className="text-md uppercase text-left lg:text-center text-primary">REQUEST A CONSULTATION</p>
                     <h1 className="text-4xl font-bold text-left lg:text-center w-full lg:w-[40%] mx-auto">Connect with Your Personal Luxury Real Estate Expert</h1>
                     <p className="text-left lg:text-center text-lg max-w-full lg:max-w-2xl mx-auto">
@@ -16,7 +16,7 @@ export default function RequestAConsultationPage() {
                     </p>
                 </div>
 
-                <div className="contact-form-wrapper w-full lg:w-[80%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="contact-form-wrapper w-full lg:w-[80%] xl:max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">
                         <RequestConsultationForm />
                     </div>
@@ -47,7 +47,7 @@ export default function RequestAConsultationPage() {
                 </div>
             </div>
             <SectionLayout>
-                <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 w-full">
+                <div className="flex flex-col gap-4 bg-secondary rounded-xl p-4 lg:p-12 w-full xl:max-w-[1600px] mx-auto">
                     <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">NEW SOLUTION</span>
                     <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">The Smartest Way to Buy, Invest & Discover Branded Residences</h2>
                     <p className="text-md lg:text-lg w-full lg:w-[50%] text-left lg:text-center mx-auto text-white/70">

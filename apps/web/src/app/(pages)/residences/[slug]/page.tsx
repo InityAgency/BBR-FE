@@ -165,7 +165,7 @@ export default function ResidencePage() {
     return(
         <>
             <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-0">
-                <div className="w-full flex flex-col lg:flex-row gap-4 items-end">
+                <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 items-end">
                     <div className="w-full">
                         <p className="text-primary">{residence.city.name}, {residence.country.name}</p>
                         <h1 className="text-4xl font-bold mt-2">{residence.name}</h1>
@@ -212,7 +212,7 @@ export default function ResidencePage() {
                     </div>
                 </div>
 
-                <div className="gallery-grid w-full">
+                <div className="gallery-grid w-full xl:max-w-[1600px] mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[550px]">
                         {galleryImages.length > 0 && (
                             <div 
@@ -300,10 +300,12 @@ export default function ResidencePage() {
             <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
                         
             <SectionLayout>
-                <StickyScrollTabs sections={sections} offset={80} />
+                <div className="w-full xl:max-w-[1600px] mx-auto">
+                    <StickyScrollTabs sections={sections} offset={80} />
+                </div>
 
 
-                <div id="overview" className="flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">
+                <div id="overview" className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">
                     <div className="about-residence w-full">
                         <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">
                             RESIDENCE INFORMATION
@@ -320,7 +322,7 @@ export default function ResidencePage() {
                     </div>
                 </div>
 
-                <div id="development" className="flex flex-col gap-4 py-8 lg:py-16 px-4 lg:px-0 w-full">
+                <div id="development" className="flex flex-col gap-4 py-8 lg:py-16 px-4 lg:px-0 w-full xl:max-w-[1600px] mx-auto">
                     <div className="w-full flex flex-col gap-2 ites-center">
                         <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase w-full">
                             DEVELOPMENT INFORMATION
@@ -380,7 +382,7 @@ export default function ResidencePage() {
                 </div>
 
                 {residence.amenities && residence.amenities.length > 0 ? (
-                    <div id="amenities" className="flex flex-col gap-3 py-8 lg:py-16 px-4 lg:px-0 w-full">
+                    <div id="amenities" className="flex flex-col gap-3 py-8 lg:py-16 px-4 lg:px-0 w-full xl:max-w-[1600px] mx-auto">
                         <div className="w-full flex flex-col gap-2 ites-center">
                             <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase w-full">
                                 LIST OF AMENITIES
@@ -442,7 +444,7 @@ export default function ResidencePage() {
 
 
                 {residence.videoTourUrl ? (
-                    <div id="video" className="flex flex-col gap-3 py-8 lg:py-16 px-4 lg:px-0 w-full">
+                    <div id="video" className="flex flex-col gap-3 py-8 lg:py-16 px-4 lg:px-0 w-full xl:max-w-[1600px] mx-auto">
                         <div className="w-full flex flex-col gap-2 ites-center">
                             <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase w-full">
                                 VIDEO TOUR
@@ -465,7 +467,7 @@ export default function ResidencePage() {
 
             <div className="bg-secondary px-2 py-6 lg:px-0 lg:py-0">
                 <SectionLayout>
-                    <div className="cta-review w-full rounded-xl border px-4 lg:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-[#faf3ee12] bg-opacity-10 relative overflow-hidden">
+                    <div className="cta-review w-full xl:max-w-[1600px] mx-auto rounded-xl border px-4 lg:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-[#faf3ee12] bg-opacity-10 relative overflow-hidden">
                         <Image 
                             src="/pattern.png"
                             width={100}
@@ -496,7 +498,7 @@ export default function ResidencePage() {
 
             <div className="bg-[#1A1E21] py-8 lg:py-16 px-4 lg:px-0 ">
                 <SectionLayout>
-                    <div className="w-full flex flex-col items-start lg:items-center gap-4 mb-8 2xl:max-w-[1600px] mx-auto">
+                    <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col items-start lg:items-center gap-4 mb-8">
                         <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">
                             SIMILAR RESIDENCES
                         </span>
@@ -506,7 +508,7 @@ export default function ResidencePage() {
                     </div>
                     
                     {/* Prikaz sličnih rezidencija */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 w-full xl:max-w-[1600px] mx-auto">
                         {loadingSimilar ? (
                             <div className="col-span-3 flex justify-center items-center py-12">
                                 <p className="text-lg text-muted-foreground">Loading similar residences...</p>

@@ -132,14 +132,14 @@ export default async function BlogPage({
     return (
       <>  
         <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
-          <div className="page-header flex flex-col gap-6 w-full">
+          <div className="page-header flex flex-col gap-6 w-full xl:max-w-[1600px] mx-auto">
             <h1 className="text-4xl font-bold text-left lg:text-center w-full lg:w-[50%] mx-auto">Discover Exclusive Insights and Trends in the Luxury Market</h1>
           </div>
         </div>
         
         {/* Featured posts section */}
         <SectionLayout>
-        
+          <div className="w-full xl:max-w-[1600px] mx-auto">
             <h2 className="text-4xl font-bold text-white mb-8 w-full">Dive into this week's trends</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* First two posts with images */}
@@ -157,18 +157,20 @@ export default async function BlogPage({
                 {featuredPosts[3] && <FeaturedPostNoImage post={featuredPosts[3]} />}
               </div>
             </div>
+          </div>
         </SectionLayout>
         
         {/* Main posts section */}
         <SectionLayout>
     
-            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 justify-between items-center w-full mb-6 lg:mb-0">
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 justify-between items-center w-full mb-6 lg:mb-0 xl:max-w-[1600px] mx-auto">
               <h2 id="latest-articles" className="text-4xl font-bold text-left w-full">Latest Articles</h2>
               <SearchInput />
             </div>
-
-            <Tabs categories={categoriesWithPosts} />
-            
+            <div className="w-full xl:max-w-[1600px] mx-auto">
+              <Tabs categories={categoriesWithPosts} />
+            </div>
+            <div className="w-full xl:max-w-[1600px] mx-auto">
             {paginatedPosts.length > 0 ? (
               <div className="grid md:grid-cols-3 gap-4">
                 {paginatedPosts.map((post) => (
@@ -180,6 +182,7 @@ export default async function BlogPage({
                 <p className="text-white text-lg">No posts found</p>
               </div>
             )}
+            </div>
     
             {totalPages > 1 && (
               <Pagination>
@@ -215,7 +218,7 @@ export default async function BlogPage({
   } catch (error) {
     console.error('Error in BlogPage:', error);
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] ">
         <h1 className="text-2xl font-bold text-red-500">Error loading blog posts</h1>
         <p className="text-gray-600">Please try again later</p>
       </div>
