@@ -99,7 +99,7 @@ export default function CategoryPage() {
     const apiVersion = process.env.NEXT_PUBLIC_API_VERSION;
 
     // Memoized API URLs
-    const categoryUrl = `${baseUrl}/api/${apiVersion}//ranking-categories/slug/${slug}`;
+    const categoryUrl = `${baseUrl}/api/${apiVersion}/ranking-categories/slug/${slug}`;
     const residencesUrl = `${baseUrl}/api/${apiVersion}/public/ranking-categories/${slug}/residences`;
 
     // Fetch category data and similar categories
