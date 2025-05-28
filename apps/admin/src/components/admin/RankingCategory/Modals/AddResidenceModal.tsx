@@ -116,7 +116,7 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
 
   // Funkcija za proveru koji kriterijumi nedostaju za rezidencije
   const checkMissingCriteria = useCallback((residences: Residence[], criteria: RankingCriteria[]) => {
-    console.log("=== PROVERA NEDOSTAJUĆIH KRITERIJUMA ===");
+    console.log("=== CHECKING MISSING CRITERIA ===");
 
     residences.forEach(residence => {
       const missingCriteria: RankingCriteria[] = [];
@@ -132,11 +132,11 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
       });
 
       if (missingCriteria.length > 0) {
-        console.log(`🏠 Rezidencija: ${residence.name} (ID: ${residence.id})`);
-        console.log(`📍 Lokacija: ${residence.city?.name || 'N/A'} - ${residence.country?.name || 'N/A'}`);
-        console.log("❌ Nedostaju kriterijumi:");
+        console.log(`🏠 Residence: ${residence.name} (ID: ${residence.id})`);
+        console.log(`📍 Location: ${residence.city?.name || 'N/A'} - ${residence.country?.name || 'N/A'}`);
+        console.log("❌ Missing criteria:");
         missingCriteria.forEach(criterion => {
-          console.log(`   - ${criterion.name} (ID: ${criterion.id}) - Težina: ${criterion.weight}%`);
+          console.log(`   - ${criterion.name} (ID: ${criterion.id}) - Weight: ${criterion.weight}%`);
         });
         console.log("---");
       }
@@ -150,10 +150,10 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
       )
     ).length;
 
-    console.log("📊 SUMARNI IZVEŠTAJ:");
-    console.log(`Ukupno rezidencija: ${totalResidences}`);
-    console.log(`Rezidencije sa nedostajućim kriterijumima: ${residencesWithMissingCriteria}`);
-    console.log(`Rezidencije sa kompletnim kriterijumima: ${totalResidences - residencesWithMissingCriteria}`);
+    console.log("📊 SUMMARY REPORT:");
+    console.log(`Total residences: ${totalResidences}`);
+    console.log(`Residences with missing criteria: ${residencesWithMissingCriteria}`);
+    console.log(`Residences with complete criteria: ${totalResidences - residencesWithMissingCriteria}`);
     console.log("===========================================");
   }, []);
 
@@ -190,18 +190,18 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
             scores: scores
           });
 
-          console.log(`📝 Kreiram skorove za ${residence.name}:`,
+          console.log(`📝 Creating scores for ${residence.name}:`,
             missingCriteria.map(c => `${c.name}: 1`).join(', '));
         }
       });
 
       // Ako nema nedostajućih skorova, vraćamo true
       if (scoreCreationItems.length === 0) {
-        console.log("✅ Sve selektovane rezidencije već imaju kompletne skorove");
+        console.log("✅ All selected residences already have complete scores");
         return true;
       }
 
-      console.log(`🔄 Kreiram skorove za ${scoreCreationItems.length} rezidencija...`);
+      console.log(`🔄 Creating scores for ${scoreCreationItems.length} residences...`);
 
       // Pozivamo API za kreiranje skorova
       const response = await fetch(
@@ -223,7 +223,7 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
         throw new Error(errorData?.message || "Failed to create missing scores");
       }
 
-      console.log("✅ Uspešno kreirani nedostajući skorovi");
+      console.log("✅ Successfully created missing scores");
       toast.success(`Created missing scores for ${scoreCreationItems.length} residences`);
       return true;
 
@@ -284,9 +284,9 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
   
       // Debug log za jasnoću
       if (isWorldwideCategory) {
-        console.log("🌍 Worldwide kategorija detektovana - učitavam sve rezidencije");
+        console.log("🌍 Worldwide category detected - loading all residences");
       } else {
-        console.log(`📍 Standardna kategorija (${key}) - filtriram po entityId: ${category.entityId}`);
+        console.log(`📍 Standard category (${key}) - filtering by entityId: ${category.entityId}`);
       }
   
       const response = await fetch(
@@ -315,7 +315,7 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
       }
   
       // Debug log za rezultate
-      console.log(`📊 Učitano ${newResidences.length} rezidencija (${isWorldwideCategory ? 'Worldwide' : key})`);
+      console.log(`📊 Loaded ${newResidences.length} residences (${isWorldwideCategory ? 'Worldwide' : key})`);
   
       // Proveravamo kriterijume samo ako imamo detaljnu kategoriju
       if (detailedCategory?.rankingCriteria && newResidences.length > 0) {
