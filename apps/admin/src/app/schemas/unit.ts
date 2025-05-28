@@ -3,7 +3,7 @@ import { z } from "zod";
 // Enums
 export const UnitStatus = {
   ACTIVE: "ACTIVE",
-  INACTIVE: "INACTIVE", 
+  PENDING: "PENDING", 
   SOLD: "SOLD",
   RESERVED: "RESERVED",
   DRAFT: "DRAFT"
@@ -34,7 +34,7 @@ export const unitSchema = z.object({
   name: z.string().min(2, "Unit name must be at least 2 characters").max(100, "Unit name must be less than 100 characters"),
   description: z.string().optional(),
   surface: z.number().min(0, "Surface must be positive").optional(),
-  status: z.enum(["ACTIVE", "INACTIVE", "SOLD", "RESERVED", "DRAFT"]),
+  status: z.enum(["ACTIVE", "PENDING", "SOLD", "RESERVED", "DRAFT"]),
   regularPrice: z.number().min(0, "Regular price must be positive"),
   exclusivePrice: z.number().min(0, "Exclusive price must be positive").optional(),
   exclusiveOfferStartDate: z.string().optional(),
@@ -42,7 +42,7 @@ export const unitSchema = z.object({
   roomType: z.string().optional(),
   roomAmount: z.number().min(0, "Room amount must be positive").optional(),
   unitTypeId: z.string().min(1, "Unit type is required"),
-  serviceType: z.array(serviceTypeSchema).optional().default([]), // Promenjen sa serviceTypes na serviceType
+  services: z.array(serviceTypeSchema).optional().default([]), // Promenjen sa serviceType na services
   about: z.string().optional(),
   bathrooms: z.string().optional(),
   bedroom: z.string().optional(),
@@ -88,7 +88,7 @@ export const initialUnitValues: Partial<UnitFormValues> = {
   roomType: "",
   roomAmount: undefined,
   unitTypeId: "",
-  serviceType: [], 
+  services: [], 
   about: "",
   bathrooms: "",
   bedroom: "",

@@ -378,8 +378,10 @@ export default function CategoryPage() {
                                         {/* Residence Info */}
                                         <div className="flex flex-col gap-2 w-full justify-center">
                                             <h2 className="text-2xl lg:text-3xl font-bold">{residence.name}</h2>
-                                            <p className="text-white text-sm lg:text-base line-clamp-3 lg:line-clamp-none">
-                                                {residence.description}
+                                            <p className="text-white text-sm lg:text-base">
+                                                {residence.description.length > 150 
+                                                    ? `${residence.description.slice(0, 400)}...`
+                                                    : residence.description}
                                             </p>
                                             <button
                                                 onClick={(e) => {

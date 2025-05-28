@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,6 @@ import {
   UnitStatusType,
   TransactionType,
   ServiceAmountType,
-  serviceTypeSchema
 } from "@/app/schemas/unit";
 import { Check, Trash2, X, Plus, Minus } from "lucide-react";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
@@ -67,7 +66,7 @@ interface EditModeImage {
   mediaId: string;
 }
 
-interface ServiceType {
+interface Service {
   name: string;
   amount: "DAILY" | "WEEKLY" | "MONTHLY";
 }
@@ -79,11 +78,13 @@ const getStatusBadgeStyle = (status: string) => {
     case "INACTIVE":
       return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
     case "SOLD":
-      return "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50";
+      return "bg-purple-900/20 hover:bg-purple-900/40 text-purple-300 border-purple-900/50";
     case "RESERVED":
-      return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
-    case "DRAFT":
       return "bg-blue-900/20 hover:bg-blue-900/40 text-blue-300 border-blue-900/50";
+    case "DRAFT":
+      return "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50";
+    case "PENDING":
+      return "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50";
     default:
       return "";
   }
@@ -99,6 +100,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
   isEditing = false,
 }) => {
   const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
   const residenceIdFromUrl = searchParams.get("residenceId");
 
@@ -110,33 +112,15 @@ const UnitForm: React.FC<UnitFormProps> = ({
   const [featuredImage, setFeaturedImage] = useState<EditModeImage | UploadedImage | null>(null);
   const [characteristics, setCharacteristics] = useState<string[]>([]);
   const [newCharacteristic, setNewCharacteristic] = useState("");
+  const [isLoadingUnit, setIsLoadingUnit] = useState(false);
 
   const form = useForm<UnitFormValues>({
     resolver: zodResolver(unitSchema),
     defaultValues: {
-      name: initialData.name || "",
-      description: initialData.description || "",
-      surface: initialData.surface || undefined,
-      status: initialData.status || "ACTIVE",
-      regularPrice: initialData.regularPrice || 0,
-      exclusivePrice: initialData.exclusivePrice || undefined,
-      exclusiveOfferStartDate: initialData.exclusiveOfferStartDate || "",
-      exclusiveOfferEndDate: initialData.exclusiveOfferEndDate || "",
-      roomType: initialData.roomType || "",
-      roomAmount: initialData.roomAmount || undefined,
-      unitTypeId: initialData.unitTypeId || "",
-      serviceType: initialData.serviceType || [],
-      about: initialData.about || "",
-      bathrooms: initialData.bathrooms || "",
-      bedroom: initialData.bedroom || "",
-      floor: initialData.floor || "",
-      transactionType: initialData.transactionType || "SALE",
-      characteristics: initialData.characteristics || [],
-      residenceId: initialData.residenceId || residenceIdFromUrl || "",
-      galleryMediaIds: initialData.galleryMediaIds || [],
-      featureImageId: initialData.featureImageId || "",
+      ...initialUnitValues,
+      ...initialData,
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   // Fetch unit types from API
@@ -145,10 +129,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
       try {
         setLoadingUnitTypes(true);
         const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/unit-types`, {
-          credentials: 'include',
+          credentials: "include",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (!response.ok) {
@@ -160,7 +144,8 @@ const UnitForm: React.FC<UnitFormProps> = ({
           setUnitTypes(data.data);
         }
       } catch (error) {
-        toast.error('Failed to load unit types');
+        toast.error("Failed to load unit types");
+        console.error("Error fetching unit types:", error);
       } finally {
         setLoadingUnitTypes(false);
       }
@@ -169,32 +154,120 @@ const UnitForm: React.FC<UnitFormProps> = ({
     fetchUnitTypes();
   }, []);
 
+  // Load unit data in edit mode
   useEffect(() => {
-    if (isEditing && initialData.galleryMediaIds && initialData.galleryMediaIds.length > 0) {
-      const galleryImages: EditModeImage[] = initialData.galleryMediaIds.map((mediaId: string, index: number) => ({
-        mediaId: mediaId,
-        preview: `${API_BASE_URL}/api/${API_VERSION}/media/${mediaId}/content`,
-        isFeatured: initialData.featureImageId === mediaId,
-        order: index
-      }));
+    const fetchUnitData = async () => {
+      if (isEditing && !initialData?.id) {
+        const unitId = params?.unitId;
+        const residenceId = params?.id;
 
-      if (!initialData.featureImageId && galleryImages.length > 0) {
-        galleryImages[0].isFeatured = true;
+        if (unitId) {
+          try {
+            setIsLoadingUnit(true);
+            console.log("🔄 Loading unit data for ID:", unitId);
+
+            const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/units/${unitId}`, {
+              credentials: "include",
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch unit detail");
+
+            const json = await response.json();
+            const data = json.data;
+
+            console.log("✅ Loaded unit data:", data);
+
+            // Load gallery images using media IDs
+            const galleryImages: EditModeImage[] = [];
+            if (data.gallery && data.gallery.length > 0) {
+              data.gallery.forEach((img: any, index: number) => {
+                const isCurrentImageFeatured = data.featureImage && data.featureImage.id === img.id;
+                galleryImages.push({
+                  mediaId: img.id,
+                  preview: `${API_BASE_URL}/api/${API_VERSION}/media/${img.id}/content`,
+                  isFeatured: isCurrentImageFeatured,
+                  order: index,
+                });
+              });
+
+              // If no featured image, set the first one as featured
+              if (!data.featureImage && galleryImages.length > 0) {
+                galleryImages[0].isFeatured = true;
+              }
+
+              console.log("🖼️ Gallery images loaded:", galleryImages);
+              setImages(galleryImages);
+              const featuredImg = galleryImages.find((img) => img.isFeatured);
+              if (featuredImg) {
+                setFeaturedImage(featuredImg);
+              }
+            }
+
+            // Set characteristics
+            if (data.characteristics && Array.isArray(data.characteristics)) {
+              setCharacteristics(data.characteristics);
+            }
+
+            // Wait for unit types to load before resetting the form
+            await new Promise((resolve) => {
+              const checkUnitTypes = () => {
+                if (!loadingUnitTypes) {
+                  resolve(true);
+                } else {
+                  setTimeout(checkUnitTypes, 50);
+                }
+              };
+              checkUnitTypes();
+            });
+
+            // Reset form with loaded data
+            form.reset({
+              id: data.id,
+              name: data.name || "",
+              description: data.description || "",
+              surface: data.surface || undefined,
+              status: data.status || "ACTIVE",
+              regularPrice: data.regularPrice || 0,
+              exclusivePrice: data.exclusivePrice || undefined,
+              exclusiveOfferStartDate: data.exclusiveOfferStartDate || "",
+              exclusiveOfferEndDate: data.exclusiveOfferEndDate || "",
+              roomType: data.roomType || "",
+              roomAmount: data.roomAmount || undefined,
+              unitTypeId: data.unitType?.id || "",
+              services: data.services || [],
+              about: data.about || "",
+              bathrooms: data.bathrooms || "",
+              bedroom: data.bedroom || "",
+              floor: data.floor || "",
+              transactionType: data.transactionType || "SALE",
+              characteristics: data.characteristics || [],
+              residenceId: residenceId || data.residence?.id || "",
+              galleryMediaIds: data.gallery?.map((img: any) => img.id) || [],
+              featureImageId: data.featureImage?.id || "",
+            });
+
+            console.log("✅ Form reset complete");
+            console.log("Form values after reset:", form.getValues());
+          } catch (error) {
+            toast.error("Failed to load unit details");
+            console.error("Error in fetchUnitData:", error);
+          } finally {
+            setIsLoadingUnit(false);
+          }
+        }
       }
+    };
 
-      setImages(galleryImages);
-      const featuredImg = galleryImages.find(img => img.isFeatured);
-      if (featuredImg) {
-        setFeaturedImage(featuredImg);
-      }
-    }
-  }, [isEditing, initialData.galleryMediaIds, initialData.featureImageId]);
+    fetchUnitData();
+  }, [isEditing, initialData?.id, params?.unitId, params?.id, form, loadingUnitTypes]);
 
+  // Initialize characteristics from form data
   useEffect(() => {
-    if (initialData.characteristics) {
-      setCharacteristics(initialData.characteristics);
+    const formCharacteristics = form.watch("characteristics");
+    if (formCharacteristics && Array.isArray(formCharacteristics)) {
+      setCharacteristics(formCharacteristics);
     }
-  }, [initialData.characteristics]);
+  }, [form.watch("characteristics")]);
 
   const hasUnsavedChanges = form.formState.isDirty;
 
@@ -244,18 +317,18 @@ const UnitForm: React.FC<UnitFormProps> = ({
     form.setValue("characteristics", updated, { shouldDirty: true });
   };
 
-  // Add service type
-  const addServiceType = () => {
-    const currentServices = form.getValues("serviceType") || [];
+  // Add service
+  const addService = () => {
+    const currentServices = form.getValues("services") || [];
     const newService = { name: "", amount: "MONTHLY" as const };
-    form.setValue("serviceType", [...currentServices, newService], { shouldDirty: true });
+    form.setValue("services", [...currentServices, newService], { shouldDirty: true });
   };
 
-  // Remove service type
-  const removeServiceType = (index: number) => {
-    const currentServices = form.getValues("serviceType") || []; 
+  // Remove service
+  const removeService = (index: number) => {
+    const currentServices = form.getValues("services") || [];
     const updated = currentServices.filter((_, i) => i !== index);
-    form.setValue("serviceType", updated, { shouldDirty: true }); 
+    form.setValue("services", updated, { shouldDirty: true });
   };
 
   const onSubmit = async (data: UnitFormValues) => {
@@ -266,93 +339,64 @@ const UnitForm: React.FC<UnitFormProps> = ({
       console.log("🚀 Starting form submission...");
       console.log("Form values:", values);
 
-      // Upload samo novih slika (one koje imaju file property)
-      const newImages = images.filter((img): img is UploadedImage => 'file' in img);
+      // Upload only new images (those with file property)
+      const newImages = images.filter((img): img is UploadedImage => "file" in img);
       console.log("📸 New images to upload:", newImages.length);
-      console.log("New images details:", newImages.map(img => ({
-        name: img.file.name,
-        size: img.file.size,
-        type: img.file.type,
-        isFeatured: img.isFeatured
-      })));
 
       const uploadedImages = await Promise.all(
         newImages.map(async (image, index) => {
           console.log(`📤 Uploading image ${index + 1}/${newImages.length}: ${image.file.name}`);
 
           const formData = new FormData();
-          formData.append('file', image.file);
+          formData.append("file", image.file);
 
-          console.log("FormData contents:", {
-            fileName: image.file.name,
-            fileSize: image.file.size,
-            fileType: image.file.type
-          });
-
-          const uploadUrl = `${API_BASE_URL}/api/${API_VERSION}/media?type=RESIDENCE`;
+          const uploadUrl = `${API_BASE_URL}/api/${API_VERSION}/media?type=RESIDENCE_UNIT`;
           console.log("🌐 Upload URL:", uploadUrl);
 
-          try {
-            console.log("🔄 Sending fetch request...");
-            const response = await fetch(uploadUrl, {
-              method: 'POST',
-              credentials: 'include',
-              body: formData,
-            });
+          const response = await fetch(uploadUrl, {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          });
 
-            console.log("📋 Response status:", response.status);
-            console.log("📋 Response headers:", Object.fromEntries(response.headers.entries()));
-
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error("❌ Upload failed - Response text:", errorText);
-              throw new Error(`Failed to upload image ${image.file.name} (Status: ${response.status})`);
-            }
-
-            const responseData = await response.json();
-            console.log("✅ Upload successful for", image.file.name, "Response:", responseData);
-
-            return {
-              mediaId: responseData.data.id,
-              isFeatured: image.isFeatured,
-              order: image.order
-            };
-          } catch (fetchError) {
-            console.error("❌ Fetch error for", image.file.name, ":", fetchError);
-            throw fetchError;
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Upload failed - Response text:", errorText);
+            throw new Error(`Failed to upload image ${image.file.name} (Status: ${response.status})`);
           }
+
+          const responseData = await response.json();
+          console.log("✅ Upload successful for", image.file.name);
+
+          return {
+            mediaId: responseData.data.id,
+            isFeatured: image.isFeatured,
+            order: image.order,
+          };
         })
       );
 
-      console.log("✅ All images uploaded successfully:", uploadedImages);
-
-      // Kombinuj postojeće i nove slike
+      // Combine existing and new images
       const existingImages = images
-        .filter((img): img is EditModeImage => 'mediaId' in img)
-        .map(img => ({
+        .filter((img): img is EditModeImage => "mediaId" in img)
+        .map((img) => ({
           mediaId: img.mediaId,
           isFeatured: img.isFeatured,
-          order: img.order
+          order: img.order,
         }));
 
-      console.log("📁 Existing images:", existingImages);
-
       const allImages = [...existingImages, ...uploadedImages];
-      console.log("🖼️ All images combined:", allImages);
 
-      // galleryMediaIds i featureImageId
-      const galleryMediaIds = allImages.map(img => img.mediaId);
-      const featureImageId = allImages.find(img => img.isFeatured)?.mediaId || null;
+      // galleryMediaIds and featureImageId
+      const galleryMediaIds = allImages.map((img) => img.mediaId);
+      const featureImageId = allImages.find((img) => img.isFeatured)?.mediaId || null;
 
-      console.log("🎯 Gallery media IDs:", galleryMediaIds);
-      console.log("⭐ Featured image ID:", featureImageId);
-
-      // Pripremi payload
+      // Prepare payload
       const { id, ...restValues } = values;
       const payload = {
         ...restValues,
         galleryMediaIds,
-        featureImageId
+        featureImageId,
       };
 
       console.log("📦 Final payload:", JSON.stringify(payload, null, 2));
@@ -361,20 +405,15 @@ const UnitForm: React.FC<UnitFormProps> = ({
         ? `${API_BASE_URL}/api/${API_VERSION}/units/${id}`
         : `${API_BASE_URL}/api/${API_VERSION}/units`;
 
-      console.log("🌐 API URL for unit save:", apiUrl);
-      console.log("🔧 Method:", isEditing ? 'PUT' : 'POST');
-
       const response = await fetch(apiUrl, {
-        method: isEditing ? 'PUT' : 'POST',
-        credentials: 'include',
+        method: isEditing ? "PUT" : "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
-
-      console.log("📋 Unit save response status:", response.status);
 
       if (!response.ok) {
         const responseText = await response.text();
@@ -385,7 +424,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
         } catch (e) {
           responseData = { message: responseText };
         }
-        throw new Error(responseData?.message || `Error ${isEditing ? 'updating' : 'creating'} unit (Status: ${response.status})`);
+        throw new Error(
+          responseData?.message || `Error ${isEditing ? "updating" : "creating"} unit (Status: ${response.status})`
+        );
       }
 
       const unitResponse = await response.json();
@@ -399,17 +440,17 @@ const UnitForm: React.FC<UnitFormProps> = ({
       }
     } catch (error) {
       console.error("💥 Complete error in onSubmit:", error);
-      console.error("💥 Error stack:", error instanceof Error ? error.stack : 'No stack trace');
 
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to save unit');
+        toast.error("Failed to save unit");
       }
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const handleDiscard = () => {
     if (hasUnsavedChanges) {
       const residenceId = form.getValues("residenceId");
@@ -429,42 +470,44 @@ const UnitForm: React.FC<UnitFormProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!initialData?.id) return;
+    const unitId = form.getValues("id");
+    if (!unitId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/units/${initialData.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/units/${unitId}`, {
+        method: "DELETE",
+        credentials: "include",
       });
 
       if (!response.ok) {
         throw new Error(`Failed to delete unit: ${response.status}`);
       }
 
-      toast.success('Unit deleted successfully');
+      toast.success("Unit deleted successfully");
       const residenceId = form.getValues("residenceId");
       if (residenceId) {
         router.push(`/residences/${residenceId}?tab=inventory`);
       } else {
-        router.push('/units');
+        router.push("/units");
       }
       router.refresh();
     } catch (error) {
-      toast.error('Failed to delete unit');
+      toast.error("Failed to delete unit");
     }
   };
 
   const handleStatusChange = async (newStatus: UnitStatusType) => {
-    if (!initialData?.id) return;
+    const unitId = form.getValues("id");
+    if (!unitId) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/units/${initialData.id}/status`, {
-        method: 'PATCH',
-        credentials: 'include',
+      const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/units/${unitId}/status`, {
+        method: "PATCH",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus }),
       });
 
       if (!response.ok) {
@@ -475,7 +518,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
       toast.success(`Unit status updated to ${newStatus}`);
       router.refresh();
     } catch (error) {
-      toast.error('Failed to update unit status');
+      toast.error("Failed to update unit status");
     }
   };
 
@@ -503,11 +546,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
             </SelectTrigger>
             <SelectContent>
               {allowedStatuses.map((status) => (
-                <SelectItem
-                  key={status}
-                  value={status}
-                  className="text-sm"
-                >
+                <SelectItem key={status} value={status} className="text-sm">
                   {status}
                 </SelectItem>
               ))}
@@ -536,13 +575,15 @@ const UnitForm: React.FC<UnitFormProps> = ({
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure you want to delete this unit?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the unit
-                and all associated data.
+                This action cannot be undone. This will permanently delete the unit and all associated data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer">
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-destructive text-white hover:bg-destructive/80 transition-colors cursor-pointer"
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </AlertDialogAction>
@@ -562,10 +603,20 @@ const UnitForm: React.FC<UnitFormProps> = ({
     onSubmit(form.getValues());
   }, [form, onSubmit, isSaveEnabled]);
 
+  // Loading state
+  if (isEditing && isLoadingUnit) {
+    return (
+      <div className="w-full py-20 flex flex-col items-center justify-center space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground">Loading unit data...</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <FormHeader
-        title={isEditing ? initialData.name || "Edit unit" : "Add new unit"}
+        title={isEditing ? form.watch("name") || "Edit unit" : "Add new unit"}
         titleContent={renderStatusBadge()}
         extraButtons={renderDeleteButton()}
         onSave={handleSave}
@@ -588,7 +639,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Name <span className="text-destructive">*</span></FormLabel>
+                        <FormLabel>
+                          Unit Name <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="Enter unit name" {...field} />
                         </FormControl>
@@ -621,12 +674,13 @@ const UnitForm: React.FC<UnitFormProps> = ({
                     name="unitTypeId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Type <span className="text-destructive">*</span></FormLabel>
+                        <FormLabel>
+                          Unit Type <span className="text-destructive">*</span>
+                        </FormLabel>
                         <Select
                           disabled={loadingUnitTypes}
                           onValueChange={field.onChange}
-                          value={field.value}
-                          defaultValue={field.value}
+                          value={field.value || ""}
                         >
                           <FormControl className="w-full">
                             <SelectTrigger>
@@ -651,7 +705,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                     name="transactionType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Transaction Type <span className="text-destructive">*</span></FormLabel>
+                        <FormLabel>
+                          Transaction Type <span className="text-destructive">*</span>
+                        </FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl className="w-full">
                             <SelectTrigger>
@@ -720,7 +776,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                               step="0.1"
                               placeholder="80.5"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
                               value={field.value || ""}
                             />
                           </FormControl>
@@ -770,7 +828,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                               type="number"
                               placeholder="2"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
                               value={field.value || ""}
                             />
                           </FormControl>
@@ -792,7 +852,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                   name="regularPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Regular Price <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        Regular Price <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -822,7 +884,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
                           step="0.01"
                           placeholder="110000"
                           {...field}
-                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                          }
                           value={field.value || ""}
                         />
                       </FormControl>
@@ -841,8 +905,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? field.value.split('T')[0] : ""}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                          value={field.value ? field.value.split("T")[0] : ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? new Date(e.target.value).toISOString() : "")
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -860,8 +926,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? field.value.split('T')[0] : ""}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                          value={field.value ? field.value.split("T")[0] : ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? new Date(e.target.value).toISOString() : "")
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -875,11 +943,11 @@ const UnitForm: React.FC<UnitFormProps> = ({
             <div>
               <h2 className="text-xl font-semibold mb-4">Service Types</h2>
               <div className="space-y-4">
-                {form.watch("serviceType")?.map((service, index) => ( // Promenjen sa serviceTypes na serviceType
+                {form.watch("services")?.map((service, index) => (
                   <div key={index} className="flex gap-4 items-end">
                     <FormField
                       control={form.control}
-                      name={`serviceType.${index}.name`} // Promenjen sa serviceTypes na serviceType
+                      name={`services.${index}.name`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormLabel>Service Name</FormLabel>
@@ -893,7 +961,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
 
                     <FormField
                       control={form.control}
-                      name={`serviceType.${index}.amount`} // Promenjen sa serviceTypes na serviceType
+                      name={`services.${index}.amount`}
                       render={({ field }) => (
                         <FormItem className="w-40">
                           <FormLabel>Amount Type</FormLabel>
@@ -920,7 +988,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => removeServiceType(index)}
+                      onClick={() => removeService(index)}
                       className="mb-2"
                     >
                       <Minus className="h-4 w-4" />
@@ -928,17 +996,13 @@ const UnitForm: React.FC<UnitFormProps> = ({
                   </div>
                 ))}
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={addServiceType}
-                  className="w-full"
-                >
+                <Button type="button" variant="outline" onClick={addService} className="w-full">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Service Type
                 </Button>
               </div>
             </div>
+
             {/* Characteristics */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Characteristics</h2>
@@ -949,7 +1013,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
                     value={newCharacteristic}
                     onChange={(e) => setNewCharacteristic(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         addCharacteristic();
                       }
@@ -1014,7 +1078,7 @@ const UnitForm: React.FC<UnitFormProps> = ({
                   onFeaturedChange={setFeaturedImage}
                   maxImages={10}
                   maxSizePerImage={5}
-                  initialImages={images.filter((img): img is EditModeImage => 'mediaId' in img)}
+                  initialImages={images.filter((img): img is EditModeImage => "mediaId" in img)}
                 />
               </div>
             </div>

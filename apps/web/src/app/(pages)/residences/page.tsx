@@ -449,7 +449,7 @@ export default function ResidencesPage() {
         </div>
       </div>
       <SectionLayout>
-        <div ref={residencesSectionRef} className="w-full ">
+        <div ref={residencesSectionRef} className="w-full xl:max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-1 lg:gap-4 w-full">
             <div>
 

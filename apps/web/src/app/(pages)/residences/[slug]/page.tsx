@@ -494,9 +494,9 @@ export default function ResidencePage() {
                 </SectionLayout>
             </div>
 
-            <div className="bg-[#1A1E21] py-8 lg:py-16 px-4 lg:px-0">
+            <div className="bg-[#1A1E21] py-8 lg:py-16 px-4 lg:px-0 ">
                 <SectionLayout>
-                    <div className="w-full flex flex-col items-start lg:items-center gap-4 mb-8">
+                    <div className="w-full flex flex-col items-start lg:items-center gap-4 mb-8 2xl:max-w-[1600px] mx-auto">
                         <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">
                             SIMILAR RESIDENCES
                         </span>
