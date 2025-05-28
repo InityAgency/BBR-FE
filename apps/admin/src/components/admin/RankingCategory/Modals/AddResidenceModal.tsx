@@ -239,34 +239,56 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
   const fetchResidences = useCallback(async (pageNumber: number, isNewSearch: boolean = false) => {
     // Koristimo ref da sprečimo duplicirane zahteve
     if (isLoadingRef.current) return;
-
+  
     try {
       isLoadingRef.current = true;
       setLoading(true);
-
+  
       let queryParams = new URLSearchParams();
       const key = category.rankingCategoryType?.key;
-      if (key === "countries") {
-        queryParams.append("countryId", category.entityId);
-      } else if (key === "cities") {
-        queryParams.append("cityId", category.entityId);
-      } else if (key === "brands") {
-        queryParams.append("brandId", category.entityId);
-      } else if (key === "lifestyles") {
-        queryParams.append("lifestyleId", category.entityId);
-      } else if (key === "geographical-areas") {
-        queryParams.append("geographicalAreaId", category.entityId);
-      } else if (key === "continents") {
-        queryParams.append("continentId", category.entityId);
+      
+      // Konstanta za Worldwide ID
+      const WORLDWIDE_ID = "2470421f-16ed-4c88-9110-7f89dea9dd0e";
+      
+      // Proveravamo da li je Worldwide kategorija
+      const isWorldwideCategory = (
+        (key === "geographical-areas" || key === "continents") && 
+        category.entityId === WORLDWIDE_ID
+      );
+  
+      // Dodajemo filtere samo ako NIJE Worldwide kategorija
+      if (!isWorldwideCategory) {
+        if (key === "countries") {
+          queryParams.append("countryId", category.entityId);
+        } else if (key === "cities") {
+          queryParams.append("cityId", category.entityId);
+        } else if (key === "brands") {
+          queryParams.append("brandId", category.entityId);
+        } else if (key === "lifestyles") {
+          queryParams.append("lifestyleId", category.entityId);
+        } else if (key === "geographical-areas") {
+          queryParams.append("geographicalAreaId", category.entityId);
+        } else if (key === "continents") {
+          queryParams.append("continentId", category.entityId);
+        }
       }
+  
+      // Osnovni parametri (uvek se dodaju)
       queryParams.append("status", "ACTIVE");
       queryParams.append("page", pageNumber.toString());
       queryParams.append("limit", "20");
-
+  
       if (debouncedSearchQuery) {
         queryParams.append("query", debouncedSearchQuery);
       }
-
+  
+      // Debug log za jasnoću
+      if (isWorldwideCategory) {
+        console.log("🌍 Worldwide kategorija detektovana - učitavam sve rezidencije");
+      } else {
+        console.log(`📍 Standardna kategorija (${key}) - filtriram po entityId: ${category.entityId}`);
+      }
+  
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/residences?${queryParams.toString()}`,
         {
@@ -276,13 +298,13 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
           },
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch residences");
       }
-
+  
       const data = await response.json();
-
+  
       let newResidences: Residence[];
       if (isNewSearch) {
         newResidences = data.data;
@@ -291,12 +313,15 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
         newResidences = data.data;
         setResidences(prev => [...prev, ...data.data]);
       }
-
+  
+      // Debug log za rezultate
+      console.log(`📊 Učitano ${newResidences.length} rezidencija (${isWorldwideCategory ? 'Worldwide' : key})`);
+  
       // Proveravamo kriterijume samo ako imamo detaljnu kategoriju
       if (detailedCategory?.rankingCriteria && newResidences.length > 0) {
         checkMissingCriteria(newResidences, detailedCategory.rankingCriteria);
       }
-
+  
       setHasMore(data.data.length === 20);
     } catch (error) {
       console.error("Error fetching residences:", error);
@@ -356,21 +381,13 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
     try {
       setLoading(true);
 
-      console.log("🚀 Početak procesa dodavanja rezidencija...");
-
-      // Korak 1: Kreiraj nedostajuće skorove
-      console.log("📝 Korak 1: Kreiranje nedostajućih skorova...");
       const scoresCreated = await createMissingScores(selectedResidences);
 
       if (!scoresCreated) {
-        console.error("❌ Kreiranje skorova neuspešno - prekidamo proces");
         return;
       }
 
-      console.log("✅ Korak 1 završen uspešno");
 
-      // Korak 2: Dodaj rezidencije u kategoriju
-      console.log("🏠 Korak 2: Dodavanje rezidencija u kategoriju...");
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/ranking-categories/${category.id}/residences`,
         {
@@ -388,9 +405,6 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
       if (!response.ok) {
         throw new Error("Failed to add residences to category");
       }
-
-      console.log("✅ Korak 2 završen uspešno");
-      console.log("🎉 Proces završen uspešno!");
 
       toast.success("Residences added successfully with all required scores");
       onSuccess?.();
