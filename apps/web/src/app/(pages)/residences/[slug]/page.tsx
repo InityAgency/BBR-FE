@@ -21,21 +21,120 @@ interface MediaImage {
     uploadStatus?: string;
     size?: number;
 }
+
+interface RankingScore {
+    totalScore: number;
+    position: number;
+    rankingCategory: {
+        id: string;
+        name: string;
+        slug: string;
+        title: string;
+        description: string;
+        featuredImage: any;
+    };
+}
+
+// Extending Residence interface locally to ensure totalScores is properly typed
+interface ExtendedResidence extends Residence {
+    totalScores?: RankingScore[];
+}
+
 const sections = [
     { id: "overview", name: "Residence Information" },
     { id: "development", name: "Development" },
     { id: "amenities", name: "Amenities" },
     // { id: "video", name: "VIDEO TOUR" },
-    { 
-      id: "ai-reviews", 
-      name: "AI Reviews Summary", 
-      disabled: true,
-      tooltip: "Coming soon"
+    {
+        id: "ai-reviews",
+        name: "AI Reviews Summary",
+        disabled: true,
+        tooltip: "Coming soon"
     }
 ];
 
+// Komponenta za ranking badge
+const RankingBadge = ({ rankingScore }: { rankingScore: RankingScore }) => {
+    const { position, rankingCategory } = rankingScore;
+
+    // Funkcija za dobijanje odgovarajuće ikone na osnovu pozicije
+    const getRankingIcon = (position: number) => {
+        switch (position) {
+            case 1:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 22 18" fill="none">
+                        <path d="M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1ZM4 17H18H4Z" fill="url(#paint0_linear_2228_101)" />
+                        <path d="M4 17H18M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1Z" stroke="url(#paint1_linear_2228_101)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F5F3F6" />
+                                <stop offset="1" stopColor="#BBA568" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F5F3F6" />
+                                <stop offset="1" stopColor="#BBA568" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            case 2:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4ZM5 20H19H5Z" fill="url(#paint0_linear_335_7485)" />
+                        <path d="M5 20H19M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4Z" stroke="url(#paint1_linear_335_7485)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_335_7485" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#E2E9E9" />
+                                <stop offset="1" stopColor="#C1C2CB" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_335_7485" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#E2E9E9" />
+                                <stop offset="1" stopColor="#C1C2CB" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            case 3:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4ZM5 20H19H5Z" fill="url(#paint0_linear_335_7580)" />
+                        <path d="M5 20H19M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4Z" stroke="url(#paint1_linear_335_7580)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_335_7580" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F8D5C6" />
+                                <stop offset="1" stopColor="#C97965" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_335_7580" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F8D5C6" />
+                                <stop offset="1" stopColor="#C97965" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // Funkcija za dobijanje teksta na osnovu pozicije
+    const getRankingText = (position: number, categoryName: string) => {
+        const ordinalSuffix = position === 1 ? 'st' : position === 2 ? 'nd' : 'rd';
+        return `#${position} ${categoryName}`;
+    };
+
+    return (
+        <Link
+            href={`/best-residences/${rankingCategory.slug}`}
+            className="bg-white/5 py-2 px-3 rounded-full w-fit flex gap-2 items-center hover:bg-white/10 transition-colors duration-200"
+        >
+            {getRankingIcon(position)}
+            {getRankingText(position, rankingCategory.name)}
+        </Link>
+    );
+};
+
 export default function ResidencePage() {
-    const [residence, setResidence] = useState<Residence | null>(null);
+    const [residence, setResidence] = useState<ExtendedResidence | null>(null);
     const [loading, setLoading] = useState(true);
     const [showGallery, setShowGallery] = useState(false);
     const [initialSlide, setInitialSlide] = useState(0);
@@ -44,19 +143,19 @@ export default function ResidencePage() {
     const [loadingSimilar, setLoadingSimilar] = useState(false);
     const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
     const [isClaimProfileModalOpen, setIsClaimProfileModalOpen] = useState(false);
-    
+
     const params = useParams();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user } = useAuth();
     const residenceSlug = params.slug as string;
-    
+
     useEffect(() => {
         // Ako je korisnik preusmeren sa login stranice i postoji "fromClaim" parametar
         const fromClaim = searchParams.get('fromClaim');
         if (user && fromClaim === 'true' && user.role.name === "developer") {
             setIsClaimProfileModalOpen(true);
-            
+
             // Očisti URL parametar bez osvježavanja stranice - replace history
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('fromClaim');
@@ -70,13 +169,13 @@ export default function ResidencePage() {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences/slug/${residenceSlug}`);
                 const data = await response.json();
                 setResidence(data.data);
-                
+
                 const images: MediaImage[] = [];
-                
+
                 if (data.data.featuredImage) {
                     images.push(data.data.featuredImage);
                 }
-                
+
                 if (data.data.mainGallery && Array.isArray(data.data.mainGallery)) {
                     data.data.mainGallery.forEach((img: MediaImage) => {
                         if (img && img.id && !images.some(existingImg => existingImg.id === img.id)) {
@@ -84,14 +183,14 @@ export default function ResidencePage() {
                         }
                     });
                 }
-                
+
                 setGalleryImages(images);
-                
+
                 if (data.data?.brand?.id) {
                     fetchSimilarResidences(data.data.brand.id, data.data.id);
                 }
             } catch (error) {
-                console.error('Error fetching residence:', error);  
+                console.error('Error fetching residence:', error);
             } finally {
                 setLoading(false);
             }
@@ -99,18 +198,18 @@ export default function ResidencePage() {
 
         fetchResidence();
     }, [residenceSlug]);
-    
+
     const fetchSimilarResidences = async (brandId: string, currentResidenceId: string) => {
         try {
             setLoadingSimilar(true);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?brandId=${brandId}&limit=3`);
             const data = await response.json();
-            
+
             const filteredResidences = data.data.filter((res: Residence) => res.id !== currentResidenceId);
-            
+
             setSimilarResidences(filteredResidences.slice(0, 3));
         } catch (error) {
-            console.error('Error fetching similar residences:', error);  
+            console.error('Error fetching similar residences:', error);
         } finally {
             setLoadingSimilar(false);
         }
@@ -126,7 +225,7 @@ export default function ResidencePage() {
             setIsClaimProfileModalOpen(true);
         }
     };
-    
+
     const getMediaUrl = (mediaId: string): string => {
         return `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${mediaId}/content`;
     };
@@ -144,25 +243,31 @@ export default function ResidencePage() {
         return <div className="flex justify-center items-center min-h-[50vh]">Residence not found</div>;
     }
 
-    const sortedHighlightedAmenities = residence.highlightedAmenities 
-        ? [...residence.highlightedAmenities].sort((a, b) => a.order - b.order) 
+    const sortedHighlightedAmenities = residence.highlightedAmenities
+        ? [...residence.highlightedAmenities].sort((a, b) => a.order - b.order)
         : [];
 
     const getYouTubeEmbedUrl = (url: string): string => {
         if (url.includes('youtube.com/embed/')) {
             return url;
         }
-        
+
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         const match = url.match(regExp);
-        
+
         if (match && match[2].length === 11) {
             return `https://www.youtube.com/embed/${match[2]}`;
         }
-        
+
         return url;
     };
-    return(
+
+    // Filtriramo ranking scores da prikažemo samo pozicije 1, 2, ili 3
+    const topRankings = residence.totalScores && Array.isArray(residence.totalScores)
+        ? residence.totalScores.filter((score: RankingScore) => score.position <= 3)
+        : [];
+
+    return (
         <>
             <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-0">
                 <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 items-end">
@@ -182,32 +287,25 @@ export default function ResidencePage() {
                                 </div>
                             )
                         )}
-                        <div className="rankings mt-4">
-                            <div className="bg-white/5 py-2 px-3 rounded-full w-fit flex gap-2 items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 22 18" fill="none">
-                                    <path d="M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1ZM4 17H18H4Z" fill="url(#paint0_linear_2228_101)"/>
-                                    <path d="M4 17H18M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1Z" stroke="url(#paint1_linear_2228_101)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <defs>
-                                        <linearGradient id="paint0_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
-                                        <stop stopColor="#F5F3F6"/>
-                                        <stop offset="1" stopColor="#BBA568"/>
-                                        </linearGradient>
-                                        <linearGradient id="paint1_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
-                                        <stop stopColor="#F5F3F6"/>
-                                        <stop offset="1" stopColor="#BBA568"/>
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                #1 Top Rated Worldwide
+
+                        {/* Dynamic Rankings Display */}
+                        {topRankings.length > 0 && (
+                            <div className="rankings mt-4 flex flex-wrap gap-2 lg:max-w-[60svw]">
+                                {topRankings.map((rankingScore: RankingScore) => (
+                                    <RankingBadge
+                                        key={rankingScore.rankingCategory.id}
+                                        rankingScore={rankingScore}
+                                    />
+                                ))}
                             </div>
-                        </div>                      
+                        )}
                     </div>
                     <div className="w-full lg:w-fit flex gap-2 mb-4 lg:mb-0">
-                        <button 
+                        <button
                             onClick={() => setIsRequestInfoModalOpen(true)}
                             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
                         >
-                            Request Information 
+                            Request Information
                         </button>
                     </div>
                 </div>
@@ -215,11 +313,11 @@ export default function ResidencePage() {
                 <div className="gallery-grid w-full xl:max-w-[1600px] mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[550px]">
                         {galleryImages.length > 0 && (
-                            <div 
+                            <div
                                 className="md:col-span-2 row-span-2 rounded-lg overflow-hidden cursor-pointer relative group h-full"
                                 onClick={() => openGallery(0)}
                             >
-                                <img 
+                                <img
                                     src={getMediaUrl(galleryImages[0].id)}
                                     alt={`${residence.name} featured image`}
                                     className="w-full h-full object-cover"
@@ -236,19 +334,19 @@ export default function ResidencePage() {
                         {galleryImages.slice(1, 5).map((image, index) => {
                             // Da li je ovo poslednja slika u gridu i ima li više slika?
                             const isLastImageInGrid = index === 3 && galleryImages.length > 5;
-                            
+
                             return (
-                                <div 
-                                    key={image.id} 
+                                <div
+                                    key={image.id}
                                     className="rounded-lg overflow-hidden cursor-pointer relative group h-full"
                                     onClick={() => openGallery(index + 1)}
                                 >
-                                    <img 
+                                    <img
                                         src={getMediaUrl(image.id)}
                                         alt={`${residence.name} gallery image ${index + 1}`}
                                         className="w-full h-full object-cover"
                                     />
-                                    
+
                                     {/* Hover overlay za obične slike - suptilniji efekat */}
                                     {!isLastImageInGrid && (
                                         <div className="absolute inset-0 bg-black/70 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -257,7 +355,7 @@ export default function ResidencePage() {
                                             </span>
                                         </div>
                                     )}
-                                    
+
                                     {/* "View gallery" overlay za poslednju sliku - suptilniji da se vidi slika ispod */}
                                     {isLastImageInGrid && (
                                         <div className="absolute inset-0 bg-black/70 bg-opacity-30 flex flex-col items-center justify-center">
@@ -277,7 +375,7 @@ export default function ResidencePage() {
             </div>
 
             {galleryImages.length > 0 && (
-                <GalleryModal 
+                <GalleryModal
                     isOpen={showGallery}
                     onClose={() => setShowGallery(false)}
                     images={galleryImages}
@@ -286,19 +384,19 @@ export default function ResidencePage() {
                     title={residence.name}
                 />
             )}
-            
-            <RequestInformationModal 
+
+            <RequestInformationModal
                 isOpen={isRequestInfoModalOpen}
                 onClose={() => setIsRequestInfoModalOpen(false)}
-                entityId={residence.id} 
-                type="MORE_INFORMATION" 
+                entityId={residence.id}
+                type="MORE_INFORMATION"
                 buttonText="Request More Information"
                 customTitle={`Would you like to know more about ${residence.name}?`}
             />
-            
+
             {/* Modal za Claim Profile */}
             <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
-                        
+
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />
 
@@ -393,7 +491,7 @@ export default function ResidencePage() {
                                 <div key={highlightedAmenity.amenity.id} className="amenity-card rounded-lg flex flex-col gap-4 transition-all">
                                     {highlightedAmenity.amenity.featuredImage ? (
                                         <div className="w-full h-[300px] rounded-md overflow-hidden">
-                                            <Image 
+                                            <Image
                                                 src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${highlightedAmenity.amenity.featuredImage?.id}/content`}
                                                 alt={highlightedAmenity.amenity.name}
                                                 className="w-full h-full object-cover"
@@ -413,30 +511,30 @@ export default function ResidencePage() {
                                 </div>
                             ))}
                         </div>
-                        
+
                         {/* Prikaz ostalih amenity-ja samo ako postoje */}
                         {residence.amenities
                             .filter(amenity => !sortedHighlightedAmenities.some(highlighted => highlighted.amenity.id === amenity.id))
                             .length > 0 && (
-                            <div className="w-full grid-cols-1 bg-secondary rounded-lg px-2 py-4 lg:px-6 lg:py-6 mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                                {residence.amenities
-                                    .filter(amenity => !sortedHighlightedAmenities.some(highlighted => highlighted.amenity.id === amenity.id))
-                                    .map((amenity) => (
-                                        <div key={amenity.id} className="amenity-card px-0 py-2 rounded-md flex flex-row items-center gap-2 transition-all">
-                                            {amenity.icon && (
-                                                <div className="icon-container w-12 h-12 flex items-center justify-center rounded-full bg-secondary/30">
-                                                    <img 
-                                                        src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${amenity.icon.id}/content`}
-                                                        alt={amenity.name}
-                                                        className="w-6 h-6 object-contain"
-                                                    />
-                                                </div>
-                                            )}
-                                            <h3 className="text-md text-sans font-medium">{amenity.name}</h3>
-                                        </div>
-                                    ))}
-                            </div>
-                        )}
+                                <div className="w-full grid-cols-1 bg-secondary rounded-lg px-2 py-4 lg:px-6 lg:py-6 mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                    {residence.amenities
+                                        .filter(amenity => !sortedHighlightedAmenities.some(highlighted => highlighted.amenity.id === amenity.id))
+                                        .map((amenity) => (
+                                            <div key={amenity.id} className="amenity-card px-0 py-2 rounded-md flex flex-row items-center gap-2 transition-all">
+                                                {amenity.icon && (
+                                                    <div className="icon-container w-12 h-12 flex items-center justify-center rounded-full bg-secondary/30">
+                                                        <img
+                                                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${amenity.icon.id}/content`}
+                                                            alt={amenity.name}
+                                                            className="w-6 h-6 object-contain"
+                                                        />
+                                                    </div>
+                                                )}
+                                                <h3 className="text-md text-sans font-medium">{amenity.name}</h3>
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
                     </div>
                 ) : null}
 
@@ -451,9 +549,9 @@ export default function ResidencePage() {
                         </div>
                         <div className="w-full">
                             <div className="aspect-video w-full rounded-lg overflow-hidden mt-6">
-                                <iframe 
-                                    src={getYouTubeEmbedUrl(residence.videoTourUrl)} 
-                                    className="w-full h-full" 
+                                <iframe
+                                    src={getYouTubeEmbedUrl(residence.videoTourUrl)}
+                                    className="w-full h-full"
                                     allowFullScreen
                                     title={`${residence.name} Video Tour`}
                                 ></iframe>
@@ -466,7 +564,7 @@ export default function ResidencePage() {
             <div className="bg-secondary px-2 py-6 lg:px-0 lg:py-0">
                 <SectionLayout>
                     <div className="cta-review w-full xl:max-w-[1600px] mx-auto rounded-xl border px-4 lg:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-[#faf3ee12] bg-opacity-10 relative overflow-hidden">
-                        <Image 
+                        <Image
                             src="/pattern.png"
                             width={100}
                             height={100}
@@ -480,11 +578,11 @@ export default function ResidencePage() {
                             <h2 className="text-4xl font-medium text-left lg:text-left mx-auto mt-4">
                                 Would you like to express your experience?
                             </h2>
-                            <h2 className="text-4xl font-reguralr text-left lg:text-left mt-2"> 
+                            <h2 className="text-4xl font-reguralr text-left lg:text-left mt-2">
                                 Send us a review
                             </h2>
                         </div>
-                        <Link 
+                        <Link
                             href={`/leave-a-review?residenceId=${residence.id}`}
                             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit z-4">
                             Submit a review
@@ -504,7 +602,7 @@ export default function ResidencePage() {
                             Discover Exclusive Opportunities in Luxury Real Estate
                         </h2>
                     </div>
-                    
+
                     {/* Prikaz sličnih rezidencija */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 w-full xl:max-w-[1600px] mx-auto">
                         {loadingSimilar ? (
@@ -513,7 +611,7 @@ export default function ResidencePage() {
                             </div>
                         ) : similarResidences.length > 0 ? (
                             similarResidences.map((similarResidence) => (
-                                <ResidenceCard 
+                                <ResidenceCard
                                     key={similarResidence.id}
                                     residence={similarResidence}
                                 />
