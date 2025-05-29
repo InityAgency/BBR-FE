@@ -102,6 +102,18 @@ export default function CategoryPage() {
     const categoryUrl = `${baseUrl}/api/${apiVersion}/ranking-categories/slug/${slug}`;
     const residencesUrl = `${baseUrl}/api/${apiVersion}/public/ranking-categories/${slug}/residences`;
 
+    // Funkcija za sortiranje ranking kriterijuma
+    const sortRankingCriteria = (criteria: RankingCriteriaScore[]): RankingCriteriaScore[] => {
+        return [...criteria].sort((a, b) => {
+            // Prvo sortiramo po isDefault (default kriterijumi prvi)
+            if (a.isDefault !== b.isDefault) {
+                return a.isDefault ? -1 : 1;
+            }
+            // Zatim alfabetski po nazivu
+            return a.name.localeCompare(b.name);
+        });
+    };
+
     // Fetch category data and similar categories
     useEffect(() => {
         const fetchCategoryData = async () => {
@@ -168,7 +180,13 @@ export default function CategoryPage() {
             // Ensure we don't show more than the category limitation
             const limitedResidences = data.data.slice(0, limit);
 
-            setResidences(limitedResidences);
+            // Sortiramo ranking kriterijume za svaku rezidenciju
+            const residencesWithSortedCriteria = limitedResidences.map(residence => ({
+                ...residence,
+                rankingCriteriaScores: sortRankingCriteria(residence.rankingCriteriaScores)
+            }));
+
+            setResidences(residencesWithSortedCriteria);
             setPagination({
                 ...data.pagination,
                 limit: limit,
