@@ -1,51 +1,65 @@
 export interface Unit {
   id: string;
   name: string;
-  description: string;
   slug: string;
-  price: number;
-  size: number;
-  bedroom: number;
-  bathrooms: number;
-  status: string;
-  type: string;
-  floor: number;
-  view: string;
-  features: string[];
-  exclusivePrice: number;
+  description: string;
   surface: number;
+  status: string;
   regularPrice: number;
-  residence: {
+  exclusivePrice: number;
+  exclusiveOfferStartDate: string;
+  exclusiveOfferEndDate: string;
+  roomType: string;
+  roomAmount: number;
+  unitType: {
     id: string;
     name: string;
-    slug: string;
-    brand: {
-      id: string;
-      name: string;
-      logo: {
-        id: string;
-        originalFileName: string;
-        mimeType: string;
-        uploadStatus: string;
-        size: number;
-      };
-    };
-    address: string;
+    createdAt: string;
+    updatedAt: string;
   };
+  services: any[];
+  gallery: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+    url: string;
+  }[];
   featureImage: {
     id: string;
     originalFileName: string;
     mimeType: string;
     uploadStatus: string;
     size: number;
-  } | null;
-  gallery?: Array<{
+    url: string;
+  };
+  residence: {
     id: string;
-    originalFileName: string;
-    mimeType: string;
-    uploadStatus: string;
-    size: number;
-  }>;
+    name: string;
+    status: string;
+    developmentStatus: string;
+    subtitle: string;
+    description: string;
+    budgetStartRange: string;
+    budgetEndRange: string;
+    address: string;
+    longitude: number;
+    latitude: number;
+    brand: {
+      id: string;
+      name: string;
+      logo: {
+        id: string;
+      };
+    };
+  };
+  about: string;
+  bathrooms: string;
+  bedroom: string;
+  floor: string;
+  transactionType: string;
+  characteristics: any[];
   createdAt: string;
   updatedAt: string;
 }
