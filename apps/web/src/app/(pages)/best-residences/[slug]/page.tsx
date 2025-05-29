@@ -365,7 +365,7 @@ export default function CategoryPage() {
                                     {/* Residence Image */}
                                     <div className="w-full lg:w-1/3 h-[200px] lg:h-[300px] relative">
                                         <Image
-                                            src={`${baseUrl}/api/${apiVersion}/media/${residence.featuredImage.id}/content`}
+                                            src={`${baseUrl}/api/${apiVersion}/media/${residence.featuredImage?.id}/content`}
                                             alt={residence.name}
                                             fill
                                             className="object-cover object-center rounded-lg"

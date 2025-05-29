@@ -10,6 +10,7 @@ export interface Residence {
   address: string;
   yearBuilt: string | number; // Može doći kao string ili broj
   rentalPotential: string;
+  score: number;
   
   // Budžetski raspon
   budgetStartRange?: string;
@@ -136,7 +137,7 @@ export interface Residence {
   
   // Rangiranje i ocene
   rankingCategories?: any[];
-  totalScores?: any[];
+  totalScore?: number;
   
   // Jedinice (stanovi/vile)
   units?: any[];

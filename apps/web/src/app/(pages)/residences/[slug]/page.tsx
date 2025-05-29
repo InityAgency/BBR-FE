@@ -25,7 +25,7 @@ const sections = [
     { id: "overview", name: "Residence Information" },
     { id: "development", name: "Development" },
     { id: "amenities", name: "Amenities" },
-    { id: "video", name: "VIDEO TOUR" },
+    // { id: "video", name: "VIDEO TOUR" },
     { 
       id: "ai-reviews", 
       name: "AI Reviews Summary", 
@@ -300,9 +300,7 @@ export default function ResidencePage() {
             <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
                         
             <SectionLayout>
-                <div className="w-full xl:max-w-[1600px] mx-auto">
-                    <StickyScrollTabs sections={sections} offset={80} />
-                </div>
+                <StickyScrollTabs sections={sections} offset={80} />
 
 
                 <div id="overview" className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">

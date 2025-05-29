@@ -13,20 +13,26 @@ import RequestConsultationForm from "@/components/web/Forms/RequestConsultation"
 import BrandSlider from "@/components/web/Brands/BrandSlider";
 import { LatestPosts } from "@/components/web/Posts/LatestPosts";
 import ResidencesSlider from "@/components/web/Residences/ResidencesSlider";
+import BestResidencesSection from "@/components/web/Sections/BestResidencesSection";
+import PopularPlaces from "@/components/web/Sections/PopularPlaces";
 
 
 export default function Home() {
   return (
     <>
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
-        <h1 className="text-4xl lg:text-6xl font-bold w-full xl:w-[80%] text-left lg:text-center mt-0 lg:mt-8">Your Trusted Guide to the World's Best Branded Residences</h1>
-        <p className="text-md lg:text-xl w-full xl:w-[60%] text-left lg:text-center">
-          From Four Seasons to Armani, explore a curated collection of high-end homes offering world-class service, private amenities, and investment value.
-        </p>
-        <Image src="/hero-image.webp" alt="Hero Image" width={1000} height={1000} className="w-full rounded-2xl mt-6" />
+        <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:items-center gap-2 lg:gap-6">
+          <h1 className="text-4xl lg:text-6xl font-bold w-full xl:w-[80%] text-left lg:text-center mt-0 lg:mt-8">Your Trusted Guide to the World's Best Branded Residences</h1>
+          <p className="text-md lg:text-xl w-full xl:w-[60%] text-left lg:text-center">
+            From Four Seasons to Armani, explore a curated collection of high-end homes offering world-class service, private amenities, and investment value.
+          </p>
+        </div>
+        <div className="w-full xl:max-w-[1600px] mx-auto">
+          <Image src="/hero-image.webp" alt="Hero Image" width={1000} height={1000} className="w-full rounded-2xl mt-6" />
+        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4 max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12">
+      <div className="flex flex-col lg:flex-row gap-4 xl:max-w-[1600px] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12 ">
         <div className="flex flex-col items-center justify-center w-full lg:w-1/4">
           <h2 className="text-4xl font-bold">1500+</h2>
           <p className="text-md lg:text-lg">Properties ranked</p>
@@ -44,6 +50,12 @@ export default function Home() {
           <p className="text-md lg:text-lg">Properties ranked</p>
         </div>
       </div>
+ 
+      <section className="residences">
+        <SectionLayout>
+          <BestResidencesSection />
+        </SectionLayout>
+      </section>
 
 
       <section className="ranking-crieteria bg-secondary mb-12">
@@ -54,7 +66,7 @@ export default function Home() {
             <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">Best Branded Residences help you choose a private residence partner or property  that is right for you by giving expert insights, offers & ratings</p>
           </div>
           <div>
-            <div className="flex flex-col lg:flex-row gap-4 mt-8 max-w-[85%] mx-auto">
+            <div className="flex flex-col lg:flex-row gap-4 mt-8 max-w-[85%] xl:max-w-[1600px] mx-auto">
               <div className="flex flex-row gap-4 items-center w-full">
                 <div>
                   <svg xmlns="http://www.w3.org/2000/svg" width="60" height="61" viewBox="0 0 80 81" fill="none">
@@ -80,7 +92,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-4 mt-4 border rounded-2xl p-6 relative w-full">
+          <div className="flex flex-col lg:flex-row gap-4 mt-4 border rounded-2xl p-6 relative w-full xl:max-w-[1600px] mx-auto">
             <Image src="/ranking-criteria-1.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
             <Image src="/ranking-criteria-2.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
             <Image src="/ranking-criteria-3.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
@@ -89,9 +101,15 @@ export default function Home() {
         </SectionLayout>
       </section>
 
-      <section className="new-solution-section">
+      <section className="popular-places mb-12">
+        <SectionLayout>
+          <PopularPlaces />
+        </SectionLayout>
+      </section>
+
+      <section className="new-solution-section xl:max-w-[1600px] mx-auto">
         <SectionLayout className="bg-secondary rounded-2xl">
-          <div className="flex flex-col gap-4 lg:gap-8 xl:gap-12 items-center px-4 py-12 lg:px-0 lg:py-0 xl:max-w-[1600px] mx-auto">
+          <div className="flex flex-col gap-4 lg:gap-8 xl:gap-12 items-center px-4 py-12 lg:px-0 lg:py-0">
             <div className="flex flex-col gap-4">
               <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">NEW SOLUTION</span>
               <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">The Smartest Way to Buy, Invest & Discover Branded Residences</h2>
@@ -184,7 +202,7 @@ export default function Home() {
 
       <section className="residences-section">
         <SectionLayout>
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 xl:gap-24 items-center px-4 py-12 pb-4 lg:pb-12 lg:px-0 lg:py-0 w-full xl:max-w-[1600px] mx-auto">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-16 items-center px-4 py-12 pb-4 lg:pb-0 lg:px-0 lg:py-0 w-full xl:max-w-[1600px] mx-auto">
             <div className="residences-section-header flex flex-col lg:flex-row w-full items-end gap-4 lg:gap-0 xl:max-w-[1600px] mx-auto">
               <div className="w-full flex flex-col gap-4">
                 <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full">EXPLORE NEW</span>

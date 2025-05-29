@@ -90,7 +90,7 @@ export function StickyScrollTabs({ sections, offset = 100 }: StickyScrollTabsPro
 
   return (
     <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border w-full lg:-mt-8">
-      <div className="flex gap-2 flex-wrap w-full mx-auto">
+      <div className="flex gap-2 flex-wrap w-full mx-auto w-full xl:max-w-[1600px] mx-auto">
         {sections.map((section) => {
           // Za onemogućene sekcije prikazujemo poseban stil sa ikonom katanca
           if (section.disabled) {
