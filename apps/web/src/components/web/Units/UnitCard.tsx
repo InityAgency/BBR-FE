@@ -62,19 +62,6 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
           </div>
         </div>
       </Link>
-      {onRequestInfo && (
-        <Button 
-          variant="outline" 
-          className="w-full mt-2"
-          onClick={(e) => {
-            e.preventDefault();
-            onRequestInfo(unit);
-          }}
-        >
-          <Info className="w-4 h-4 mr-2" />
-          Request More Information
-        </Button>
-      )}
     </div>
   )
 } 

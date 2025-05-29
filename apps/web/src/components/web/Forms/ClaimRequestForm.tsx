@@ -120,6 +120,7 @@ export default function ClaimRequestForm({ onSuccess }: ClaimRequestFormProps) {
       // Slanje podataka na glavni endpoint
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/claim-profile-contact-forms`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
