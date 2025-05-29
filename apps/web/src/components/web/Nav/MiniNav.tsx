@@ -70,8 +70,8 @@ export default function MiniNav() {
   };
 
   return (
-    <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-2 justify-between items-center gap-6 hidden md:flex">
-      <div className="flex flex-row gap-6">
+    <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-2 justify-between items-center gap-6 hidden md:flex">
+      <div className="flex flex-row gap-6 ">
         <Link
           href="mailto:support@bestbrandedresidence.com"
           className="flex gap-2 items-center hover:text-primary transition-all"

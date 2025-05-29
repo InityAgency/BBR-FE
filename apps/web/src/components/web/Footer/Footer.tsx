@@ -12,8 +12,8 @@ export default function Footer() {
 
   return (
     <footer className="bg-background text-foreground bg-secondary">
-      <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-8 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-16">
-        <div className="flex flex-col gap-3">
+      <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-8 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-16">
+        <div className="flex flex-col gap-3 ">
           <Link href="/" className="mb-6">
             <Image
               src="/logo-horizontal.svg"
@@ -128,7 +128,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)]  mx-auto px-4 py-8 flex flex-col gap-16">
+      <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-8 flex flex-col gap-16">
         <Separator orientation="horizontal" />
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="flex flex-col gap-2">
