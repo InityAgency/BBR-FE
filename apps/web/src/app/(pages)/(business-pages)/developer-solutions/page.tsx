@@ -213,7 +213,7 @@ const MarketingSolutionsPage = () => {
     <div>
       {/* FIRST SECTION */}
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow xl:max-w-[1600px] mx-auto">
           <Image
             src="/why-choose-us-from-outside.webp"
             alt="about-us"
@@ -245,137 +245,139 @@ const MarketingSolutionsPage = () => {
 
       {/* SECOND SECTION */}
       <div className="bg-beigeVariant8 py-4 xl:py-20">
-        <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16">
-          <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
-            OUR SOLUTIONS
-          </span>
-          <h2 className="text-4xl text-black font-bold w-[100%] lg:w-[50%] text-left lg:text-center mx-auto">
-            How BBR Solves These Challenges
-          </h2>
-          <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[50%] text-left lg:text-center mx-auto">
-            BBR is designed to offer solutions for developers at every stage of
-            their project’s life cycle from pre-construction to completion. We
-            ensure that developers can
-          </p>
+        <div className="w-full xl:max-w-[1600px] mx-auto">    
+          <div className="flex flex-col gap-4 rounded-xl p-4">
+            <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
+              OUR SOLUTIONS
+            </span>
+            <h2 className="text-4xl text-black font-bold w-[100%] lg:w-[50%] text-left lg:text-center mx-auto">
+              How BBR Solves These Challenges
+            </h2>
+            <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[50%] text-left lg:text-center mx-auto">
+              BBR is designed to offer solutions for developers at every stage of
+              their project’s life cycle from pre-construction to completion. We
+              ensure that developers can
+            </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4 xl:mt-16 w-full">
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4 mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/refresh-alt.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4 xl:mt-16 w-full">
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/refresh-alt.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Generate high-quality leads
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Generate high-quality leads
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  Throuisibility and credibility-building strategies, including
+                  premium rankings and global exposure.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                Throuisibility and credibility-building strategies, including
-                premium rankings and global exposure.
-              </p>
-            </div>
 
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4 mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/tag.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/tag.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Shorten their sales cycles
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Shorten their sales cycles
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  By leveraging CRM tools, third-party validation, and buyer
+                  insights.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                By leveraging CRM tools, third-party validation, and buyer
-                insights.
-              </p>
-            </div>
 
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4 mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/medal.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/medal.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Achieve high rankings
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Achieve high rankings
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  In the categories that matter most to their buyers, such as
+                  lifestyle, property type, and location.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                In the categories that matter most to their buyers, such as
-                lifestyle, property type, and location.
-              </p>
-            </div>
 
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4  mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/ruler.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4  mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/ruler.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Scale marketing efforts
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Scale marketing efforts
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  Based on project size, whether small or large, with flexible
+                  plan options.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                Based on project size, whether small or large, with flexible
-                plan options.
-              </p>
-            </div>
 
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4 mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/square-dollar-chart.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/square-dollar-chart.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Maximize ROI on marketing
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Maximize ROI on marketing
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  With an all-in-one platform and access to advanced analytics.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                With an all-in-one platform and access to advanced analytics.
-              </p>
-            </div>
 
-            <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
-              <div className="flex flex-col gap-4 mb-4">
-                <div className="relative">
-                  <Image
-                    src="/icons/chart-mixed.svg"
-                    alt="refresh"
-                    width={60}
-                    height={60}
-                  />
+              <div className="flex flex-col justify-center w-full bg-white rounded-2xl p-6 border">
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="relative">
+                    <Image
+                      src="/icons/chart-mixed.svg"
+                      alt="refresh"
+                      width={60}
+                      height={60}
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#171D22]">
+                    Make data-driven decisions
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-[#171D22]">
-                  Make data-driven decisions
-                </h3>
+                <p className="text-[#4D4D4DCC]">
+                  Through real-time insights and analytics to optimize marketing
+                  spend and lead engagement.
+                </p>
               </div>
-              <p className="text-[#4D4D4DCC]">
-                Through real-time insights and analytics to optimize marketing
-                spend and lead engagement.
-              </p>
             </div>
           </div>
         </div>
@@ -384,29 +386,31 @@ const MarketingSolutionsPage = () => {
       {/* THIRD SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
-            <Image
-              src="/texture.webp"
-              alt="about-us"
-              fill
-              className="w-full h-full object-cover opacity-80"
-            />
-            <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
-              Leverage performance-based marketing campaigns
-            </h1>
-            <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
-              Where developers pay based on the results generated, ensuring a
-              cost-effective approach to lead generation and visibility. BBR
-              also offers a fixed monthly fee + performance-based component for
-              developers who want a hybrid model that includes predictable costs
-              along with performance incentives
-            </p>
-            <Link
-              href="/#"
-              className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
-            >
-              Get Started -&gt;
-            </Link>
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
+              <Image
+                src="/texture.webp"
+                alt="about-us"
+                fill
+                className="w-full h-full object-cover opacity-80"
+              />
+              <h1 className="text-black text-[24px] lg:text-[40px] lg:w-[70%] text-center">
+                Leverage performance-based marketing campaigns
+              </h1>
+              <p className="text-black text-[14px] lg:text-[18px] lg:w-[70%] text-center">
+                Where developers pay based on the results generated, ensuring a
+                cost-effective approach to lead generation and visibility. BBR
+                also offers a fixed monthly fee + performance-based component for
+                developers who want a hybrid model that includes predictable costs
+                along with performance incentives
+              </p>
+              <Link
+                href="/#"
+                className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
+              >
+                Get Started -&gt;
+              </Link>
+            </div>
           </div>
         </SectionLayout>
       </div>
@@ -414,7 +418,7 @@ const MarketingSolutionsPage = () => {
       {/* FOURTH SECTION */}
       <div className="bg-white">
         <SectionLayout>
-          <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px]">
+          <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px] xl:max-w-[1600px] mx-auto">
             <div>
               <p className="text-primary text-[14px] lg:text-[18px] tracking-widest">
                 OUR SUGGESTION
@@ -437,7 +441,7 @@ const MarketingSolutionsPage = () => {
             </Link>
           </div>
 
-          <div className="flex flex-col lg:flex-row w-full gap-[24px]">
+          <div className="flex flex-col lg:flex-row w-full gap-[24px] xl:max-w-[1600px] mx-auto">
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-3/5">
               <h2 className="text-black text-[22px] lg:text-[28px]">
                 Scored list of residences
@@ -476,7 +480,7 @@ const MarketingSolutionsPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row w-full gap-[24px]">
+          <div className="flex flex-col lg:flex-row w-full gap-[24px] xl:max-w-[1600px] mx-auto">
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-1">
               <h2 className="text-black text-[22px] lg:text-[26px]">
                 Enhanced Residence Scoring
@@ -520,20 +524,26 @@ const MarketingSolutionsPage = () => {
       {/* FIFTH SECTION */}
       <div className="bg-beigeVariant6">
         <SectionLayout>
-          <HorizontalTabs tabs={tabs} />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <HorizontalTabs tabs={tabs} />
+          </div>
         </SectionLayout>
       </div>
 
       {/* SIXTH SECTION */}
       <div className="flex flex-col gap-[56px] bg-secondary bg-secondary items-center">
         <SectionLayout>
-          <ClientTestimonials />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <ClientTestimonials />
+          </div>
         </SectionLayout>
       </div>
 
       {/* SEVENTH SECTION */}
       <SectionLayout>
-        <BrandSlider />
+        <div className="w-full xl:max-w-[1600px] mx-auto">
+          <BrandSlider />
+        </div>
       </SectionLayout>
     </div>
   );

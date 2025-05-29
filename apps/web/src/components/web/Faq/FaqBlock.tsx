@@ -39,7 +39,7 @@ export default function FaqBlock({ themeLight }: { themeLight?: boolean }) {
   return (
     <div className={`${themeLight && "bg-white"}`}>
       <SectionLayout>
-        <div className="flex flex-col lg:flex-row w-full gap-8">
+        <div className="flex flex-col lg:flex-row w-full gap-8 xl:max-w-[1600px] mx-auto">
           <div className="flex flex-col gap-6 w-full lg:w-1/2 xl:w-1/3">
             <span className="text-md uppercase text-left lg:text-left text-primary">
               FAQ’s

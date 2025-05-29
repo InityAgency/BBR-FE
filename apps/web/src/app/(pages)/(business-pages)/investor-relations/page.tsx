@@ -12,7 +12,7 @@ const InvestorRelationsPage = () => {
     <div>
       {/* FIRST SECTION */}
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow xl:max-w-[1600px] mx-auto">
           <Image
             src="/investor-relations-hero.png"
             alt="about-us"
@@ -40,9 +40,9 @@ const InvestorRelationsPage = () => {
       </div>
 
       {/* SECOND SECTION */}
-      <div className="bg-white p-[16px] lg:p-[80px] border-2 border-b-[#F1E8DF]">
+      <div className="bg-white border-2 border-b-[#F1E8DF]">
         <SectionLayout>
-          <div className="flex flex-col bg-beigeVariant11 gap-4 p-[16px] lg:p-[30px] rounded-xl">
+          <div className="flex flex-col bg-beigeVariant11 gap-4 p-[16px] lg:p-[30px] rounded-xl w-full xl:max-w-[1600px] mx-auto">
             <p className="text-primary tracking-widest">CURRENT PERFORMANCE</p>
             <h1 className="text-[30px] lg:text-[36px] text-[#101518]">
               Capturing the Growth in Luxury Branded Residences
@@ -111,7 +111,7 @@ const InvestorRelationsPage = () => {
       {/* THIRD SECTION */}
       <div className="bg-white">
         <SectionLayout>
-          <div className="flex flex-col gap-[30px] lg:gap-[58px]">
+          <div className="flex flex-col gap-[30px] lg:gap-[58px] w-full xl:max-w-[1600px] mx-auto">
             <div className="flex flex-col gap-[10px] lg:w-[65%] place-self-center">
               <p className="text-primary text-center tracking-widest text-[14px] xl:text-[16px]">
                 OUR SOLUTION
@@ -153,7 +153,7 @@ const InvestorRelationsPage = () => {
       {/* FOURTH SECTION */}
       <div className="bg-beigeVariant11">
         <SectionLayout>
-          <div className="relative contact-form-wrapper w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[20px] lg:gap-[80px]">
+          <div className="relative contact-form-wrapper w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[20px] lg:gap-[80px] xl:max-w-[1600px] mx-auto">
             <Image
               src="/texture.webp"
               alt="about-us"
@@ -205,7 +205,7 @@ const InvestorRelationsPage = () => {
       {/* FIFTH SECTION */}
       <div className="bg-[#F7EFE8]">
         <SectionLayout>
-          <div className="flex flex-col gap-[16px]">
+          <div className="flex flex-col gap-[16px] w-full xl:max-w-[1600px] mx-auto">
             <p className="text-primary text-[16px]">REVENUE MODEL</p>
             <h1 className="text-[30px] lg:text-[36px] text-black">
               Diverse Revenue Streams for Sustainable Growth
@@ -218,7 +218,7 @@ const InvestorRelationsPage = () => {
               future success.
             </p>
           </div>
-          <div className="flex flex-col lg:flex-row flex-1/2 gap-[16px]">
+          <div className="flex flex-col lg:flex-row flex-1/2 gap-[16px] w-full xl:max-w-[1600px] mx-auto">
             <div className="flex flex-1 bg-[#FCFCFCCC] p-[22px] gap-[16px] rounded-xl">
               <Image
                 src="/icons/investor-user.svg"
@@ -290,7 +290,7 @@ const InvestorRelationsPage = () => {
       <div className="bg-secondary">
         <SectionLayout>
           <div className="flex gap-[80px]">
-            <div className="contact-form-wrapper w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px]">
+            <div className="contact-form-wrapper grid grid-cols-1 lg:grid-cols-2 gap-[80px] w-full xl:max-w-[1600px] mx-auto">
               <div className="flex flex-col gap-4">
                 <p className="text-[16px] text-primary">GET IN TOUCH</p>
                 <h1 className="text-[30px] lg:text-[40px]">

@@ -17,8 +17,8 @@ const VerticalCarouselItem = ({
   imgSrc: string;
 }) => {
   return (
-    <div className="flex flex-col lg:flex-row gap-[15px] h-full">
-      <div className="flex flex-col lg:flex-row lg:flex-row gap-[15px]">
+    <div className="flex flex-col lg:flex-row gap-[15px] h-full ">
+      <div className="flex flex-col lg:flex-row lg:flex-row gap-[15px] ">
         <Image
           src={imgSrc}
           alt="bb-score"
@@ -74,42 +74,44 @@ const MarketingSolutionsPage = () => {
   return (
     <div>
       {/* FIRST SECTION */}
-      <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
-          <Image
-            src="/marketing-solutions-hero.jpg"
-            alt="about-us"
-            fill
-            className="w-full h-full object-cover opacity-40 rounded-xl"
-          />
-          <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] ">
-            <div className="flex flex-col justify-center gap-[16px]">
-              <p className="text-primary text-[16px]">TRUSTED PLATFORM</p>
-              <h1 className="text-[30px] lg:text-[42px] ">
-                Reach Affluent Buyers Seeking Opulent Branded Residences
-              </h1>
-              <p className="text-[18px] text-white/60">
-                Showcase your branded residences to affluent individuals
-                actively seeking their next high-end property, helping you close
-                deals faster and with confidence.
-              </p>
-              <div className="flex gap-[8px] place-self-start">
-                <Link
-                  href="/#"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
-                >
-                  Start for free
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-white/20 text-primary-foreground shadow-xs hover:bg-white/25 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
-                >
-                  Schedule a demo
-                </Link>
+      <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0 xl:mb-12">
+        <div className="w-full xl:max-w-[1600px] mx-auto">
+          <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+            <Image
+              src="/marketing-solutions-hero.jpg"
+              alt="about-us"
+              fill
+              className="w-full h-full object-cover opacity-40 rounded-xl"
+            />
+            <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px] ">
+              <div className="flex flex-col justify-center gap-[16px]">
+                <p className="text-primary text-[16px]">TRUSTED PLATFORM</p>
+                <h1 className="text-[30px] lg:text-[42px] ">
+                  Reach Affluent Buyers Seeking Opulent Branded Residences
+                </h1>
+                <p className="text-[18px] text-white/60">
+                  Showcase your branded residences to affluent individuals
+                  actively seeking their next high-end property, helping you close
+                  deals faster and with confidence.
+                </p>
+                <div className="flex gap-[8px] place-self-start">
+                  <Link
+                    href="/#"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
+                  >
+                    Start for free
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-white/20 text-primary-foreground shadow-xs hover:bg-white/25 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
+                  >
+                    Schedule a demo
+                  </Link>
+                </div>
               </div>
-            </div>
-            <div className="w-full lg:min-w-[550px]">
-              <ClientCommonInfoForm />
+              <div className="w-full lg:min-w-[550px]">
+                <ClientCommonInfoForm />
+              </div>
             </div>
           </div>
         </div>
@@ -118,38 +120,40 @@ const MarketingSolutionsPage = () => {
       {/* SECOND SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <div className="flex flex-col lg:flex-row gap-[20px]">
-            <div className="flex flex-col flex-1/2">
-              <p className="text-black text-primary xl:text-[18px]">
-                MAXIMIZE IMPACT
-              </p>
-              <h1 className="text-black text-[30px] xl:text-[40px]">
-                Accelerate Your Sales
-              </h1>
-            </div>
-            <div className="flex flex-col flex-1/2 gap-[24px]">
-              <p className="text-[#171D22] xl:text-[18px]">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown.
-              </p>
-              <div className="flex gap-[8px] place-self-start">
-                <Link
-                  href="/#"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
-                >
-                  Start for free
-                </Link>
-                <Link
-                  href="/#"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-transparent text-slate-900 shadow-xs hover:bg-white/25 h-9 px-4 py-2 has-[>svg]:px-3 w-fit border-1 border-slate-300"
-                >
-                  Explore plans
-                </Link>
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <div className="flex flex-col lg:flex-row gap-[20px]">
+              <div className="flex flex-col flex-1/2">
+                <p className="text-black text-primary xl:text-[18px]">
+                  MAXIMIZE IMPACT
+                </p>
+                <h1 className="text-black text-[30px] xl:text-[40px]">
+                  Accelerate Your Sales
+                </h1>
+              </div>
+              <div className="flex flex-col flex-1/2 gap-[24px]">
+                <p className="text-[#171D22] xl:text-[18px]">
+                  Lorem Ipsum is simply dummy text of the printing and typesetting
+                  industry. Lorem Ipsum has been the industry's standard dummy
+                  text ever since the 1500s, when an unknown.
+                </p>
+                <div className="flex gap-[8px] place-self-start">
+                  <Link
+                    href="/#"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit"
+                  >
+                    Start for free
+                  </Link>
+                  <Link
+                    href="/#"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-transparent text-slate-900 shadow-xs hover:bg-white/25 h-9 px-4 py-2 has-[>svg]:px-3 w-fit border-1 border-slate-300"
+                  >
+                    Explore plans
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row w-full">
+          <div className="flex flex-col lg:flex-row w-full xl:max-w-[1600px] mx-auto">
             <div className="flex flex-1/2">
               <Image
                 src="/accelerate.webp"
@@ -274,7 +278,7 @@ const MarketingSolutionsPage = () => {
                 Explore Our Plans & Pricing
               </Link>
             </div>
-            <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px]">
+            <div className="flex flex-col lg:flex-row gap-[16px] lg:gap-[30px] xl:max-w-[1600px] mx-auto">
               <div className="flex flex-1 flex-col p-[16px] lg:p-[40px] border border-primary/60 rounded-xl">
                 <p className="text-[#777777] tracking-widest text-[14px] lg:text-[16px]">
                   IT'S FREE
@@ -318,7 +322,7 @@ const MarketingSolutionsPage = () => {
       {/* FOURTH SECTION */}
       <div className="bg-white">
         <SectionLayout>
-          <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px]">
+          <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[160px] xl:max-w-[1600px] mx-auto">
             <div>
               <p className="text-primary text-[14px] lg:text-[18px] tracking-widest">
                 BOOST PERFORMANCE 
@@ -342,7 +346,7 @@ const MarketingSolutionsPage = () => {
             </Link>
           </div>
 
-          <div className="flex flex-col lg:flex-row w-full gap-[24px]">
+          <div className="flex flex-col lg:flex-row w-full gap-[24px] xl:max-w-[1600px] mx-auto">
             <div className="p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-1/3">
               <h2 className="text-black text-[22px] lg:text-[28px] ">
                 Global Audience Reach
@@ -393,7 +397,7 @@ const MarketingSolutionsPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row w-full gap-[24px]">
+          <div className="flex flex-col lg:flex-row w-full gap-[24px] xl:max-w-[1600px] mx-auto">
             <div className="flex flex-col p-[16px] lg:p-[40px] bg-beigeVariant6 rounded-xl flex-2/3">
               <h2 className="text-black text-[22px] lg:text-[28px]">
                 Targeted Marketing Tools
@@ -428,7 +432,7 @@ const MarketingSolutionsPage = () => {
       {/* FIFTH SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <div className="flex flex-col gap-[10px] lg:w-[65%] place-self-center">
+          <div className="flex flex-col gap-[10px] lg:w-[65%] place-self-center xl:max-w-[1600px] mx-auto">
             <p className="text-primary text-center tracking-widest text-[14px] lg:text-[18px]]">
               WHY CHOOSE US
             </p>
@@ -448,7 +452,7 @@ const MarketingSolutionsPage = () => {
             </Link>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-[10px] bg-beigeVariant6 rounded-xl p-[16px] lg:p-[54px] w-full">
+          <div className="flex flex-col lg:flex-row gap-[10px] bg-beigeVariant6 rounded-xl p-[16px] lg:p-[54px] w-full xl:max-w-[1600px] mx-auto">
             <div className="flex flex-col">
               <h1 className="text-[#0F172A] text-[50px] lg:text-[60px] text-center">
                 95%
@@ -489,7 +493,9 @@ const MarketingSolutionsPage = () => {
       <FaqBlock themeLight />
 
       {/* SEVENTH SECTION */}
-      <BrandSlider />
+      <div className="w-full xl:max-w-[1600px] mx-auto py-12">
+        <BrandSlider />
+      </div>
     </div>
   );
 };

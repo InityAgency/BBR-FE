@@ -10,7 +10,7 @@ const PricingPage = () => {
     <div>
       {/* FIRST SECTION */}
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-10">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow xl:max-w-[1600px] mx-auto">
           <Image
             src="/pricing-hero.webp"
             alt="about-us"
@@ -41,21 +41,23 @@ const PricingPage = () => {
       {/* SECOND SECTION */}
       <div className="bg-white">
         <SectionLayout>
-          <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16">
-            <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
-              CHOOSE YOUR PLAN
-            </span>
-            <h2 className="text-4xl text-black font-bold w-[100%] lg:w-[70%] text-left lg:text-center mx-auto">
-              Find the right plan you want
-            </h2>
-            <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[70%] text-left lg:text-center mx-auto">
-              We connect developers with a global audience of high-end buyers,
-              providing premium marketing solutions that maximize exposure and
-              drive sales.
-            </p>
+          <div className="w-full xl:max-w-[1600px] mx-auto">    
+            <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16">
+              <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
+                CHOOSE YOUR PLAN
+              </span>
+              <h2 className="text-4xl text-black font-bold w-[100%] lg:w-[70%] text-left lg:text-center mx-auto">
+                Find the right plan you want
+              </h2>
+              <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[70%] text-left lg:text-center mx-auto">
+                We connect developers with a global audience of high-end buyers,
+                providing premium marketing solutions that maximize exposure and
+                drive sales.
+              </p>
+            </div>
           </div>
 
-          <div className="flex gap-[24px] flex-col xl:flex-row">
+          <div className="flex gap-[24px] flex-col xl:flex-row xl:max-w-[1600px] mx-auto">
             {/* STARTER PLAN */}
             <div className="flex flex-1 flex-col bg-white border-1 border-[#D4D4D4] rounded-xl p-[32px] gap-[10px]">
               <h1 className="text-[#171D22] !font-medium text-[36px]">Free</h1>
@@ -313,7 +315,7 @@ const PricingPage = () => {
       {/* THIRD SECTION */}
       <div className="bg-[#FCF9F6]">
         <SectionLayout>
-          <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16">
+          <div className="flex flex-col gap-4 rounded-xl p-4 xl:mx-16 xl:max-w-[1600px] mx-auto">
             <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">
               PLAN 0VERVIEW
             </span>
@@ -326,85 +328,91 @@ const PricingPage = () => {
               drive sales.
             </p>
           </div>
-          <PlanOverview />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <PlanOverview />  
+          </div>
         </SectionLayout>
       </div>
 
       {/* FOURTH SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <div className="flex flex-col lg:flex-row">
-            <div>
-              <h1 className="text-[#171D22] text-[36px]">
-                Increase your rankings
-              </h1>
-              <p className="text-[#4D4D4DCC] text-[20px]">
-                Enhance your property’s reputation with strategic rankings,
-                giving your development the credibility needed to convert more
-                leads into buyers.
-              </p>
-            </div>
-            <Link
-              href="/#"
-              className="w-full lg:w-fit place-self-end my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-white hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
-            >
-              Get started
-            </Link>
-          </div>
-          <div className="flex flex-col lg:flex-row gap-[30px] lg:gap-[60px] items-center">
-            <div className="flex flex-col gap-[16px]">
-              <div className="flex flex-col lg:flex-row gap-[16px]">
-                <div className="flex-1 bg-white p-[24px] rounded-xl">
-                  <h2 className="text-black">By City</h2>
-                  <p className="text-black/50 text-[14px]">
-                    Get ranked in the top properties for your city to attract
-                    local high-net-worth buyers.
-                  </p>
-                </div>
-                <div className="flex-1 bg-white p-[24px] rounded-xl">
-                  <h2 className="text-black">By Geographical area</h2>
-                  <p className="text-black/50 text-[14px]">
-                    Highlight your property in the top rankings for categories
-                    like condos, penthouses, or villas.
-                  </p>
-                </div>
-                <div className="flex-1 bg-white p-[24px] rounded-xl">
-                  <h2 className="text-black">By Country</h2>
-                  <p className="text-black/50 text-[14px]">
-                    Secure a spot in the top branded residences in your country,
-                    increasing your appeal to both lo.
-                  </p>
-                </div>
-              </div>
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <div className="flex flex-col lg:flex-row w-full justify-between">
               <div>
+                <h1 className="text-[#171D22] text-[36px]">
+                  Increase your rankings
+                </h1>
+                <p className="text-[#4D4D4DCC] text-[20px] w-full lg:w-[70%]">
+                  Enhance your property’s reputation with strategic rankings,
+                  giving your development the credibility needed to convert more
+                  leads into buyers.
+                </p>
+              </div>
+              <Link
+                href="/#"
+                className="w-full lg:w-fit place-self-end my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-white hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
+              >
+                Get started
+              </Link>
+            </div>
+          </div>
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <div className="flex flex-col lg:flex-row gap-[30px] lg:gap-[60px] items-center">
+              <div className="flex flex-col gap-[16px] w-full ">
                 <div className="flex flex-col lg:flex-row gap-[16px]">
                   <div className="flex-1 bg-white p-[24px] rounded-xl">
-                    <h2 className="text-black">By Lifestyle</h2>
+                    <h2 className="text-black">By City</h2>
                     <p className="text-black/50 text-[14px]">
-                      Rank your property in lifestyle categorie.g., beachfront,
-                      urban, eco-friendly) to reach buyers ank your property in
-                      lifestyle categorie.g., beachfront, urban, eco-friendly)
-                      to reach buyers
+                      Get ranked in the top properties for your city to attract
+                      local high-net-worth buyers.
                     </p>
                   </div>
                   <div className="flex-1 bg-white p-[24px] rounded-xl">
-                    <h2 className="text-black">By Brand</h2>
+                    <h2 className="text-black">By Geographical area</h2>
                     <p className="text-black/50 text-[14px]">
-                      Rank your property in lifestyle categorie.g., beachfront,
-                      urban, eco-friendly) to reach buyers ank your property in
-                      lifestyle categorie.g., beachfront, urban, eco-friendly)
-                      to reach buyers
+                      Highlight your property in the top rankings for categories
+                      like condos, penthouses, or villas.
+                    </p>
+                  </div>
+                  <div className="flex-1 bg-white p-[24px] rounded-xl">
+                    <h2 className="text-black">By Country</h2>
+                    <p className="text-black/50 text-[14px]">
+                      Secure a spot in the top branded residences in your country,
+                      increasing your appeal to both lo.
                     </p>
                   </div>
                 </div>
+                <div>
+                  <div className="flex flex-col lg:flex-row gap-[16px]">
+                    <div className="flex-1 bg-white p-[24px] rounded-xl">
+                      <h2 className="text-black">By Lifestyle</h2>
+                      <p className="text-black/50 text-[14px]">
+                        Rank your property in lifestyle categorie.g., beachfront,
+                        urban, eco-friendly) to reach buyers ank your property in
+                        lifestyle categorie.g., beachfront, urban, eco-friendly)
+                        to reach buyers
+                      </p>
+                    </div>
+                    <div className="flex-1 bg-white p-[24px] rounded-xl">
+                      <h2 className="text-black">By Brand</h2>
+                      <p className="text-black/50 text-[14px]">
+                        Rank your property in lifestyle categorie.g., beachfront,
+                        urban, eco-friendly) to reach buyers ank your property in
+                        lifestyle categorie.g., beachfront, urban, eco-friendly)
+                        to reach buyers
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
+              <Image
+                src="/pricing-residence.webp"
+                alt="residence"
+                width={450}
+                height={550}
+              />
             </div>
-            <Image
-              src="/pricing-residence.webp"
-              alt="residence"
-              width={450}
-              height={550}
-            />
           </div>
         </SectionLayout>
       </div>
@@ -435,7 +443,7 @@ const PricingPage = () => {
       {/* SIXTH SECTION */}
       <div className="bg-white">
         <SectionLayout>
-          <div className="flex flex-col lg:flex-row gap-[40px]">
+          <div className="flex flex-col lg:flex-row gap-[40px] w-full xl:max-w-[1600px] mx-auto">
             <div className="flex flex-1">
               <Image
                 src="/property-placement.webp"

@@ -195,8 +195,8 @@ export default function WhyChooseUsPage() {
   return (
     <div>
       {/* FIRST SECTION */}
-      <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0">
-        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow">
+      <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-8 lg:mb-0 xl:mb-12">
+        <div className="flex flex-col gap-6 w-full bg-secondary bg-black/50 p-4 lg:p-8 py-12 lg:py-[50px] relative overflow xl:max-w-[1600px] mx-auto">
           <Image
             src="/why-choose-us-hero.webp"
             alt="about-us"
@@ -226,99 +226,101 @@ export default function WhyChooseUsPage() {
       {/* SECOND SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <p className="text-primary text-[20px] text-center w-full">
-            WHY CHOOSE BEST BRANDED RESIDENCES?
-          </p>
-          <h1 className="text-[36px] 2xl:text-[40px] text-black place-self-center text-center lg:w-[70%]">
-            Align Your Development with the Industry Leader in Luxury Branded
-            Residences
-          </h1>
-          <div className="flex flex-col xl:flex-row bg-beigeVariant5 mt-[25px] 2xl:mt-[56px] rounded-2xl p-[24px] lg:p-[48px] gap-[32px]">
-            <Image
-              src="/why-choose-us-best.webp"
-              alt="why-choose-us-best"
-              width={500}
-              height={300}
-              className="rounded-2xl flex-1 flex"
-            />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <p className="text-primary text-[20px] text-center w-full">
+              WHY CHOOSE BEST BRANDED RESIDENCES?
+            </p>
+            <h1 className="text-[36px] 2xl:text-[40px] text-black place-self-center text-center lg:w-[70%]">
+              Align Your Development with the Industry Leader in Luxury Branded
+              Residences
+            </h1>
+            <div className="flex flex-col xl:flex-row bg-beigeVariant5 mt-[25px] 2xl:mt-[56px] rounded-2xl p-[24px] lg:p-[48px] gap-[32px]">
+              <Image
+                src="/why-choose-us-best.webp"
+                alt="why-choose-us-best"
+                width={500}
+                height={300}
+                className="rounded-2xl flex-1 flex"
+              />
 
-            <div className="flex flex-1 flex-col justify-between gap-[10px] xl:w-[50%]">
-              <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
-                <Image
-                  src="/icons/why-choose-us-boost.svg"
-                  width={40}
-                  height={40}
-                  alt="home-icon"
-                  className="place-self-start"
-                />
-                <div>
-                  <h2 className="text-black text-[22px]">
-                    Boost Credibility & Trust
-                  </h2>
-                  <p className="text-black/80 text-[16px]">
-                    Enhance your property’s reputation with strategic rankings,
-                    giving your development the credibility needed to convert
-                    more leads into buyers.
-                  </p>
+              <div className="flex flex-1 flex-col justify-between gap-[10px] xl:w-[50%]">
+                <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
+                  <Image
+                    src="/icons/why-choose-us-boost.svg"
+                    width={40}
+                    height={40}
+                    alt="home-icon"
+                    className="place-self-start"
+                  />
+                  <div>
+                    <h2 className="text-black text-[22px]">
+                      Boost Credibility & Trust
+                    </h2>
+                    <p className="text-black/80 text-[16px]">
+                      Enhance your property’s reputation with strategic rankings,
+                      giving your development the credibility needed to convert
+                      more leads into buyers.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
-                <Image
-                  src="/icons/why-choose-us-stand-out.svg"
-                  width={40}
-                  height={40}
-                  alt="home-icon"
-                  className="place-self-start"
-                />
-                <div>
-                  <h2 className="text-black text-[22px]">
-                    Stand Out with Global Rankings
-                  </h2>
-                  <p className="text-black/80 text-[16px]">
-                    Gain higher visibility through our platform’s ranking
-                    system, positioning your property for premium exposure and
-                    trust with buyers.
-                  </p>
+                <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
+                  <Image
+                    src="/icons/why-choose-us-stand-out.svg"
+                    width={40}
+                    height={40}
+                    alt="home-icon"
+                    className="place-self-start"
+                  />
+                  <div>
+                    <h2 className="text-black text-[22px]">
+                      Stand Out with Global Rankings
+                    </h2>
+                    <p className="text-black/80 text-[16px]">
+                      Gain higher visibility through our platform’s ranking
+                      system, positioning your property for premium exposure and
+                      trust with buyers.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
-                <Image
-                  src="/icons/why-choose-us-elevate.svg"
-                  width={40}
-                  height={40}
-                  alt="home-icon"
-                  className="place-self-start"
-                />
-                <div>
-                  <h2 className="text-black text-[22px]">
-                    Elevate Your Property's Value
-                  </h2>
-                  <p className="text-black/80 text-[16px]">
-                    Secure premium pricing and greater demand by aligning with
-                    our ranking system, driving unmatched visibility and
-                    credibility for your property.
-                  </p>
+                <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
+                  <Image
+                    src="/icons/why-choose-us-elevate.svg"
+                    width={40}
+                    height={40}
+                    alt="home-icon"
+                    className="place-self-start"
+                  />
+                  <div>
+                    <h2 className="text-black text-[22px]">
+                      Elevate Your Property's Value
+                    </h2>
+                    <p className="text-black/80 text-[16px]">
+                      Secure premium pricing and greater demand by aligning with
+                      our ranking system, driving unmatched visibility and
+                      credibility for your property.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
-                <Image
-                  src="/icons/why-choose-us-expand.svg"
-                  width={40}
-                  height={40}
-                  alt="home-icon"
-                  className="place-self-start"
-                />
-                <div>
-                  <h2 className="text-black text-[22px]">
-                    Expand Global Reach
-                  </h2>
-                  <p className="text-black/80 text-[16px]">
-                    SAccess a worldwide network of affluent buyers, positioning
-                    your property for international visibility and higher sales
-                    velocity.
-                  </p>
+                <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] rounded-xl">
+                  <Image
+                    src="/icons/why-choose-us-expand.svg"
+                    width={40}
+                    height={40}
+                    alt="home-icon"
+                    className="place-self-start"
+                  />
+                  <div>
+                    <h2 className="text-black text-[22px]">
+                      Expand Global Reach
+                    </h2>
+                    <p className="text-black/80 text-[16px]">
+                      SAccess a worldwide network of affluent buyers, positioning
+                      your property for international visibility and higher sales
+                      velocity.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -329,7 +331,7 @@ export default function WhyChooseUsPage() {
       {/* THIRD SECTION */}
       <div className="flex flex-col gap-[56px] bg-beigeVariant8 border-3 border-beigeVariant7">
         <SectionLayout>
-          <div className="flex flex-col xl:flex-row gap-[30px] xl:gap-[70px]">
+          <div className="flex flex-col xl:flex-row gap-[30px] xl:gap-[70px] xl:max-w-[1600px] mx-auto">
             <div className="w-full xl:w-[50%]">
               <p className="text-primary text-left">WHY THEY CHOOSE US</p>
               <h1 className="text-[30px] xl:text-[40px] w-full text-center xl:text-start text-black">
@@ -347,14 +349,16 @@ export default function WhyChooseUsPage() {
               indust
             </p>
           </div>
-          <Image
-            src="/living-room-view.webp"
-            alt="living-room-view"
-            width={1680}
-            height={400}
-            className="rounded-2xl w-full"
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-2">
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <Image
+              src="/living-room-view.webp"
+              alt="living-room-view"
+              width={1680}
+              height={400}
+              className="rounded-2xl w-full"
+            />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-2 xl:max-w-[1600px] mx-auto">
             <div className="flex bg-beigeVariant6 p-[22px] gap-[16px] lg:border-r-3 lg:border-beigeVariant5 lg:mb-10">
               <div className="flex w-[60px] h-[60px] bg-beigeVariant4 rounded-xl justify-center items-center">
                 <p className="w-[60px] text-center bg-beigeVariant4 text-primary font-bold text-[28px]">
@@ -551,14 +555,16 @@ export default function WhyChooseUsPage() {
               ever
             </p>
           </div>
-          <WhyChooseUsTabs tabs={tabs} />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <WhyChooseUsTabs tabs={tabs} />
+          </div>
         </SectionLayout>
       </div>
 
       {/* SIXTH SECTION */}
       <div className="bg-beigeVariant4">
         <SectionLayout>
-          <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center">
+          <div className="relative flex flex-col gap-[16px] lg:gap-[20px] bg-beigeVariant6 rounded-xl px-[12px] py-[24px] lg:py-[66px] items-center xl:max-w-[1600px] mx-auto">
             <Image
               src="/texture.webp"
               alt="about-us"
@@ -588,13 +594,17 @@ export default function WhyChooseUsPage() {
       {/* SEVENTH SECTION */}
       <div className="flex flex-col gap-[56px] bg-secondary bg-secondary items-center">
         <SectionLayout>
-          <ClientTestimonials />
+          <div className="w-full xl:max-w-[1600px] mx-auto">
+            <ClientTestimonials />
+          </div>
         </SectionLayout>
       </div>
 
       {/* EIGHT SECTION */}
       <SectionLayout>
-        <BrandSlider />
+        <div className="w-full xl:max-w-[1600px] mx-auto">
+          <BrandSlider />
+        </div>
       </SectionLayout>
     </div>
   );
