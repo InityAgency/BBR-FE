@@ -62,7 +62,7 @@ const nextConfig = {
   compress: true,
   
   // Optimizacija za production
-  swcMinify: true,
+  // swcMinify: true,
   
   eslint: {
     ignoreDuringBuilds: true,
