@@ -15,6 +15,7 @@ import { RequestInformationModal } from "@/components/web/Modals/RequestInformat
 import { useAuth } from "@/contexts/AuthContext";
 import { ClaimRequestModal } from "@/components/web/Modals/ClaimRequestModal";
 import type { Unit } from "@/types/unit";
+import RankingBadges from "@/components/web/Residences/RankingBadges";
 
 interface MediaImage {
     id: string;
@@ -123,6 +124,7 @@ const RankingBadge = ({ rankingScore }: { rankingScore: RankingScore }) => {
         const ordinalSuffix = position === 1 ? 'st' : position === 2 ? 'nd' : 'rd';
         return `#${position} ${categoryName}`;
     };
+
 
     return (
         <Link
@@ -292,6 +294,12 @@ export default function ResidencePage() {
         ? residence.totalScores.filter((score: RankingScore) => score.position <= 3)
         : [];
 
+
+    const allRankings = residence.totalScores && Array.isArray(residence.totalScores)
+        ? residence.totalScores
+        : [];
+
+
     return (
         <>
             <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-0">
@@ -437,8 +445,8 @@ export default function ResidencePage() {
                             {residence.description}
                         </p>
                     </div>
-                    <div className="badges bg-secondary rounded-lg min-w-full lg:min-w-[40svw] opacity-0">
-                        {/* Badges */}
+                    <div className="badges bg-secondary rounded-lg min-w-full lg:min-w-[40svw]">
+                        <RankingBadges rankingScores={allRankings} />
                     </div>
                 </div>
 
@@ -616,7 +624,7 @@ export default function ResidencePage() {
             </div>
 
             {/* Units Section - Exclusive Offers */}
-             {units.length > 0 && (
+            {units.length > 0 && (
                 <div className="py-8 lg:py-16 px-4 lg:px-0">
                     <SectionLayout>
                         <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col items-start lg:items-center gap-4 mb-8">
