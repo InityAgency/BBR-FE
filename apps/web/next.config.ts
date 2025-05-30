@@ -47,10 +47,12 @@ const nextConfig = {
       'images.unsplash.com', 
       'bbrapi.inity.space', 
       'bbrcontent.inity.space',
+      'bestbrandedresidences.com',
       'flagcdn.com', 
       'upload.wikimedia.org',  
       'bbr-bucket.s3.amazonaws.com', 
       'bbr-bucket.s3.eu-west-2.amazonaws.com', 
+      'backend.bestbrandedresidences.com',
       'localhost'
     ],
     formats: ['image/webp', 'image/avif'], // SEO optimizacija slika
