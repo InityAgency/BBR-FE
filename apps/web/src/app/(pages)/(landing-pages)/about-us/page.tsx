@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import SectionLayout from "@/components/web/SectionLayout";

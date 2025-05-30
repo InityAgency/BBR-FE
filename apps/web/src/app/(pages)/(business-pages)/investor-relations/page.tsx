@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
@@ -205,7 +203,7 @@ const InvestorRelationsPage = () => {
                 the luxury real estate market.
               </p>
               <Link
-                href="/#"
+                href="/contact"
                 className="my-4 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-white hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Get in touch
@@ -319,9 +317,9 @@ const InvestorRelationsPage = () => {
                   investment, or an exclusive lifestyle experience, our
                   consultants are here to help.
                 </p>
-                <Button onClick={() => {}} className="place-self-start">
+                <Link href="/schedule-a-demo" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit">
                   Schedule a consultation
-                </Button>
+                </Link>
                 <Image
                   src="/connect-with-experts.png"
                   width={2800}

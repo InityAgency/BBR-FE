@@ -21,18 +21,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { generatePageMetadata } from '@/lib/metadata'
-import type { Metadata } from 'next'
+// import { generatePageMetadata } from '@/lib/metadata'
+// import type { Metadata } from 'next'
 
-export const metadata: Metadata = generatePageMetadata({
-  type: 'page',
-  data: {
-    title: 'Leave a review',
-    description: 'We value your feedback and would love to hear your thoughts about the best branded residences. Please fill out the form below to leave a review.',
-    slug: 'leave-a-review',
-    keywords: ['leave a review', 'luxury residences', 'company info']
-  }
-})
+// export const metadata: Metadata = generatePageMetadata({
+//   type: 'page',
+//   data: {
+//     title: 'Leave a review',
+//     description: 'We value your feedback and would love to hear your thoughts about the best branded residences. Please fill out the form below to leave a review.',
+//     slug: 'leave-a-review',
+//     keywords: ['leave a review', 'luxury residences', 'company info']
+//   }
+// })
 
 const RATING_CATEGORIES = [
     { key: 'buildQuality', label: 'Build Quality' },

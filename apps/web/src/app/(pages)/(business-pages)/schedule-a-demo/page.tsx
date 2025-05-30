@@ -2,18 +2,18 @@
 
 import { useEffect } from 'react';
 
-import { generatePageMetadata } from '@/lib/metadata'
-import type { Metadata } from 'next'
+// import { generatePageMetadata } from '@/lib/metadata'
+// import type { Metadata } from 'next'
 
-export const metadata: Metadata = generatePageMetadata({
-  type: 'page',
-  data: {
-    title: 'Schedule a Demo',
-    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
-    slug: 'schedule-a-demo',
-    keywords: ['schedule a demo', 'luxury residences', 'company info']
-  }
-})
+// export const metadata: Metadata = generatePageMetadata({
+//   type: 'page',
+//   data: {
+//     title: 'Schedule a Demo',
+//     description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+//     slug: 'schedule-a-demo',
+//     keywords: ['schedule a demo', 'luxury residences', 'company info']
+//   }
+// })
 
 export default function ScheduleADemoPage() {
     useEffect(() => {
