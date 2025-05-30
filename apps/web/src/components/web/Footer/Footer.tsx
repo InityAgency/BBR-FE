@@ -24,23 +24,23 @@ export default function Footer() {
           </Link>
           <div className="flex flex-row gap-2 items-center">
             <MapPin className="w-5 h-5" color="#6B7280" />
-            <p>Ipsum 3344 Peachtree Rd NE, Suite 800 Atlanta</p>
+            <p>16726 Prato Way NAPLES, FL 34110</p>
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Mail className="w-5 h-5" color="#6B7280" />
-            <Link href="mailto:support@bestbrandedresidence.com">
-              support@bestbrandedresidence.com
+            <Link href="mailto:support@bestbrandedresidences.com">
+              support@bestbrandedresidences.com
             </Link>
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Mail className="w-5 h-5" color="#6B7280" />
-            <Link href="mailto:sales@bestbrandedresidence.com">
-              sales@bestbrandedresidence.com
+            <Link href="mailto:sales@bestbrandedresidences.com">
+              sales@bestbrandedresidences.com
             </Link>
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Phone className="w-5 h-5 " color="#6B7280" />
-            <Link href="tel:+1 223 664 5599">+1 223 664 5599</Link>
+            <Link href="tel:800-874-2458">800-874-2458</Link>
           </div>
         </div>
 
@@ -50,7 +50,7 @@ export default function Footer() {
           </h3>
           <NewsletterForm />
           <div className="flex gap-2 sodical-media mt-6">
-            <Link href="/#">
+            <Link href="https://www.facebook.com/profile.php?id=61571417297937" target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -66,7 +66,7 @@ export default function Footer() {
                 />
               </svg>
             </Link>
-            <Link href="/#">
+            <Link href="https://www.instagram.com/bestbrandedresidences/" target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -92,24 +92,12 @@ export default function Footer() {
                 />
               </svg>
             </Link>
-            <Link href="/#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                fill="none"
-              >
-                <path d="M18.6 16L14.4 13.6V18.4L18.6 16Z" fill="white" />
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M0 5C0 2.23858 2.23858 0 5 0H27C29.7614 0 32 2.23858 32 5V27C32 29.7614 29.7614 32 27 32H5C2.23858 32 0 29.7614 0 27V5ZM22.2 10.7C22.9 10.9 23.4 11.4 23.6 12.1C24 13.4 24 16 24 16C24 16 24 18.6 23.7 19.9C23.5 20.6 23 21.1 22.3 21.3C21 21.6 16 21.6 16 21.6C16 21.6 10.9 21.6 9.7 21.3C9 21.1 8.5 20.6 8.3 19.9C8 18.6 8 16 8 16C8 16 8 13.4 8.2 12.1C8.4 11.4 8.90001 10.9 9.60001 10.7C10.9 10.4 15.9 10.4 15.9 10.4C15.9 10.4 21 10.4 22.2 10.7Z"
-                  fill="white"
-                />
+            <Link href="https://www.tiktok.com/@bestbrandedresidences1" target="_blank">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path fillRule="evenodd" clipRule="evenodd" d="M5 0C2.23859 0 0 2.23858 0 5V27C0 29.7614 2.23859 32 5 32H27C29.7614 32 32 29.7614 32 27V5C32 2.23858 29.7614 0 27 0H5ZM19.1182 8C19.1182 8.23775 19.1404 8.4719 19.1813 8.69851C19.3781 9.74606 19.998 10.645 20.8592 11.2059C21.4605 11.5997 22.1732 11.8263 22.9415 11.8263L22.9413 12.4393V14.5753C21.516 14.5753 20.1946 14.1184 19.1182 13.3457V18.9366C19.1182 21.7265 16.8466 24 14.0591 24C12.9827 24 11.9805 23.6581 11.1602 23.0824C9.85367 22.1648 9 20.6491 9 18.9366C9 16.143 11.2679 13.8732 14.0554 13.8769C14.2892 13.8769 14.5157 13.8955 14.7384 13.9252V14.5753L14.7302 14.5792L14.7383 14.579V16.7337C14.5231 16.6668 14.2929 16.6259 14.0554 16.6259C12.7823 16.6259 11.7467 17.6624 11.7467 18.9366C11.7467 19.8245 12.2515 20.5934 12.9864 20.9835C12.9973 20.9984 13.0083 21.0132 13.0195 21.0278C13.0111 21.0115 13.0013 20.9955 12.9901 20.9798C13.313 21.1507 13.6768 21.2472 14.0628 21.2472C15.3062 21.2472 16.3233 20.2554 16.3678 19.0221L16.3715 8H19.1182Z" fill="white" />
               </svg>
             </Link>
-            <Link href="/#">
+            <Link href="https://www.linkedin.com/company/best-branded-residences1?trk=public_post_feed-actor-name" target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -135,100 +123,19 @@ export default function Footer() {
             <h3 className="text-xl font-bold text-primary-link">Rankings</h3>
             <ul className="flex flex-col gap-1">
               <li>
-                {/* <Link href="/#">Worldwide</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>Worldwide</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Link href="/best-residences/top-50-worldwide">Worldwide</Link>
               </li>
               <li>
-                {/* <Link href="/#">By Country</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>By Country</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Link href="/best-residences/countries">By Country</Link>
               </li>
               <li>
-                {/* <Link href="/#">By City</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>By City</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Link href="/best-residences/cities">By City</Link>
               </li>
               <li>
-                {/* <Link href="/#">By Lifestyle</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>By Lifestyle</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Link href="/best-residences/lifestyle">By Lifestyle</Link>
               </li>
               <li>
-                {/* <Link href="/#">By Property Type</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>By Property Type</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </li>
-              <li>
-                {/* <Link href="/#">By Brand</Link> */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 text-white/50 cursor-not-allowed">
-                        <span>By Brand</span>
-                        <Lock className="w-4 h-4" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Coming Soon</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Link href="/best-residences/brands">By Brand</Link>
               </li>
             </ul>
           </div>

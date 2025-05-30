@@ -47,20 +47,20 @@ export default function Home() {
 
       <div className="flex flex-col lg:flex-row gap-4 xl:max-w-[1600px] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-8 mb-12 ">
         <div className="flex flex-col items-center justify-center w-full lg:w-1/4">
-          <h2 className="text-4xl font-bold">1500+</h2>
-          <p className="text-md lg:text-lg">Properties ranked</p>
+          <h2 className="text-4xl font-bold">1000+</h2>
+          <p className="text-md lg:text-lg">Properties Ranked</p>
         </div>
         <div className="flex flex-col items-center justify-center w-full lg:w-1/4">
-          <h2 className="text-4xl font-bold">1500+</h2>
-          <p className="text-md lg:text-lg">Properties ranked</p>
+          <h2 className="text-4xl font-bold">150+</h2>
+          <p className="text-md lg:text-lg">Ranking Categories</p>
         </div>
         <div className="flex flex-col items-center justify-center w-full lg:w-1/4">
-          <h2 className="text-4xl font-bold">1500+</h2>
-          <p className="text-md lg:text-lg">Properties ranked</p>
+          <h2 className="text-4xl font-bold">100</h2>
+          <p className="text-md lg:text-lg">Luxury brands</p>
         </div>
         <div className="flex flex-col items-center justify-center w-full lg:w-1/4">
-          <h2 className="text-4xl font-bold">1500+</h2>
-          <p className="text-md lg:text-lg">Properties ranked</p>
+          <h2 className="text-4xl font-bold">5.0</h2>
+          <p className="text-md lg:text-lg">Star Customer Ratings</p>
         </div>
       </div>
  

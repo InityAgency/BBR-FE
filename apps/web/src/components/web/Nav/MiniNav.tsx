@@ -73,18 +73,18 @@ export default function MiniNav() {
     <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-2 justify-between items-center gap-6 hidden md:flex">
       <div className="flex flex-row gap-6 ">
         <Link
-          href="mailto:support@bestbrandedresidence.com"
+          href="mailto:support@bestbrandedresidences.com"
           className="flex gap-2 items-center hover:text-primary transition-all"
         >
           <Mail width={16} height={16} color="#B3804C" />
-          support@bestbrandedresidence.com
+          support@bestbrandedresidences.com
         </Link>
         <Link
-          href="tel:+1 223 664 5599"
+          href="tel:800-874-2458"
           className="flex gap-2 items-center hover:text-primary transition-all"
         >
           <Phone width={16} height={16} color="#B3804C" />
-          +1 223 664 5599
+          800-874-2458
         </Link>
       </div>
       <div className="flex flex-row gap-6 items-center">

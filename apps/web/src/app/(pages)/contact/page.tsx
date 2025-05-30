@@ -55,9 +55,9 @@ export default function ContactPage() {
                             </div>
                             <div className="flex gap-4">
                                 <div className="w-1/2">
-                                    <Link href="mailto:info@bestbrandedresidences.com" className="flex items-center gap-2 p-4 rounded-md grid-cols-1 border bg-[#151b1e] hover:bg-[#192024]  border  transition-colors">
+                                    <Link href="mailto:sales@bestbrandedresidences.com" className="flex items-center gap-2 p-4 rounded-md grid-cols-1 border bg-[#151b1e] hover:bg-[#192024]  border  transition-colors">
                                         <Mail size={24} strokeWidth={2} absoluteStrokeWidth className="text-primary"/>
-                                        <p className="text-sm">info@bestbrandedresidences.com</p>
+                                        <p className="text-sm">sales@bestbrandedresidences.com</p>
                                     </Link>
                                 </div>
                                 <div className="w-1/2">

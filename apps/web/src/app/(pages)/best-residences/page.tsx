@@ -5,6 +5,7 @@ import { BrandCard } from "@/components/brands/BrandCard";
 import { useEffect, useState, useCallback } from "react";
 import AiMatchmakingToolSection from "@/components/web/Sections/AiMatchmakingToolSection";
 import RankingDirectory from "@/components/web/Sections/RankingDirectory";
+import Link from "next/link";
 
 interface RankingCategory {
     slug: any;
@@ -196,7 +197,15 @@ export default function BestResidences() {
             <div className="w-full bg-secondary py-6">
                 <SectionLayout>
                     <div className="w-full xl:max-w-[1600px] mx-auto">
-                        <span className="text-md uppercase text-left text-primary inline-block mb-4">BEST WORLDWIDE RESIDENCES</span>
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
+                            <span className="text-md uppercase text-left text-primary inline-block">BEST WORLDWIDE RESIDENCES</span>
+                            <Link 
+                                href="/best-residences/countries"
+                                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c] w-fit"
+                            >
+                                View All
+                            </Link>
+                        </div>
                         <h2 className="text-3xl font-bold w-full mb-16">Top Branded Residences by Country</h2>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
                             {data.countries.map((category) => (
@@ -216,7 +225,15 @@ export default function BestResidences() {
             <div className="w-full">
                 <SectionLayout>
                     <div className="w-full xl:max-w-[1600px] mx-auto">
-                        <h2 className="text-3xl font-bold w-full mb-12">Top Branded Residences by City</h2>
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-12 gap-4">
+                            <h2 className="text-3xl font-bold w-full">Top Branded Residences by City</h2>
+                            <Link 
+                                href="/best-residences/cities"
+                                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-secondary/50/5 hover:bg-secondary/50/10 text-white border-[#b3804c] w-fit"
+                            >
+                                View All
+                            </Link>
+                        </div>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
                             {data.cities.map((category) => (
                                 <RankingCard
@@ -237,7 +254,15 @@ export default function BestResidences() {
             <div className="w-full bg-secondary py-6">
                 <SectionLayout>
                     <div className="w-full xl:max-w-[1600px] mx-auto">
-                        <h2 className="text-3xl font-bold w-full mb-16">Top Branded Residences by Lifestyle</h2>
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-16 gap-4">
+                            <h2 className="text-3xl font-bold w-full">Top Branded Residences by Lifestyle</h2>
+                            <Link 
+                                href="/best-residences/lifestyle"
+                                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c] w-fit"
+                            >
+                                View All
+                            </Link>
+                        </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
                             {data.lifestyle.map((category) => (
                                 <RankingCard
@@ -252,10 +277,13 @@ export default function BestResidences() {
                 </SectionLayout>
             </div>
 
+            {/* Brands Section */}
             <div className="w-full py-6">
                 <SectionLayout>
                     <div className="w-full xl:max-w-[1600px] mx-auto">
-                        <h2 className="text-3xl font-bold w-full mb-16 text-left lg:text-center">Top Branded Residences by Brands</h2>
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-16 gap-4">
+                            <h2 className="text-3xl font-bold w-full text-left lg:text-center">Top Branded Residences by Brands</h2>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                             {brands.map((brand) => (
                                 <BrandCard
