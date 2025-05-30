@@ -15,7 +15,7 @@ import { LatestPosts } from "@/components/web/Posts/LatestPosts";
 import ResidencesSlider from "@/components/web/Residences/ResidencesSlider";
 import BestResidencesSection from "@/components/web/Sections/BestResidencesSection";
 import PopularPlaces from "@/components/web/Sections/PopularPlaces";
-
+import HomeSearchForm from "@/components/web/Forms/HomeSearchForm";
 
 import { generatePageMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next'
@@ -39,6 +39,9 @@ export default function Home() {
           <p className="text-md lg:text-xl w-full xl:w-[60%] text-left lg:text-center">
             From Four Seasons to Armani, explore a curated collection of high-end homes offering world-class service, private amenities, and investment value.
           </p>
+        </div>
+        <div className="home-form w-full">
+          <HomeSearchForm />
         </div>
         <div className="w-full xl:max-w-[1600px] mx-auto">
           <Image src="/hero-image.webp" alt="Hero Image" width={1000} height={1000} className="w-full rounded-2xl mt-6" />
@@ -75,7 +78,7 @@ export default function Home() {
         <SectionLayout>
           <div className="flex flex-col gap-4 w-full">
             <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">IMPECABLE RANKING CRITERIA</span>
-            <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">Find your new home or investment from the World’s Best</h2>
+            <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">Find your new home or investment from the World's Best</h2>
             <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">Best Branded Residences help you choose a private residence partner or property  that is right for you by giving expert insights, offers & ratings</p>
           </div>
           <div>
