@@ -616,7 +616,7 @@ export default function ResidencePage() {
             </div>
 
             {/* Units Section - Exclusive Offers */}
-            {units.length > 0 && (
+             {units.length > 0 && (
                 <div className="py-8 lg:py-16 px-4 lg:px-0">
                     <SectionLayout>
                         <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col items-start lg:items-center gap-4 mb-8">

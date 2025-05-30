@@ -8,6 +8,33 @@ import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
 import { PostCard } from "@/components/web/Posts/PostCard";
 import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  try {
+    const post = await getPostBySlug(params.slug);
+    
+    if (!post) {
+      return {
+        title: 'Post Not Found | Luxury Insights',
+        description: 'The requested blog post could not be found.',
+      }
+    }
+
+    return generatePageMetadata({
+      type: 'blogPost',
+      data: post
+    })
+  } catch (error) {
+    console.error('Error generating blog post metadata:', error)
+    return {
+      title: 'Blog Post | Luxury Insights', 
+      description: 'Read insights about luxury real estate market trends.',
+    }
+  }
+}
+
 interface BlogPostPageProps {
     params: {
         slug: string;

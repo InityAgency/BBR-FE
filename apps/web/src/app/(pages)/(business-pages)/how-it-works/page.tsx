@@ -4,6 +4,19 @@ import SectionLayout from "@/components/web/SectionLayout";
 import Image from "next/image";
 import Link from "next/link";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'How It Works',
+    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    slug: 'how-it-works',
+    keywords: ['how it works', 'luxury residences', 'company info']
+  }
+})
+
 const HowItWorksPage = () => {
   return (
     <div>

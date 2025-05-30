@@ -1,4 +1,16 @@
 import ReportIssueForm from "@/components/web/Forms/ReportIssueForm";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Report an error',
+    description: 'If you encountered a problem or bug, please fill out the form below so we can resolve it as soon as possible. Your feedback helps us improve the platform for everyone.',
+    slug: 'report-issue',
+    keywords: ['report an error', 'luxury residences', 'company info']
+  }
+})
 
 export default function ReportIssuePage() {
   return (

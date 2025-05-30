@@ -5,6 +5,18 @@ import Link from "next/link";
 import BrandSlider from "@/components/web/Brands/BrandSlider";
 import ClientTestimonials from "@/components/web/ClientTestimonials/ClientTestimonials";
 import HorizontalTabs from "@/components/web/HorizontalTabs/HorizontalTabs";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Developer Solutions',
+    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    slug: 'developer-solutions',
+    keywords: ['developer solutions', 'luxury residences', 'company info']
+  }
+})
 
 // #region Tabs
 type TabContentProps = {

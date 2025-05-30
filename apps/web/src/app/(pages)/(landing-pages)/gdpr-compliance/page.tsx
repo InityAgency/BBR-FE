@@ -1,5 +1,18 @@
 import SectionLayout from "@/components/web/SectionLayout";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'GDPR Compliance',
+    description: 'We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of your information.',
+    slug: 'gdpr-compliance',
+    keywords: ['gdpr compliance', 'luxury residences', 'company info']
+  }
+})
+
 export default function GdprCompliancePage() {
     return (
         <>

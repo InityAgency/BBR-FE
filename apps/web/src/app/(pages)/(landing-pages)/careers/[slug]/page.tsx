@@ -7,6 +7,38 @@ import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import SectionLayout from "@/components/web/SectionLayout";
 import { CareerFormWrapper } from "@/components/web/Careers/CareerFormWrapper";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+// Dodaj generateMetadata funkciju
+export async function generateMetadata({ params }: CareerPostPageProps): Promise<Metadata> {
+  try {
+    const slug = params.slug;
+    const career = await getJobPostitionBySlug(slug);
+    
+    if (!career) {
+      return {
+        title: 'Career Position Not Found | Best Branded Residences',
+        description: 'The requested career position could not be found.',
+      }
+    }
+
+    // Fetch full data for metadata
+    const data = await getJobPostitionById(career.id);
+
+    return generatePageMetadata({
+      type: 'careerPost',
+      data: data
+    })
+  } catch (error) {
+    console.error('Error generating career post metadata:', error)
+    return {
+      title: 'Career Opportunity | Best Branded Residences',
+      description: 'Explore exciting career opportunities with our team.',
+    }
+  }
+}
+
 // Dinamička strana sa revalidacijom
 export const dynamic = 'force-dynamic';
 export const revalidate = 600;

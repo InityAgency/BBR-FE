@@ -8,6 +8,19 @@ import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 import SectionLayout from "@/components/web/SectionLayout";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Evaluation Criteria',
+    description: 'Our evaluation criteria are designed to help you make informed decisions about the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    slug: 'criteria',
+    keywords: ['evaluation criteria', 'luxury residences', 'company info']
+  }
+})
+
 const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
 const CAROUSEL_CARDS = [
   {

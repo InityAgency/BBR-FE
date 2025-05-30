@@ -6,10 +6,17 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionLayout from "@/components/web/SectionLayout";
 
-export const metadata: Metadata = {
-  title: "FAQ - Best Branded Residences",
-  description: "Find answers to common questions about buying your dream property",
-};
+import { generatePageMetadata } from '@/lib/metadata';
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'FAQ - Best Branded Residences',
+    description: 'Find answers to common questions about buying your dream property',
+    slug: 'faq-buyer',
+    keywords: ['faq buyer', 'luxury residences', 'company info']
+  }
+})
 
 const faqData = [
   {

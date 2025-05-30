@@ -4,6 +4,19 @@ import Link from "next/link";
 import { Mail, Phone, Calendar } from "lucide-react";
 import RequestConsultationForm from "@/components/web/Forms/RequestConsultation";
 import Image from "next/image";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Request a consultation',
+    description: 'Get personalized assistance and expert advice from our experienced consultants to make the best decisions for your property needs.',
+    slug: 'request-consultation',
+    keywords: ['request a consultation', 'luxury residences', 'company info']
+  }
+})
+
 export default function RequestAConsultationPage() {
     return (
         <>

@@ -2,6 +2,18 @@ import BrandSlider from "@/components/web/Brands/BrandSlider";
 import SectionLayout from "@/components/web/SectionLayout";
 import Image from "next/image";
 import Link from "next/link";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'About Us',
+    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    slug: 'about-us',
+    keywords: ['about us', 'luxury residences', 'company info']
+  }
+})
 
 const B2BAboutUsPage = () => {
   return (

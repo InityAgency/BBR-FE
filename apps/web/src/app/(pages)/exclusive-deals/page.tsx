@@ -30,6 +30,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { RequestInformationModal } from "@/components/web/Modals/RequestInformationModal";
 
+
 export default function ExclusiveDealsPage() {
   const [units, setUnits] = useState<Unit[]>([])
   const [unitTypes, setUnitTypes] = useState<UnitType[]>([])

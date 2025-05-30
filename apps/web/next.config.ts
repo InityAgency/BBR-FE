@@ -1,6 +1,5 @@
 import path from "path";
 
-// next.config.js
 const nextConfig = {
   async rewrites() {
     return [
@@ -21,28 +20,76 @@ const nextConfig = {
           { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
         ],
       },
+      // SEO optimizacije
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
     ];
   },
   transpilePackages: ["ui"],
   images: {
-    domains: ['tailwindui.com', 'images.unsplash.com', 'bbrapi.inity.space', "bbrcontent.inity.space" ,'flagcdn.com', 'upload.wikimedia.org',  'bbr-bucket.s3.amazonaws.com', 'bbr-bucket.s3.eu-west-2.amazonaws.com', 'localhost'],
-    unoptimized: true,
+    domains: [
+      'tailwindui.com', 
+      'images.unsplash.com', 
+      'bbrapi.inity.space', 
+      'bbrcontent.inity.space',
+      'flagcdn.com', 
+      'upload.wikimedia.org',  
+      'bbr-bucket.s3.amazonaws.com', 
+      'bbr-bucket.s3.eu-west-2.amazonaws.com', 
+      'localhost'
+    ],
+    formats: ['image/webp', 'image/avif'], // SEO optimizacija slika
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    unoptimized: false, // Omogući optimizaciju slika za SEO
   },
+  // Kompresija za bolje performanse
+  compress: true,
+  
+  // Optimizacija za production
+  swcMinify: true,
+  
   eslint: {
-    // Isključujemo proveru ESLint grešaka tokom build procesa
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Isključujemo proveru TypeScript grešaka tokom build procesa
     ignoreBuildErrors: true,
   },
+  
+  // SEO optimizacije
+  experimental: {
+    optimizeCss: true,
+  },
+  
   webpack: (config: any) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './src')
     };
+    
+    // Optimizacija bundlea
+    config.optimization = {
+      ...config.optimization,
+      moduleIds: 'deterministic',
+    };
+    
     return config;
   }
 };
 
-export default nextConfig;  
+export default nextConfig;

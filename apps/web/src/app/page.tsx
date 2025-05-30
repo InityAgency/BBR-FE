@@ -17,6 +17,19 @@ import BestResidencesSection from "@/components/web/Sections/BestResidencesSecti
 import PopularPlaces from "@/components/web/Sections/PopularPlaces";
 
 
+import { generatePageMetadata } from '@/lib/metadata';
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Luxury Branded Residences Worldwide',
+    description: 'Discover the world\'s finest luxury branded residences. Exclusive rankings, detailed insights, and premium real estate opportunities.',
+    keywords: ['luxury residences', 'branded residences', 'real estate', 'luxury homes']
+  }
+})
+
+
 export default function Home() {
   return (
     <>

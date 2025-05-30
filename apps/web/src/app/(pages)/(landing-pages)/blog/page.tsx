@@ -32,10 +32,28 @@ import SectionLayout from "@/components/web/SectionLayout";
 export const dynamic = 'force-dynamic';
 export const revalidate = 600;
 
-export const metadata: Metadata = {
-  title: "Blog Posts",
-  description: "Browse all our blog posts",
-};
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata({ searchParams }: {
+  searchParams: {
+    author?: string;
+    tag?: string; 
+    category?: string;
+    page?: string;
+    search?: string;
+  };
+}): Promise<Metadata> {
+  return generatePageMetadata({
+    type: 'blog',
+    data: {
+      search: searchParams.search,
+      category: searchParams.category,
+      author: searchParams.author,
+      tag: searchParams.tag,
+      page: searchParams.page ? parseInt(searchParams.page) : undefined
+    }
+  })
+}
 
 // Featured post card with image
 const FeaturedPostWithImage = ({ post }: { post: Post }) => {

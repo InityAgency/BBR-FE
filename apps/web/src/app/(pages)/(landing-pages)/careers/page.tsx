@@ -7,6 +7,27 @@ import { Post } from "@/lib/wordpress/wordpress.d";
 import { getJobPostitions } from "@/lib/wordpress/wordpress";
 import { CareerCard } from "@/components/web/Careers/CareerCard";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+// Dodaj generateMetadata funkciju (zameni postojeći metadata ako ga ima)
+export async function generateMetadata({ searchParams }: {
+  searchParams: {
+    category?: string;
+    page?: string;
+    search?: string;
+  };
+}): Promise<Metadata> {
+  return generatePageMetadata({
+    type: 'career',
+    data: {
+      search: searchParams.search,
+      category: searchParams.category,
+      page: searchParams.page ? parseInt(searchParams.page) : undefined
+    }
+  })
+}
+
 export default async function CareerPage() {
     // Defaultno prazan niz
     let jobPositions: Post[] = [];

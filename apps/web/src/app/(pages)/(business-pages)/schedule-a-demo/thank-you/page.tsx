@@ -1,6 +1,19 @@
 import { CircleCheck } from "lucide-react";
 import Link from "next/link";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Thank You',
+    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    slug: 'thank-you',
+    keywords: ['thank you', 'luxury residences', 'company info']
+  }
+})
+
 export default function ThankYouPage() {
     return (
         <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-12 gap-4 xl:gap-12 mb-12">

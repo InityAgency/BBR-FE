@@ -3,6 +3,18 @@ import SectionLayout from "@/components/web/SectionLayout";
 import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
 import Image from "next/image";
 import Link from "next/link";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Corporate Responsibility Legal',
+    description: 'We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of your information.',
+    slug: 'corporate-responsibility-legal',
+    keywords: ['corporate responsibility legal', 'luxury residences', 'company info']
+  }
+})
 
 const OurCommitment = () => {
   return (

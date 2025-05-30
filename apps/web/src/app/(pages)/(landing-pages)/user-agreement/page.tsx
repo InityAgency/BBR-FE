@@ -1,5 +1,18 @@
 import SectionLayout from "@/components/web/SectionLayout";
 
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'User Agreement',
+    description: 'Welcome to Your Site Name!. By accessing or using our platform, you agree to comply with and be bound by these Terms and Conditions. Please read them carefully.',
+    slug: 'user-agreement',
+    keywords: ['user agreement', 'luxury residences', 'company info']
+  }
+})
+
 export default function UserAgreementPage() {
     return (
         <>

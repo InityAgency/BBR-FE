@@ -4,6 +4,20 @@ import ContactForm from "@/components/web/Forms/ContactForm";
 import Link from "next/link";
 import { ArrowUpRight, Lightbulb, Mail, OctagonAlert, Phone, Calendar } from "lucide-react";
 import SectionLayout from "@/components/web/SectionLayout";
+
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Contact Us',
+    description: 'Have questions or want to collaborate? Get in touch with us! Whether you\'re interested in our services, have a project in mind, or need support, our team is here to help. Fill out the form below or reach out via email, and we\'ll respond as soon as possible.',
+    slug: 'contact',
+    keywords: ['contact us', 'luxury residences', 'company info']
+  }
+})
+
 export default function ContactPage() {
     return (
         <div>

@@ -1,5 +1,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'Unsubscribe confirmation',
+    description: 'You have successfully unsubscribed from our newsletter. We\'re sorry to see you go. If you\'d like to share why you unsubscribed, we\'d love to hear your feedback.',
+    slug: 'unsubscribe-confirmation',
+    keywords: ['unsubscribe confirmation', 'luxury residences', 'company info']
+  }
+})
 
 export default function UnsubscribeConfirmationPage() {
   return (

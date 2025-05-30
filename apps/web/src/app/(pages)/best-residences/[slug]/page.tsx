@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Pagination } from "@/components/common/Pagination";
 import React from "react";
 
+
 // Skeleton component (ako ne postoji u shadcn/ui)
 const Skeleton = ({ className }: { className?: string }) => (
     <div className={`animate-pulse bg-secondary/10 rounded-md ${className}`} />
