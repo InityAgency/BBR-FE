@@ -9,10 +9,12 @@ import { StickyScrollTabs } from "@/components/web/Residences/StickyScrollTabs";
 import Image from "next/image";
 import { ArrowRight, Lock } from "lucide-react";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
+import { UnitCard } from "@/components/web/Units/UnitCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { RequestInformationModal } from "@/components/web/Modals/RequestInformationModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { ClaimRequestModal } from "@/components/web/Modals/ClaimRequestModal";
+import type { Unit } from "@/types/unit";
 
 interface MediaImage {
     id: string;
@@ -141,6 +143,8 @@ export default function ResidencePage() {
     const [galleryImages, setGalleryImages] = useState<MediaImage[]>([]);
     const [similarResidences, setSimilarResidences] = useState<Residence[]>([]);
     const [loadingSimilar, setLoadingSimilar] = useState(false);
+    const [units, setUnits] = useState<Unit[]>([]);
+    const [loadingUnits, setLoadingUnits] = useState(false);
     const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
     const [isClaimProfileModalOpen, setIsClaimProfileModalOpen] = useState(false);
 
@@ -189,6 +193,11 @@ export default function ResidencePage() {
                 if (data.data?.brand?.id) {
                     fetchSimilarResidences(data.data.brand.id, data.data.id);
                 }
+
+                // Fetch units for this residence
+                if (data.data?.id) {
+                    fetchUnits(data.data.id);
+                }
             } catch (error) {
                 console.error('Error fetching residence:', error);
             } finally {
@@ -212,6 +221,22 @@ export default function ResidencePage() {
             console.error('Error fetching similar residences:', error);
         } finally {
             setLoadingSimilar(false);
+        }
+    };
+
+    const fetchUnits = async (residenceId: string) => {
+        try {
+            setLoadingUnits(true);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/units?sortBy=regularPrice&sortOrder=desc&residenceId=${residenceId}`);
+            const data = await response.json();
+
+            if (data.data && Array.isArray(data.data)) {
+                setUnits(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching units:', error);
+        } finally {
+            setLoadingUnits(false);
         }
     };
 
@@ -400,7 +425,6 @@ export default function ResidencePage() {
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />
 
-
                 <div id="overview" className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">
                     <div className="about-residence w-full">
                         <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">
@@ -538,7 +562,6 @@ export default function ResidencePage() {
                     </div>
                 ) : null}
 
-
                 {residence.videoTourUrl ? (
                     <div id="video" className="flex flex-col gap-3 py-8 lg:py-16 px-4 lg:px-0 w-full xl:max-w-[1600px] mx-auto">
                         <div className="w-full flex flex-col gap-2 ites-center">
@@ -591,6 +614,39 @@ export default function ResidencePage() {
                     </div>
                 </SectionLayout>
             </div>
+
+            {/* Units Section - Exclusive Offers */}
+            {units.length > 0 && (
+                <div className="py-8 lg:py-16 px-4 lg:px-0">
+                    <SectionLayout>
+                        <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col items-start lg:items-center gap-4 mb-8">
+                            <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full uppercase">
+                                EXCLUSIVE OFFERS
+                            </span>
+                            <h2 className="text-4xl font-medium lg:w-[60%] lg:text-center">
+                                Discover Exclusive Opportunities <br />
+                                in Luxury Real Estate
+                            </h2>
+                        </div>
+
+                        {/* Prikaz unita u okviru rezidencije */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 w-full xl:max-w-[1600px] mx-auto">
+                            {loadingUnits ? (
+                                <div className="col-span-3 flex justify-center items-center py-12">
+                                    <p className="text-lg text-muted-foreground">Loading exclusive offers...</p>
+                                </div>
+                            ) : (
+                                units.map((unit) => (
+                                    <UnitCard
+                                        key={unit.id}
+                                        unit={unit}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </SectionLayout>
+                </div>
+            )}
 
             <div className="bg-[#1A1E21] py-8 lg:py-16 px-4 lg:px-0 ">
                 <SectionLayout>
