@@ -1,0 +1,98 @@
+name: Deploy NextJS (Mono-Repo::Admin & Web) with PNPM & Turbo to Production EC2
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy-nextjs:
+    runs-on: ubuntu-latest
+
+    env:
+      REMOTE_BASE_DIR: /mnt/app/bbr-frontend-new
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: "latest"
+
+      - name: 📦 Verify PNPM
+        run: pnpm --version
+
+      - name: 🔧 Install Workspace Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 1) Build Admin App
+      - name: 🔨 Build Admin App
+        working-directory: ./apps/admin
+        run: pnpm run build
+
+      # 2) Build Web App
+      - name: 🔨 Build Web App
+        working-directory: ./apps/web
+        run: pnpm run build
+
+      # 3) Package Both Builds + ecosystem.config.js
+      - name: 📦 Prepare Artifacts
+        run: |
+          cp ecosystem.config.js ./
+
+          tar -czf nextjs-build.tar.gz     \
+            apps/admin/.next               \
+            apps/admin/public              \
+            apps/admin/package.json        \
+            apps/admin/ecosystem.config.js \
+            apps/web/.next                 \
+            apps/web/public                \
+            apps/web/package.json          \
+            apps/web/ecosystem.config.js   \
+            package.json                   \
+            pnpm-lock.yaml                 \
+            ecosystem.config.js
+
+      - name: 📡 Deploy to EC2 via SCP
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST_PROD }} >> ~/.ssh/known_hosts
+
+          # 4.1 Kreiramo destinacijski folder na EC2 (/mnt/app/bbr-frontend-new)
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST_PROD }} "sudo mkdir -p $REMOTE_BASE_DIR && sudo chown ubuntu:ubuntu $REMOTE_BASE_DIR"
+
+          # 4.2 Kopiraj tar fajl na EC2 u /mnt/app/bbr-frontend-new
+          scp nextjs-build.tar.gz ubuntu@${{ secrets.EC2_HOST_PROD }}:$REMOTE_BASE_DIR/
+
+          # 4.3 Raspakiraj tar unutar /mnt/app/bbr-frontend-new
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST_PROD }} "cd $REMOTE_BASE_DIR && tar -xzf nextjs-build.tar.gz && rm nextjs-build.tar.gz"
+
+      - name: 🚀 Restart Admin & Web on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST_PROD }} << 'EOF'
+            set -e
+
+            cd $REMOTE_BASE_DIR
+
+            sudo pnpm install
+
+            pm2 reload apps/admin/ecosystem.config.js
+
+            pm2 reload apps/web/ecosystem.config.js
+          EOF
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notification_title: "[PRODUCTION] - New Release BBR NextJS Admin & Web to EC2"
+          mention_groups: ""
+          footer: "<{run_url}|View Run>"
+          message_format: "{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
