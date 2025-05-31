@@ -56,8 +56,6 @@ jobs:
       # 3) Package Both Builds + ecosystem.config.js
       - name: 📦 Prepare Artifacts
         run: |
-          cp ecosystem.config.js ./
-
           tar -czf nextjs-build.tar.gz     \
             apps/admin/.next               \
             apps/admin/public              \
@@ -69,7 +67,7 @@ jobs:
             apps/web/ecosystem.config.js   \
             package.json                   \
             pnpm-lock.yaml                 \
-            ecosystem.config.js
+            pnpm-workspace.yaml
 
       - name: 📡 Deploy to EC2 via SCP
         run: |
