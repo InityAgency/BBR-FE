@@ -88,15 +88,11 @@ jobs:
       - name: 🚀 Restart Admin & Web on EC2
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST_PROD }} << 'EOF'
-            set -e
-
-            cd $REMOTE_BASE_DIR
-
-            sudo pnpm install
-
-            pm2 reload apps/admin/ecosystem.config.js
-
-            pm2 reload apps/web/ecosystem.config.js
+          set -e
+          cd /mnt/app/bbr-frontend-new
+          sudo pnpm install
+          pm2 reload apps/admin/ecosystem.config.js
+          pm2 reload apps/web/ecosystem.config.js
           EOF
 
       - name: Report Status
