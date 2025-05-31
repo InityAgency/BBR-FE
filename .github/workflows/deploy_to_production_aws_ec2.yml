@@ -30,11 +30,27 @@ jobs:
       # 1) Build Admin App
       - name: 🔨 Build Admin App
         working-directory: ./apps/admin
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_API_VERSION: ${{ vars.NEXT_PUBLIC_API_VERSION }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
         run: pnpm run build
 
       # 2) Build Web App
       - name: 🔨 Build Web App
         working-directory: ./apps/web
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_API_VERSION: ${{ vars.NEXT_PUBLIC_API_VERSION }}
+          NEXT_PUBLIC_WP_API_URL: ${{ vars.NEXT_PUBLIC_WP_API_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CALLBACK_URL: ${{ vars.GOOGLE_CALLBACK_URL }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
         run: pnpm run build
 
       # 3) Package Both Builds + ecosystem.config.js
