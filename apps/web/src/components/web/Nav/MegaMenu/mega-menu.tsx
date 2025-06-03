@@ -78,7 +78,7 @@ export function MegaMenu() {
   return (
     <div ref={menuRef} className="relative" onMouseLeave={handleMouseLeave}>
       {/* Main navigation bar */}
-      <div className="max-w-[calc(100vw-1.5rem)] 2xl:max-w-[calc(100vw-4rem)] mx-auto px-8 py-6 bg-secondary rounded-t-lg mt-2">
+      <div className="max-w-[calc(100vw-1.5rem)] 2xl:max-w-[calc(100vw-4rem)] mx-auto px-4 lg:px-8 py-6 bg-secondary rounded-t-lg mt-2">
         <div className="flex flex-col lg:flex-row justify-between items-center w-full xl:max-w-[1600px] mx-auto">
           <div className="flex w-full lg:w-auto justify-between items-center">
             <Link href="/">
