@@ -10,7 +10,7 @@ export function getMediaUrl(mediaId: string): string {
 const baseConfig = {
   siteName: 'Best Branded Residences',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://bestbrandedresidences.com',
-  defaultImage: '/og-default.jpg',
+  defaultImage: '/bbr-cover.png',
   twitterHandle: '@bbr_residences',
 }
 
