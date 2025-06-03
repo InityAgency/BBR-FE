@@ -10,7 +10,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'About Us',
+    title: 'About us: Explore the Best Branded Residences',
     description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
     slug: 'about-us',
     keywords: ['about us', 'luxury residences', 'company info']

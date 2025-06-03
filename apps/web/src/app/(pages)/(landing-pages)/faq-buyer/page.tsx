@@ -11,8 +11,8 @@ import { generatePageMetadata } from '@/lib/metadata';
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'FAQ - Best Branded Residences',
-    description: 'Find answers to common questions about buying your dream property',
+    title: 'Buyer FAQs: Answers to Your Questions from Best Branded Residences',
+    description: 'Explore our Buyer FAQs for answers to common questions about purchasing luxury properties. Get expert guidance from Best Brand Residences.',
     slug: 'faq-buyer',
     keywords: ['faq buyer', 'luxury residences', 'company info']
   }

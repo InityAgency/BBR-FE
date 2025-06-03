@@ -26,10 +26,55 @@ export async function generateMetadata({ params }: CareerPostPageProps): Promise
     // Fetch full data for metadata
     const data = await getJobPostitionById(career.id);
 
-    return generatePageMetadata({
-      type: 'careerPost',
-      data: data
-    })
+    // Get featured image
+    let mediaUrl = null;
+    if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0]) {
+      mediaUrl = data._embedded['wp:featuredmedia'][0].source_url;
+    } else if (data.featured_media && data.featured_media > 0) {
+      const media = await getFeaturedMediaById(data.featured_media);
+      if (media && media.source_url) {
+        mediaUrl = media.source_url;
+      }
+    }
+    const featuredImage = mediaUrl || '/og-default.jpg';
+
+    // Clean HTML from title and get location
+    const cleanTitle = data.title?.rendered?.replace(/<[^>]*>/g, '') || 'Career Opportunity';
+    const location = data.acf?.location || 'Remote';
+    const category = getCategoryFromClassList(data.class_list);
+
+    // Create description
+    const description = `Join our team as ${cleanTitle} in ${location}. ${category ? `Category: ${category}.` : ''} Explore this exciting opportunity at Best Branded Residences.`;
+
+    return {
+      title: `${cleanTitle} - Career Opportunity | Best Branded Residences`,
+      description,
+      openGraph: {
+        title: `${cleanTitle} - ${location}`,
+        description,
+        type: 'article',
+        publishedTime: new Date(data.date).toISOString(),
+        modifiedTime: data.modified ? new Date(data.modified).toISOString() : undefined,
+        section: category,
+        images: [
+          {
+            url: featuredImage,
+            width: 1200,
+            height: 630,
+            alt: cleanTitle,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${cleanTitle} - ${location}`,
+        description,
+        images: [featuredImage],
+      },
+      alternates: {
+        canonical: `https://bestbrandedresidences.com/careers/${params.slug}`,
+      },
+    };
   } catch (error) {
     console.error('Error generating career post metadata:', error)
     return {

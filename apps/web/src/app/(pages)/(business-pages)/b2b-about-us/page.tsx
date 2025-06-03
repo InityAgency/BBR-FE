@@ -8,8 +8,8 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'About Us',
-    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    title: 'About Us: Experts in Luxury Real Estate',
+    description: 'Discover the story behind Best Branded Residences. Our team of luxury real estate experts combines data-driven insights and industry experience to curate, evaluate, and recommend the world’s most prestigious branded residences. Learn more about our mission, values, and commitment to excellence in the luxury property market.',
     slug: 'about-us',
     keywords: ['about us', 'luxury residences', 'company info']
   }

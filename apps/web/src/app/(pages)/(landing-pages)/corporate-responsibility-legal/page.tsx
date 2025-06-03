@@ -9,10 +9,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Corporate Responsibility Legal',
-    description: 'We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of your information.',
+    title: 'Corporate Responsibility: Commitment to Sustainability',
+    description: 'Commitment to Sustainability by Best Brand Residences. Discover how we integrate ethics and sustainability into our luxury real estate operations.',
     slug: 'corporate-responsibility-legal',
-    keywords: ['corporate responsibility legal', 'luxury residences', 'company info']
+    keywords: ['corporate responsibility legal']
   }
 })
 

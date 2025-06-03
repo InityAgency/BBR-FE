@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Accessibility Statement',
+    title: 'Accessibility Statement: Explore the Best Branded Residences',
     description: 'We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of your information.',
     slug: 'accessibility-statement',
     keywords: ['accessibility statement', 'luxury residences', 'company info']

@@ -23,8 +23,8 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Luxury Branded Residences Worldwide',
-    description: 'Discover the world\'s finest luxury branded residences. Exclusive rankings, detailed insights, and premium real estate opportunities.',
+    title: 'Best Branded Residences: Rankings & Reviews by Country, City, & Lifestyle',
+    description: 'We review & rate the world’s Best Branded Residences, from Miami to Dubai. Verified properties globally by country, city, lifestyle, or investment opportunities',
     keywords: ['luxury residences', 'branded residences', 'real estate', 'luxury homes']
   }
 })

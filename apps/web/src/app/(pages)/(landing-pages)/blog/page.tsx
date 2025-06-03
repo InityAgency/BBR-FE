@@ -43,16 +43,39 @@ export async function generateMetadata({ searchParams }: {
     search?: string;
   };
 }): Promise<Metadata> {
-  return generatePageMetadata({
-    type: 'blog',
-    data: {
-      search: searchParams.search,
-      category: searchParams.category,
-      author: searchParams.author,
-      tag: searchParams.tag,
-      page: searchParams.page ? parseInt(searchParams.page) : undefined
+  const baseMetadata = {
+    title: 'Discover Exclusive Insights and Trends in the Luxury Market from BBR',
+    description: 'Trends and Insights in Luxury Living by Best Brand Residences. Explore expert analysis, trends, and stories shaping luxury branded residences.',
+  };
+
+  // Ako imamo filtere, dodajemo ih u title
+  if (searchParams.category || searchParams.author || searchParams.tag || searchParams.search) {
+    return generatePageMetadata({
+      type: 'blog',
+      data: {
+        search: searchParams.search,
+        category: searchParams.category,
+        author: searchParams.author,
+        tag: searchParams.tag,
+        page: searchParams.page ? parseInt(searchParams.page) : undefined
+      }
+    });
+  }
+
+  // Za glavnu blog stranicu koristimo base metadata
+  return {
+    ...baseMetadata,
+    openGraph: {
+      title: baseMetadata.title,
+      description: baseMetadata.description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: baseMetadata.title,
+      description: baseMetadata.description,
     }
-  })
+  };
 }
 
 // Featured post card with image

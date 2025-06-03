@@ -5,8 +5,8 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Suggest a new feature',
-    description: 'Have questions or want to collaborate? Get in touch with us! Whether you\'re interested in our services, have a project in mind, or need support, our team is here to help. Fill out the form below or reach out via email, and we\'ll respond as soon as possible.',
+    title: 'Suggest a Feature: Help Us Improve Your Experience at BBR',
+    description: 'Suggest a Feature: Share your ideas for new luxury property features with Best Brand Residences to improve your experience and enhance our services.',
     slug: 'suggest-feature',
     keywords: ['suggest a new feature', 'luxury residences', 'company info']
   }
