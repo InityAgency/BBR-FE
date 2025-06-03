@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Best Branded Residences',
+    template: '%s',
     default: 'Best Branded Residences - Luxury Branded Residences'
   },
   description: 'Discover the world\'s finest luxury branded residences',
@@ -65,10 +65,10 @@ export const metadata: Metadata = {
     images: ['https://bestbrandedresidences.com/twitter-image.jpg'],
   },
   robots: {
-    index: true,
+    index: false,
     follow: true,
     googleBot: {
-      index: true,
+      index: false,
       follow: true,
       'max-video-preview': -1,
       'max-image-preview': 'large',

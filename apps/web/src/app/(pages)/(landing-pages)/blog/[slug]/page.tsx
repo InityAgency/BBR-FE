@@ -22,10 +22,50 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       }
     }
 
-    return generatePageMetadata({
-      type: 'blogPost',
-      data: post
-    })
+    // Get featured image
+    const media = post.featured_media ? await getFeaturedMediaById(post.featured_media) : null;
+    const featuredImage = media?.source_url || '/og-default.jpg';
+
+    // Get category
+    const category = post.categories?.[0] ? await getCategoryById(post.categories[0]) : null;
+
+    // Clean HTML from title and excerpt
+    const cleanTitle = post.title?.rendered?.replace(/<[^>]*>/g, '') || 'Blog Post';
+    const cleanExcerpt = post.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || 
+                        post.content?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || 
+                        'Read this insightful article about luxury real estate market trends.';
+
+    return {
+      title: `${cleanTitle} | Luxury Insights`,
+      description: cleanExcerpt,
+      authors: [{ name: 'Best Branded Residences' }],
+      openGraph: {
+        title: cleanTitle,
+        description: cleanExcerpt,
+        type: 'article',
+        publishedTime: new Date(post.date).toISOString(),
+        modifiedTime: post.modified ? new Date(post.modified).toISOString() : undefined,
+        authors: ['Best Branded Residences'],
+        section: category?.name,
+        images: [
+          {
+            url: featuredImage,
+            width: 1200,
+            height: 630,
+            alt: cleanTitle,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: cleanTitle,
+        description: cleanExcerpt,
+        images: [featuredImage],
+      },
+      alternates: {
+        canonical: `https://bestbrandedresidences.com/blog/${params.slug}`,
+      },
+    };
   } catch (error) {
     console.error('Error generating blog post metadata:', error)
     return {

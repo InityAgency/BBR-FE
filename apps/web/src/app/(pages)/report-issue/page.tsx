@@ -5,8 +5,8 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Report an error',
-    description: 'If you encountered a problem or bug, please fill out the form below so we can resolve it as soon as possible. Your feedback helps us improve the platform for everyone.',
+    title: 'Report an Error: Help Us Improve Your Experience at BBR',
+    description: 'Report an Error: Notify Best Brand Residences of any issues or errors to help us improve your experience and ensure seamless service.',
     slug: 'report-issue',
     keywords: ['report an error', 'luxury residences', 'company info']
   }

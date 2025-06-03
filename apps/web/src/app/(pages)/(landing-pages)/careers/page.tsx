@@ -18,14 +18,37 @@ export async function generateMetadata({ searchParams }: {
     search?: string;
   };
 }): Promise<Metadata> {
-  return generatePageMetadata({
-    type: 'career',
-    data: {
-      search: searchParams.search,
-      category: searchParams.category,
-      page: searchParams.page ? parseInt(searchParams.page) : undefined
+  const baseMetadata = {
+    title: 'Careers: Join the Best Brand Residences Team',
+    description: 'Careers: Join the Best Brand Residences Team. Explore exciting job opportunities and contribute to redefining the luxury real estate experience.',
+  };
+
+  // Ako imamo filtere, koristimo dinamički metadata
+  if (searchParams.category || searchParams.search) {
+    return generatePageMetadata({
+      type: 'career',
+      data: {
+        search: searchParams.search,
+        category: searchParams.category,
+        page: searchParams.page ? parseInt(searchParams.page) : undefined
+      }
+    });
+  }
+
+  // Za glavnu careers stranicu koristimo base metadata
+  return {
+    ...baseMetadata,
+    openGraph: {
+      title: baseMetadata.title,
+      description: baseMetadata.description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: baseMetadata.title,
+      description: baseMetadata.description,
     }
-  })
+  };
 }
 
 export default async function CareerPage() {

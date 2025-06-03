@@ -11,10 +11,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Investor Relations',
-    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+    title: 'Investor Relations: Transparent Insights for the Valued Private Investors',
+    description: 'Investor Relations: Partner with Best Brand Residences. Access financial reports, updates, and partnership opportunities in luxury branded residences.',
     slug: 'investor-relations',
-    keywords: ['investor relations', 'luxury residences', 'company info']
+    keywords: ['investor relations']
   }
 })
 

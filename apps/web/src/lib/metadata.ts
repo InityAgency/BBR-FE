@@ -600,3 +600,32 @@ export async function generateAsyncMetadata(
     return getDefaultMetadata()
   }
 }
+
+// Dodati strukturnu data za bolje razumevanje sadržaja od strane pretraživača
+export const generateStructuredData = (data: any) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BestBrandedResidences",
+    "name": data.name,
+    "description": data.description,
+    "url": `${baseConfig.siteUrl}${data.slug}`,
+    "image": data.featuredImage?.id ? getMediaUrl(data.featuredImage.id) : baseConfig.defaultImage,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": data.city?.name,
+      "addressCountry": data.country?.name
+    }
+  }
+}
+
+// Dodati dinamički robots.txt generator
+export async function generateRobotsTxt() {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/private/', '/admin/'],
+    },
+    sitemap: 'https://bestbrandedresidences.com/sitemap.xml',
+  }
+}

@@ -11,10 +11,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
   data: {
-    title: 'Contact Us',
-    description: 'Have questions or want to collaborate? Get in touch with us! Whether you\'re interested in our services, have a project in mind, or need support, our team is here to help. Fill out the form below or reach out via email, and we\'ll respond as soon as possible.',
+    title: 'Contact Us: Connect with Best Brand Residences',
+    description: 'Contact Us: Connect with Best Brand Residences. Reach out for inquiries, support, or partnership opportunities in the luxury real estate market.',
     slug: 'contact',
-    keywords: ['contact us', 'luxury residences', 'company info']
+    keywords: ['contact us']
   }
 })
 

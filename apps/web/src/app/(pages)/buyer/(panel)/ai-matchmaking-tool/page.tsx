@@ -1,28 +1,17 @@
-"use client"
-import { MatchmakerChat } from "@/components/web/AIMatchmaking/MatchmakerChat"
-import { BestMatches } from "@/components/web/AIMatchmaking/BestMatches"
-import { useState } from "react"
+import type { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/metadata'
+import AiMatchMakingToolClient from "./AiMatchMakingToolClient";
 
-export default function AiMatchmakingTool() {
-  const [userSelections, setUserSelections] = useState<any>({})
-
-  const handleSelectionsChange = (selections: any) => {
-    setUserSelections(selections)
+export const metadata: Metadata = generatePageMetadata({
+  type: 'page',
+  data: {
+    title: 'AI Matchmaking Tool: Find Your Perfect Luxury Residence',
+    description: 'AI Matchmaking Tool: Find your perfect luxury residence with our advanced AI-powered tool. Discover the best branded residences tailored to your needs.',
+    slug: 'ai-matchmaking-tool',
+    keywords: ['ai matchmaking tool', 'luxury residences', 'company info']
   }
+})
 
-  return (
-    <div className="h-screen bg-[#0c1012] text-white flex overflow-hidden">
-      {/* Main Content - Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 p-6 overflow-hidden">
-          <MatchmakerChat onSelectionsChange={handleSelectionsChange} />
-        </div>
-      </div>
-
-      {/* Right Sidebar - Full Height */}
-      <div className="w-96 bg-[#101518] border-l border-[#333638] flex-shrink-0">
-        <BestMatches userSelections={userSelections} />
-      </div>
-    </div>
-  )
+export default function AiMatchMakingToolPage() {
+  return <AiMatchMakingToolClient />
 }
