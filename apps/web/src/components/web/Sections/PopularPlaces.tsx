@@ -71,11 +71,11 @@ export default function PopularPlaces() {
                 { text: "Top 10 in Banyan Tree", url: "/best-residences/top-10-banyan-tree-residences" },
                 { text: "Top 10 in Dorchester", url: "/best-residences/top-10-dorchester-residences" },
                 { text: "Top 10 in Nobu", url: "/best-residences/top-10-nobu-residences" },
+                { text: "Top 10 in Mandarin Oriental", url: "/best-residences/top-10-mandarin-oriental-residences" },
                 { text: "Top 10 in Fairmont", url: "/best-residences/top-10-fairmont-residences" },
                 { text: "Top 10 in Montage", url: "/best-residences/top-10-montage-residences" },
                 { text: "Top 10 in Trump", url: "/best-residences/top-10-trump-residences" },
                 { text: "Top 10 in Four Seasons", url: "/best-residences/top-10-four-seasons-residences" },
-                { text: "Top 10 in Mandarin Oriental", url: "/best-residences/top-10-mandarin-oriental-residences" }
             ]
         }
     ]
@@ -97,7 +97,7 @@ export default function PopularPlaces() {
                                 fill
                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 p-6 z-20 flex flex-col lg:flex-row justify-between lg:items-end">
+                            <div className="absolute inset-0 p-6 z-20 gap-24 flex flex-col lg:flex-row justify-between lg:items-end">
                                 <h3 className="text-2xl font-bold text-white mb-4 lg:mb-0 max-w-[50%]">{place.title}</h3>
                                 <div className="flex flex-col gap-2">
                                     {place.links.map((link, index) => (
@@ -129,9 +129,9 @@ export default function PopularPlaces() {
                                 fill
                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 p-6 z-20 flex flex-col lg:flex-row justify-between lg:items-end">
+                            <div className="absolute inset-0 p-6 z-20 gap-24 flex flex-col lg:flex-row justify-between lg:items-end">
                                 <h3 className="text-2xl font-bold text-white mb-4 lg:mb-0">{place.title}</h3>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                <div className="grid grid-cols-2 gap-x-2 gap-y-2">
                                     {place.links.map((link, index) => (
                                         <Link 
                                             key={index}

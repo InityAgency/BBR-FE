@@ -8,6 +8,14 @@ interface ResidenceCardProps {
   score?: number
 }
 
+const formatText = (text: string) => {
+  if (!text) return "";
+  return text
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export function ResidenceCard({ residence, score }: ResidenceCardProps) {
   return (
     <Link href={`/residences/${residence.slug}`} className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-4 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2">
@@ -42,7 +50,7 @@ export function ResidenceCard({ residence, score }: ResidenceCardProps) {
             </span>
             ): ( null )}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-primary">{residence.developmentStatus}</span>
+              <span className="text-xs font-medium text-primary uppercase">{formatText(residence.developmentStatus)}</span>
             </div>
           </div>
           <h3 className="text-xl text-white font-medium transition-all">{residence.name}</h3>

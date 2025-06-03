@@ -460,19 +460,19 @@ export default function SingleResidenceClient() {
                     <div className="grid grid-rows-1 lg:grid-rows-2 grid-cols-1 lg:grid-cols-4 w-full gap-4 mt-8">
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-3">
                             <span className="text-2xl text-serif">
-                                {residence.yearBuilt || "-"}
+                                {residence.yearBuilt ? residence.yearBuilt : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">YEAR BUILT</span>
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-3">
                             <span className="text-2xl text-serif">
-                                {residence.floorSqft ? `${residence.floorSqft} sq ft` : "-"}
+                                {residence.floorSqft ? `${Number(residence.floorSqft).toLocaleString('en-US', { maximumFractionDigits: 0 })} sq ft` : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">RESIDENCE AREA</span>
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-3">
                             <span className="text-2xl text-serif">
-                                {residence.units?.length || "-"}
+                                {residence.units?.length ? Number(residence.units.length).toLocaleString('en-US', { maximumFractionDigits: 0 }) : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">NUMBER OF UNITS</span>
                         </div>
@@ -484,25 +484,25 @@ export default function SingleResidenceClient() {
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-3">
                             <span className="text-2xl text-serif">
-                                {residence.amenities?.length || "-"}
+                                {residence.amenities?.length ? Number(residence.amenities.length).toLocaleString('en-US', { maximumFractionDigits: 0 }) : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">NUMBER OF AMENITIES</span>
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-3">
                             <span className="text-2xl text-serif">
-                                {residence.avgPricePerUnit ? `${residence.avgPricePerUnit} $` : "-"}
+                                {residence.avgPricePerUnit ? `$ ${Number(residence.avgPricePerUnit).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">AVG. PRICE PER UNIT</span>
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-2">
                             <span className="text-2xl text-serif">
-                                {residence.avgPricePerSqft ? `${residence.avgPricePerSqft} $` : "-"}
+                                {residence.avgPricePerSqft ? `$ ${Number(residence.avgPricePerSqft).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">AVG. PRICE PER SQ FT.</span>
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-2">
                             <span className="text-2xl text-serif">
-                                {residence.rentalPotential || "-"}
+                                {residence.rentalPotential ? Number(residence.rentalPotential).toLocaleString('en-US', { maximumFractionDigits: 0 }) : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">RENTAL POTENTIAL</span>
                         </div>
