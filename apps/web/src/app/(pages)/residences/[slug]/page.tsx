@@ -16,14 +16,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     : undefined;
 
   return generatePageMetadata({
-    type: 'page',
-    data: {
+  type: 'page',
+  data: {
       title,
       description,
       slug: `residences/${params.slug}`,
       keywords: ['residence', 'luxury residences', 'branded residences', title],
       image: featuredImage
-    }
+  }
   });
 }
 

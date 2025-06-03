@@ -66,7 +66,7 @@ export default function Home() {
           <p className="text-md lg:text-lg">Star Customer Ratings</p>
         </div>
       </div>
- 
+
       <section className="residences">
         <SectionLayout>
           <BestResidencesSection />
@@ -77,9 +77,9 @@ export default function Home() {
       <section className="ranking-crieteria bg-secondary mb-12">
         <SectionLayout>
           <div className="flex flex-col gap-4 w-full">
-            <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">IMPECABLE RANKING CRITERIA</span>
+            <span className="text-md lg:text-lg text-left lg:text-center text-primary w-full">IMPECCABLE RANKING CRITERIA</span>
             <h2 className="text-4xl font-bold w-[100%] lg:w-[60%] text-left lg:text-center mx-auto">Find your new home or investment from the World's Best</h2>
-            <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">Best Branded Residences help you choose a private residence partner or property  that is right for you by giving expert insights, offers & ratings</p>
+            <p className="text-md lg:text-lg w-full lg:w-[60%] text-left lg:text-center mx-auto text-white/70">Best Branded Residences help you choose a private residence partner or property that is right for you by giving expert insights, offers & ratings</p>
           </div>
           <div>
             <div className="flex flex-col lg:flex-row gap-4 mt-8 max-w-[85%] xl:max-w-[1600px] mx-auto">
@@ -91,7 +91,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl lg:text-2xl font-bold">Trusted Rankings</h3>
-                  <p>Buying a branded residence is a significant investment—our rankings help you make the best choice with confidence. </p>
+                  <p>Buying a branded residence is a significant investment—our rankings help you make the best choice with confidence.</p>
                 </div>
               </div>
               <div className="flex flex-row gap-4 items-center w-full">
@@ -101,13 +101,12 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <h3 className="text-xl lg:text-2xl font-bold">Informed Decisions</h3>
-                  <p>Our ranking system is built on comprehensive research, expert reviews, and buyer insights, offering a transparent, data-backed evaluation process.  </p>
+                  <h3 className="text-xl lg:text-2xl font-bold capitalize">Informed Decisions</h3>
+                  <p>Our ranking system is built on comprehensive research, expert reviews, and buyer insights, offering a transparent, data-backed evaluation process.</p>
                 </div>
               </div>
             </div>
           </div>
-
           <div className="flex flex-col lg:flex-row gap-4 mt-4 border rounded-2xl p-6 relative w-full xl:max-w-[1600px] mx-auto">
             <Image src="/ranking-criteria-1.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
             <Image src="/ranking-criteria-2.webp" alt="Ranking Image" width={1000} height={1000} className="w-full lg:max-w-[32.5%] flex-1 rounded-lg object-cover" />
@@ -155,7 +154,7 @@ export default function Home() {
                       <path d="M44 16H40M40 16H38C34 12.0036 28 7.9996 24 12M40 16V32M24 12L17.9991 18.0033C17.8404 18.1621 17.761 18.2414 17.6972 18.3117C16.31 19.8379 16.3106 22.1686 17.6985 23.6941C17.7624 23.7643 17.842 23.8438 18.0006 24.0024C18.1593 24.161 18.2387 24.2403 18.309 24.3042C19.8349 25.6908 22.1647 25.6904 23.6902 24.3033C23.7604 24.2395 23.8398 24.1601 23.9984 24.0014L25.9992 22.0007M24 12C20 7.9996 14 12.0037 10 16.0001H8M4 16.0001H8M8 16.0001V32M40 32V38H44M40 32H34.3431M30 26L33 29C33.1592 29.1592 33.239 29.239 33.3031 29.3095C34.6898 30.8351 34.6898 33.1649 33.3031 34.6905C33.239 34.761 33.1592 34.8408 33 35C32.8408 35.1592 32.761 35.239 32.6905 35.3031C31.1649 36.6899 28.8351 36.6899 27.3095 35.3031C27.239 35.239 27.1592 35.1592 27 35L26 34C24.9095 35.0905 24.3643 35.6358 23.7761 35.9272C22.657 36.4818 21.343 36.4818 20.2239 35.9272C19.6358 35.6358 19.0905 35.0905 18 34C16.6217 35.8378 13.7913 35.5825 12.7639 33.5279L12 32H8M8 32V38H4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold">Exclusive Developer Partnerships</h3>
+                  <h3 className="text-xl lg:text-2xl font-bold capitalize">Exclusive Developer Partnerships</h3>
                 </div>
                 <p>Get direct access to top-tier branded residences from leading global developers.</p>
               </div>
@@ -168,7 +167,7 @@ export default function Home() {
                       <path d="M42 42H15.6C12.2397 42 10.5595 42 9.27606 41.346C8.14708 40.7708 7.2292 39.8529 6.65396 38.7239C6 37.4405 6 35.7603 6 32.4V6M12 30L20 22L28 30L40 18M40 18V26M40 18H32" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold">Data-Driven Investment Insights</h3>
+                  <h3 className="text-xl lg:text-2xl font-bold capitalize">Data-Driven Investment Insights</h3>
                 </div>
                 <p>Access ROI projections, rental yield reports, and market trends to make smarter buying decisions.	</p>
               </div>
@@ -181,7 +180,7 @@ export default function Home() {
                       <path d="M10.0012 14V22M20.0012 4V12M36.0012 32V40M6.00116 18H14.0012M16.0012 8H24.0012M32.0012 36H40.0012M28.0012 14L33.658 19.6569M39.0344 7.49223L40.1658 8.6236C40.9578 9.41564 41.3538 9.81166 41.5022 10.2683C41.6327 10.67 41.6327 11.1027 41.5022 11.5044C41.3538 11.961 40.9578 12.3571 40.1658 13.1491L13.0521 40.2628C12.2601 41.0548 11.8641 41.4508 11.4074 41.5992C11.0057 41.7297 10.573 41.7297 10.1713 41.5992C9.71467 41.4508 9.31866 41.0548 8.52662 40.2628L7.39525 39.1314C6.60322 38.3394 6.2072 37.9433 6.05882 37.4867C5.92831 37.085 5.92831 36.6523 6.05882 36.2506C6.2072 35.794 6.60322 35.3979 7.39525 34.6059L34.5089 7.49224C35.301 6.7002 35.697 6.30418 36.1536 6.15581C36.5553 6.02529 36.988 6.02529 37.3897 6.15581C37.8464 6.30418 38.2424 6.7002 39.0344 7.49223Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold">AI-Powered Property Matchmaking</h3>
+                  <h3 className="text-xl lg:text-2xl font-bold capitalize">AI-Powered Property Matchmaking</h3>
                 </div>
                 <p>Our SmartMatch AI recommends the best properties based on your goals, lifestyle, and budget.	</p>
               </div>
@@ -194,7 +193,7 @@ export default function Home() {
                       <path d="M21 42H8C8 34.9471 13.2154 29.1122 20 28.1418M32.9952 32.4239C31.5957 30.8656 29.2618 30.4464 27.5083 31.8733C25.7547 33.3003 25.5079 35.686 26.8849 37.3736C27.6624 38.3264 29.5095 39.9967 30.9708 41.2706C31.6638 41.8748 32.0103 42.1769 32.4294 42.3005C32.7867 42.4059 33.2037 42.4059 33.561 42.3005C33.9801 42.1769 34.3266 41.8748 35.0196 41.2706C36.4809 39.9967 38.328 38.3264 39.1055 37.3736C40.4825 35.686 40.2658 33.2852 38.4821 31.8733C36.6984 30.4614 34.3948 30.8656 32.9952 32.4239ZM30 14C30 18.4183 26.4183 22 22 22C17.5817 22 14 18.4183 14 14C14 9.58172 17.5817 6 22 6C26.4183 6 30 9.58172 30 14Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold">First People oriented real-estate platform </h3>
+                  <h3 className="text-xl lg:text-2xl font-bold capitalize">First People oriented real-estate platform </h3>
                 </div>
                 <p>Real estate should be about people, not just properties. We connect buyers, investors, and developers with curated listings - ensuring a seamless, personalized experience.	</p>
               </div>
@@ -221,7 +220,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-16 items-center px-4 py-12 pb-4 lg:pb-0 lg:px-0 lg:py-0 w-full xl:max-w-[1600px] mx-auto">
             <div className="residences-section-header flex flex-col lg:flex-row w-full items-end gap-4 lg:gap-0 xl:max-w-[1600px] mx-auto">
               <div className="w-full flex flex-col gap-4">
-                <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full">EXPLORE NEW</span>
+                <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">Newest Residences</span>
                 <h2 className="text-4xl font-bold w-fulltext-left lg:text-left">
                   The Newest Added Residences
                 </h2>
@@ -287,13 +286,13 @@ export default function Home() {
         <SectionLayout>
           <div className="blog-section-header flex flex-col lg:flex-row w-full items-end gap-4 lg:gap-0 xl:max-w-[1600px] mx-auto">
             <div className="w-full flex flex-col gap-4">
-              <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full">LATEST NEWS</span>
-              <h2 className="text-4xl font-bold w-[100%] lg:w-[50%] xl:w-[30%] text-left lg:text-left">
+              <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">LATEST NEWS</span>
+              <h2 className="text-4xl font-bold w-[100%] lg:w-[80%] xl:w-[80%] text-left lg:text-left">
                 Stay Ahead with Luxury Real Estate Insights
               </h2>
             </div>
-            <Link href="/blog" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit">
-              Read all Insights
+            <Link href="/blog" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit ">
+              Read all insights
             </Link>
           </div>
 
@@ -323,13 +322,13 @@ export default function Home() {
             <div className="w-full lg:flex lg:flex-col">
               <div className="flex flex-col">
                 <span className="text-md lg:text-lg text-left lg:text-left text-primary">GET IN TOUCH</span>
-                <h2 className="text-4xl font-bold text-left mx-auto mb-4 mt-4 w-full">Connect with Our Experts</h2>
+                <h2 className="text-4xl font-bold text-left mx-auto mb-4 mt-4 w-full capitalize">Connect with Our Experts</h2>
                 <p className="text-md text-white/70">
                   Have questions or need personalized assistance? Our dedicated consultants provide tailored guidance, ensuring you make the right investment choices with confidence.
                   <br /><br />
                   Whether you are looking for a luxury home, a profitable investment, or an exclusive lifestyle experience, our consultants are here to help.
                 </p>
-                <Link href="/consultation" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit mt-4">
+                <Link href="/schedule-a-demo" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit mt-4">
                   Schedule a consultation
                   <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -365,7 +364,7 @@ export default function Home() {
             <p className="text-md lg:text-md w-full lg:w-[65%] text-left lg:text-center mx-auto text-[#1A1E21]">
               Is your luxury residence one of the finest in the world? Elevate its prestige by securing a spot on Best Branded Residences. Our expert-driven rankings and reviews showcase top-tier residences to discerning buyers, investors, and luxury connoisseurs.
             </p>
-            <Link href="/list-your-residence" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit m-auto">
+            <Link href="/login" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit m-auto">
               List Your Residence
               <ArrowRight className="w-4 h-4" />
             </Link>

@@ -30,36 +30,36 @@ interface RankingBadgesProps {
 // Badge SVG Components
 const GoldBadge = ({ position, rankingCategory }: { position: number, rankingCategory: RankingCategory }) => (
     <div className="relative">
-        <Image src="/badges/Gold.svg" alt="Gold Badge" width={200} height={200} />
-        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#B3804C] px-4 py-1 rounded-sm w-full text-center">
-            <span className="text-sm font-medium text-white">#{position} {rankingCategory.name}</span>
+        <Image src="/badges/Gold.svg" alt="Gold Badge" width={300} height={300} />
+        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#B3804C] px-4 py-1 rounded-sm w-full text-center h-[45px]">
+            <span className="text-xs font-medium text-white">#{position} {rankingCategory.name}</span>
         </div>
     </div>
 );
 
 const SilverBadge = ({ position, rankingCategory }: { position: number, rankingCategory: RankingCategory }) => (
     <div className="relative">
-        <Image src="/badges/Silver.svg" alt="Silver Badge" width={200} height={200} />
-        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#567676] px-4 py-1 rounded-sm w-full text-center">
-            <span className="text-sm font-medium text-white">#{position} {rankingCategory.name}</span>
+        <Image src="/badges/Silver.svg" alt="Silver Badge" width={300} height={300} />
+        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#567676] px-4 py-1 rounded-sm w-full text-center h-[45px]">
+            <span className="text-xs font-medium text-white">#{position} {rankingCategory.name}</span>
         </div>
     </div>
 );
 
 const BronzeBadge = ({ position, rankingCategory }: { position: number, rankingCategory: RankingCategory }) => (
     <div className="relative">
-        <Image src="/badges/Bronze.svg" alt="Bronze Badge" width={200} height={200} />
-        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#94462E] px-4 py-1 rounded-sm w-full text-center">
-            <span className="text-sm font-medium text-white">#{position} {rankingCategory.name}</span>
+        <Image src="/badges/Bronze.svg" alt="Bronze Badge" width={300} height={300} />
+        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#94462E] px-4 py-1 rounded-sm w-full text-center h-[45px]">
+            <span className="text-xs font-medium text-white">#{position} {rankingCategory.name}</span>
         </div>
     </div>
 );
 
 const ClassicBadge = ({ position, rankingCategory }: { position: number, rankingCategory: RankingCategory }) => (
     <div className="relative">
-        <Image src="/badges/Clasic.svg" alt="Classic Badge" width={200} height={200} />
-        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#29343D] px-4 py-1 rounded-sm w-full text-center"> 
-            <span className="text-sm font-medium text-white">#{position} {rankingCategory.name}</span>
+        <Image src="/badges/Clasic.svg" alt="Classic Badge" width={300} height={300} />
+        <div className="absolute  bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-[#29343D] px-4 py-1 rounded-sm w-full text-center h-[45px]"> 
+            <span className="text-xs font-medium text-white">#{position} {rankingCategory.name}</span>
         </div>
     </div>
 );
@@ -108,7 +108,7 @@ const RankingBadges: React.FC<RankingBadgesProps> = ({ rankingScores }) => {
 
     return (
         <div className="bg-secondary rounded-lg p-6 min-w-full lg:min-w-[40svw]">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 xl:gap-8">
                 {filteredAndSortedScores.map((rankingScore) => (
                     <RankingBadgeDisplay
                         key={rankingScore.rankingCategory.id}

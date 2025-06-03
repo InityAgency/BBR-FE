@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X, User, LogOut, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from "@/contexts/AuthContext"
 import { navigationData } from "./navigation-data"
 
 type NavigationStep = "main" | "tabs" | "content"
@@ -29,6 +32,9 @@ export function MobileMegaMenu({
   const [activeTab, setActiveTab] = useState<string>("")
   const [isAnimating, setIsAnimating] = useState(false)
   const [mounted, setMounted] = useState(false)
+  
+  // Auth context
+  const { user, isLoading, logout } = useAuth()
 
   // Kontrola animacije otvaranja/zatvaranja
   useEffect(() => {
@@ -91,6 +97,36 @@ export function MobileMegaMenu({
         return "View all Residences"
     }
   }
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      onClose(); // Zatvaramo meni nakon logout-a
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  const getDashboardUrl = () => {
+    if (!user) return "/";
+
+    if (user.role?.name === "developer") {
+      return "/developer/dashboard";
+    } else if (user.role?.name === "buyer") {
+      return "/buyer/dashboard";
+    }
+
+    return "/";
+  };
 
   // Klase za animaciju otvaranja/zatvaranja
   const menuAnimationClasses = cn(
@@ -195,6 +231,74 @@ export function MobileMegaMenu({
                   >
                     Contact Us
                   </Link>
+
+                  {/* Auth buttons sekcija */}
+                  <div className="pt-6 mt-6">
+                    {user ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 py-2">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={
+                                user.role?.name === 'developer'
+                                  ? user.company?.image_id
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image_id}/content`
+                                    : ""
+                                  : user.buyer?.image_id
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.buyer?.image_id}/content`
+                                    : ""
+                              }
+                              alt={user.fullName}
+                            />
+                            <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <span className="text-lg font-medium">{user.fullName}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {user.role?.name}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            asChild
+                          >
+                            <Link href={getDashboardUrl()} onClick={onClose}>
+                              <User className="h-4 w-4 mr-2" />
+                              My Dashboard
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                            onClick={handleLogout}
+                            disabled={isLoading}
+                          >
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Logout
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        <Button variant="secondary" className="w-full justify-center bg-[#1e2225]" asChild>
+                          <Link href="/register" onClick={onClose}>Join</Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-center"
+                          asChild
+                        >
+                          <Link href="/login" onClick={onClose}>
+                            <User className="w-full  h-4 w-4 mr-2" />
+                            Login
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

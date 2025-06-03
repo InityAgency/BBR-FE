@@ -50,15 +50,15 @@ export async function generateMetadata({ searchParams }: {
 
   // Ako imamo filtere, dodajemo ih u title
   if (searchParams.category || searchParams.author || searchParams.tag || searchParams.search) {
-    return generatePageMetadata({
-      type: 'blog',
-      data: {
-        search: searchParams.search,
-        category: searchParams.category,
-        author: searchParams.author,
-        tag: searchParams.tag,
-        page: searchParams.page ? parseInt(searchParams.page) : undefined
-      }
+  return generatePageMetadata({
+    type: 'blog',
+    data: {
+      search: searchParams.search,
+      category: searchParams.category,
+      author: searchParams.author,
+      tag: searchParams.tag,
+      page: searchParams.page ? parseInt(searchParams.page) : undefined
+    }
     });
   }
 

@@ -33,6 +33,7 @@ interface RankingCategoryType {
 interface RankingCategory {
   id: string;
   name: string;
+  title: string;
   slug: string;
   categoryTypeId: string;
 }
@@ -471,7 +472,7 @@ export async function getRankingCategories(): Promise<{ [key: string]: MenuItem[
       const categories = await fetchRankingCategoriesForType(type.id);
       
       categoriesByType[type.name] = categories.map(category => ({
-        label: category.name,
+        label: category.title,
         href: `/best-residences/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`
       })).sort((a, b) => a.label.localeCompare(b.label));
     }

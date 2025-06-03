@@ -133,7 +133,7 @@ export default function ContactForm() {
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
-                                    <FormLabel className="text-sm font-medium leading-none">
+                                    <FormLabel className="text-sm font-medium leading-none leading-[1.35]">
                                         I agree to the BBR Terms of Service, Privacy Policy
                                     </FormLabel>
                                     <FormMessage />

@@ -235,7 +235,7 @@ export default function HomeSearchForm() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 w-full max-w-3xl mx-auto p-6 rounded-xl items-center justify-center">
+    <div className="flex flex-col lg:flex-row gap-4 w-full lg:max-w-3xl mx-auto lg:p-6 rounded-xl items-center justify-center">
       <Select
         value={selectedCategory}
         onValueChange={handleCategoryChange}
