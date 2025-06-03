@@ -25,13 +25,13 @@ export async function generateMetadata({ searchParams }: {
 
   // Ako imamo filtere, koristimo dinamički metadata
   if (searchParams.category || searchParams.search) {
-    return generatePageMetadata({
-      type: 'career',
-      data: {
-        search: searchParams.search,
-        category: searchParams.category,
-        page: searchParams.page ? parseInt(searchParams.page) : undefined
-      }
+  return generatePageMetadata({
+    type: 'career',
+    data: {
+      search: searchParams.search,
+      category: searchParams.category,
+      page: searchParams.page ? parseInt(searchParams.page) : undefined
+    }
     });
   }
 

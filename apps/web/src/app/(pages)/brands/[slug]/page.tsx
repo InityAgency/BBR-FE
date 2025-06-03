@@ -17,14 +17,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     : undefined;
 
   return generatePageMetadata({
-    type: 'page',
-    data: {
+  type: 'page',
+  data: {
       title: `Rankings of the Best Branded Residences by ${brandName}`,
       description: `Explore the rankings of the Best Branded Residences by ${brandName}. Experience luxury homes with exceptional service and timeless elegance in prime locations.`,
       slug: `brands/${params.slug}`,
       keywords: ['brands', 'luxury residences', 'branded residences', brandName],
       image: logoUrl // koristi pravi logo
-    }
+  }
   });
 }
 
