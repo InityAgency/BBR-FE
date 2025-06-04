@@ -1,4 +1,25 @@
 // types/residence.ts
+export interface RankingCategory {
+  id: string;
+  name: string;
+  slug: string;
+  title: string;
+  description: string;
+  featuredImage: {
+    id: string;
+    originalFileName: string;
+    mimeType: string;
+    uploadStatus: string;
+    size: number;
+  } | null;
+}
+
+export interface TotalScore {
+  totalScore: number;
+  position: number;
+  rankingCategory: RankingCategory;
+}
+
 export interface Residence {
   id: string;
   name: string;
@@ -138,6 +159,7 @@ export interface Residence {
   // Rangiranje i ocene
   rankingCategories?: any[];
   totalScore?: number;
+  totalScores: TotalScore[];
   
   // Jedinice (stanovi/vile)
   units?: any[];
