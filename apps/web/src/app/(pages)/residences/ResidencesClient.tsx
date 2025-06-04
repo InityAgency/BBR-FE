@@ -127,7 +127,7 @@ export default function ResidencesClient() {
   const fetchCities = async () => {
     try {
       setCitiesLoading(true)
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/cities`)
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/cities?sortBy=asciiName&sortOrder=asc`)
       url.searchParams.set("limit", "100") // Get all cities for the filter
 
       const response = await fetch(url.toString())
