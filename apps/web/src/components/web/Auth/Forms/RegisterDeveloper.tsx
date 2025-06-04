@@ -105,9 +105,8 @@ export default function RegisterDeveloperForm() {
     };
 
     const handleGoogleSignup = () => {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-        const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-        window.location.href = `${baseUrl}/api/${apiVersion}/auth/google?accountType=developer`;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        window.location.href = `${appUrl}/api/auth/google?accountType=developer`;
     };
 
     return (

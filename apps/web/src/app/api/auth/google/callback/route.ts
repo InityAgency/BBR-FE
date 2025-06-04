@@ -19,8 +19,10 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Decode state to get account type
-        const { accountType } = JSON.parse(Buffer.from(state, 'base64').toString());
+        // Decode state to get account type or login flag
+        const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+        const isLogin = stateData.isLogin;
+        const accountType = stateData.accountType;
 
         // Exchange code for tokens
         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
                 email: userInfo.email,
                 fullName: userInfo.name,
                 googleId: userInfo.id,
-                accountType,
+                ...(accountType && { accountType }),
             }),
         });
 
@@ -78,7 +80,9 @@ export async function GET(request: NextRequest) {
 
         // Store tokens in cookies
         const response = NextResponse.redirect(
-            `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/${accountType}`
+            isLogin 
+                ? `${process.env.NEXT_PUBLIC_APP_URL}/login`
+                : `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/${accountType}`
         );
 
         response.cookies.set('accessToken', authResult.accessToken, {
