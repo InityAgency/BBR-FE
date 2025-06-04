@@ -428,7 +428,11 @@ export default function SingleResidenceClient() {
             />
 
             {/* Modal za Claim Profile */}
-            <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
+            <ClaimRequestModal 
+              isOpen={isClaimProfileModalOpen} 
+              onClose={() => setIsClaimProfileModalOpen(false)} 
+              residenceId={residence.id}
+            />
 
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />
