@@ -55,7 +55,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   checkAccess: (path: string) => boolean;
   loginWithToken: (token: string) => Promise<void>; 
-  setUser: (userData: User) => void; // Preimenovano iz setUserData za konzistentnost
+  setUser: (userData: User) => void;
   refreshUser: () => Promise<void>;
 }
 
@@ -68,66 +68,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Inicijalno učitavanje korisnika
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUserState(parsedUser);
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-        localStorage.removeItem('user');
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  // Dodajemo useEffect za rukovanje Google callback-om
-  useEffect(() => {
-    const handleGoogleCallback = async () => {
-      const code = searchParams.get('code');
-      if (code && pathname === '/api/v1/auth/google/callback') {
-        setIsLoading(true);
+    const initializeAuth = async () => {
+      // Prvo proveravamo localStorage za brže učitavanje
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/google/callback?code=${code}`, {
+          const parsedUser = JSON.parse(savedUser);
+          setUserState(parsedUser);
+        } catch (error) {
+          console.error('Error parsing user from localStorage:', error);
+          localStorage.removeItem('user');
+        }
+      }
+
+      // Proveravamo da li imamo bbr-session cookie
+      const hasBbrSession = document.cookie.includes('bbr-session');
+      
+      if (hasBbrSession) {
+        // Ako imamo sesiju, pozivamo /me endpoint da dobijemo sveže podatke
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
             method: 'GET',
             credentials: 'include',
           });
-
-          if (!response.ok) {
-            throw new Error('Google authentication failed');
-          }
-
-          const data = await response.json();
-          if (data.data) {
-            setUser(data.data);
-            localStorage.setItem('user', JSON.stringify(data.data));
-            
-            // Preusmeravanje na osnovu uloge
-            const targetPath = data.data.role?.name === "developer" 
-              ? '/developer/dashboard' 
-              : data.data.role?.name === "buyer" 
-                ? '/buyer/dashboard' 
-                : '/';
-                
-            router.replace(targetPath);
+          
+          if (res.ok) {
+            const data = await res.json();
+            if (data.data) {
+              setUser(data.data);
+            }
+          } else {
+            // Ako /me endpoint ne uspe, čistimo lokalne podatke
+            setUserState(null);
+            localStorage.removeItem('user');
           }
         } catch (error) {
-          console.error('Google callback error:', error);
-          router.replace('/login');
-        } finally {
-          setIsLoading(false);
+          console.error('Error fetching user data:', error);
         }
+      } else {
+        // Ako nema sesije, čistimo lokalne podatke
+        setUserState(null);
+        localStorage.removeItem('user');
       }
+      
+      setIsLoading(false);
     };
 
-    handleGoogleCallback();
-  }, [searchParams, pathname, router]);
+    initializeAuth();
+  }, []);
 
   const setUser = (userData: User) => {
     setUserState(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    document.cookie = `user=${JSON.stringify(userData)}; path=/`;
   };
 
   const login = async (email: string, password: string) => {
@@ -171,7 +165,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Funkcija za prijavljivanje sa tokenom (nakon verifikacije)
   const loginWithToken = async (token: string) => {
     setIsLoading(true);
     try {
@@ -194,7 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       const userData = await res.json();
       
-      // Postavlja korisnika u stanje i localStorage/cookie
+      // Postavlja korisnika u stanje i localStorage
       setUser(userData.data);
       
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -231,8 +224,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       setUserState(null);
       localStorage.removeItem('user');
-      // document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      // document.cookie = 'bbr-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -261,11 +252,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const refreshUser = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.data) {
+          setUser(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
   };
+
   return (
     <AuthContext.Provider value={{ 
       user, 

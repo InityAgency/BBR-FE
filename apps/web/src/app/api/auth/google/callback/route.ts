@@ -70,34 +70,49 @@ export async function GET(request: NextRequest) {
                 googleId: userInfo.id,
                 ...(accountType && { accountType }),
             }),
+            credentials: 'include' 
         });
 
         if (!authResponse.ok) {
             throw new Error('Failed to authenticate with backend');
         }
 
-        const authResult = await authResponse.json();
+        const authData = await authResponse.json();
+        
+        // Sada pozivamo /me endpoint da dobijemo potpune podatke o korisniku
+        const meResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
+            method: 'GET',
+            headers: {
+                'Cookie': authResponse.headers.get('set-cookie') || ''
+            },
+            credentials: 'include'
+        });
 
-        // Store tokens in cookies
+        if (!meResponse.ok) {
+            throw new Error('Failed to get user data');
+        }
+
+        const userData = await meResponse.json();
+        
+        // Kreiramo redirect sa podacima
         const response = NextResponse.redirect(
-            isLogin 
-                ? `${process.env.NEXT_PUBLIC_APP_URL}/login`
-                : `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/${accountType}`
+            `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback-handler?type=${isLogin ? 'login' : 'register'}&role=${userData.data?.role?.name || ''}`
         );
 
-        response.cookies.set('accessToken', authResult.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-        });
+        // Postavljamo user podatke u cookie
+        if (userData.data) {
+            response.cookies.set('user', JSON.stringify(userData.data), {
+                httpOnly: false, // Mora biti false da bi JavaScript mogao da čita
+                sameSite: 'lax',
+                path: '/'
+            });
+        }
 
-        response.cookies.set('refreshToken', authResult.refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-        });
+        // Prosleđujemo bbr-session cookie iz backend odgovora
+        const setCookieHeader = authResponse.headers.get('set-cookie');
+        if (setCookieHeader) {
+            response.headers.set('set-cookie', setCookieHeader);
+        }
 
         return response;
     } catch (error) {
@@ -106,4 +121,4 @@ export async function GET(request: NextRequest) {
             `${process.env.NEXT_PUBLIC_APP_URL}/login?error=${encodeURIComponent('Authentication failed')}`
         );
     }
-} 
+}
