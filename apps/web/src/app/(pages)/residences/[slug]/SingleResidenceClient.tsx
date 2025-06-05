@@ -37,10 +37,9 @@ interface RankingScore {
         featuredImage: any;
     };
 }
-
 // Extending Residence interface locally to ensure totalScores is properly typed
-interface ExtendedResidence extends Residence {
-    totalScores?: RankingScore[];
+interface ExtendedResidence extends Omit<Residence, 'totalScores'> {
+    totalScores: RankingScore[];
 }
 
 const sections = [
@@ -428,7 +427,11 @@ export default function SingleResidenceClient() {
             />
 
             {/* Modal za Claim Profile */}
-            <ClaimRequestModal isOpen={isClaimProfileModalOpen} onClose={() => setIsClaimProfileModalOpen(false)} />
+            <ClaimRequestModal 
+              isOpen={isClaimProfileModalOpen} 
+              onClose={() => setIsClaimProfileModalOpen(false)} 
+              residenceId={residence.id}
+            />
 
             <SectionLayout>
                 <StickyScrollTabs sections={sections} offset={80} />
@@ -502,7 +505,7 @@ export default function SingleResidenceClient() {
                         </div>
                         <div className="custom-card p-4 rounded-lg border flex flex-col gap-2">
                             <span className="text-2xl text-serif">
-                                {residence.rentalPotential ? Number(residence.rentalPotential).toLocaleString('en-US', { maximumFractionDigits: 0 }) : "-"}
+                                {residence.rentalPotential && !isNaN(Number(residence.rentalPotential)) ? Number(residence.rentalPotential).toLocaleString('en-US', { maximumFractionDigits: 0 }) : "-"}
                             </span>
                             <span className="uppercase text-md text-muted-foreground">RENTAL POTENTIAL</span>
                         </div>

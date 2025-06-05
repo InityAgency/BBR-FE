@@ -104,7 +104,7 @@ export default function RegisterBuyerForm() {
     const handleGoogleSignup = () => {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
-        window.location.href = `${baseUrl}/api/${apiVersion}/auth/google?role=buyer`;
+        window.location.href = `${baseUrl}/api/${apiVersion}/auth/google?accountType=buyer`;
     };
 
     return (

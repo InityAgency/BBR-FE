@@ -35,9 +35,10 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface ClaimRequestFormProps {
   onSuccess?: () => void;
+  residenceId: string;
 }
 
-export default function ClaimRequestForm({ onSuccess }: ClaimRequestFormProps) {
+export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -112,9 +113,10 @@ export default function ClaimRequestForm({ onSuccess }: ClaimRequestFormProps) {
         lastName: data.lastName,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        phoneCodeId: data.phoneCodeId, // Dodato phoneCodeId
+        phoneCodeId: data.phoneCodeId,
         websiteUrl: data.websiteUrl,
-        cvId: cvId
+        cvId: cvId,
+        residenceId: residenceId
       };
       
       // Slanje podataka na glavni endpoint

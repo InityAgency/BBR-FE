@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface Company {
   id: string;
@@ -50,88 +50,68 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
+  loading: boolean;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAccess: (path: string) => boolean;
   loginWithToken: (token: string) => Promise<void>; 
-  setUser: (userData: User) => void; // Preimenovano iz setUserData za konzistentnost
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUserState] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUserState(parsedUser);
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-        localStorage.removeItem('user');
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  // Dodajemo useEffect za rukovanje Google callback-om
-  useEffect(() => {
-    const handleGoogleCallback = async () => {
-      const code = searchParams.get('code');
-      if (code && pathname === '/api/v1/auth/google/callback') {
-        setIsLoading(true);
+  const [user, setUser] = useState<User | null>(() => {
+    // Pokušavamo da učitamo korisnika iz sessionStorage za brže inicijalno učitavanje
+    if (typeof window !== 'undefined') {
+      const savedUser = sessionStorage.getItem('user');
+      if (savedUser) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/google/callback?code=${code}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
-
-          if (!response.ok) {
-            throw new Error('Google authentication failed');
-          }
-
-          const data = await response.json();
-          if (data.data) {
-            setUser(data.data);
-            localStorage.setItem('user', JSON.stringify(data.data));
-            
-            // Preusmeravanje na osnovu uloge
-            const targetPath = data.data.role?.name === "developer" 
-              ? '/developer/dashboard' 
-              : data.data.role?.name === "buyer" 
-                ? '/buyer/dashboard' 
-                : '/';
-                
-            router.replace(targetPath);
-          }
-        } catch (error) {
-          console.error('Google callback error:', error);
-          router.replace('/login');
-        } finally {
-          setIsLoading(false);
+          return JSON.parse(savedUser);
+        } catch (e) {
+          sessionStorage.removeItem('user');
         }
       }
-    };
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-    handleGoogleCallback();
-  }, [searchParams, pathname, router]);
-
-  const setUser = (userData: User) => {
-    setUserState(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    document.cookie = `user=${JSON.stringify(userData)}; path=/`;
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.data) {
+          setUser(data.data);
+          // Čuvamo u sessionStorage za brže sledeće učitavanje
+          sessionStorage.setItem('user', JSON.stringify(data.data));
+        }
+      } else {
+        setUser(null);
+        sessionStorage.removeItem('user');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUser(null);
+      sessionStorage.removeItem('user');
+    }
   };
 
+  // Inicijalno učitavanje u pozadini
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/login`, {
         method: 'POST',
@@ -145,40 +125,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(error.message || 'Login failed');
       }
       
-      const response = await res.json();
-      const userData = response.data;
+      await fetchUser();
       
-      setUser(userData);
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const targetPath = userData?.role?.name === "developer" 
+      const targetPath = user?.role?.name === "developer" 
         ? '/developer/dashboard' 
-        : userData?.role?.name === "buyer" 
+        : user?.role?.name === "buyer" 
           ? '/buyer/dashboard' 
           : '/';
           
       if (pathname !== targetPath) {
         router.replace(targetPath);
       }
-      
-      return userData;
     } catch (error: any) {
       console.error('Login error:', error);
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Funkcija za prijavljivanje sa tokenom (nakon verifikacije)
   const loginWithToken = async (token: string) => {
-    setIsLoading(true);
+    setLoading(true);
     try {
-      // Postavljamo token u cookie (može biti korisno za API pozive)
-      document.cookie = `bbr-session=${token}; path=/`;
-      
-      // Dohvati podatke o korisniku sa tokenom
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
         method: 'GET',
         headers: { 
@@ -192,49 +160,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error('Failed to get user data with token');
       }
       
-      const userData = await res.json();
+      await fetchUser();
       
-      // Postavlja korisnika u stanje i localStorage/cookie
-      setUser(userData.data);
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Preusmeravanje na osnovu uloge
-      let targetPath;
-      if (userData.data?.role?.name === "developer") {
-        targetPath = '/developer/onboarding';
-      } else if (userData.data?.role?.name === "buyer") {
-        targetPath = '/buyer/onboarding';
-      } else {
-        targetPath = '/';
-      }
+      const targetPath = user?.role?.name === "developer" 
+        ? '/developer/onboarding' 
+        : user?.role?.name === "buyer" 
+          ? '/buyer/onboarding' 
+          : '/';
       
       if (pathname !== targetPath) {
         router.replace(targetPath);
       }
-      
-      return userData;
     } catch (error) {
       console.error('Login with token error:', error);
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const logout = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
-      setUserState(null);
-      localStorage.removeItem('user');
-      // document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      // document.cookie = 'bbr-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
+      setUser(null);
+      sessionStorage.removeItem('user');
       
       if (pathname !== '/') {
         router.replace('/');
@@ -242,7 +195,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -261,20 +214,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const refreshUser = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    await fetchUser();
   };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
-      isLoading, 
+      loading, 
+      isAuthenticated: !!user,
       login, 
       logout, 
       checkAccess, 
-      loginWithToken, 
-      setUser,
+      loginWithToken,
       refreshUser
     }}>
       {children}
