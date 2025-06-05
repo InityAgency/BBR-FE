@@ -21,7 +21,7 @@ export function ResidenceCard({ residence, score }: ResidenceCardProps) {
     <Link href={`/residences/${residence.slug}`} className="border p-4 bg-secondary/30 rounded-lg group flex justify-between flex-col not-prose gap-4 hover:bg-secondary/50 transition-all h-full hover:-translate-y-2">
         <div className="h-72 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
           {score !== undefined && (
-            <span className="text-md font-medium text-white bg-primary rounded-md px-2 py-1 w-[45px] h-[45px] flex items-center justify-center absolute top-3 right-3">{score}</span>
+            <span className="text-md font-medium text-white bg-primary rounded-md px-2 py-1 w-[45px] h-[45px] flex items-center justify-center absolute top-3 right-3">{(score / 10).toFixed(1)}</span>
           )}
           {residence.featuredImage ? (
             <Image

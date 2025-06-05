@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import ClientCommonInfoForm from "@/components/web/Forms/ClientCommonInfoForm";
 import SectionLayout from "@/components/web/SectionLayout";
@@ -7,16 +8,18 @@ import ClientTestimonials from "@/components/web/ClientTestimonials/ClientTestim
 import HorizontalTabs from "@/components/web/HorizontalTabs/HorizontalTabs";
 import { generatePageMetadata } from '@/lib/metadata'
 import type { Metadata } from 'next'
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
-export const metadata: Metadata = generatePageMetadata({
-  type: 'page',
-  data: {
-    title: 'Developer Solutions',
-    description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
-    slug: 'developer-solutions',
-    keywords: ['developer solutions', 'luxury residences', 'company info']
-  }
-})
+// export const metadata: Metadata = generatePageMetadata({
+//   type: 'page',
+//   data: {
+//     title: 'Developer Solutions',
+//     description: 'We are a team of experts who are passionate about helping people find the best branded residences. We use a combination of data and expert insights to assess the quality of each residence.',
+//     slug: 'developer-solutions',
+//     keywords: ['developer solutions', 'luxury residences', 'company info']
+//   }
+// })
 
 // #region Tabs
 type TabContentProps = {
@@ -75,7 +78,7 @@ const tabContent1 = {
     "Developers often struggle to connect with the right audience—affluent buyers who are actively searching for branded residences...",
   list1: [
     "Insufficient leads to sustain the sales pipeline.",
-    "Low-quality leads, including buyers who lack budget or aren’t ready to purchase.",
+    "Low-quality leads, including buyers who lack budget or aren't ready to purchase.",
     "Difficulty connecting with affluent individuals who are the right fit for luxury branded residences.",
   ],
   title3: "How BBR Solves This",
@@ -221,6 +224,21 @@ const tabs = [
 // #endregion
 
 const MarketingSolutionsPage = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    if (user) {
+      if (user.role?.name === "developer") {
+        router.push('/developer/dashboard');
+      } else if (user.role?.name === "buyer") {
+        router.push('/buyer/dashboard');
+      }
+    } else {
+      router.push('/register');
+    }
+  };
+
   return (
     <div>
       {/* FIRST SECTION */}
@@ -235,7 +253,7 @@ const MarketingSolutionsPage = () => {
           <div className="flex flex-col xl:flex-row justify-between z-10 gap-[50px]">
             <div className="flex flex-col justify-center gap-[16px]">
               <p className="text-primary text-[16px]">
-                UNLOCK YOUR PROJECT’S FULL POTENTIAL
+                UNLOCK YOUR PROJECT'S FULL POTENTIAL
               </p>
               <h1 className="text-[30px] lg:text-[36px]">
                 Transform Your Branded Residences with the Best Real Estate
@@ -267,7 +285,7 @@ const MarketingSolutionsPage = () => {
             </h2>
             <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[50%] text-left lg:text-center mx-auto">
               BBR is designed to offer solutions for developers at every stage of
-              their project’s life cycle from pre-construction to completion. We
+              their project's life cycle from pre-construction to completion. We
               ensure that developers can
             </p>
 
@@ -416,12 +434,12 @@ const MarketingSolutionsPage = () => {
                 developers who want a hybrid model that includes predictable costs
                 along with performance incentives
               </p>
-              <Link
-                href="/#"
+              <button
+                onClick={handleGetStarted}
                 className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
               >
                 Get Started -&gt;
-              </Link>
+              </button>
             </div>
           </div>
         </SectionLayout>
@@ -436,7 +454,7 @@ const MarketingSolutionsPage = () => {
                 OUR SUGGESTION
               </p>
               <h1 className="text-black text-[30px] lg:text-[40px]">
-                Unlock your project’s Potential with BBR
+                Unlock your project's Potential with BBR
               </h1>
               <p className="text-[#4D4D4D] text-[16px] lg:text-[18px]">
                 As a developer in the competitive branded residences market, you
@@ -445,12 +463,12 @@ const MarketingSolutionsPage = () => {
                 marketing complexity.
               </p>
             </div>
-            <Link
-              href="/#"
-              className="place-self-start inline-flex place-self-center items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-4 has-[>svg]:px-3 w-fit"
-            >
-              Get Started -&gt;
-            </Link>
+            <button
+                onClick={handleGetStarted}
+                className="z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3 w-full lg:w-fit"
+              >
+                Get Started -&gt;
+              </button>
           </div>
 
           <div className="flex flex-col lg:flex-row w-full gap-[24px] xl:max-w-[1600px] mx-auto">

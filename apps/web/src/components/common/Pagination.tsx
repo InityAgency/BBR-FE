@@ -135,7 +135,7 @@ export function Pagination({
                         : 'text-white hover:bg-primary/10'
                 }`}
             >
-                <span className="hidden sm:inline">Next page</span>
+                <span className="hidden sm:inline">Next</span>
                 <span className="sm:hidden">
                     <ArrowRight />  
                 </span>

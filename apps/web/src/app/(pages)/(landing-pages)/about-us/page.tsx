@@ -38,7 +38,7 @@ export default function AboutUsPage() {
               most exceptional branded residences.
             </p>
             <Link
-              href="/rankings"
+              href="/best-residences"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit lg:m-auto"
             >
               Explore Our Rankings

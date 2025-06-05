@@ -19,6 +19,7 @@ import HomeSearchForm from "@/components/web/Forms/HomeSearchForm";
 
 import { generatePageMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next'
+import ListResidenceButton from "@/components/web/Buttons/ListResidenceButton";
 
 export const metadata: Metadata = generatePageMetadata({
   type: 'page',
@@ -220,9 +221,9 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-16 items-center px-4 py-12 pb-4 lg:pb-0 lg:px-0 lg:py-0 w-full xl:max-w-[1600px] mx-auto">
             <div className="residences-section-header flex flex-col lg:flex-row w-full items-end gap-4 lg:gap-0 xl:max-w-[1600px] mx-auto">
               <div className="w-full flex flex-col gap-4">
-                <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">Newest Residences</span>
+                <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">EXPLORE NEW</span>
                 <h2 className="text-4xl font-bold w-fulltext-left lg:text-left">
-                  The Newest Added Residences
+                  Newly Added Residences
                 </h2>
               </div>
               <Link href="/residences" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit">
@@ -273,7 +274,7 @@ export default function Home() {
               <p className="mb-4 text-white/70">
                 We've partnered with your favourite developers to get you exclusive offers on their inventory available only to our buyers.
               </p>
-              <Link href="/exclusive-offers" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit m-auto">
+              <Link href="/exclusive-deals" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit m-auto">
                 Get exclusive deals
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -364,10 +365,9 @@ export default function Home() {
             <p className="text-md lg:text-md w-full lg:w-[65%] text-left lg:text-center mx-auto text-[#1A1E21]">
               Is your luxury residence one of the finest in the world? Elevate its prestige by securing a spot on Best Branded Residences. Our expert-driven rankings and reviews showcase top-tier residences to discerning buyers, investors, and luxury connoisseurs.
             </p>
-            <Link href="/login" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full lg:w-fit m-auto">
-              List Your Residence
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="w-full lg:w-fit m-auto items-center justify-center">
+              <ListResidenceButton />   
+            </div>
           </div>
         </SectionLayout>
       </section>

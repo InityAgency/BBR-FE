@@ -29,8 +29,8 @@ export default function ResidencesSlider() {
     fetchResidences();
   }, []);
 
-  if (loading) return <div>Učitavanje...</div>;
-  if (error) return <div>Greška pri učitavanju rezidencija.</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading residences.</div>;
 
   return (
     <div className="w-full lg:mt-8 lg:mb-8 lg:mb-12">

@@ -46,7 +46,7 @@ export default function Footer() {
 
         <div className="flex flex-col gap-2 newsletter">
           <h3 className="text-xl font-bold text-white w-full lg:w-90">
-            Latest of news, insights & info straight into your inbox
+            Latest of news, insights & information straight into your inbox
           </h3>
           <NewsletterForm />
           <div className="flex gap-2 sodical-media mt-6">

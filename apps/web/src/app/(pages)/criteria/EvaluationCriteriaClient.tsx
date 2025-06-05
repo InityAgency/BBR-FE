@@ -7,6 +7,7 @@ import RequestConsultationForm from "@/components/web/Forms/RequestConsultation"
 import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 import SectionLayout from "@/components/web/SectionLayout";
+import Link from "next/link";
 
 const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
 const CAROUSEL_CARDS = [
@@ -357,8 +358,8 @@ export default function EvaluationCriteriaClient() {
                   your desired location.
                 </p>
               </div>
-              <Button variant="secondary" onClick={() => {}} className="w-full">
-                See all rankings
+              <Button variant="secondary" className="w-full">
+                <Link href="/best-residences">See all rankings</Link>
               </Button>
             </div>
           </div>

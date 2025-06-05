@@ -417,7 +417,7 @@ export default function SingleBestResidencesClient() {
                                         <div className="bg-secondary rounded-lg p-4 lg:p-5 w-full flex flex-col gap-2">
                                             <div className="flex flex-row gap-2 items-center">
                                                 <p className="text-white bg-primary rounded-lg p-2 w-fit font-bold text-base lg:text-lg">
-                                                    {residence.totalScore.toFixed(1)}
+                                                    {(residence.totalScore / 10).toFixed(1)}
                                                 </p>
                                                 <p className="text-white uppercase font-bold text-sm lg:text-base">
                                                     BBR <br /> Score
