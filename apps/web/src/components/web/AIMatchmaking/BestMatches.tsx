@@ -151,14 +151,14 @@ export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) 
                 
                 <div className="flex items-center justify-between pt-2 border-t border-[#333638]">
                   <div className="flex gap-2">
-                    <Button
+                    {/* <Button
                       variant="outline"
                       size="sm"
                       className="bg-transparent border-[#555] text-white hover:bg-[#555] rounded-md px-3 py-1 text-xs"
                       onClick={() => handleRequestInfo(property.id)}
                     >
                       Request Info
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outline"
                       size="sm"
