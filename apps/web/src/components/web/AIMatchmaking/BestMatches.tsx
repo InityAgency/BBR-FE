@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Heart, Loader2, MapPin, DollarSign, Home } from "lucide-react"
@@ -13,6 +13,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer"
+import { FavoriteHeart } from "../Residences/FavoriteHeart"
 
 interface Property {
   id: string
@@ -54,14 +55,11 @@ export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) 
 
   console.log(displayedMatches)
 
-  // Toggle favorite status
-  const toggleFavorite = (propertyId: string) => {
-    setDisplayedMatches((prev) =>
-      prev.map((property) =>
-        property.id === propertyId ? { ...property, isFavorite: !property.isFavorite } : property,
-      ),
-    )
-  }
+  // Handle favorite removal
+  const onFavoriteRemoved = useCallback(() => {
+    // Ažuriramo lokalno stanje da uklonimo rezidenciju iz prikaza
+    setDisplayedMatches(prev => prev.filter(match => !match.isFavorite));
+  }, []);
 
   // Handle view more - navigate to property detail
   const handleViewMore = (propertyId: string) => {
@@ -149,7 +147,7 @@ export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) 
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-2 border-t border-[#333638]">
+                <div className="flex items-center justify-between pt-2 border-t border-[#333638] relative ai-residence-card">
                   <div className="flex gap-2">
                     {/* <Button
                       variant="outline"
@@ -168,11 +166,11 @@ export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) 
                       View Details
                     </Button>
                   </div>
-                  <Heart
-                    className={`w-5 h-5 cursor-pointer transition-colors ${
-                      property.isFavorite ? "text-[#b3804c] fill-[#b3804c]" : "text-[#a3a3a3] hover:text-[#b3804c]"
-                    }`}
-                    onClick={() => toggleFavorite(property.id)}
+                  <FavoriteHeart
+                    entityId={property.id}
+                    entityType="residences"
+                    isFavorite={property.isFavorite}
+                    onFavoriteRemoved={onFavoriteRemoved}
                   />
                 </div>
               </div>
