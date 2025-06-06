@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import FileUpload from "@/components/web/Forms/FileUpload";
 import * as z from "zod";
+import Link from "next/link";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -60,20 +61,20 @@ export default function ReportIssueForm() {
         const formData = new FormData();
         // Prilagođavanje imena polja za zahtev prema API-ju
         formData.append("file", uploadedFiles[0]);
-        
+
         // Korišćenje environment varijabli za API putanje
         const uploadRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media?type=CONTACT_FORM`, 
+          `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media?type=CONTACT_FORM`,
           {
             method: "POST",
             body: formData,
           }
         );
-        
+
         if (!uploadRes.ok) throw new Error("File upload failed");
-        
+
         const uploadData = await uploadRes.json();
-        
+
         // Pristupanje ID-u iz odgovora servera prema strukturi koju smo dobili
         if (uploadData.data && uploadData.data.id) {
           attachmentId = uploadData.data.id;
@@ -83,7 +84,7 @@ export default function ReportIssueForm() {
           attachmentId = Array.isArray(uploadData) ? uploadData[0] : uploadData.attachmentId;
         }
       }
-      
+
       const payload = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -93,19 +94,19 @@ export default function ReportIssueForm() {
         description: data.description,
         attachmentId: attachmentId,
       };
-      
+
       // Korišćenje environment varijabli za glavni API poziv
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/contact-forms`, 
+        `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/contact-forms`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
       );
-      
+
       if (!res.ok) throw new Error("Failed to send issue report");
-      
+
       toast.success("Issue reported successfully");
       form.reset();
       setUploadedFiles([]);
@@ -210,7 +211,7 @@ export default function ReportIssueForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-medium leading-none leading-[1.35]">
-                    I agree to the BBR Terms of Service, Privacy Policy
+                    I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                   </FormLabel>
                   <FormMessage />
                 </div>

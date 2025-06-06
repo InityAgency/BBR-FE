@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import Image from "next/image";
+
 // Interfejs za telefonske kodove prema stvarnoj strukturi API-ja
 export interface PhoneCode {
   id: string;
@@ -48,9 +49,6 @@ interface PhoneCodeSelectProps {
   className?: string;
 }
 
-// Globalna keš varijabla za phone kodove
-let cachedPhoneCodes: PhoneCode[] | null = null;
-
 export const PhoneCodeSelect = ({
   value,
   onChange,
@@ -59,11 +57,9 @@ export const PhoneCodeSelect = ({
   className,
 }: PhoneCodeSelectProps) => {
   const [phoneCodes, setPhoneCodes] = useState<PhoneCode[]>([]);
-  const [filteredCodes, setFilteredCodes] = useState<PhoneCode[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isDataFetched, setIsDataFetched] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -72,20 +68,26 @@ export const PhoneCodeSelect = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const firstRenderRef = useRef(true);
 
-  // Memoizirana funkcija za učitavanje phone kodova
-  const fetchPhoneCodes = useCallback(async (pageNum = 1, limit = 30) => {
-    // Ako su phone kodovi već u kešu i tražimo prvu stranicu, koristimo ih
-    if (cachedPhoneCodes && pageNum === 1) {
-      setPhoneCodes(cachedPhoneCodes);
-      setFilteredCodes(cachedPhoneCodes);
-      setIsDataFetched(true);
-      return;
-    }
+  // Koristimo useDebounce hook za pretragu (300ms za server calls)
+  const [debouncedSearchValue] = useDebounce(searchValue, 300);
 
+  // Funkcija za učitavanje phone kodova sa server-side pretragom
+  const fetchPhoneCodes = useCallback(async (pageNum = 1, query = '', append = false) => {
     setIsLoading(true);
     try {
+      // Kreiramo URL sa query parametrima
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: '20'
+      });
+      
+      // Dodajemo query parametar samo ako postoji
+      if (query.trim()) {
+        params.append('query', query.trim());
+      }
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/phone-codes?page=${pageNum}&limit=${limit}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/phone-codes?${params.toString()}`
       );
       
       if (!response.ok) {
@@ -93,24 +95,25 @@ export const PhoneCodeSelect = ({
       }
       
       const responseData: PhoneCodeResponse = await response.json();
-      
-      // Na osnovu strukture odgovora
       const fetchedPhoneCodes = responseData.data || [];
       const paginationInfo = responseData.pagination;
       
-      if (pageNum === 1) {
-        setPhoneCodes(fetchedPhoneCodes);
-        setFilteredCodes(fetchedPhoneCodes);
-        // Keširanje phone kodova za buduću upotrebu
-        cachedPhoneCodes = fetchedPhoneCodes;
+      if (append) {
+        // Dodaj nove rezultate na postojeće (scroll load more)
+        // Filtriramo duplikate na osnovu ID-ja
+        setPhoneCodes(prev => {
+          const existingIds = new Set(prev.map(pc => pc.id));
+          const newItems = fetchedPhoneCodes.filter(pc => !existingIds.has(pc.id));
+          return [...prev, ...newItems];
+        });
       } else {
-        setPhoneCodes(prev => [...prev, ...fetchedPhoneCodes]);
-        // Filtriranje novih podataka će se desiti automatski u useEffect-u koji prati debouncedSearchValue
+        // Zameni postojeće rezultate (nova pretraga ili prvo učitavanje)
+        setPhoneCodes(fetchedPhoneCodes);
       }
 
       setTotalPages(paginationInfo.totalPages);
       setHasMore(pageNum < paginationInfo.totalPages);
-      setIsDataFetched(true);
+      setPage(pageNum);
     } catch (error) {
       console.error("Error fetching phone codes:", error);
       toast.error("Failed to load country codes. Please try again.");
@@ -119,32 +122,22 @@ export const PhoneCodeSelect = ({
     }
   }, []);
 
-  // Učitavanje podataka samo kada se dropdown otvori prvi put
+  // Učitavanje početnih podataka kada se dropdown otvori
   useEffect(() => {
-    if (isOpen && !isDataFetched) {
-      fetchPhoneCodes(1);
+    if (isOpen && phoneCodes.length === 0) {
+      fetchPhoneCodes(1, '');
     }
-  }, [isOpen, isDataFetched, fetchPhoneCodes]);
+  }, [isOpen, phoneCodes.length, fetchPhoneCodes]);
 
-  // Koristimo useDebounce hook za pretragu
-  const [debouncedSearchValue] = useDebounce(searchValue, 150);
-
-  // Efikasnije filtriranje phone kodova prema pretrazi
+  // Server-side pretraga kada se promeni debounced search value
   useEffect(() => {
-    if (debouncedSearchValue.trim() === '') {
-      setFilteredCodes(phoneCodes);
-    } else {
-      const search = debouncedSearchValue.toLowerCase();
-      const filtered = phoneCodes.filter(
-        pc => 
-          pc.country.name.toLowerCase().includes(search) || 
-          pc.code.includes(search)
-      );
-      setFilteredCodes(filtered);
+    if (isOpen) {
+      // Reset na prvu stranicu za novu pretragu
+      fetchPhoneCodes(1, debouncedSearchValue, false);
     }
-  }, [debouncedSearchValue, phoneCodes]);
+  }, [debouncedSearchValue, isOpen, fetchPhoneCodes]);
 
-  // Optimizovana funkcija za obradu scroll eventa
+  // Optimizovana funkcija za obradu scroll eventa (load more)
   const handleScroll = useCallback(() => {
     if (!scrollAreaRef.current || !hasMore || isLoading) return;
 
@@ -153,10 +146,10 @@ export const PhoneCodeSelect = ({
 
     // Ako smo došli do 80% visine scroll područja, učitavamo sledeću stranicu
     if (scrollTop + clientHeight >= scrollHeight * 0.8) {
-      setPage(prev => prev + 1);
-      fetchPhoneCodes(page + 1);
+      const nextPage = page + 1;
+      fetchPhoneCodes(nextPage, debouncedSearchValue, true);
     }
-  }, [scrollAreaRef, hasMore, isLoading, page, fetchPhoneCodes]);
+  }, [scrollAreaRef, hasMore, isLoading, page, debouncedSearchValue, fetchPhoneCodes]);
 
   // Postavljanje event listenera za scroll
   useEffect(() => {
@@ -180,9 +173,12 @@ export const PhoneCodeSelect = ({
         }, 50);
       }
     } else {
-      // Kad se dropdown zatvori, resetujemo firstRender flag
+      // Kad se dropdown zatvori, resetujemo sve
       firstRenderRef.current = true;
       setSearchValue('');
+      setPhoneCodes([]);
+      setPage(1);
+      setHasMore(true);
     }
   }, [isOpen]);
 
@@ -197,7 +193,7 @@ export const PhoneCodeSelect = ({
 
   // Memoizirani render listi phone kodova za optimizaciju performansi
   const phoneCodeItems = useMemo(() => {
-    if (isLoading && page === 1) {
+    if (isLoading && phoneCodes.length === 0) {
       return (
         <SelectItem value="loading" disabled>
           Loading country codes...
@@ -205,22 +201,22 @@ export const PhoneCodeSelect = ({
       );
     } 
     
-    if (filteredCodes.length === 0) {
+    if (phoneCodes.length === 0 && !isLoading) {
       return (
         <SelectItem value="empty" disabled>
-          No matching country codes
+          {searchValue ? 'No matching country codes found' : 'No country codes available'}
         </SelectItem>
       );
     }
 
-    return filteredCodes.map((phoneCode) => (
+    return phoneCodes.map((phoneCode, index) => (
       <SelectItem 
-        key={phoneCode.id} 
+        key={`${phoneCode.id}-${index}`} // Kombinujemo ID sa indexom za jedinstveni key
         value={phoneCode.id} 
-        className="flex items-center gap-2 "
+        className="flex items-center gap-2"
       >
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 overflow-hidden rounded-sm flex-shrink-0 ">
+          <div className="h-4 w-4 overflow-hidden rounded-sm flex-shrink-0">
             {phoneCode.country.flag ? (
               <img
                 src={phoneCode.country.flag}
@@ -242,7 +238,7 @@ export const PhoneCodeSelect = ({
         </div>
       </SelectItem>
     ));
-  }, [filteredCodes, isLoading, page]);
+  }, [phoneCodes, isLoading, searchValue]);
 
   return (
     <Select
@@ -276,12 +272,12 @@ export const PhoneCodeSelect = ({
         >
           <SelectGroup>
             {phoneCodeItems}
-            {isLoading && page > 1 && (
+            {isLoading && phoneCodes.length > 0 && (
               <div className="py-2 text-center text-sm text-muted-foreground">
                 Loading more...
               </div>
             )}
-            {!isLoading && hasMore && filteredCodes.length > 0 && (
+            {!isLoading && hasMore && phoneCodes.length > 0 && (
               <div className="py-2 text-center text-xs text-muted-foreground">
                 Scroll for more options
               </div>

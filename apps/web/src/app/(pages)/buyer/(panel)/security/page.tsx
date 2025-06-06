@@ -93,7 +93,7 @@ export default function Security() {
     };
 
     return (
-        <div className="space-y-6 w-full py-8 xl:max-w-2xl custom-form">
+        <div className="space-y-6 w-full py-8 xl:max-w-2xl custom-form pt-0 lg:pt-8">
             <div>
                 <h1 className="text-2xl text-sans font-bold text-left">Security Settings</h1>
                 <p className="text-muted-foreground mt-2">

@@ -6,16 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import FileUpload from "./FileUpload";
-import { 
-  Form, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormControl, 
-  FormMessage 
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage
 } from "@/components/ui/form";
 import { PhoneCodeSelect } from "./PhoneCodeSelect";
 import { toast } from "sonner";
+import Link from "next/link";
 
 // Ažurirana šema forme za usklađivanje sa API zahtevima
 const formSchema = z.object({
@@ -64,17 +65,17 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
       const xhr = new XMLHttpRequest();
       const formData = new FormData();
       formData.append('file', file);
-      
+
       xhr.open('POST', `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media?type=CLAIM_PROFILE_CONTACT_FORM`, true);
-      
+
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded * 100) / event.total);
           setUploadProgress(progress);
         }
       });
-      
-      xhr.onload = function() {
+
+      xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const response = JSON.parse(xhr.responseText);
@@ -91,11 +92,11 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
           reject(new Error('File upload failed'));
         }
       };
-      
+
       xhr.onerror = () => {
         reject(new Error('Network error during file upload'));
       };
-      
+
       xhr.send(formData);
     });
   };
@@ -103,10 +104,24 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      
+
       // Prvo pošaljemo fajl i dobijemo ID
-      const cvId = await uploadFile(data.file);
-      
+      let cvId;
+      try {
+        cvId = await uploadFile(data.file);
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.includes('Network error')) {
+            toast.error("Network error occurred while uploading file. Please check your internet connection.");
+          } else if (error.message.includes('Invalid server response')) {
+            toast.error("Server error occurred while uploading file. Please try again later.");
+          } else {
+            toast.error("Failed to upload file. Please try again.");
+          }
+        }
+        return;
+      }
+
       // Priprema podataka za glavni API zahtev
       const payload = {
         firstName: data.firstName,
@@ -118,7 +133,7 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
         cvId: cvId,
         residenceId: residenceId
       };
-      
+
       // Slanje podataka na glavni endpoint
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/claim-profile-contact-forms`, {
         method: 'POST',
@@ -128,18 +143,43 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
         },
         body: JSON.stringify(payload)
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to submit claim request');
+        const errorData = await response.json().catch(() => null);
+        
+        if (errorData?.message) {
+          toast.error(errorData.message);
+        } else if (response.status === 400) {
+          toast.error("Invalid form data. Please check your inputs.");
+        } else if (response.status === 401) {
+          toast.error("Authentication required. Please try again.");
+        } else if (response.status === 403) {
+          toast.error("You don't have permission to submit this form.");
+        } else if (response.status === 429) {
+          toast.error("Too many requests. Please try again later.");
+        } else if (response.status >= 500) {
+          toast.error("Server error occurred. Please try again later.");
+        } else {
+          toast.error("Failed to submit your request. Please try again.");
+        }
+        return;
       }
-      
-      toast.success("Your claim request has been submitted!");
+
+      toast.success("Your claim request has been submitted successfully!");
       if (onSuccess) onSuccess();
       form.reset();
-      
+
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Failed to submit your request. Please try again.");
+      if (error instanceof Error) {
+        if (error.message.includes('Network')) {
+          toast.error("Network error occurred. Please check your internet connection.");
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
+      } else {
+        toast.error("Failed to submit your request. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
       setUploadProgress(0);
@@ -224,7 +264,7 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="phoneNumber"
@@ -263,7 +303,7 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
                     label="Upload your file"
                     description="PDF, DOC, DOCX, JPG, JPEG, PNG formats are supported."
                     supportedFormats={["PDF", "DOC", "DOCX", "JPG", "JPEG", "PNG"]}
-                    maxSize={10}
+                    maxSize={2}
                     onChange={field.onChange}
                     value={field.value}
                     className="w-full"
@@ -272,8 +312,8 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
                 </FormControl>
                 {uploadProgress > 0 && uploadProgress < 100 && (
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                    <div 
-                      className="bg-primary h-2.5 rounded-full" 
+                    <div
+                      className="bg-primary h-2.5 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -292,7 +332,7 @@ export default function ClaimRequestForm({ onSuccess, residenceId }: ClaimReques
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-medium leading-none leading-[1.35]">
-                    I agree to the BBR Terms of Service, Privacy Policy
+                    I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                   </FormLabel>
                   <FormMessage />
                 </div>

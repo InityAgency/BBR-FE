@@ -20,7 +20,7 @@ import {
   formSchema,
   type FormValues,
 } from "@/app/api/contact/requestConsultation";
-import { Mail, Phone } from "lucide-react";
+import { Link, Mail, Phone } from "lucide-react";
 import Image from "next/image";
 
 interface RequestConsultationFormProps {
@@ -38,7 +38,7 @@ export default function RequestConsultationForm({
   showTitle = true,
   customTitle = "Contact our expert",
   entityId,
-  type = "CONSULTATION", 
+  type = "CONSULTATION",
   buttonText = "Send Message",
   onSuccess
 }: RequestConsultationFormProps) {
@@ -54,7 +54,7 @@ export default function RequestConsultationForm({
       message: "",
       termsAccepted: false,
       type: type,
-      entityId: entityId,  
+      entityId: entityId,
       preferredContactMethod: [],
     },
   });
@@ -177,13 +177,12 @@ export default function RequestConsultationForm({
                       ].map((method) => (
                         <div
                           key={method.value}
-                          className={`flex items-center space-x-3 rounded-md border px-3 py-3 cursor-pointer transition-colors w-full ${
-                            (field.value || []).includes(
-                              method.value as "EMAIL" | "PHONE" | "WHATSAPP"
-                            )
+                          className={`flex items-center space-x-3 rounded-md border px-3 py-3 cursor-pointer transition-colors w-full ${(field.value || []).includes(
+                            method.value as "EMAIL" | "PHONE" | "WHATSAPP"
+                          )
                               ? "border-primary bg-primary/10"
                               : "border-muted"
-                          }`}
+                            }`}
                           onClick={() => {
                             const currentValue = field.value || [];
                             const newValue = currentValue.includes(
@@ -235,7 +234,7 @@ export default function RequestConsultationForm({
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-medium leading-none text-left leading-[1.35]">
-                    I agree to the BBR Terms of Service, Privacy Policy
+                    I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                   </FormLabel>
                   <FormMessage />
                 </div>
