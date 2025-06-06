@@ -137,17 +137,10 @@ export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) 
                         {property.matchRate}%
                       </Badge>
                     </div>
-                    
-                    <div className="space-y-1 text-xs text-white">
-                      <div className="flex items-start">
-                        <MapPin className="w-3 min-w-3 min-h-3 h-3 mr-1 mt-1" />
-                        {property.location}
-                      </div>
-                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-2 border-t border-[#333638] relative ai-residence-card">
+                <div className="flex items-center justify-between pt-2 border-[#333638] relative ai-residence-card">
                   <div className="flex gap-2">
                     {/* <Button
                       variant="outline"
