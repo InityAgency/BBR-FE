@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useState, useCallback } from "react";
+import { ReactNode, useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import SectionLayout from "@/components/web/SectionLayout";
 import Link from "next/link";
@@ -87,10 +87,12 @@ export default function SingleBestResidencesClient() {
         total: 0,
         totalPages: 0,
         page: 1,
-        limit: 10
+        limit: 12
     });
     const [loading, setLoading] = useState(true);
     const [residencesLoading, setResidencesLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const observerTarget = useRef<HTMLDivElement>(null);
 
     const params = useParams();
     const slug = params.slug as string;
@@ -165,7 +167,7 @@ export default function SingleBestResidencesClient() {
     }, [slug, categoryUrl, baseUrl, apiVersion]);
 
     // Fetch residences with proper limit
-    const fetchResidences = useCallback(async (page: number, limit: number) => {
+    const fetchResidences = useCallback(async (page: number, limit: number, append: boolean = false) => {
         if (!slug || !limit) return;
 
         try {
@@ -187,25 +189,53 @@ export default function SingleBestResidencesClient() {
                 rankingCriteriaScores: sortRankingCriteria(residence.rankingCriteriaScores)
             }));
 
-            setResidences(residencesWithSortedCriteria);
+            setResidences(prev => append ? [...prev, ...residencesWithSortedCriteria] : residencesWithSortedCriteria);
             setPagination({
                 ...data.pagination,
                 limit: limit,
                 total: Math.min(data.pagination.total, limit),
                 totalPages: Math.ceil(Math.min(data.pagination.total, limit) / limit)
             });
+
+            // Check if we have more pages to load
+            setHasMore(page < Math.ceil(data.pagination.total / limit));
         } catch (error) {
             console.error('Error fetching residences:', error);
-            setResidences([]);
+            if (!append) {
+                setResidences([]);
+            }
         } finally {
             setResidencesLoading(false);
         }
     }, [slug, residencesUrl]);
 
+    // Intersection Observer setup
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting && hasMore && !residencesLoading) {
+                    setPagination(prev => ({ ...prev, page: prev.page + 1 }));
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => {
+            if (observerTarget.current) {
+                observer.unobserve(observerTarget.current);
+            }
+        };
+    }, [hasMore, residencesLoading]);
+
     // Fetch residences when dependencies change
     useEffect(() => {
         if (category?.residenceLimitation) {
-            fetchResidences(pagination.page, category.residenceLimitation);
+            const limit = Math.min(12, category.residenceLimitation);
+            fetchResidences(pagination.page, limit, pagination.page > 1);
         }
     }, [category?.residenceLimitation, pagination.page, fetchResidences]);
 
@@ -364,8 +394,8 @@ export default function SingleBestResidencesClient() {
             {/* Residences Section */}
             <SectionLayout>
                 <div className="w-full flex flex-col gap-6 xl:max-w-[1600px] mx-auto">
-                    {residencesLoading ? (
-                        // Residences loading skeleton
+                    {residencesLoading && residences.length === 0 ? (
+                        // Initial loading skeleton
                         [1, 2, 3, 4, 5].map((i) => (
                             <ResidenceSkeleton key={i} />
                         ))
@@ -374,110 +404,122 @@ export default function SingleBestResidencesClient() {
                             No residences found for this category.
                         </div>
                     ) : (
-                        residences.map((residence, index) => (
-                            <React.Fragment key={residence.id}>
-                                <Link
-                                    href={`/residences/${residence.slug}`}
-                                    className="flex flex-col lg:flex-row gap-6 rounded-xl shadow-sm items-center min-h-[300px] p-4 lg:p-0 hover:bg-secondary transition-colors duration-200"
-                                    onClick={(e) => handleResidenceClick(e, residence.slug)}
-                                >
-                                    {/* Residence Image */}
-                                    <div className="w-full lg:w-1/3 h-[200px] lg:h-[300px] relative">
-                                        <Image
-                                            src={`${baseUrl}/api/${apiVersion}/media/${residence.featuredImage?.id}/content`}
-                                            alt={residence.name}
-                                            fill
-                                            className="object-cover object-center rounded-lg"
-                                            sizes="(max-width: 768px) 100vw, 33vw"
-                                        />
-                                    </div>
-
-                                    {/* Residence Content */}
-                                    <div className="w-full lg:w-2/3 flex flex-col lg:flex-row gap-4 p-2 lg:p-0">
-                                        {/* Residence Info */}
-                                        <div className="flex flex-col gap-6 w-full justify-center">
-                                            <h2 className="text-2xl lg:text-3xl font-bold">{residence.name}</h2>
-                                            <p className="text-white text-sm lg:text-base">
-                                                {residence.description.length > 150 
-                                                    ? `${residence.description.slice(0, 250)}...`
-                                                    : residence.description}
-                                            </p>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/residences/${residence.slug}`);
-                                                }}
-                                                className="w-fit inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-secondary/50/5 hover:bg-secondary/50/10 text-white border-[#b3804c]"
-                                            >
-                                                View more
-                                            </button>
+                        <>
+                            {residences.map((residence, index) => (
+                                <React.Fragment key={residence.id}>
+                                    <Link
+                                        href={`/residences/${residence.slug}`}
+                                        className="flex flex-col lg:flex-row gap-6 rounded-xl shadow-sm items-center min-h-[300px] p-4 lg:p-0 hover:bg-secondary transition-colors duration-200"
+                                        onClick={(e) => handleResidenceClick(e, residence.slug)}
+                                    >
+                                        {/* Residence Image */}
+                                        <div className="w-full lg:w-1/3 h-[200px] lg:h-[300px] relative">
+                                            <Image
+                                                src={`${baseUrl}/api/${apiVersion}/media/${residence.featuredImage?.id}/content`}
+                                                alt={residence.name}
+                                                fill
+                                                className="object-cover object-center rounded-lg"
+                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                            />
                                         </div>
 
-                                        {/* Scoring Section */}
-                                        <div className="bg-secondary rounded-lg p-4 lg:p-5 w-full flex flex-col gap-2">
-                                            <div className="flex flex-row gap-2 items-center">
-                                                <p className="text-white bg-primary rounded-lg p-2 w-fit font-bold text-base lg:text-lg">
-                                                    {(residence.totalScore / 10).toFixed(1)}
+                                        {/* Residence Content */}
+                                        <div className="w-full lg:w-2/3 flex flex-col lg:flex-row gap-4 p-2 lg:p-0">
+                                            {/* Residence Info */}
+                                            <div className="flex flex-col gap-6 w-full justify-center">
+                                                <h2 className="text-2xl lg:text-3xl font-bold">{residence.name}</h2>
+                                                <p className="text-white text-sm lg:text-base">
+                                                    {residence.description.length > 150 
+                                                        ? `${residence.description.slice(0, 250)}...`
+                                                        : residence.description}
                                                 </p>
-                                                <p className="text-white uppercase font-bold text-sm lg:text-base">
-                                                    BBR <br /> Score
-                                                </p>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/residences/${residence.slug}`);
+                                                    }}
+                                                    className="w-fit inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-secondary/50/5 hover:bg-secondary/50/10 text-white border-[#b3804c]"
+                                                >
+                                                    View more
+                                                </button>
                                             </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
-                                                {residence.rankingCriteriaScores
-                                                    .filter((criteria) => criteria)
-                                                    .map((criteria) => (
-                                                        <div key={criteria.rankingCriteriaId} className="flex flex-col">
-                                                            <span className="text-white text-xs lg:text-sm mb-1">
-                                                                {criteria.name}
-                                                            </span>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-full h-2 bg-gray-700 rounded">
-                                                                    <div
-                                                                        className="h-2 bg-primary rounded"
-                                                                        style={{ width: `${criteria.score}%` }}
-                                                                    />
-                                                                </div>
-                                                                <span className="text-white text-xs lg:text-sm min-w-fit">
-                                                                    {criteria.score} %
+
+                                            {/* Scoring Section */}
+                                            <div className="bg-secondary rounded-lg p-4 lg:p-5 w-full flex flex-col gap-2">
+                                                <div className="flex flex-row gap-2 items-center">
+                                                    <p className="text-white bg-primary rounded-lg p-2 w-fit font-bold text-base lg:text-lg">
+                                                        {(residence.totalScore / 10).toFixed(1)}
+                                                    </p>
+                                                    <p className="text-white uppercase font-bold text-sm lg:text-base">
+                                                        BBR <br /> Score
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+                                                    {residence.rankingCriteriaScores
+                                                        .filter((criteria) => criteria)
+                                                        .map((criteria) => (
+                                                            <div key={criteria.rankingCriteriaId} className="flex flex-col">
+                                                                <span className="text-white text-xs lg:text-sm mb-1">
+                                                                    {criteria.name}
                                                                 </span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-full h-2 bg-gray-700 rounded">
+                                                                        <div
+                                                                            className="h-2 bg-primary rounded"
+                                                                            style={{ width: `${criteria.score}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-white text-xs lg:text-sm min-w-fit">
+                                                                        {criteria.score} %
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-
-                                {/* Custom Section Placeholder */}
-                                {index === 4 && (
-                                    <div className="w-full col-span-2 bg-secondary rounded-lg p-8 my-4 flex items-center justify-center border">
-                                        <div className="flex flex-col lg:flex-row gap-4 items-center">
-                                            <div className="w-full lg:w-1/2 flex flex-col gap-3">
-                                                <span className="text-md uppercase text-left text-primary">GET IN TOUCH</span>
-                                                <h3 className="text-3xl font-bold">Connect with Our Experts</h3>
-                                                <p className="text-muted-foreground">
-                                                    Have questions or need personalized assistance? Our dedicated consultants provide tailored guidance, ensuring you make the right investment choices with confidence.
-                                                    <br /> <br />
-                                                    Whether you are looking for a luxury home, a profitable investment, or an exclusive lifestyle experience, our consultants are here to help.
-                                                </p>
-                                                <div className="flex flex-row gap-2 mt-4">
-                                                    <Link href="/request-consultation" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit">
-                                                        Schedule a consultation
-                                                    </Link>
-                                                    <Link href="/contact" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c]">
-                                                        Contact us
-                                                    </Link>
+                                                        ))}
                                                 </div>
                                             </div>
-                                            <div className="w-full lg:w-1/2 rounded-lg overflow-hidden">
-                                                <Image src="/get-in-touch.webp" alt="Get in touch" width={500} height={500} className="rounded-lg w-full h-full object-cover" />
+                                        </div>
+                                    </Link>
+
+                                    {/* Custom Section Placeholder */}
+                                    {(index === 4 || (index === residences.length - 1 && residences.length < 5)) && (
+                                        <div className="w-full col-span-2 bg-secondary rounded-lg p-8 my-4 flex items-center justify-center border">
+                                            <div className="flex flex-col lg:flex-row gap-4 items-center">
+                                                <div className="w-full lg:w-1/2 flex flex-col gap-3">
+                                                    <span className="text-md uppercase text-left text-primary">GET IN TOUCH</span>
+                                                    <h3 className="text-3xl font-bold">Connect with Our Experts</h3>
+                                                    <p className="text-muted-foreground">
+                                                        Have questions or need personalized assistance? Our dedicated consultants provide tailored guidance, ensuring you make the right investment choices with confidence.
+                                                        <br /> <br />
+                                                        Whether you are looking for a luxury home, a profitable investment, or an exclusive lifestyle experience, our consultants are here to help.
+                                                    </p>
+                                                    <div className="flex flex-row gap-2 mt-4">
+                                                        <Link href="/request-consultation" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-fit">
+                                                            Schedule a consultation
+                                                        </Link>
+                                                        <Link href="/contact" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c]">
+                                                            Contact us
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full lg:w-1/2 rounded-lg overflow-hidden">
+                                                    <Image src="/get-in-touch.webp" alt="Get in touch" width={500} height={500} className="rounded-lg w-full h-full object-cover" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </React.Fragment>
-                        ))
+                                    )}
+                                </React.Fragment>
+                            ))}
+                            
+                            {/* Loading indicator */}
+                            {residencesLoading && (
+                                <div className="w-full flex justify-center py-4">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            )}
+
+                            {/* Observer target */}
+                            <div ref={observerTarget} className="h-4 w-full" />
+                        </>
                     )}
 
                     {/* Pagination */}

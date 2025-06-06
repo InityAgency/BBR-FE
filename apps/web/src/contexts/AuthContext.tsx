@@ -61,6 +61,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper funkcije za cookie management
+const deleteCookie = (name: string) => {
+  if (typeof window === 'undefined') return;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+};
+
+const deleteAllAuthCookies = () => {
+  deleteCookie('bbr-session');
+  deleteCookie('userLoggedIn');
+  // Pokušaj brisanja sa različitim putanjama u slučaju da je cookie postavljen drugačije
+  document.cookie = 'bbr-session=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;';
+  document.cookie = 'bbr-session=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + window.location.hostname + ';';
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     // Pokušavamo da učitamo korisnika iz sessionStorage za brže inicijalno učitavanje
@@ -97,11 +111,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUser(null);
         sessionStorage.removeItem('user');
+        // Obriši cookie-je ako API vraća grešku
+        deleteAllAuthCookies();
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
       setUser(null);
       sessionStorage.removeItem('user');
+      deleteAllAuthCookies();
     }
   };
 
@@ -186,16 +203,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: 'POST',
         credentials: 'include',
       });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Uvek obriši sve podatke i cookie-je
       setUser(null);
       sessionStorage.removeItem('user');
+      deleteAllAuthCookies();
+      setLoading(false);
       
       if (pathname !== '/') {
         router.replace('/');
       }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 

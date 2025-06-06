@@ -58,7 +58,7 @@ export default function BestResidencesSection() {
                 ) : residences.length > 0 ? (
                     <div className="grid gap-6">
                         {/* First row - 2 residences */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 no-favorite-heart">
                             {residences.slice(0, 2).map((residence) => (
                                 <ResidenceCard 
                                     key={residence.id} 
@@ -70,7 +70,7 @@ export default function BestResidencesSection() {
 
                         {/* Second row - 3 residences */}
                         {residences.length > 2 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-favorite-heart">
                                 {residences.slice(2, 5).map((residence) => (
                                     <ResidenceCard 
                                         key={residence.id} 

@@ -110,3 +110,24 @@ div[data-slot="select-scroll-down-button"]{
 .bg-popover{
     background: #101417 !important;
 }
+
+#match-trigger{
+    bottom: 105px;
+    max-width: calc(100% - 1.5rem);
+    margin: 0 auto;
+}
+
+.no-favorite-heart{
+    #favorite-heart{
+        display: none;
+    }
+}
+
+.ai-residence-card{
+    #favorite-heart{
+        position: relative !important;
+        right: 0 !important;
+        top: 0 !important;
+        background-color: transparent !important;
+    }
+}

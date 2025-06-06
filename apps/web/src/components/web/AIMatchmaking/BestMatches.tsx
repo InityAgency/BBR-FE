@@ -1,9 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Heart, Loader2 } from "lucide-react"
+import { Heart, Loader2, MapPin, DollarSign, Home } from "lucide-react"
+import { useRouter } from "next/navigation"
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer"
+import { FavoriteHeart } from "../Residences/FavoriteHeart"
 
 interface Property {
   id: string
@@ -11,395 +21,157 @@ interface Property {
   location: string
   image: string
   matchRate: number
-  isFavorite: boolean
-  confidenceLevel?: string
-}
-
-interface EnhancedProperty extends Property {
-  characteristics: {
-    location: {
-      country: string
-      city: string
-      region: string
-    }
-    priceRange: string[]
-    amenities: string[]
-    brand: string
-    lifestyle: string[]
-    features: string[]
-  }
+  isFavorite?: boolean
+  subtitle?: string
+  budgetRange?: string
+  characteristics?: Record<string, any>
 }
 
 interface BestMatchesProps {
   userSelections?: any
+  matches?: Property[]
 }
 
-export function BestMatches({ userSelections }: BestMatchesProps) {
-  const [matches, setMatches] = useState<Property[]>([])
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [hasGenerated, setHasGenerated] = useState(false)
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([])
-
-  // Expanded property database with more diverse luxury branded residences
-  const propertyDatabase: EnhancedProperty[] = [
-    {
-      id: "1",
-      name: "Bulgari Resort & Residences, Dubai",
-      location: "Dubai, United Arab Emirates",
-      image: "https://bbrapi.inity.space/api/v1/media/aa8502cc-7cf8-4264-a0ef-904c723c3ed0/content",
-      matchRate: 0,
-      isFavorite: false,
-      characteristics: {
-        location: {
-          country: "United Arab Emirates",
-          city: "Dubai",
-          region: "Middle East",
-        },
-        priceRange: ["$5M+"],
-        amenities: ["Pool", "Spa", "Concierge", "Beach Access", "Private Chef"],
-        brand: "Bulgari",
-        lifestyle: ["Beach Lifestyle", "Culinary Lifestyle", "Urban Living"],
-        features: ["Luxury", "Waterfront", "High-end"],
-      },
-    },
-    {
-      id: "2",
-      name: "Ritz-Carlton Residences, Miami Beach",
-      location: "Miami, United States",
-      image: "https://bbrapi.inity.space/api/v1/media/aa8502cc-7cf8-4264-a0ef-904c723c3ed0/content",
-      matchRate: 0,
-      isFavorite: false,
-      characteristics: {
-        location: {
-          country: "United States",
-          city: "Miami",
-          region: "North America",
-        },
-        priceRange: ["$1M-$5M", "$5M+"],
-        amenities: ["Pool", "Spa", "Gym", "Concierge", "Beach Access"],
-        brand: "Ritz-Carlton",
-        lifestyle: ["Beach Lifestyle", "Urban Living", "Art and Culture"],
-        features: ["Luxury", "Oceanfront", "Modern"],
-      },
-    },
-    {
-      id: "3",
-      name: "Aman Residences, Tokyo",
-      location: "Tokyo, Japan",
-      image: "https://bbrapi.inity.space/api/v1/media/aa8502cc-7cf8-4264-a0ef-904c723c3ed0/content",
-      matchRate: 0,
-      isFavorite: false,
-      characteristics: {
-        location: {
-          country: "Japan",
-          city: "Tokyo",
-          region: "Asia",
-        },
-        priceRange: ["$5M+"],
-        amenities: ["Spa", "Gym", "Concierge", "Private Chef"],
-        brand: "Aman",
-        lifestyle: ["Urban Living", "Art and Culture", "Culinary Lifestyle"],
-        features: ["Minimalist", "Zen", "Ultra-luxury"],
-      },
-    },
-  ]
-
-  // Calculate dynamic match rate based on user preferences and confidence
-  const calculateMatchRate = (property: EnhancedProperty, userSelections: any): number => {
-    let totalScore = 0
-    let maxScore = 0
-
-    // Dynamic weights based on user priority
-    const priority = userSelections?.priority
-    const weights = {
-      location: priority === "Location" ? 0.4 : 0.2,
-      budget: priority === "Price" ? 0.4 : 0.2,
-      amenities: 0.15,
-      brands: priority === "Brand" ? 0.4 : 0.15,
-      lifestyle: priority === "Lifestyle" ? 0.4 : 0.15,
-    }
-
-    // Location matching with confidence scoring
-    const userLocations = [...(userSelections.location || []), ...(userSelections.customInputs?.location || [])]
-    if (userLocations.length > 0) {
-      let locationScore = 0
-      for (const userLocation of userLocations) {
-        if (property.characteristics.location.country.toLowerCase().includes(userLocation.toLowerCase())) {
-          locationScore = 1.0 // Perfect match
-          break
-        } else if (property.characteristics.location.city.toLowerCase().includes(userLocation.toLowerCase())) {
-          locationScore = 0.9 // Very good match
-          break
-        } else if (property.characteristics.location.region.toLowerCase().includes(userLocation.toLowerCase())) {
-          locationScore = 0.7 // Good match
-          break
-        }
-      }
-      totalScore += locationScore * weights.location
-    }
-    maxScore += weights.location
-
-    // Budget matching with range overlap confidence
-    const userBudgets = [...(userSelections.budget || []), ...(userSelections.customInputs?.budget || [])]
-    if (userBudgets.length > 0) {
-      let budgetScore = 0
-      for (const userBudget of userBudgets) {
-        if (property.characteristics.priceRange.includes(userBudget)) {
-          budgetScore = 1.0 // Perfect match
-          break
-        } else {
-          // Partial matching for adjacent ranges
-          if (
-            (userBudget === "Under $1M" && property.characteristics.priceRange.includes("$1M-$5M")) ||
-            (userBudget === "$1M-$5M" &&
-              (property.characteristics.priceRange.includes("Under $1M") ||
-                property.characteristics.priceRange.includes("$5M+"))) ||
-            (userBudget === "$5M+" && property.characteristics.priceRange.includes("$1M-$5M"))
-          ) {
-            budgetScore = 0.6 // Partial match
-          }
-        }
-      }
-      totalScore += budgetScore * weights.budget
-    }
-    maxScore += weights.budget
-
-    // Amenities matching with percentage-based confidence
-    const userAmenities = [...(userSelections.amenities || []), ...(userSelections.customInputs?.amenities || [])]
-    if (userAmenities.length > 0) {
-      const amenityMatches = userAmenities.filter((amenity) =>
-        property.characteristics.amenities.some(
-          (propAmenity) =>
-            propAmenity.toLowerCase().includes(amenity.toLowerCase()) ||
-            amenity.toLowerCase().includes(propAmenity.toLowerCase()),
-        ),
-      ).length
-      const amenityScore = amenityMatches / userAmenities.length
-      totalScore += amenityScore * weights.amenities
-    }
-    maxScore += weights.amenities
-
-    // Brand matching with exact confidence
-    const userBrands = [...(userSelections.brands || []), ...(userSelections.customInputs?.brands || [])]
-    if (userBrands.length > 0) {
-      let brandScore = 0
-      for (const userBrand of userBrands) {
-        if (
-          property.characteristics.brand.toLowerCase().includes(userBrand.toLowerCase()) ||
-          userBrand.toLowerCase().includes(property.characteristics.brand.toLowerCase())
-        ) {
-          brandScore = 1.0
-          break
-        }
-      }
-      totalScore += brandScore * weights.brands
-    }
-    maxScore += weights.brands
-
-    // Lifestyle matching with percentage-based confidence
-    const userLifestyles = [...(userSelections.lifestyle || []), ...(userSelections.customInputs?.lifestyle || [])]
-    if (userLifestyles.length > 0) {
-      const lifestyleMatches = userLifestyles.filter((lifestyle) =>
-        property.characteristics.lifestyle.some(
-          (propLifestyle) =>
-            propLifestyle.toLowerCase().includes(lifestyle.toLowerCase()) ||
-            lifestyle.toLowerCase().includes(propLifestyle.toLowerCase()),
-        ),
-      ).length
-      const lifestyleScore = lifestyleMatches / userLifestyles.length
-      totalScore += lifestyleScore * weights.lifestyle
-    }
-    maxScore += weights.lifestyle
-
-    // Calculate final percentage with confidence adjustment
-    let matchPercentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 75
-
-    // Apply confidence boost for multiple category matches
-    const categoryMatches = [
-      userLocations.length > 0,
-      userBudgets.length > 0,
-      userAmenities.length > 0,
-      userBrands.length > 0,
-      userLifestyles.length > 0,
-    ].filter(Boolean).length
-
-    if (categoryMatches >= 3) {
-      matchPercentage *= 1.05 // 5% boost for comprehensive matches
-    }
-
-    // Ensure minimum quality threshold and cap at 99%
-    return Math.min(99, Math.max(60, Math.round(matchPercentage)))
-  }
-
-  // Get confidence level description based on match rate
-  const getConfidenceLevel = (matchRate: number): string => {
-    if (matchRate >= 95) return "Excellent Match"
-    if (matchRate >= 85) return "Very Good Match"
-    if (matchRate >= 75) return "Good Match"
-    if (matchRate >= 65) return "Fair Match"
-    return "Potential Match"
-  }
-
-  // Update selected locations when user selections change
+export function BestMatches({ userSelections, matches = [] }: BestMatchesProps) {
+  const [displayedMatches, setDisplayedMatches] = useState<Property[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasReceivedMatches, setHasReceivedMatches] = useState(false)
+  const router = useRouter()
+  // Update matches when received from backend
   useEffect(() => {
-    if (userSelections?.location) {
-      setSelectedLocations(userSelections.location)
+    if (matches && matches.length > 0) {
+      // Replace displayedMatches instead of potentially accumulating duplicates
+      const newMatches = matches.map(match => ({
+        ...match,
+        isFavorite: match.isFavorite ?? false, // Preserve existing favorite status if present
+      }))
+      setDisplayedMatches(newMatches)
+      setHasReceivedMatches(true)
+    } else {
+      setDisplayedMatches([])
+      setHasReceivedMatches(false)
     }
-    if (userSelections?.customInputs?.location) {
-      setSelectedLocations((prev) => [...prev, ...userSelections.customInputs.location])
-    }
-  }, [userSelections])
+  }, [matches])
 
-  // Generate matches based on user preferences with dynamic confidence scoring
-  const generateMatches = () => {
-    setIsGenerating(true)
+  console.log(displayedMatches)
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // Calculate match rates for all properties
-      const scoredProperties = propertyDatabase.map((property) => {
-        const matchRate = calculateMatchRate(property, userSelections)
-        const confidenceLevel = getConfidenceLevel(matchRate)
+  // Handle favorite removal
+  const onFavoriteRemoved = useCallback(() => {
+    // Ažuriramo lokalno stanje da uklonimo rezidenciju iz prikaza
+    setDisplayedMatches(prev => prev.filter(match => !match.isFavorite));
+  }, []);
 
-        return {
-          ...property,
-          matchRate,
-          confidenceLevel,
-        }
-      })
-
-      // Sort by match rate and take top matches
-      const topMatches = scoredProperties.sort((a, b) => b.matchRate - a.matchRate).slice(0, 3)
-
-      setMatches(topMatches)
-      setIsGenerating(false)
-      setHasGenerated(true)
-    }, 2000) // 2 second delay to simulate processing
+  // Handle view more - navigate to property detail
+  const handleViewMore = (propertyId: string) => {
+    // Open in new tab
+    window.open(`/residences/${propertyId}`, '_blank')
   }
 
-  // Handle regenerate with slight variation in scoring
-  const handleRegenerate = () => {
-    setIsGenerating(true)
-
-    setTimeout(() => {
-      // Add slight randomization to create variety in regeneration
-      const scoredProperties = propertyDatabase.map((property) => {
-        let matchRate = calculateMatchRate(property, userSelections)
-
-        // Add small random variation (±3%) to simulate different matching algorithms
-        const variation = (Math.random() - 0.5) * 6
-        matchRate = Math.min(99, Math.max(60, Math.round(matchRate + variation)))
-
-        const confidenceLevel = getConfidenceLevel(matchRate)
-
-        return {
-          ...property,
-          matchRate,
-          confidenceLevel,
-        }
-      })
-
-      const topMatches = scoredProperties.sort((a, b) => b.matchRate - a.matchRate).slice(0, 3)
-
-      setMatches(topMatches)
-      setIsGenerating(false)
-    }, 2000)
-  }
-
-  // Toggle favorite status
-  const toggleFavorite = (propertyId: string) => {
-    setMatches((prev) =>
-      prev.map((property) =>
-        property.id === propertyId ? { ...property, isFavorite: !property.isFavorite } : property,
-      ),
-    )
+  // Handle request information
+  const handleRequestInfo = (propertyId: string) => {
+    // In a real app, this would open a contact form or modal
+    console.log("Request info for:", propertyId)
   }
 
   return (
     <div className="h-full flex flex-col">
       {/* Header - Fixed */}
-      <div className="flex-shrink-0 p-4 pb-3">
+      <div className="flex-shrink-0 p-4 pb-3 border-b border-[#333638]">
         <h2 className="text-xl font-serif text-white">My Best Matches</h2>
+        {hasReceivedMatches && (
+          <p className="text-xs text-[#a3a3a3] mt-1">
+            {displayedMatches.length} properties found
+          </p>
+        )}
       </div>
 
       {/* Content Area - Scrollable */}
       <div className="flex-1 px-4 overflow-y-auto min-h-0">
-        {!hasGenerated && !isGenerating && (
-          <div className="flex flex-col items-center justify-center text-center h-full">
+        {!hasReceivedMatches && !isLoading && (
+          <div className="flex flex-col items-center justify-center text-center h-full py-8">
             <div className="w-24 h-24 bg-[#1a1e21] rounded-lg flex items-center justify-center mb-4">
               <div className="w-12 h-12 bg-[#b3804c] rounded flex items-center justify-center">
-                <div className="w-6 h-6 bg-white rounded-sm"></div>
+                <Home className="w-6 h-6 text-white" />
               </div>
             </div>
             <h3 className="text-sm font-medium text-white mb-2">No matches yet</h3>
             <p className="text-xs text-[#a3a3a3] mb-6 max-w-[200px]">
-              Complete your preferences and generate results to see your personalized matches
+              Start chatting with our AI to find your perfect luxury residence
             </p>
-            <Button
-              className="w-full bg-[#b3804c] hover:bg-[#ad7c4a] rounded-full"
-              onClick={generateMatches}
-              disabled={isGenerating}
-            >
-              Generate results
-            </Button>
           </div>
         )}
 
-        {isGenerating && (
-          <div className="flex flex-col items-center justify-center text-center h-full">
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center text-center h-full py-8">
             <div className="w-24 h-24 bg-[#1a1e21] rounded-lg flex items-center justify-center mb-4">
               <Loader2 className="w-8 h-8 text-[#b3804c] animate-spin" />
             </div>
-            <h3 className="text-sm font-medium text-white mb-2">Generating results...</h3>
+            <h3 className="text-sm font-medium text-white mb-2">Finding your matches...</h3>
             <p className="text-xs text-[#a3a3a3] max-w-[200px]">
-              Analyzing your preferences and calculating confidence scores for the best matches
+              Analyzing luxury residences that match your preferences
             </p>
           </div>
         )}
 
-        {hasGenerated && !isGenerating && (
-          <div className="space-y-6">
-            {matches.map((property) => (
-              <div key={property.id} className="flex space-x-4">
-                <img
-                  src={property.image || "/placeholder.svg"}
-                  alt={property.name}
-                  className="w-20 h-16 object-cover rounded-lg flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Badge className="bg-[#4ade80] text-black text-xs font-medium px-2 py-1 rounded">
-                      {property.matchRate}%
-                    </Badge>
-                    <span className="text-xs text-[#a3a3a3]">Match rate</span>
-                  </div>
-                  <h3 className="font-serif text-sm text-white mb-3 leading-tight break-words">{property.name}</h3>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-transparent border-[#555] text-white hover:bg-[#555] rounded-full px-3 py-1 text-xs"
-                      >
-                        Request Information
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-transparent border-[#555] text-white hover:bg-[#555] rounded-full px-3 py-1 text-xs"
-                      >
-                        View more
-                      </Button>
+        {hasReceivedMatches && !isLoading && displayedMatches.length > 0 && (
+          <div className="space-y-4 py-4">
+            {displayedMatches.map((property, index) => (
+              <div key={`${property.id}-${index}`} className="bg-[#1a1e21] rounded-lg p-4 space-y-3">
+                <div className="flex space-x-4">
+                  <img
+                    src={property.image || "/placeholder.svg"}
+                    alt={property.name}
+                    className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-serif text-sm text-white leading-tight break-words">
+                          {property.name}
+                        </h3>
+                        {property.subtitle && (
+                          <p className="text-xs text-[#a3a3a3] mt-1">{property.subtitle}</p>
+                        )}
+                      </div>
+                      <Badge className="bg-[#4ade80] text-black text-xs font-medium px-2 py-1 rounded ml-2 flex-shrink-0">
+                        {property.matchRate}%
+                      </Badge>
                     </div>
-                    <div className="flex justify-end">
-                      <Heart
-                        className={`w-5 h-5 cursor-pointer ${
-                          property.isFavorite ? "text-[#b3804c] fill-[#b3804c]" : "text-[#a3a3a3]"
-                        }`}
-                        onClick={() => toggleFavorite(property.id)}
-                      />
+                    
+                    <div className="space-y-1 text-xs text-white">
+                      <div className="flex items-start">
+                        <MapPin className="w-3 min-w-3 min-h-3 h-3 mr-1 mt-1" />
+                        {property.location}
+                      </div>
                     </div>
                   </div>
+                </div>
+                
+                <div className="flex items-center justify-between pt-2 border-t border-[#333638] relative ai-residence-card">
+                  <div className="flex gap-2">
+                    {/* <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-transparent border-[#555] text-white hover:bg-[#555] rounded-md px-3 py-1 text-xs"
+                      onClick={() => handleRequestInfo(property.id)}
+                    >
+                      Request Info
+                    </Button> */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-transparent border-[#555] text-white hover:bg-[#555] rounded-md px-3 py-1 text-xs"
+                      onClick={() => handleViewMore(property.characteristics?.slug)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                  <FavoriteHeart
+                    entityId={property.id}
+                    entityType="residences"
+                    isFavorite={property.isFavorite}
+                    onFavoriteRemoved={onFavoriteRemoved}
+                  />
                 </div>
               </div>
             ))}
@@ -408,24 +180,39 @@ export function BestMatches({ userSelections }: BestMatchesProps) {
       </div>
 
       {/* Footer - Fixed */}
-      {hasGenerated && !isGenerating && (
+      {hasReceivedMatches && !isLoading && displayedMatches.length > 0 && (
         <div className="flex-shrink-0 p-4 pt-3 border-t border-[#444]">
-          <Button
-            className="w-full bg-[#b3804c] hover:bg-[#ad7c4a] rounded-full py-3 text-white font-medium"
-            onClick={handleRegenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Regenerating...
-              </>
-            ) : (
-              "Regenerate"
-            )}
-          </Button>
+          <p className="text-xs text-[#a3a3a3] text-center">
+            Ask the AI to refine your search or find more options
+          </p>
         </div>
       )}
+    </div>
+  )
+}
+
+interface BestMatchesDrawerProps {
+  userSelections: any;
+  matches: any;
+}
+
+export function BestMatchesDrawer({ userSelections, matches }: BestMatchesDrawerProps) {
+  return (
+    <div className="fixed bottom-[80px] z-50 relative w-full" id="match-trigger">
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button className="bg-[#b3804c] text-white hover:bg-[#b3804c]/90 w-full">
+            Show Matches
+          </Button>
+        </DrawerTrigger>
+        <DrawerTitle></DrawerTitle>
+        <DrawerContent className="p-0">
+          {/* Ovde prikazujemo BestMatches */}
+          <div className="h-[80vh] overflow-y-auto">
+            <BestMatches userSelections={userSelections} matches={matches} />
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }

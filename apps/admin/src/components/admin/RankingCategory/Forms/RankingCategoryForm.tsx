@@ -97,6 +97,7 @@ const STATUS_STYLES: Record<RankingCategoryStatus, string> = {
   ACTIVE: "bg-green-900/20 hover:bg-green-900/40 text-green-300 border-green-900/50",
   DRAFT: "bg-gray-900/20 hover:bg-gray-900/40 text-gray-300 border-gray-900/50",
   DELETED: "bg-red-900/20 hover:bg-red-900/40 text-red-300 border-red-900/50",
+  INACTIVE: "bg-yellow-900/20 hover:bg-yellow-900/40 text-yellow-300 border-yellow-900/50",
 };
 
 const ENTITY_API_ROUTES: Record<string, string> = {
@@ -107,7 +108,7 @@ const ENTITY_API_ROUTES: Record<string, string> = {
   Country: `${API_BASE_URL}/api/v1/public/countries`,
 };
 
-const ALLOWED_STATUSES: RankingCategoryStatus[] = ["DRAFT", "ACTIVE", "DELETED"];
+const ALLOWED_STATUSES: RankingCategoryStatus[] = ["DRAFT", "ACTIVE", "DELETED", "INACTIVE"];
 const ITEMS_PER_PAGE = 20;
 
 const RankingCategoryForm: React.FC<RankingCategoryFormProps> = ({ 

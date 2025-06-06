@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { contactService, formSchema, type FormValues } from "@/app/api/contact/contactService";
+import Link from "next/link";
 
 export default function ContactForm() {
     const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +79,7 @@ export default function ContactForm() {
                             )}
                         />
                     </div>
-                    
+
                     <FormField
                         control={form.control}
                         name="email"
@@ -92,7 +93,7 @@ export default function ContactForm() {
                             </FormItem>
                         )}
                     />
-                    
+
                     <FormField
                         control={form.control}
                         name="subject"
@@ -106,7 +107,7 @@ export default function ContactForm() {
                             </FormItem>
                         )}
                     />
-                    
+
                     <FormField
                         control={form.control}
                         name="message"
@@ -127,21 +128,21 @@ export default function ContactForm() {
                         render={({ field }) => (
                             <FormItem className="flex items-start gap-2">
                                 <FormControl>
-                                    <Checkbox 
-                                        checked={field.value} 
+                                    <Checkbox
+                                        checked={field.value}
                                         onCheckedChange={field.onChange}
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
                                     <FormLabel className="text-sm font-medium leading-none leading-[1.35]">
-                                        I agree to the BBR Terms of Service, Privacy Policy
+                                        I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                                     </FormLabel>
                                     <FormMessage />
                                 </div>
                             </FormItem>
                         )}
                     />
-                    
+
                     <Button type="submit" disabled={isLoading} className="w-full">
                         {isLoading ? "Sending..." : "Send Message"}
                     </Button>
