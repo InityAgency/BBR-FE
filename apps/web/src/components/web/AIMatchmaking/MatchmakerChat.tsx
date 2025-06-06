@@ -969,7 +969,7 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
       </div>
 
       {/* Chat Messages - Scrollable Area */}
-      <div className="flex-1 overflow-y-auto min-h-0 pb-4">
+      <div className="flex-1 overflow-y-auto min-h-0 pb-8">
         <div className="space-y-4">
           {isSessionLoading && messages.length == 0 && (
             <div className="flex items-center justify-center py-8">

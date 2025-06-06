@@ -7,7 +7,6 @@ import Image from "next/image";
 import { Pagination } from "@/components/common/Pagination";
 import React from "react";
 
-
 // Skeleton component (ako ne postoji u shadcn/ui)
 const Skeleton = ({ className }: { className?: string }) => (
     <div className={`animate-pulse bg-secondary/10 rounded-md ${className}`} />
@@ -78,6 +77,81 @@ interface ResidencesResponse {
     data: Residence[];
     pagination: PaginationData;
 }
+
+// Komponenta za ranking badge
+const RankingBadge = ({ position, categoryName }: { position: number; categoryName: string }) => {
+    // Funkcija za dobijanje odgovarajuće ikone na osnovu pozicije
+    const getRankingIcon = (position: number) => {
+        switch (position) {
+            case 1:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 22 18" fill="none">
+                        <path d="M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1ZM4 17H18H4Z" fill="url(#paint0_linear_2228_101)" />
+                        <path d="M4 17H18M1 1L4 13H18L21 1L15 8L11 1L7 8L1 1Z" stroke="url(#paint1_linear_2228_101)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F5F3F6" />
+                                <stop offset="1" stopColor="#BBA568" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_2228_101" x1="11" y1="1" x2="11" y2="17" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F5F3F6" />
+                                <stop offset="1" stopColor="#BBA568" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            case 2:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4ZM5 20H19H5Z" fill="url(#paint0_linear_335_7485)" />
+                        <path d="M5 20H19M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4Z" stroke="url(#paint1_linear_335_7485)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_335_7485" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#E2E9E9" />
+                                <stop offset="1" stopColor="#C1C2CB" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_335_7485" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#E2E9E9" />
+                                <stop offset="1" stopColor="#C1C2CB" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            case 3:
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4ZM5 20H19H5Z" fill="url(#paint0_linear_335_7580)" />
+                        <path d="M5 20H19M2 4L5 16H19L22 4L16 11L12 4L8 11L2 4Z" stroke="url(#paint1_linear_335_7580)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                            <linearGradient id="paint0_linear_335_7580" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F8D5C6" />
+                                <stop offset="1" stopColor="#C97965" />
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_335_7580" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#F8D5C6" />
+                                <stop offset="1" stopColor="#C97965" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // Funkcija za dobijanje teksta na osnovu pozicije
+    const getRankingText = (position: number, categoryName: string) => {
+        const ordinalSuffix = position === 1 ? 'st' : position === 2 ? 'nd' : 'rd';
+        return `#${position} ${categoryName}`;
+    };
+
+    return (
+        <div className="bg-secondary py-2 px-4 rounded-full w-fit flex gap-1 items-center transition-colors duration-200 text-xs">
+            {getRankingIcon(position)}
+            <span className="text-sm font-medium">{getRankingText(position, categoryName)}</span>
+        </div>
+    );
+};
 
 export default function SingleBestResidencesClient() {
     const [category, setCategory] = useState<Category | null>(null);
@@ -421,12 +495,24 @@ export default function SingleBestResidencesClient() {
                                                 className="object-cover object-center rounded-lg"
                                                 sizes="(max-width: 768px) 100vw, 33vw"
                                             />
+
+                                             {/* Ranking Badge - samo za prve tri pozicije */}
+                                             {residence.position <= 3 && category && (
+                                                <div className="absolute top-3 left-3">
+                                                    <RankingBadge 
+                                                        position={residence.position} 
+                                                        categoryName={category.name} 
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Residence Content */}
                                         <div className="w-full lg:w-2/3 flex flex-col lg:flex-row gap-4 p-2 lg:p-0">
                                             {/* Residence Info */}
                                             <div className="flex flex-col gap-6 w-full justify-center">
+                                               
+                                                
                                                 <h2 className="text-2xl lg:text-3xl font-bold">{residence.name}</h2>
                                                 <p className="text-white text-sm lg:text-base">
                                                     {residence.description.length > 150 

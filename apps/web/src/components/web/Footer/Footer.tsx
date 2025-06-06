@@ -191,7 +191,7 @@ export default function Footer() {
                 <Link href="/investor-relations">Investor Relations</Link>
               </li>
               <li>
-                <Link href="/register/developer">Register Your Residence</Link>
+                <Link href="/developer/residences/create">Register Your Residence</Link>
               </li>
             </ul>
           </div>

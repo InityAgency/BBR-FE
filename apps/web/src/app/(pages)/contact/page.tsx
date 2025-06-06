@@ -61,9 +61,9 @@ export default function ContactPage() {
                                     </Link>
                                 </div>
                                 <div className="w-1/2">
-                                    <Link href="tel:+1 223 664 5599" className="flex items-center gap-2 p-4 rounded-md grid-cols-1 border bg-[#151b1e] hover:bg-[#192024]  transition-colors">
+                                    <Link href="tel:800-874-2458" className="flex items-center gap-2 p-4 rounded-md grid-cols-1 border bg-[#151b1e] hover:bg-[#192024]  transition-colors">
                                         <Phone size={24} strokeWidth={2} absoluteStrokeWidth className="text-primary"/>
-                                        <p className="text-sm">+1 223 664 5599</p>
+                                        <p className="text-sm">800-874-2458</p>
                                     </Link>
                                 </div>
                             </div>

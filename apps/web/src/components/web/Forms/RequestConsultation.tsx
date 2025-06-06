@@ -20,8 +20,9 @@ import {
   formSchema,
   type FormValues,
 } from "@/app/api/contact/requestConsultation";
-import { Link, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface RequestConsultationFormProps {
   className?: string;
@@ -234,7 +235,7 @@ export default function RequestConsultationForm({
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-medium leading-none text-left leading-[1.35]">
-                    I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
+                  I agree to the <Link href="/terms-of-service" className="hover:underline hover:text-primary transition-all">BBR Terms of Service</Link> and <Link href="/gdpr-compliance" className="hover:underline hover:text-primary transition-all">Privacy Policy</Link>
                   </FormLabel>
                   <FormMessage />
                 </div>
