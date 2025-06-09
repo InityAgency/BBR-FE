@@ -90,20 +90,20 @@ const WhatDoYouGetFree = () => {
   return (
     <div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Featured Property Placement
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Featured Property Placement
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2 mb-2">
           Your listings receive premium visibility across the platform including
           priority placement in search results and curated collections ensuring
           they stand out to discerning buyers.
         </p>
       </div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Direct Lead Access
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Direct Lead Access
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2 mb-2">
           Gain full access to verified buyer inquiries and connect directly with
           interested prospects to accelerate your sales pipeline.
         </p>
@@ -116,20 +116,20 @@ const WhatDoYouGetPremium = () => {
   return (
     <div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Featured Property Placement
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Featured Property Placement
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2 mb-2">
           Your listings receive premium visibility across the platform including
           priority placement in search results and curated collections ensuring
           they stand out to discerning buyers.
         </p>
       </div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Direct Lead Access
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Direct Lead Access
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2 mb-2">
           Gain full access to verified buyer inquiries and connect directly with
           interested prospects to accelerate your sales pipeline.
         </p>
@@ -142,20 +142,20 @@ const WhatDoYouGetBespoke = () => {
   return (
     <div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Featured Property Placement
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Featured Property Placement
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2 mb-2">
           Your listings receive premium visibility across the platform including
           priority placement in search results and curated collections ensuring
           they stand out to discerning buyers.
         </p>
       </div>
       <div>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
-          •Direct Lead Access
+        <p className="text-[#252430] text-[12px] lg:text-[18px] font-medium">
+          • Direct Lead Access
         </p>
-        <p className="text-[#252430] text-[12px] lg:text-[18px]">
+        <p className="text-[#252430] text-[12px] lg:text-[18px] mt-2">
           Gain full access to verified buyer inquiries and connect directly with
           interested prospects to accelerate your sales pipeline.
         </p>
@@ -259,50 +259,50 @@ const PlanOverview = () => {
           <div className="border border-gray-200 p-[2px] lg:p-[2px] md:p-[14px] lg:p-[16px] text-justify">
             <OverviewTitle />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] ">
             <OverviewFree />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <OverviewPremium />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <OverviewBespoke />
           </div>
 
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatDoYouGetTitle />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatDoYouGetFree />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatDoYouGetPremium />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatDoYouGetBespoke />
           </div>
 
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatItsForTitle />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatItsForFree />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatItsForPremium />
           </div>
-          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <WhatItsForBespoke />
           </div>
 
-          <div className="border rounded-bl-xl border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify" />
-          <div className="flex border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="border rounded-bl-xl border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]" />
+          <div className="flex border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <FreeLink />
           </div>
-          <div className="flex border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="flex border border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <PremiumLink />
           </div>
-          <div className="flex border rounded-br-xl border-gray-200 p-[2px] md:p-[14px] lg:p-[16px] text-justify">
+          <div className="flex border rounded-br-xl border-gray-200 p-[2px] md:p-[14px] lg:p-[16px]">
             <BespokeLink />
           </div>
         </div>
