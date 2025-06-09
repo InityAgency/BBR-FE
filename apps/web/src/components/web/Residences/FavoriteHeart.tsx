@@ -124,7 +124,7 @@ export function FavoriteHeart({ entityId, entityType, isFavorite = false, classN
             disabled={isLoading}
             id="favorite-heart"
             className={cn(
-                "absolute top-3 right-3 z-10 p-2 rounded-full transition-all z-50",
+                "absolute top-3 right-3 z-10 p-2 rounded-full transition-all z-10",
                 (isFavorited || isFavorite) 
                     ? "bg-secondary/80 hover:bg-secondary" 
                     : "bg-secondary/80 hover:bg-secondary",

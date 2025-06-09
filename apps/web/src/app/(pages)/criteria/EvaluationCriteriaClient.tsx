@@ -8,6 +8,8 @@ import { EmblaOptionsType } from "embla-carousel";
 import Image from "next/image";
 import SectionLayout from "@/components/web/SectionLayout";
 import Link from "next/link";
+import GetMatchedButton from "@/components/web/Buttons/GetMatchedButton";
+
 
 const CAROUSEL_OPTIONS: EmblaOptionsType = { dragFree: true };
 const CAROUSEL_CARDS = [
@@ -149,12 +151,7 @@ export default function EvaluationCriteriaClient() {
                 review.
               </p>
               <div className="flex gap-4">
-                <Button
-                  onClick={() => {}}
-                  className="place-self-start lg:place-self-center"
-                >
-                  Get Matched
-                </Button>
+                <GetMatchedButton />  
                 <Button
                   onClick={() => {}}
                   variant="outline"
@@ -175,12 +172,7 @@ export default function EvaluationCriteriaClient() {
         </h1>
         <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px] xl:max-w-[1600px] mx-auto">
           <div className="flex place-self-start gap-[12px] lg:place-self-end">
-            <Button
-              onClick={() => {}}
-              className="place-self-start lg:place-self-center"
-            >
-              Get Matched
-            </Button>
+            <GetMatchedButton />
             <Button
               onClick={() => {}}
               variant="outline"
@@ -387,12 +379,7 @@ export default function EvaluationCriteriaClient() {
             within its market and brand category.
           </p>
           <div className="flex gap-4">
-            <Button
-              onClick={() => {}}
-              className="place-self-start lg:place-self-center"
-            >
-              Get Matched
-            </Button>
+            <GetMatchedButton />
             <Button
               onClick={() => {}}
               variant="outline"

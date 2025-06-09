@@ -487,7 +487,7 @@ export default function SingleBestResidencesClient() {
                                         onClick={(e) => handleResidenceClick(e, residence.slug)}
                                     >
                                         {/* Residence Image */}
-                                        <div className="w-full lg:w-1/3 h-[200px] lg:h-[300px] relative">
+                                        <div className="w-full lg:w-1/4 3xl:w-1/3 h-[200px] lg:h-[300px] relative">
                                             <Image
                                                 src={`${baseUrl}/api/${apiVersion}/media/${residence.featuredImage?.id}/content`}
                                                 alt={residence.name}
@@ -508,9 +508,9 @@ export default function SingleBestResidencesClient() {
                                         </div>
 
                                         {/* Residence Content */}
-                                        <div className="w-full lg:w-2/3 flex flex-col lg:flex-row gap-4 p-2 lg:p-0">
+                                        <div className="w-full lg:w-3/4 3xl:w-2/3 flex flex-col lg:flex-row gap-4 p-2 lg:p-0">
                                             {/* Residence Info */}
-                                            <div className="flex flex-col gap-6 w-full justify-center">
+                                            <div className="flex flex-col gap-6 justify-center w-full lg:w-[45%]">
                                                
                                                 
                                                 <h2 className="text-2xl lg:text-3xl font-bold">{residence.name}</h2>
@@ -531,7 +531,7 @@ export default function SingleBestResidencesClient() {
                                             </div>
 
                                             {/* Scoring Section */}
-                                            <div className="bg-secondary rounded-lg p-4 lg:p-5 w-full flex flex-col gap-2">
+                                            <div className="bg-secondary rounded-lg p-4 lg:p-5 flex flex-col gap-2 w-full lg:w-[55%]">
                                                 <div className="flex flex-row gap-2 items-center">
                                                     <p className="text-white bg-primary rounded-lg p-2 w-fit font-bold text-base lg:text-lg">
                                                         {(residence.totalScore / 10).toFixed(1)}
@@ -540,7 +540,7 @@ export default function SingleBestResidencesClient() {
                                                         BBR <br /> Score
                                                     </p>
                                                 </div>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-x-6 mt-4">
                                                     {residence.rankingCriteriaScores
                                                         .filter((criteria) => criteria)
                                                         .map((criteria) => (

@@ -82,13 +82,13 @@ export default function PopularPlaces() {
 
     return (
         <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-8">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 md:gap-6">
                 {/* Prvi red - tri kartice */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 [1300px]:grid-cols-1 2xl:grid-cols-3 gap-4 md:gap-6">
                     {places.slice(0, 3).map((place) => (
                         <div 
                             key={place.id}
-                            className="relative h-[300px] rounded-xl overflow-hidden group cursor-pointer"
+                            className="relative min-h-[250px] md:h-[300px] rounded-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10" />
                             <Image
@@ -97,14 +97,14 @@ export default function PopularPlaces() {
                                 fill
                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 p-6 z-20 gap-24 flex flex-col lg:flex-row justify-between lg:items-end">
-                                <h3 className="text-2xl font-bold text-white mb-4 lg:mb-0 max-w-[50%]">{place.title}</h3>
-                                <div className="flex flex-col gap-2">
+                            <div className="absolute inset-0 p-4 md:p-6 z-20 flex flex-col 2xl:flex-row 2xl:items-end 2xl:gap-4 3xl:gap-8 justify-between">
+                                <h3 className="text-xl md:text-2xl font-bold text-white 2xl:max-w-[40%] 3xl:max-w-[50%]">{place.title}</h3>
+                                <div className="flex flex-col gap-1 md:gap-2 mt-4 2xl:mt-0 2xl:min-w-[50%] 2xl:max-w-[50%]">
                                     {place.links.map((link, index) => (
                                         <Link 
                                             key={index}
                                             href={link.url}
-                                            className="text-white hover:text-white transition-colors text-md"
+                                            className="text-sm md:text-base text-white hover:text-white/80 transition-colors"
                                         >
                                             {link.text}
                                         </Link>
@@ -116,11 +116,11 @@ export default function PopularPlaces() {
                 </div>
                 
                 {/* Drugi red - dve kartice */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 [1300px]:grid-cols-1 2xl:grid-cols-2 gap-4 md:gap-6">
                     {places.slice(3).map((place) => (
                         <div 
                             key={place.id}
-                            className="relative h-[300px] rounded-xl overflow-hidden group cursor-pointer"
+                            className="relative min-h-[250px] md:h-[300px] rounded-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10" />
                             <Image
@@ -129,14 +129,14 @@ export default function PopularPlaces() {
                                 fill
                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 p-6 z-20 gap-24 flex flex-col lg:flex-row justify-between lg:items-end">
-                                <h3 className="text-2xl font-bold text-white mb-4 lg:mb-0">{place.title}</h3>
-                                <div className="grid grid-cols-2 gap-x-2 gap-y-2">
+                            <div className="absolute inset-0 p-4 md:p-6 z-20 flex flex-col 2xl:flex-row 2xl:items-end justify-between">
+                                <h3 className="text-xl md:text-2xl font-bold text-white 2xl:max-w-[45%]">{place.title}</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1 md:gap-y-2 mt-4 2xl:mt-0 2xl:min-w-[50%]">
                                     {place.links.map((link, index) => (
                                         <Link 
                                             key={index}
                                             href={link.url}
-                                            className="text-white hover:text-white transition-colors text-md"
+                                            className="text-sm md:text-base text-white hover:text-white/80 transition-colors"
                                         >
                                             {link.text}
                                         </Link>
