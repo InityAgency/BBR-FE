@@ -437,7 +437,7 @@ export default function SingleResidenceClient() {
                 <StickyScrollTabs sections={sections} offset={80} />
 
                 <div id="overview" className="w-full xl:max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 py-8 lg:py-16 lg:pt-8 px-4 lg:px-0 justify-between">
-                    <div className="about-residence w-full">
+                    <div className="about-residence w-full xl:w-1/2">
                         <span className="text-md lg:text-lg text-left lg:text-left text-primary w-full uppercase">
                             RESIDENCE INFORMATION
                         </span>
@@ -448,7 +448,7 @@ export default function SingleResidenceClient() {
                             {residence.description}
                         </p>
                     </div>
-                    <div className="badges bg-secondary rounded-lg min-w-full lg:min-w-[40svw]">
+                    <div className="badges bg-secondary rounded-lg w-full lg:max-w-[50%] xl:w-1/2">
                         <RankingBadges rankingScores={allRankings} />
                     </div>
                 </div>

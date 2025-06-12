@@ -38,7 +38,7 @@ export default function BuyerSidebar() {
         h-full lg:h-auto
         bg-secondary px-4 py-8 rounded-lg
         transform transition-transform duration-300 ease-in-out
-        z-50
+        z-20
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col gap-4">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/common/Pagination";
-import { Eye, ArrowUpDown } from "lucide-react";
+import { Eye, ArrowUpDown, Building2, Trophy } from "lucide-react";
 import Link from "next/link";
 import type { Residence } from "@/types/residence";
 
@@ -128,11 +128,11 @@ export default function DeveloperRanking() {
                 ) : rankingRows.length > 0 ? (
                     <>
                         <div className="rounded-md border">
-                            <table className="w-full">
+                            <table className="w-full table-fixed">
                                 <thead>
                                     <tr className="border-b bg-secondary/30">
                                         <th 
-                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50"
+                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50 w-[30%]"
                                             onClick={() => handleSort('residenceName')}
                                         >
                                             <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function DeveloperRanking() {
                                             </div>
                                         </th>
                                         <th 
-                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50"
+                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50 w-[25%]"
                                             onClick={() => handleSort('rankingCategory')}
                                         >
                                             <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default function DeveloperRanking() {
                                             </div>
                                         </th>
                                         <th 
-                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50"
+                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50 w-[15%]"
                                             onClick={() => handleSort('position')}
                                         >
                                             <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function DeveloperRanking() {
                                             </div>
                                         </th>
                                         <th 
-                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50"
+                                            className="h-12 px-4 text-left align-middle font-medium text-muted-foreground cursor-pointer hover:bg-secondary/50 w-[15%]"
                                             onClick={() => handleSort('score')}
                                         >
                                             <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function DeveloperRanking() {
                                                 <ArrowUpDown className="w-4 h-4" />
                                             </div>
                                         </th>
-                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                                        <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground w-[15%]">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -177,14 +177,22 @@ export default function DeveloperRanking() {
                                             <td className="p-4 align-middle">{row.rankingCategory}</td>
                                             <td className="p-4 align-middle">{row.position}</td>
                                             <td className="p-4 align-middle">{row.score.toFixed(1)}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="p-4 align-middle flex flex-row items-end justify-end gap-2">
                                                 <Link 
                                                     href={`/residences/${row.residenceSlug}`} 
-                                                    className="text-xs font-medium border flex items-center justify-center px-2 py-2 rounded-md bg-secondary hover:bg-white/5 transition-all inline-flex"
+                                                    className="w-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c]"
                                                     target="_blank"
                                                 >
-                                                    <Eye className="w-4 h-4 mr-2" />
-                                                    View
+                                                    <Building2 className="w-4 h-4" />
+                                                  
+                                                </Link>
+                                                <Link 
+                                                    href={`/best-residences/${row.rankingCategory.toLowerCase()}`} 
+                                                    className="w-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border shadow-xs hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-white/5 hover:bg-white/10 text-white border-[#b3804c]"
+                                                    target="_blank"
+                                                >
+                                                    <Trophy className="w-4 h-4" />
+                                     
                                                 </Link>
                                             </td>
                                         </tr>

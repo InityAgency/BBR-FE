@@ -107,7 +107,7 @@ const RankingBadges: React.FC<RankingBadgesProps> = ({ rankingScores }) => {
     }
 
     return (
-        <div className="bg-secondary rounded-lg p-6 min-w-full lg:min-w-[40svw]">
+        <div className="bg-secondary rounded-lg p-6 min-w-full lg:min-w-full">
             <div className="grid grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 xl:gap-8">
                 {filteredAndSortedScores.map((rankingScore) => (
                     <RankingBadgeDisplay
