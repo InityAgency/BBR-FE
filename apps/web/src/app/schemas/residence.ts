@@ -111,7 +111,7 @@ export const residenceSchema = z.object({
   avgPricePerSqft: z.string().optional(),
   petFriendly: z.boolean().optional(),
   disabledFriendly: z.boolean().optional(),
-  videoTourUrl: z.string().url().optional().nullable(),
+  videoTourUrl: z.string().url().optional().or(z.literal("")).nullable(),
   // videoTour: z.any().optional().nullable(),
   featuredImageId: z.any().optional().nullable(),
   keyFeatures: z.array(keyFeatureSchema).optional(),

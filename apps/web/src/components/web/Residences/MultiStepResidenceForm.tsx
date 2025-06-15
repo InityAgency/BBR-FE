@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, ChevronsUpDown } from "lucide-react";
 
 // UI Components
 import { Input } from "@/components/ui/input";
@@ -20,21 +20,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Custom Components - ove ćete morati da importujete iz vaših postojećih komponenti
+// Custom Components
 import LocationSelector from "@/components/web/Forms/LocationSelector";
 import MultipleImageUpload from "@/components/web/Forms/MultipleImageUpload";
 import { CountryAndCity } from "@/components/web/Forms/CountryAndCity";
-import {MultiSelect} from "@/components/web/Forms/MultiSelect";
+import { MultiSelect } from "@/components/web/Forms/MultiSelect";
 
-// Constants and schemas - importujte iz vašeg postojećeg koda
+// Constants and schemas
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
-import { 
+import {
   residenceSchema,
   ResidenceFormValues,
   initialResidenceValues,
   DevelopmentStatus,
-  RentalPotential 
+  RentalPotential
 } from "@/app/schemas/residence";
+
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Step definitions
 const STEPS = [
@@ -112,14 +127,14 @@ export default function MultiStepResidenceForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [residenceId, setResidenceId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Data states
   const [brands, setBrands] = useState<Brand[]>([]);
   const [keyFeatures, setKeyFeatures] = useState<KeyFeature[]>([]);
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [images, setImages] = useState<any[]>([]);
   const [featuredImage, setFeaturedImage] = useState<any>(null);
-  
+
   // Form setup
   const form = useForm<ResidenceFormValues>({
     resolver: zodResolver(residenceSchema),
@@ -151,9 +166,9 @@ export default function MultiStepResidenceForm() {
   const validateCurrentStep = async () => {
     const stepSchema = getStepSchema(currentStep);
     const values = form.getValues();
-    
+
     console.log("Validating step", currentStep, "with values:", values);
-    
+
     try {
       await stepSchema.parseAsync(values);
       return true;
@@ -236,7 +251,7 @@ export default function MultiStepResidenceForm() {
     try {
       setIsSubmitting(true);
       const values = form.getValues();
-      
+
       const dataToSend = {
         name: values.name,
         websiteUrl: values.websiteUrl || null,
@@ -250,7 +265,7 @@ export default function MultiStepResidenceForm() {
         address: values.address,
         latitude: values.latitude,
         longitude: values.longitude,
-        status: "PENDING", // Always PENDING for web creation
+        status: "PENDING",
       };
 
       const response = await fetch(`${API_BASE_URL}/api/${API_VERSION}/residences`, {
@@ -298,7 +313,6 @@ export default function MultiStepResidenceForm() {
           };
           break;
         case 3:
-          // Upload images first
           const uploadedImages = await uploadImages();
           dataToSend = {
             mainGallery: uploadedImages.map((img, index) => ({
@@ -340,12 +354,12 @@ export default function MultiStepResidenceForm() {
   // Upload images helper
   const uploadImages = async () => {
     const uploadedImages = [];
-    
+
     for (const image of images) {
       if ('file' in image) {
         const formData = new FormData();
         formData.append('file', image.file);
-        
+
         const response = await fetch(
           `${API_BASE_URL}/api/${API_VERSION}/media?type=RESIDENCE`,
           {
@@ -354,7 +368,7 @@ export default function MultiStepResidenceForm() {
             body: formData,
           }
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           uploadedImages.push({
@@ -364,7 +378,7 @@ export default function MultiStepResidenceForm() {
         }
       }
     }
-    
+
     return uploadedImages;
   };
 
@@ -378,24 +392,24 @@ export default function MultiStepResidenceForm() {
 
     await updateResidence();
     toast.success("Residence submitted for review!");
-    router.push("/");
+    router.push("/developer/residences");
   };
 
   // Render step indicator
   const renderStepIndicator = () => (
-    <div className="w-full mb-8">
+    <div className="w-full max-w-4xl mb-4">
       <Tabs value={currentStep.toString()} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+        <TabsList className="h-auto bg-secondary border">
           {STEPS.map((step) => (
             <TabsTrigger
               key={step.id}
               value={step.id.toString()}
               disabled={!residenceId && step.id > 1}
               className={`
-                data-[state=active]:bg-primary data-[state=active]:text-primary-foreground
+                data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent
                 ${step.id < currentStep ? 'text-primary' : ''}
                 ${step.id > currentStep && (!residenceId || step.id > 1) ? 'text-muted-foreground' : ''}
-                py-3 px-4
+                py-2 px-4
               `}
               onClick={() => {
                 if (residenceId || step.id === 1) {
@@ -435,65 +449,52 @@ export default function MultiStepResidenceForm() {
   };
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
+    <div className="py-8 w-full">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Add new residence</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl font-bold sm:text-2xl text-sans">Add new residence</h1>
+        <p className="text-muted-foreground text-sm mt-2">
           Create a new residence listing by following the steps below
         </p>
       </div>
 
-      {renderStepIndicator()}
+      <div className="flex items-center justify-between">
+        {renderStepIndicator()}
+        <div className="flex items-center gap-4 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 1 || isSubmitting}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
 
-      <Form {...form}>
-        <form className="space-y-8">
-          <Card>
-            <CardContent className="pt-6">
-              {renderStepContent()}
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-between items-center">
+          {currentStep < STEPS.length ? (
             <Button
               type="button"
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1 || isSubmitting}
+              onClick={handleNext}
+              disabled={isSubmitting}
             >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Previous
+              Next
+              <ChevronRight className="h-4 w-4" />
             </Button>
-
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/")}
-              >
-                Save & Exit
-              </Button>
-
-              {currentStep < STEPS.length ? (
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isSubmitting}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={isSubmitting}
-                  className="bg-primary"
-                >
-                  Publish residence
-                </Button>
-              )}
-            </div>
-          </div>
+          ) : (
+            <Button
+              type="button"
+              onClick={handlePublish}
+              disabled={isSubmitting}
+              className="bg-primary"
+            >
+              Publish residence
+            </Button>
+          )}
+        </div>
+      </div>
+      
+      <Form {...form}>
+        <form className="space-y-8">
+          {renderStepContent()}
         </form>
       </Form>
     </div>
@@ -507,161 +508,26 @@ interface Step1ContentProps {
 }
 
 function Step1Content({ form, brands }: Step1ContentProps) {
+  const [open, setOpen] = useState(false);
+
+  // Get selected brand
+  const selectedBrand = brands.find(brand => brand.id === form.watch("brandId"));
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Basic information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Residence name <span className="text-destructive">*</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter residence name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="websiteUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website URL</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="https://example.com" 
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="brandId"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Associated brand <span className="text-destructive">*</span></FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a brand" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {brands.map((brand) => (
-                      <SelectItem key={brand.id} value={brand.id}>
-                        {brand.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Brief Overview</h2>
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="subtitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Brief Subtitle <span className="text-destructive">*</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="Ex. Ritz Carlton Residences Miami" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Brief overview <span className="text-destructive">*</span></FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Enter brief overview" 
-                    className="min-h-[120px]"
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Budget Limitations</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="budgetStartRange"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Budget start range <span className="text-destructive">*</span></FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="0" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="budgetEndRange"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Budget end range <span className="text-destructive">*</span></FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="0" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Location Details</h2>
-        <div className="space-y-4">
+    <div className="space-y-6 custom-form grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Basic information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
-              name="countryId"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country <span className="text-destructive">*</span></FormLabel>
-                  <CountryAndCity
-                    defaultCountryId={field.value}
-                    defaultCityId={form.watch("cityId")}
-                    onCountrySelect={(countryId) => {
-                      field.onChange(countryId);
-                      form.setValue("cityId", "", { shouldValidate: true });
-                    }}
-                    onCitySelect={(cityId) => {
-                      form.setValue("cityId", cityId, { shouldValidate: true });
-                    }}
-                  />
+                  <FormLabel>Residence name <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter residence name" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -669,13 +535,170 @@ function Step1Content({ form, brands }: Step1ContentProps) {
 
             <FormField
               control={form.control}
-              name="cityId"
+              name="websiteUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City <span className="text-destructive">*</span></FormLabel>
+                  <FormLabel>Website URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://example.com"
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            <FormField
+              control={form.control}
+              name="brandId"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Associated brand <span className="text-destructive">*</span></FormLabel>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={open}
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {selectedBrand ? selectedBrand.name : "Select a brand"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command shouldFilter={false}>
+                        <CommandInput placeholder="Search brands..." />
+                        <CommandList>
+                          <CommandEmpty>No brand found.</CommandEmpty>
+                          <CommandGroup>
+                            {Array.isArray(brands) && brands.map((brand) => (
+                              <CommandItem
+                                key={brand.id}
+                                value={brand.name}
+                                onSelect={(currentValue) => {
+                                  const selectedBrand = brands.find(
+                                    b => b.name.toLowerCase() === currentValue.toLowerCase()
+                                  );
+                                  if (selectedBrand) {
+                                    field.onChange(selectedBrand.id);
+                                    setOpen(false);
+                                  }
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedBrand?.id === brand.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {brand.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Brief Overview</h2>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="subtitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Brief Subtitle <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex. Ritz Carlton Residences Miami" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Brief overview <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter brief overview"
+                      className="min-h-[120px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Budget Limitations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="budgetStartRange"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget start range <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="0" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="budgetEndRange"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget end range <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="0" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Location Details</h2>
+        <div className="space-y-4">
+          <div className="w-full">
+            <CountryAndCity
+              defaultCountryId={form.watch("countryId")}
+              defaultCityId={form.watch("cityId")}
+              onCountrySelect={(countryId) => {
+                form.setValue("countryId", countryId, { shouldValidate: true });
+              }}
+              onCitySelect={(cityId) => {
+                form.setValue("cityId", cityId, { shouldValidate: true });
+              }}
             />
           </div>
 
@@ -717,12 +740,9 @@ interface Step2ContentProps {
 
 function Step2Content({ form, keyFeatures }: Step2ContentProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 custom-form">
       <div>
-        <h2 className="text-xl font-semibold mb-4">Key Features</h2>
-        <p className="text-muted-foreground mb-4">
-          CHOOSE 5 KEY FEATURES TO REPRESENT YOUR PROPERTY
-        </p>
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Key Features</h2>
         <p className="text-sm text-muted-foreground mb-6">
           They are necessary to attract potential buyers by showcasing what makes the residence stand out and why it is a desirable investment.
         </p>
@@ -771,7 +791,7 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Development Information</h2>
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Development Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -791,18 +811,18 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
             control={form.control}
             name="developmentStatus"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="w-full">
                 <FormLabel>Development status <span className="text-destructive">*</span></FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="w-full">
                     {Object.entries(DevelopmentStatus).map(([key, value]) => (
                       <SelectItem key={value} value={value as string}>
-                        {key.split('_').map(word => 
+                        {key.split('_').map(word =>
                           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                         ).join(' ')}
                       </SelectItem>
@@ -835,9 +855,9 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
               <FormItem>
                 <FormLabel>Staff to residence ratio</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="0" 
+                  <Input
+                    type="number"
+                    placeholder="0"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
@@ -885,15 +905,15 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
             control={form.control}
             name="rentalPotential"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="col-span-2 w-full">
                 <FormLabel>Rental potential</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
+                  <FormControl className="w-full">
                     <SelectTrigger>
                       <SelectValue placeholder="Select rental potential" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="w-full">
                     {Object.entries(RentalPotential).map(([key, value]) => (
                       <SelectItem key={value} value={value as string}>
                         {key}
@@ -909,13 +929,13 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Policies</h2>
-        <div className="space-y-4">
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Policies</h2>
+        <div className="flex items-center gap-4">
           <FormField
             control={form.control}
             name="petFriendly"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 w-full">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Pet Friendly?</FormLabel>
                 </div>
@@ -933,7 +953,7 @@ function Step2Content({ form, keyFeatures }: Step2ContentProps) {
             control={form.control}
             name="disabledFriendly"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 w-full">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Accessible for people with disabilities?</FormLabel>
                 </div>
@@ -965,9 +985,9 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-4">Main Gallery</h2>
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-2">Main Gallery</h2>
         <p className="text-muted-foreground mb-6">Maximum 10 photos</p>
-        
+
         <MultipleImageUpload
           onChange={setImages}
           onFeaturedChange={setFeaturedImage}
@@ -976,16 +996,16 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
         />
       </div>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Video Tour</h2>
+      <div className="custom-form">
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-2">Video Tour (Optional)</h2>
         <FormField
           control={form.control}
           name="videoTourUrl"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input 
-                  placeholder="Enter Youtube video URL" 
+                <Input
+                  placeholder="Enter Youtube video URL (optional)"
                   value={field.value || ""}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
@@ -994,7 +1014,7 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
                 />
               </FormControl>
               <FormDescription>
-                OR
+                Add a video tour URL if available. This is optional.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -1012,11 +1032,14 @@ interface Step4ContentProps {
 }
 
 function Step4Content({ form, amenities }: Step4ContentProps) {
+  const selectedAmenities = form.watch("amenities") || [];
+  const highlightedAmenities = form.watch("highlightedAmenities") || [];
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-4">Provide the full list of amenities nearby</h2>
-        
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Provide the full list of amenities nearby</h2>
+
         <FormField
           control={form.control}
           name="amenities"
@@ -1069,18 +1092,15 @@ function Step4Content({ form, amenities }: Step4ContentProps) {
         />
       </div>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Highlight top 3 amenities</h2>
-        
+      <div className="custom-form">
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Highlight top 3 amenities</h2>
+
         <FormField
           control={form.control}
           name="highlightedAmenities"
           render={({ field }) => {
-            const selectedAmenities = form.watch("amenities") || [];
-            const highlightedAmenities = field.value || [];
-
-            // Prepare options for MultiSelect
-            const amenityOptions = selectedAmenities.map(amenity => ({
+            // Filter only selected amenities for highlighting
+            const availableAmenities = selectedAmenities.map(amenity => ({
               id: amenity.id,
               name: amenity.name
             }));
@@ -1107,12 +1127,13 @@ function Step4Content({ form, amenities }: Step4ContentProps) {
                     placeholder="Select amenities to highlight"
                     apiEndpoint="amenities"
                     maxItems={3}
-                    initialOptions={amenityOptions}
+                    initialOptions={availableAmenities}
+                    disabled={selectedAmenities.length === 0}
                   />
                 </FormControl>
                 <FormDescription>
                   {selectedIds.length} of 3 selected<br />
-                  Select up to 3 amenities to highlight as featured. These will be displayed prominently.
+                  Select up to 3 amenities to highlight as featured from your selected amenities above.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
