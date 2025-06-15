@@ -59,7 +59,7 @@ const STEPS = [
   { id: 4, name: "Amenities", description: "Available amenities and highlights" },
 ] as const;
 
-// Schema za svaki korak
+// Schema za svaki korak - ISPRAVKA: video tour nije obavezno
 const step1Schema = z.object({
   name: z.string().min(1, "Name is required"),
   websiteUrl: z.string().url().optional().or(z.literal("")),
@@ -91,8 +91,9 @@ const step2Schema = z.object({
   disabledFriendly: z.boolean().optional(),
 });
 
+// ISPRAVKA: Video tour je potpuno opciono - potpuno preskoči validaciju
 const step3Schema = z.object({
-  videoTourUrl: z.string().url().optional().or(z.literal("")),
+  // Namerno ostavljamo prazan objekat jer video tour ne treba validaciju
 });
 
 const step4Schema = z.object({
@@ -122,7 +123,14 @@ interface Amenity {
   name: string;
 }
 
-export default function MultiStepResidenceForm() {
+// Dodajemo propse za edit mod
+interface MultiStepResidenceFormProps {
+  initialValues?: Partial<ResidenceFormValues>;
+  isEdit?: boolean;
+  initialImages?: any[];
+}
+
+export default function MultiStepResidenceForm({ initialValues, isEdit, initialImages }: MultiStepResidenceFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [residenceId, setResidenceId] = useState<string | null>(null);
@@ -135,16 +143,44 @@ export default function MultiStepResidenceForm() {
   const [images, setImages] = useState<any[]>([]);
   const [featuredImage, setFeaturedImage] = useState<any>(null);
 
-  // Form setup
+  // Form setup - ISPRAVKA: dodajemo pravilno mapiranje highlightedAmenities
   const form = useForm<ResidenceFormValues>({
-    resolver: zodResolver(residenceSchema),
-    defaultValues: {
+    resolver: zodResolver(residenceSchema.omit({ videoTourUrl: true }).extend({
+      videoTourUrl: z.string().nullable().optional()  // Override-ujemo video tour da bude potpuno opciono i može biti null
+    })),
+    defaultValues: isEdit && initialValues ? {
       ...initialResidenceValues,
-      latitude: "0",
-      longitude: "0",
+      ...initialValues,
+      // KLJUČNA ISPRAVKA: mapiramo highlightedAmenities iz API format-a
+      highlightedAmenities: initialValues.highlightedAmenities?.map((ha: any) => ({
+        id: ha.amenity?.id || ha.id,  // Pokrivamo oba slučaja
+        order: ha.order || 0,
+      })) || [],
+    } : { 
+      ...initialResidenceValues, 
+      latitude: "0", 
+      longitude: "0" 
     },
     mode: "onChange",
   });
+
+  // ISPRAVKA: Postaviti residenceId u edit modu
+  useEffect(() => {
+    if (isEdit && initialValues?.id) {
+      setResidenceId(initialValues.id);
+    }
+  }, [isEdit, initialValues?.id]);
+
+  // ISPRAVKA: Inicijalizacija slika u edit modu
+  useEffect(() => {
+    if (isEdit && initialImages && initialImages.length > 0) {
+      setImages(initialImages);
+      const featured = initialImages.find(img => img.isFeatured);
+      if (featured) {
+        setFeaturedImage(featured);
+      }
+    }
+  }, [isEdit, initialImages]);
 
   // Get schema for current step
   const getStepSchema = (step: number) => {
@@ -230,6 +266,16 @@ export default function MultiStepResidenceForm() {
       return;
     }
 
+    // EDIT MODE: UVEK radi updateResidence na Next
+    if (isEdit) {
+      await updateResidence();
+      if (currentStep < STEPS.length) {
+        setCurrentStep(currentStep + 1);
+      }
+      return;
+    }
+
+    // CREATE MODE: ponašaj se kao do sada
     if (currentStep === 1 && !residenceId) {
       // Create residence on first step
       await createResidence();
@@ -288,48 +334,149 @@ export default function MultiStepResidenceForm() {
     }
   };
 
-  // Update residence (Steps 2-4)
+  // Update residence (Steps 2-4 ili edit mode)
   const updateResidence = async () => {
-    if (!residenceId) return;
+    if (!residenceId) {
+      console.error("No residenceId available for update");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
       const values = form.getValues();
       let dataToSend: any = {};
 
-      switch (currentStep) {
-        case 2:
-          dataToSend = {
-            developmentStatus: values.developmentStatus,
-            yearBuilt: values.yearBuilt || null,
-            floorSqft: values.floorSqft || null,
-            staffRatio: values.staffRatio || null,
-            avgPricePerUnit: values.avgPricePerUnit || null,
-            avgPricePerSqft: values.avgPricePerSqft || null,
-            rentalPotential: values.rentalPotential || null,
-            keyFeatures: values.keyFeatures?.map(f => f.id) || [],
-            petFriendly: values.petFriendly || false,
-            disabledFriendly: values.disabledFriendly || false,
-          };
-          break;
-        case 3:
-          const uploadedImages = await uploadImages();
-          dataToSend = {
-            mainGallery: uploadedImages.map((img, index) => ({
-              id: img.mediaId,
-              order: index,
-            })),
-            featuredImageId: featuredImage?.mediaId || uploadedImages[0]?.mediaId || null,
-            videoTourUrl: values.videoTourUrl || null,
-          };
-          break;
-        case 4:
-          dataToSend = {
-            amenities: values.amenities?.map(a => a.id) || [],
-            highlightedAmenities: values.highlightedAmenities || [],
-          };
-          break;
+      console.log("Current step:", currentStep);
+      console.log("Form values:", values);
+
+      // ISPRAVKA: U edit modu, potrebno je proslediti sva polja za svaki korak
+      if (isEdit) {
+        switch (currentStep) {
+          case 1:
+            dataToSend = {
+              name: values.name,
+              websiteUrl: values.websiteUrl || null,
+              brandId: values.brandId,
+              countryId: values.countryId,
+              cityId: values.cityId,
+              subtitle: values.subtitle,
+              description: values.description,
+              budgetStartRange: values.budgetStartRange,
+              budgetEndRange: values.budgetEndRange,
+              address: values.address,
+              latitude: values.latitude,
+              longitude: values.longitude,
+            };
+            break;
+          case 2:
+            dataToSend = {
+              developmentStatus: values.developmentStatus,
+              yearBuilt: values.yearBuilt || null,
+              floorSqft: values.floorSqft || null,
+              staffRatio: values.staffRatio || null,
+              avgPricePerUnit: values.avgPricePerUnit || null,
+              avgPricePerSqft: values.avgPricePerSqft || null,
+              rentalPotential: values.rentalPotential || null,
+              keyFeatures: values.keyFeatures?.map(f => f.id) || [],
+              petFriendly: values.petFriendly || false,
+              disabledFriendly: values.disabledFriendly || false,
+            };
+            break;
+          case 3:
+            const uploadedImages = await uploadImages();
+            // ISPRAVKA: U create modu, pravilno postavi featured image
+            const featuredImageId = featuredImage?.mediaId || 
+                                   uploadedImages.find(img => img.isFeatured)?.mediaId || 
+                                   uploadedImages[0]?.mediaId || 
+                                   null;
+            
+            dataToSend = {
+              mainGallery: uploadedImages.map((img, index) => ({
+                id: img.mediaId,
+                order: index,
+              })),
+              featuredImageId: featuredImageId,
+              videoTourUrl: values.videoTourUrl || null,
+            };
+            console.log("Step 3 create mode data:", {
+              featuredImage,
+              featuredImageId,
+              uploadedImages: uploadedImages.length
+            });
+            break;
+          case 4:
+            // ISPRAVKA: API očekuje { id, order } format, ne { amenityId, order }
+            const highlightedAmenitiesForAPI = values.highlightedAmenities?.map(ha => ({
+              id: ha.id,  // Vraćeno na id umesto amenityId
+              order: ha.order
+            })) || [];
+
+            dataToSend = {
+              amenities: values.amenities?.map(a => a.id) || [],
+              highlightedAmenities: highlightedAmenitiesForAPI,
+            };
+
+            console.log("Step 4 data being sent:", {
+              amenities: dataToSend.amenities,
+              highlightedAmenities: dataToSend.highlightedAmenities,
+              originalHighlighted: values.highlightedAmenities
+            });
+            break;
+        }
+      } else {
+        // CREATE MODE - postojeća logika
+        switch (currentStep) {
+          case 2:
+            dataToSend = {
+              developmentStatus: values.developmentStatus,
+              yearBuilt: values.yearBuilt || null,
+              floorSqft: values.floorSqft || null,
+              staffRatio: values.staffRatio || null,
+              avgPricePerUnit: values.avgPricePerUnit || null,
+              avgPricePerSqft: values.avgPricePerSqft || null,
+              rentalPotential: values.rentalPotential || null,
+              keyFeatures: values.keyFeatures?.map(f => f.id) || [],
+              petFriendly: values.petFriendly || false,
+              disabledFriendly: values.disabledFriendly || false,
+            };
+            break;
+          case 3:
+            const uploadedImages = await uploadImages();
+            // ISPRAVKA: U edit modu, kombinuj postojeće i nove slike za featured
+            const allImagesForFeatured = [...images.filter(img => 'mediaId' in img), ...uploadedImages];
+            const featuredImageId = featuredImage?.mediaId || 
+                                   allImagesForFeatured.find(img => img.isFeatured)?.mediaId || 
+                                   allImagesForFeatured[0]?.mediaId || 
+                                   null;
+            
+            dataToSend = {
+              mainGallery: uploadedImages.map((img, index) => ({
+                id: img.mediaId,
+                order: index,
+              })),
+              featuredImageId: featuredImageId,
+              videoTourUrl: values.videoTourUrl || null,
+            };
+            console.log("Step 3 edit mode data:", {
+              featuredImage,
+              featuredImageId,
+              allImagesForFeatured: allImagesForFeatured.length,
+              uploadedImages: uploadedImages.length
+            });
+            break;
+          case 4:
+            dataToSend = {
+              amenities: values.amenities?.map(a => a.id) || [],
+              highlightedAmenities: values.highlightedAmenities?.map(ha => ({
+                amenityId: ha.id,
+                order: ha.order
+              })) || [],
+            };
+            break;
+        }
       }
+
+      console.log("Final data to send:", dataToSend);
 
       const response = await fetch(
         `${API_BASE_URL}/api/${API_VERSION}/residences/${residenceId}`,
@@ -341,17 +488,27 @@ export default function MultiStepResidenceForm() {
         }
       );
 
-      if (!response.ok) throw new Error('Failed to update residence');
+      console.log("API response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API error response:", errorText);
+        throw new Error(`Failed to update residence: ${response.status} - ${errorText}`);
+      }
+
+      const responseData = await response.json();
+      console.log("API success response:", responseData);
 
       toast.success('Progress saved');
     } catch (error) {
+      console.error("Update error:", error);
       toast.error('Failed to save progress');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Upload images helper
+  // Upload images helper - ISPRAVKA: Čuvaj isFeatured informaciju
   const uploadImages = async () => {
     const uploadedImages = [];
 
@@ -373,12 +530,14 @@ export default function MultiStepResidenceForm() {
           const data = await response.json();
           uploadedImages.push({
             mediaId: data.data.id,
-            isFeatured: image.isFeatured,
+            isFeatured: image.isFeatured || false,  // Čuvaj featured status
+            order: image.order || uploadedImages.length
           });
         }
       }
     }
 
+    console.log("Uploaded images with featured info:", uploadedImages);
     return uploadedImages;
   };
 
@@ -391,7 +550,7 @@ export default function MultiStepResidenceForm() {
     }
 
     await updateResidence();
-    toast.success("Residence submitted for review!");
+    toast.success(isEdit ? "Residence updated successfully!" : "Residence submitted for review!");
     router.push("/developer/residences");
   };
 
@@ -404,16 +563,16 @@ export default function MultiStepResidenceForm() {
             <TabsTrigger
               key={step.id}
               value={step.id.toString()}
-              disabled={!residenceId && step.id > 1}
+              disabled={!residenceId && step.id > 1 && !isEdit}
               className={`
                 data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent
                 ${step.id < currentStep ? 'text-primary' : ''}
-                ${step.id > currentStep && (!residenceId || step.id > 1) ? 'text-muted-foreground' : ''}
+                ${step.id > currentStep && (!residenceId || step.id > 1) && !isEdit ? 'text-muted-foreground' : ''}
                 py-2 px-4
               `}
               onClick={() => {
-                if (residenceId || step.id === 1) {
-                  if (step.id < currentStep) {
+                if (residenceId || step.id === 1 || isEdit) {
+                  if (step.id < currentStep || isEdit) {
                     setCurrentStep(step.id);
                   }
                 }
@@ -440,7 +599,7 @@ export default function MultiStepResidenceForm() {
       case 2:
         return <Step2Content form={form} keyFeatures={keyFeatures} />;
       case 3:
-        return <Step3Content form={form} images={images} setImages={setImages} featuredImage={featuredImage} setFeaturedImage={setFeaturedImage} />;
+        return <Step3Content form={form} images={images} setImages={setImages} featuredImage={featuredImage} setFeaturedImage={setFeaturedImage} initialImages={initialImages || []} />;
       case 4:
         return <Step4Content form={form} amenities={amenities} />;
       default:
@@ -451,9 +610,11 @@ export default function MultiStepResidenceForm() {
   return (
     <div className="py-8 w-full">
       <div className="mb-8">
-        <h1 className="text-xl font-bold sm:text-2xl text-sans">Add new residence</h1>
+        <h1 className="text-xl font-bold sm:text-2xl text-sans">
+          {isEdit ? "Edit residence" : "Add new residence"}
+        </h1>
         <p className="text-muted-foreground text-sm mt-2">
-          Create a new residence listing by following the steps below
+          {isEdit ? "Update your residence listing by modifying the information below" : "Create a new residence listing by following the steps below"}
         </p>
       </div>
 
@@ -486,7 +647,7 @@ export default function MultiStepResidenceForm() {
               disabled={isSubmitting}
               className="bg-primary"
             >
-              Publish residence
+              {isEdit ? "Update residence" : "Publish residence"}
             </Button>
           )}
         </div>
@@ -979,9 +1140,10 @@ interface Step3ContentProps {
   setImages: (images: any[]) => void;
   featuredImage: any;
   setFeaturedImage: (image: any) => void;
+  initialImages?: any[];
 }
 
-function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage }: Step3ContentProps) {
+function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage, initialImages = [] }: Step3ContentProps) {
   return (
     <div className="space-y-6">
       <div>
@@ -993,11 +1155,13 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
           onFeaturedChange={setFeaturedImage}
           maxImages={10}
           maxSizePerImage={5}
+          initialImages={initialImages}
         />
       </div>
 
       <div className="custom-form">
-        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-2">Video Tour (Optional)</h2>
+        <h2 className="text-lg font-bold sm:text-2xl text-sans mb-2">Video Tour</h2>
+        <p className="text-muted-foreground mb-6">This is completely optional. You can add a video tour URL if available.</p>
         <FormField
           control={form.control}
           name="videoTourUrl"
@@ -1005,16 +1169,20 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
             <FormItem>
               <FormControl>
                 <Input
-                  placeholder="Enter Youtube video URL (optional)"
+                  placeholder="Enter video URL (optional - YouTube, Vimeo, etc.)"
                   value={field.value || ""}
-                  onChange={field.onChange}
+                  onChange={(e) => {
+                    // Očisti grešku kad korisnik počne da kuca
+                    form.clearErrors("videoTourUrl");
+                    field.onChange(e.target.value);
+                  }}
                   onBlur={field.onBlur}
                   name={field.name}
                   ref={field.ref}
                 />
               </FormControl>
               <FormDescription>
-                Add a video tour URL if available. This is optional.
+                This field is completely optional. You can skip it or add any video URL later.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -1025,7 +1193,7 @@ function Step3Content({ form, images, setImages, featuredImage, setFeaturedImage
   );
 }
 
-// Step 4 Component
+// Step 4 Component - ISPRAVKA: Pravilno filtriranje amenities za highlighting
 interface Step4ContentProps {
   form: ReturnType<typeof useForm<ResidenceFormValues>>;
   amenities: Amenity[];
@@ -1034,6 +1202,15 @@ interface Step4ContentProps {
 function Step4Content({ form, amenities }: Step4ContentProps) {
   const selectedAmenities = form.watch("amenities") || [];
   const highlightedAmenities = form.watch("highlightedAmenities") || [];
+
+  // ISPRAVKA: Dodajemo useEffect da logujemo početno stanje
+  useEffect(() => {
+    console.log("Step4Content mounted with:", {
+      selectedAmenities: selectedAmenities.length,
+      highlightedAmenities,
+      allAmenities: amenities.length
+    });
+  }, [selectedAmenities.length, highlightedAmenities, amenities.length]);
 
   return (
     <div className="space-y-6">
@@ -1094,46 +1271,124 @@ function Step4Content({ form, amenities }: Step4ContentProps) {
 
       <div className="custom-form">
         <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Highlight top 3 amenities</h2>
+        <p className="text-muted-foreground mb-6">
+          Select up to 3 amenities from your selected list above to highlight as featured amenities. These will be displayed prominently on the residence page.
+        </p>
 
         <FormField
           control={form.control}
           name="highlightedAmenities"
           render={({ field }) => {
-            // Filter only selected amenities for highlighting
-            const availableAmenities = selectedAmenities.map(amenity => ({
-              id: amenity.id,
-              name: amenity.name
-            }));
+            const currentSelectedAmenities = form.watch("amenities") || [];
+            const selectedIds = (field.value || []).map(h => h.id);
 
-            // Extract just the IDs for the value prop
-            const selectedIds = highlightedAmenities.map(h => h.id);
+            const handleToggleAmenity = (amenityId: string) => {
+              console.log("Toggle amenity clicked:", amenityId);
+              console.log("Current selectedIds:", selectedIds);
+              
+              const isCurrentlySelected = selectedIds.includes(amenityId);
+              let newSelectedIds: string[];
 
-            const handleSelectionChange = (selectedIds: string[]) => {
-              const newHighlightedAmenities = selectedIds.map((id, index) => ({
+              if (isCurrentlySelected) {
+                // Remove amenity
+                newSelectedIds = selectedIds.filter(id => id !== amenityId);
+                console.log("Removing amenity, new list:", newSelectedIds);
+              } else {
+                // Add amenity (max 3)
+                if (selectedIds.length < 3) {
+                  newSelectedIds = [...selectedIds, amenityId];
+                  console.log("Adding amenity, new list:", newSelectedIds);
+                } else {
+                  console.log("Cannot add amenity - already have 3");
+                  toast.error("Maximum 3 amenities can be highlighted. Remove one first.");
+                  return;
+                }
+              }
+
+              const newHighlightedAmenities = newSelectedIds.map((id, index) => ({
                 id: id,
                 order: index
               }));
 
+              console.log("Setting new highlighted amenities:", newHighlightedAmenities);
               field.onChange(newHighlightedAmenities);
             };
 
+            console.log("Step4 render state:", {
+              currentSelectedAmenities: currentSelectedAmenities.length,
+              selectedIds,
+              fieldValue: field.value
+            });
+
             return (
               <FormItem>
-                <FormLabel>Featured amenities (max 3) <span className="text-destructive">*</span></FormLabel>
+                <FormLabel>Featured amenities (max 3)</FormLabel>
                 <FormControl>
-                  <MultiSelect
-                    value={selectedIds}
-                    onChange={handleSelectionChange}
-                    placeholder="Select amenities to highlight"
-                    apiEndpoint="amenities"
-                    maxItems={3}
-                    initialOptions={availableAmenities}
-                    disabled={selectedAmenities.length === 0}
-                  />
+                  {currentSelectedAmenities.length === 0 ? (
+                    <div className="text-sm text-muted-foreground p-4 border rounded-md bg-muted/50">
+                      Please select at least one amenity from the list above before choosing featured amenities.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Click to select/deselect amenities for highlighting (max 3):
+                        </div>
+                        {selectedIds.length === 3 && (
+                          <div className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-md">
+                            Limit reached - remove one to add another
+                          </div>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {currentSelectedAmenities.map((amenity) => {
+                          const isHighlighted = selectedIds.includes(amenity.id);
+                          const canSelect = selectedIds.length < 3;  // Može se dodati novi samo ako ima manje od 3
+                          const canClick = isHighlighted || canSelect;  // Može se kliknuti ako je već highlighted ili ako može da se doda novi
+                          
+                          return (
+                            <div
+                              key={amenity.id}
+                              onClick={() => canClick && handleToggleAmenity(amenity.id)}
+                              className={cn(
+                                "flex items-center space-x-3 p-3 border rounded-md transition-colors",
+                                canClick ? "cursor-pointer hover:bg-secondary" : "cursor-not-allowed",
+                                isHighlighted 
+                                  ? "bg-primary/5 border-primary text-primary" 
+                                  : "border",
+                                !canClick && !isHighlighted && "opacity-50"
+                              )}
+                            >
+                              <div className={cn(
+                                "w-4 h-4 border-2 rounded flex items-center justify-center flex-shrink-0",
+                                isHighlighted 
+                                  ? "border-primary bg-primary" 
+                                  : canClick 
+                                    ? "border border-gray-500" 
+                                    : "border-gray-200"
+                              )}>
+                                {isHighlighted && (
+                                  <Check className="w-3 h-3 text-white" />
+                                )}
+                              </div>
+                              <span className={cn(
+                                "text-sm font-medium",
+                                !canClick && !isHighlighted && "text-gray-400"
+                              )}>
+                                {amenity.name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </FormControl>
                 <FormDescription>
                   {selectedIds.length} of 3 selected<br />
-                  Select up to 3 amenities to highlight as featured from your selected amenities above.
+                  {currentSelectedAmenities.length > 0 
+                    ? "Select up to 3 amenities to highlight as featured from your selected amenities above."
+                    : "You need to select amenities from the list above first."}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
