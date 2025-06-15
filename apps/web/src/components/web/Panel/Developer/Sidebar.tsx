@@ -14,7 +14,7 @@ export default function DeveloperSidebar() {
       {/* Mobile Menu Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden p-3 rounded-b-lg bg-secondary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+        className="lg:hidden p-3 rounded-b-lg bg-secondary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2 w-full"
       >
         {isOpen ? <X size={16} /> : <Menu size={16} />}
         <span className="text-sm font-medium">Panel Menu</span>
