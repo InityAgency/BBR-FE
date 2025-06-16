@@ -35,8 +35,8 @@ const handleUpgrade = async () => {
                 credentials: "include",
                 body: JSON.stringify({
                     priceId: STRIPE_PRICE_ID,
-                    successUrl: `${window.location.origin}/developer/panel/billing/success`,
-                    cancelUrl: `${window.location.origin}/developer/panel/billing/cancel`,
+                    successUrl: `${window.location.origin}/developer/billing/success`,
+                    cancelUrl: `${window.location.origin}/developer/billing/cancel`,
                     metadata: {}
                 })
             }
