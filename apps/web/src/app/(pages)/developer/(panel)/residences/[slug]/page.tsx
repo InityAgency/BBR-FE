@@ -10,6 +10,8 @@ import { ResidenceRanking } from "@/components/web/Residences/Detials/ResidenceR
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ResidenceReviews } from "@/components/web/Residences/Detials/ResidenceReviews";
+import { ResidenceLeads } from "@/components/web/Residences/Detials/ResidenceLeads";
 
 export default function ResidencesSingle() {
   const router = useRouter();
@@ -125,10 +127,9 @@ export default function ResidencesSingle() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <TabsTrigger value="leads" disabled className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Leads</TabsTrigger>
+            <TabsTrigger value="leads" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Leads</TabsTrigger>
             <TabsTrigger value="rankings" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Rankings</TabsTrigger>
             <TabsTrigger value="reviews" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Reviews</TabsTrigger>
-            <TabsTrigger value="billing" disabled className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Billing</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="mt-6">
             <ResidenceDetails residence={residence} />
@@ -145,16 +146,13 @@ export default function ResidencesSingle() {
             )}
           </TabsContent>
           <TabsContent value="leads" className="mt-6">
-            <Card><CardContent className="py-8 text-center text-muted-foreground">Leads are currently locked.</CardContent></Card>
+            <ResidenceLeads residenceId={residence.id} />
           </TabsContent>
           <TabsContent value="rankings" className="mt-6">
             <ResidenceRanking residenceId={residence.id} totalScores={residence.totalScores} />
           </TabsContent>
           <TabsContent value="reviews" className="mt-6">
-            <Card className="bg-secondary"><CardContent className="py-8 text-center text-muted-foreground">Reviews content coming soon...</CardContent></Card>
-          </TabsContent>
-          <TabsContent value="billing" className="mt-6">
-            <Card><CardContent className="py-8 text-center text-muted-foreground">Billing is currently locked.</CardContent></Card>
+            <ResidenceReviews residenceId={residence.id} />
           </TabsContent>
         </Tabs>
       </div>

@@ -22,7 +22,8 @@ const enhancedColumns = (fetchUnits: (page: number) => Promise<void>, currentPag
       return {
         ...column,
         cell: (props: CellContext<Unit, unknown>) => (
-          <UnitsActions row={props.row} onDelete={fetchUnits} currentPage={currentPage} residenceId={residenceId} />
+          <span className="text-muted-foreground w-[80px]">Soon</span>
+          // <UnitsActions row={props.row} onDelete={fetchUnits} currentPage={currentPage} residenceId={residenceId} />
         )
       };
     }
