@@ -16,7 +16,7 @@ export default function BuyerSidebar() {
       {/* Mobile Menu Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden p-3 rounded-b-lg bg-secondary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+        className="lg:hidden p-3 rounded-b-lg bg-secondary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2 w-full"
       >
         {isOpen ? <X size={16} /> : <Menu size={16} />}
         <span className="text-sm font-medium">Panel Menu</span>
@@ -25,7 +25,7 @@ export default function BuyerSidebar() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-15"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -38,7 +38,7 @@ export default function BuyerSidebar() {
         h-full lg:h-auto
         bg-secondary px-4 py-8 rounded-lg
         transform transition-transform duration-300 ease-in-out
-        z-50
+        z-20
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col gap-4">

@@ -61,7 +61,7 @@ export default function DeveloperResidences() {
     };
 
     return (
-        <div className="container mx-auto py-8">
+        <div className="mx-auto py-8">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between">

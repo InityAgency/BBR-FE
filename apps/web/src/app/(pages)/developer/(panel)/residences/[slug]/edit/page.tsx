@@ -1,10 +1,7 @@
-import UnderConstruction from "@/components/web/UnderConstruction"
+import MultiStepResidenceFormEdit from "@/components/web/Residences/MultiStepResidenceFormEdit"
 
 export default function EditResidencePage() {
   return (
-    // <div>
-    //   <h1>Edit Residence</h1>
-    // </div>
-    <UnderConstruction />
+    <MultiStepResidenceFormEdit />
   )
 }

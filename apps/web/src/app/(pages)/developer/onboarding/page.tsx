@@ -50,7 +50,10 @@ const developerOnboardingSchema = z.object({
     notifyBlogs: z.boolean().default(false),
     receiveLuxuryInsights: z.boolean().default(false),
     pushNotifications: z.boolean().default(false),
-    emailNotifications: z.boolean().default(false)
+    emailNotifications: z.boolean().default(false),
+
+    // Step 4: Upgrade Plan
+    selectedPlan: z.string().min(1, "Please select a plan")
 });
 
 type DeveloperOnboardingFormValues = z.infer<typeof developerOnboardingSchema>;
@@ -84,7 +87,10 @@ export default function DeveloperOnboarding() {
             notifyBlogs: false,
             receiveLuxuryInsights: false,
             pushNotifications: false,
-            emailNotifications: false
+            emailNotifications: false,
+
+            // Step 4
+            selectedPlan: ""
         },
         mode: "onChange" // Enable real-time validation
     });
@@ -287,7 +293,7 @@ export default function DeveloperOnboarding() {
         }
     };
 
-    const finalSubmit = async () => {
+    const handleStep3Submit = async () => {
         setIsLoading(true);
 
         try {
@@ -311,10 +317,10 @@ export default function DeveloperOnboarding() {
             console.log("Notification preferences update successful:", response);
 
             toast.success('Onboarding completed successfully!');
-            router.push('/developer/onboarding/thank-you');
+            router.push('/developer/choose-plan');
         } catch (error) {
-            console.error('Error in final onboarding submit:', error);
-            toast.error('Failed to complete onboarding. Please try again.');
+            console.error('Error in notification preferences submit:', error);
+            toast.error('Failed to save notification preferences. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -328,12 +334,12 @@ export default function DeveloperOnboarding() {
         } else if (currentStep === 2) {
             await handleStep2Submit();
         } else {
-            await finalSubmit();
+            await handleStep3Submit();
         }
     };
 
     const nextStep = () => {
-        setCurrentStep((prev) => Math.min(prev + 1, 3));
+        setCurrentStep((prev) => Math.min(prev + 1, 4));
     };
 
     const prevStep = () => {
@@ -623,9 +629,53 @@ export default function DeveloperOnboarding() {
                             </>
                         )}
 
+                        {currentStep === 4 && (
+                            <>
+                                <div>
+                                    <div className="flex w-full flex-row items-center justify-between">
+                                        <Link href="/developer/dashboard" className="text-balance cursor-pointer text-md font-medium text-primary-foreground flex items-center gap-1 hover:text-primary transition-all mb-3">
+                                            Skip and start
+                                            <ArrowRight size={20} />
+                                        </Link>
+                                        <span className="text-muted-foreground text-md font-medium">Developer account</span>
+                                    </div>
+                                    <h1 className="text-3xl font-bold text-left">Choose Your Plan</h1>
+                                    <p className="text-muted-foreground mt-2">
+                                        Select the plan that best suits your needs and start maximizing your property's potential
+                                    </p>
+                                </div>
+                                <div className="space-y-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="selectedPlan"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Select Plan</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a plan" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="basic">Basic Plan</SelectItem>
+                                                        <SelectItem value="premium">Premium Plan</SelectItem>
+                                                        <SelectItem value="enterprise">Enterprise Plan</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Choose the plan that best fits your needs
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </>
+                        )}
 
                         <div className="flex justify-between pt-4">
-                            {currentStep < 3 ? (
+                            {currentStep < 4 ? (
                                 <Button
                                     type="submit"
                                     className="w-full"
