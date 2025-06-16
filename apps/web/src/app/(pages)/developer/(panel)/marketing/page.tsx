@@ -54,7 +54,7 @@ export default function DeveloperMarketing() {
                         <div>
                             <Image src="/editor-onsite.png" alt="Editor Onsite" width={200} height={200} />
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 w-full">
                             <h2 className="text-lg font-bold text-sans">Editor Onsite+</h2>
                             <p className="text-md text-muted-foreground">
                                 Full peace of mind with our physical, on-site verification to certify your residence's quality and authenticity.
@@ -84,7 +84,7 @@ export default function DeveloperMarketing() {
                         <div>
                             <Image src="/editor-everify.png" alt="Editor eVerify" width={200} height={200} />
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 w-full">
                             <h2 className="text-lg font-bold text-sans">Editor eVerify</h2>
                             <p className="text-md text-muted-foreground">
                                 Digital verification to strengthen your property's credibility and ranking.
@@ -114,7 +114,7 @@ export default function DeveloperMarketing() {
                         <div>
                             <Image src="/featured-property.png" alt="Featured Property - Homepage" width={200} height={200} />
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 w-full">
                             <h2 className="text-lg font-bold text-sans">Featured Property - Homepage</h2>
                             <p className="text-md text-muted-foreground">
                                 Position your property front and center for high-net-worth buyers actively searching for their next investment.

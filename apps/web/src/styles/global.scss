@@ -182,18 +182,32 @@ div[data-slot="select-scroll-down-button"] {
     }
 }
 
-.status-select{
-    button{
-        background-color: transparent ;
+.status-select {
+    button {
+        background-color: transparent;
     }
 }
 
 /* Dodaj u globals.css ili component CSS */
 .download-ready {
     color: rgb(255 255 255) !important;
-  }
-  
-  .download-ready * {
+}
+
+.download-ready * {
     color: inherit !important;
     background-color: transparent !important;
-  }
+}
+
+
+.custom-card-title {
+    font-family: 'PPEiko';
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.plan-price {
+    span {
+        font-weight: 500;
+        letter-spacing: 0.75px;
+    }
+}

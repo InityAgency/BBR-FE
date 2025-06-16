@@ -9,6 +9,7 @@ import { ResidenceInventory } from "@/components/web/Residences/Detials/Residenc
 import { ResidenceRanking } from "@/components/web/Residences/Detials/ResidenceRanking";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function ResidencesSingle() {
   const router = useRouter();
@@ -17,6 +18,19 @@ export default function ResidencesSingle() {
   const [residence, setResidence] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userData, setUserData] = useState<any>(null);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('/api/v1/auth/me', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      setUserData(data.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   const fetchResidence = async () => {
     try {
@@ -49,8 +63,11 @@ export default function ResidencesSingle() {
   useEffect(() => {
     if (residenceSlug) {
       fetchResidence();
+      fetchUserData();
     }
   }, [residenceSlug]);
+
+  const isPremiumPlan = userData?.company?.plan !== null;
 
   if (loading) {
     return (
@@ -86,7 +103,28 @@ export default function ResidencesSingle() {
         <Tabs defaultValue="overview">
           <TabsList className="h-auto bg-secondary border">
             <TabsTrigger value="overview" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Overview</TabsTrigger>
-            <TabsTrigger value="inventory" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Inventory</TabsTrigger>
+            <div className="relative">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <TabsTrigger 
+                        value="inventory" 
+                        disabled={!isPremiumPlan}
+                        className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4"
+                      >
+                        Inventory
+                      </TabsTrigger>
+                    </div>
+                  </TooltipTrigger>
+                  {!isPremiumPlan && (
+                    <TooltipContent side="bottom" className="z-50">
+                      <p>Inventory management is available only for PREMIUM users <br /> Please upgrade your plan to access this feature.</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <TabsTrigger value="leads" disabled className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Leads</TabsTrigger>
             <TabsTrigger value="rankings" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Rankings</TabsTrigger>
             <TabsTrigger value="reviews" className="data-[state=active]:text-white dark:data-[state=active]:bg-black/5 cursor-pointer border-transparent py-2 px-4">Reviews</TabsTrigger>
@@ -96,13 +134,20 @@ export default function ResidencesSingle() {
             <ResidenceDetails residence={residence} />
           </TabsContent>
           <TabsContent value="inventory" className="mt-6">
-            <ResidenceInventory residenceId={residence.id} />
+            {isPremiumPlan ? (
+              <ResidenceInventory residenceId={residence.id} />
+            ) : (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  Inventory management is available only for premium users. Please upgrade your plan to access this feature.
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
           <TabsContent value="leads" className="mt-6">
             <Card><CardContent className="py-8 text-center text-muted-foreground">Leads are currently locked.</CardContent></Card>
           </TabsContent>
           <TabsContent value="rankings" className="mt-6">
-            {/* <Card><CardContent className="py-8 text-center text-muted-foreground">Rankings content coming soon...</CardContent></Card> */}
             <ResidenceRanking residenceId={residence.id} totalScores={residence.totalScores} />
           </TabsContent>
           <TabsContent value="reviews" className="mt-6">

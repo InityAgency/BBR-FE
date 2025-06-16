@@ -9,7 +9,7 @@ export default function ThankYou() {
                     <div className="relative w-fit">
                         <Image src="/thank-you.png" alt="Thank you" width={200} height={150} />
                     </div>
-                    <h1 className="text-4xl font-bold text-left lg:text-left">Thank you for Registering!</h1>
+                    <h1 className="text-4xl font-bold text-left lg:text-center">Thank you for Registering!</h1>
                     <p className="mb-2 text-muted-foreground text-md text-center">
                         Thank you for setting up your company account.  Now you’re be able to manage your residences. Please note that you can always update your information in your account settings.
                     </p>
