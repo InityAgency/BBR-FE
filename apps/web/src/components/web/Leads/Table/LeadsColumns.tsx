@@ -1,7 +1,6 @@
 "use client";
-
 import { ColumnDef } from "@tanstack/react-table";
-import { Lead } from "@/types/Lead";
+import { Lead } from "@/types/lead";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -130,17 +129,17 @@ export const columns: ColumnDef<Lead>[] = [
     enableSorting: false, // Disable client-side sorting
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => renderStatusCell(row.getValue("status")),
-    enableSorting: false, // Disable client-side sorting
-  },
-  {
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd.MM.yyyy. HH:mm"),
     enableSorting: false, // Disable client-side sorting
   },
+  // {
+  //   accessorKey: "status",
+  //   header: "Status",
+  //   cell: ({ row }) => renderStatusCell(row.getValue("status")),
+  //   enableSorting: false,
+  // },
   {
     id: "actions",
     header: "Actions",

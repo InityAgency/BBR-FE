@@ -22,8 +22,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Mail, Phone, Eye, ExternalLink } from "lucide-react";
-import { Lead } from "@/types/Lead";
+import { Trash2, Mail, Phone, Eye, ExternalLink, Building2, Home } from "lucide-react";
+import Link from "next/link";
+import { Lead } from "@/types/lead";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 
 const getStatusBadgeStyle = (status: string) => {
@@ -72,6 +73,13 @@ const formatRequestType = (type: string): string => {
     ).join(' ');
 };
 
+interface EntityInfo {
+    id: string;
+    name: string;
+    type: 'residence' | 'unit';
+    slug: string;
+}
+
 export default function LeadDetailsPage() {
     const router = useRouter();
     const params = useParams();
@@ -79,7 +87,7 @@ export default function LeadDetailsPage() {
     const [lead, setLead] = useState<Lead | null>(null);
     const [loading, setLoading] = useState(true);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [status, setStatus] = useState<string>("");
+    const [entityInfo, setEntityInfo] = useState<Record<string, EntityInfo>>({});
 
     useEffect(() => {
         const fetchLead = async () => {
@@ -91,7 +99,55 @@ export default function LeadDetailsPage() {
                 if (!res.ok) throw new Error("Failed to fetch lead");
                 const data = await res.json();
                 setLead(data.data);
-                setStatus(data.data.status);
+
+                // Fetch entity information for each request
+                if (data.data.requests) {
+                    const entityPromises = data.data.requests.map(async (request: any) => {
+                        try {
+                            // Try fetching as residence first
+                            const residenceRes = await fetch(`${API_BASE_URL}/api/${API_VERSION}/public/residences/${request.entityId}`);
+                            if (residenceRes.ok) {
+                                const residenceData = await residenceRes.json();
+                                return {
+                                    id: request.entityId,
+                                    info: {
+                                        id: request.entityId,
+                                        name: residenceData.data.name,
+                                        type: 'residence' as const,
+                                        slug: residenceData.data.slug,
+                                    }
+                                };
+                            }
+
+                            // If residence fails, try fetching as unit
+                            const unitRes = await fetch(`${API_BASE_URL}/api/${API_VERSION}/public/units/${request.entityId}`);
+                            if (unitRes.ok) {
+                                const unitData = await unitRes.json();
+                                return {
+                                    id: request.entityId,
+                                    info: {
+                                        id: request.entityId,
+                                        name: unitData.data.name,
+                                        type: 'unit' as const,
+                                        slug: unitData.data.slug,
+                                    }
+                                };
+                            }
+                        } catch (error) {
+                            console.error(`Failed to fetch entity info for ${request.entityId}`);
+                        }
+                        return null;
+                    });
+
+                    const entityResults = await Promise.all(entityPromises);
+                    const entityMap = entityResults.reduce((acc: Record<string, EntityInfo>, curr) => {
+                        if (curr) {
+                            acc[curr.id] = curr.info;
+                        }
+                        return acc;
+                    }, {});
+                    setEntityInfo(entityMap);
+                }
             } catch (e) {
                 toast.error("Failed to load lead");
                 router.push("/404");
@@ -101,24 +157,6 @@ export default function LeadDetailsPage() {
         };
         if (leadId) fetchLead();
     }, [leadId, router]);
-
-    const handleStatusChange = async (newStatus: string) => {
-        if (!lead) return;
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/${API_VERSION}/leads/${lead.id}/status`, {
-                method: "PATCH",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus })
-            });
-            if (!res.ok) throw new Error("Failed to update status");
-            setStatus(newStatus);
-            toast.success(`Status updated to ${formatStatus(newStatus)}`);
-            setLead({ ...lead, status: newStatus });
-        } catch (e) {
-            toast.error("Failed to update status");
-        }
-    };
 
     const handleDelete = async () => {
         if (!lead) return;
@@ -157,38 +195,16 @@ export default function LeadDetailsPage() {
                     <h1 className="text-2xl font-semibold text-sans">
                         {lead.firstName} {lead.lastName}
                     </h1>
-                    <div className="status-select">
-                        <Select value={status} onValueChange={handleStatusChange}>
-                            <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
-                                <Badge className={`${getStatusBadgeStyle(status)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80`}>
-                                    {formatStatus(status)}
-                                </Badge>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {["NEW", "WON", "LOST"].map((s) => (
-                                    <SelectItem key={s} value={s} className="text-sm">
-                                        {formatStatus(s)}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push(`/leads/${lead.id}/edit`)}
-                    >
-                        Edit
-                    </Button>
-                    <Button
+                    {/* <Button
                         variant="destructive"
                         onClick={() => setShowDeleteDialog(true)}
                         className="cursor-pointer transition-colors"
                     >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 
@@ -214,8 +230,8 @@ export default function LeadDetailsPage() {
             </AlertDialog>
 
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+
                 <div className="bg-secondary rounded-lg p-4 lg:col-span-2">
                     <h2 className="text-lg font-semibold mb-4 text-sans">Contact information</h2>
                     <div className="mb-2 flex w-full gap-4">
@@ -278,27 +294,47 @@ export default function LeadDetailsPage() {
                         <div className="divide-y divide-border">
                             {lead.requests.map((request) => (
                                 <div key={request.id} className="py-4 mb-2 flex items-center justify-between border p-4 rounded-lg hover:bg-white/5 transition-colors">
-                                    <div>
-                                        {request.subject ? (
-                                            <div className="font-medium">{request.subject}</div>
-                                        ) : (
-                                            <div className="font-medium">-</div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Badge variant="outline" className="text-sm px-2 py-0.5 inline-block capitalize">
+                                                {request.type ? formatRequestType(request.type) : "-"}
+                                            </Badge>
+
+                                            {entityInfo[request.entityId] && (
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                     <Badge variant="outline" className="text-sm px-2 py-0.5">
+                                                        {entityInfo[request.entityId].type === 'residence' ? 'Residence' : 'Unit'}
+                                                    </Badge>
+                                                    {entityInfo[request.entityId].type === 'residence' ? (
+                                                        <Building2 className="h-4 w-4" />
+                                                    ) : (
+                                                        <Home className="h-4 w-4" />
+                                                    )}
+                                                    <span>{entityInfo[request.entityId].name}</span>
+                                                   
+                                                    <Link
+                                                        href={
+                                                            entityInfo[request.entityId].type === 'unit'
+                                                                ? `/exclusive-deals/${entityInfo[request.entityId].slug}`
+                                                                : `/residences/${entityInfo[request.entityId].slug}`
+                                                        }
+                                                        className="text-sm text-primary hover:text-primary/80 transition-all"
+                                                    >
+                                                        <ExternalLink className="h-4 w-4" />
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {request.subject && (
+                                            <span className="font-medium">{request.subject}</span>
                                         )}
-                                        {request.message ? (
-                                            <p className="text-sm text-muted-foreground">
-                                                {request.message}
-                                            </p>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground">-</p>
-                                        )}
+
+                                        <div className="text-sm text-muted-foreground mb-2">
+                                            {request.message}
+                                        </div>
+
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="text-sm px-2 py-0.5 inline-block capitalize">
-                                            {request.type ? formatRequestType(request.type) : "-"}
-                                        </Badge>
-                                        <Badge className={getStatusBadgeStyle(request.status)}>
-                                            {request.status ? formatStatus(request.status) : "-"}
-                                        </Badge>
+                                    {/* <div className="flex items-center gap-2">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -307,7 +343,7 @@ export default function LeadDetailsPage() {
                                         >
                                             <Eye className="h-4 w-4" />
                                         </Button>
-                                    </div>
+                                    </div> */}
                                 </div>
                             ))}
                         </div>

@@ -6,7 +6,7 @@ import { useTableFilters } from "@/hooks/useTableFilters";
 import { BaseTable } from "@/components/web/Table/BaseTable";
 import { LeadsFilters } from "./LeadsFilters";
 import { columns } from "./LeadsColumns";
-import { Lead } from "@/types/Lead";
+import { Lead } from "@/types/lead";
 import { fuzzyFilter } from "@/lib/tableFilters";
 import { CellContext } from "@tanstack/react-table";
 import { LeadsActions } from "./LeadsActions";
@@ -143,7 +143,7 @@ export function LeadsTable({
   const { uniqueStatuses } = useTableFilters<Lead>({
     table,
     data: leads,
-    statusAccessor: "status",
+    // statusAccessor: "status",
   });
 
   return (
