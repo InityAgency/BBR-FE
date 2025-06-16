@@ -187,3 +187,13 @@ div[data-slot="select-scroll-down-button"] {
         background-color: transparent ;
     }
 }
+
+/* Dodaj u globals.css ili component CSS */
+.download-ready {
+    color: rgb(255 255 255) !important;
+  }
+  
+  .download-ready * {
+    color: inherit !important;
+    background-color: transparent !important;
+  }
