@@ -46,8 +46,8 @@ export default function DeveloperBilling() {
         fetchUserData();
     }, []);
 
-    const isPremium = userData?.company?.plan === 'Premium';
-    const isFree = userData?.company?.plan === 'Free' || !userData?.company?.plan;
+    const isPremium = userData?.company?.plan?.name === 'Premium';
+    const isFree = userData?.company?.plan?.name === 'Free' || !userData?.company?.plan?.name;
 
     return (
         <div className="w-full py-8">

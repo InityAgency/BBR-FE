@@ -9,12 +9,6 @@ const STRIPE_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_VERSION = "v1";
 
-interface UserData {
-    company: {
-        plan: any | null;
-    };
-}
-
 interface Plan {
     name: string;
     price: string;
@@ -27,7 +21,6 @@ interface Plan {
     buttonVariant?: "default" | "outline";
     cardClass?: string;
     onClick?: () => void;
-    disabled?: boolean;
 }
 
 const handleUpgrade = async () => {
@@ -63,10 +56,65 @@ const handleUpgrade = async () => {
     }
 };
 
+const plans: Plan[] = [
+    {
+        name: "Free",
+        price: "",
+        description: "Perfect for developers with limited budgets who want to gain initial exposure and test the platform before upgrading.",
+        features: [
+            "Basic property listing with limited features.",
+            "Strategic partnership to ensure you get the most",
+            "Brief property overview.",
+            "Essential contact information."
+        ],
+        badge: "Current plan",
+        badgeColor: "bg-blue-600/20 text-blue-400",
+        buttonText: "Current plan",
+        buttonVariant: "outline",
+        cardClass: "bg-secondary text-white border-0"
+    },
+    {
+        name: "Premium",
+        price: "1,500$/month",
+        description: "Ideal for developers ready to invest in premium marketing strategies to actively generate leads, increase visibility, and manage a growing portfolio.",
+        features: [
+            "Includes all Basic Plan features",
+            "Showcase your brand with enhanced property listings",
+            "Access leads from buyers who inquire through our platform",
+            "Boost traffic with advanced SEO and performance analytics",
+            "Easily upload inventory for visitors to view and inquire about",
+            "Highlight units with exclusive BBR offers for our visitors",
+            "Get AI-driven insights to improve performance and lead generation",
+            "Receive expert support from a dedicated marketing consultant"
+        ],
+        badge: "Most Popular",
+        badgeColor: "bg-primary text-white",
+        buttonText: "Upgrade plan",
+        buttonVariant: "default",
+        cardClass: "bg-[#F7E6D4] text-black border-0",
+        onClick: handleUpgrade
+    },
+    {
+        name: "Bespoke",
+        price: "Custom plan",
+        description: "Great for developers seeking comprehensive, results-driven support with maximum premium exposure, strategic guidance, and a flexible fee structure tied to performance.",
+        features: [
+            "All Premium Plan features included for enhanced property exposure and lead generation",
+            "Strategic partnership to ensure you get the most out of the platform",
+            "Tailored strategy for achieving top rankings in relevant categories, including location, lifestyle, and property type",
+            "Flexible performance-based pricing options with shared success incentives to align our goals"
+        ],
+        buttonText: "Schedule a call",
+        buttonLink: "/schedule-a-demo",
+        buttonVariant: "outline",
+        cardClass: "bg-secondary text-white border-0"
+    }
+];
+
 export function UpgradePlan() {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [loadingUser, setLoadingUser] = useState(true);
+    const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -75,142 +123,95 @@ export function UpgradePlan() {
                     credentials: 'include'
                 });
                 const data = await response.json();
-                setUserData(data.data);
+                setCurrentPlan(data.data?.company?.plan?.name || 'Free');
             } catch (error) {
-                setUserData(null);
+                setCurrentPlan('Free');
             } finally {
-                setLoadingUser(false);
+                setLoading(false);
             }
         };
         fetchUserData();
     }, []);
 
-    const isPremium = userData?.company?.plan?.name === 'Premium';
-    const isFree = userData?.company?.plan?.name === 'Free' || !userData?.company?.plan;
-
-    const plans: Plan[] = [
-        {
-            name: "Free",
-            price: "",
-            description: "Perfect for developers with limited budgets who want to gain initial exposure and test the platform before upgrading.",
-            features: [
-                "Basic property listing with limited features.",
-                "Strategic partnership to ensure you get the most",
-                "Brief property overview.",
-                "Essential contact information."
-            ],
-            badge: isFree ? "Current plan" : undefined,
-            badgeColor: "bg-blue-600/20 text-blue-400",
-            buttonText: isFree ? "Current plan" : "Select plan",
-            buttonVariant: "outline",
-            cardClass: "bg-secondary text-white border-0",
-            disabled: isFree
-        },
-        {
-            name: "Premium",
-            price: "1,500$/month",
-            description: "Ideal for developers ready to invest in premium marketing strategies to actively generate leads, increase visibility, and manage a growing portfolio.",
-            features: [
-                "Includes all Basic Plan features",
-                "Showcase your brand with enhanced property listings",
-                "Access leads from buyers who inquire through our platform",
-                "Boost traffic with advanced SEO and performance analytics",
-                "Easily upload inventory for visitors to view and inquire about",
-                "Highlight units with exclusive BBR offers for our visitors",
-                "Get AI-driven insights to improve performance and lead generation",
-                "Receive expert support from a dedicated marketing consultant"
-            ],
-            badge: isPremium ? "Current plan" : "Most Popular",
-            badgeColor: isPremium ? "bg-blue-600/20 text-blue-400" : "bg-[#B3804C] text-white",
-            buttonText: isPremium ? "Current plan" : "Upgrade plan",
-            buttonVariant: "default",
-            cardClass: "bg-[#F7E6D4] text-black border-0",
-            onClick: isPremium ? undefined : handleUpgrade,
-            disabled: isPremium
-        },
-        {
-            name: "Bespoke",
-            price: "Custom plan",
-            description: "Great for developers seeking comprehensive, results-driven support with maximum premium exposure, strategic guidance, and a flexible fee structure tied to performance.",
-            features: [
-                "All Premium Plan features included for enhanced property exposure and lead generation",
-                "Strategic partnership to ensure you get the most out of the platform",
-                "Tailored strategy for achieving top rankings in relevant categories, including location, lifestyle, and property type",
-                "Flexible performance-based pricing options with shared success incentives to align our goals"
-            ],
-            buttonText: "Schedule a call",
-            buttonLink: "/schedule-a-demo",
-            buttonVariant: "outline",
-            cardClass: "bg-secondary text-white border-0"
+    const getPlanConfig = (plan: Plan) => {
+        if (plan.name === currentPlan) {
+            return {
+                ...plan,
+                badge: "Current plan",
+                badgeColor: "bg-primary text-white",
+                buttonText: "Current plan",
+                buttonVariant: (plan.name === "Premium" ? "default" : "outline") as "default" | "outline",
+                onClick: undefined
+            };
         }
-    ];
-
-    if (loadingUser) {
-        return (
-            <div className="flex items-center justify-center py-8">
-                <div className="text-center">Loading...</div>
-            </div>
-        );
-    }
+        if (plan.name === "Free") {
+            return {
+                ...plan,
+                badge: currentPlan === "Premium" ? undefined : plan.badge,
+                buttonText: "Select plan",
+                buttonVariant: "outline" as const
+            };
+        }
+        return plan;
+    };
 
     return (
         <div className="flex items-center justify-center py-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-                {plans.map((plan, idx) => (
-                    <Card
-                        key={plan.name}
-                        className={`relative flex flex-col justify-between shadow-xl rounded-2xl p-0 py-2 h-full ${plan.cardClass}`}
-                    >
-                        <CardHeader className="pb-2 pt-6 px-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <CardTitle className="text-3xl font-bold font-serif custom-card-title">{plan.name}</CardTitle>
-                                {plan.badge && (
-                                    <span className={`ml-2 px-3 py-2 rounded-md text-sm font-medium ${plan.badgeColor}`}>{plan.badge}</span>
-                                )}
-                                
-                            </div>
+                {plans.map((plan, idx) => {
+                    const configuredPlan = getPlanConfig(plan);
+                    return (
+                        <Card
+                            key={plan.name}
+                            className={`relative flex flex-col justify-between shadow-xl rounded-2xl p-0 py-2 h-full ${configuredPlan.cardClass}`}
+                        >
+                            <CardHeader className="pb-2 pt-6 px-6">
+                                <div className="flex items-center justify-between mb-2">
+                                    <CardTitle className="text-3xl font-bold font-serif custom-card-title">{configuredPlan.name}</CardTitle>
+                                    {configuredPlan.badge && (
+                                        <span className={`ml-2 px-3 py-2 rounded-md text-sm font-medium ${configuredPlan.badgeColor}`}>{configuredPlan.badge}</span>
+                                    )}
+                                </div>
 
-                            <div className="mb-2 plan-price">
-                                {plan.price && (
-                                    <span className="text-lg font-semibold letter-spacing-1 text-serif">{plan.price}</span>
-                                )}
-                            </div>
+                                <div className="mb-2 plan-price">
+                                    {configuredPlan.price && (
+                                        <span className="text-lg font-semibold letter-spacing-1 text-serif">{configuredPlan.price}</span>
+                                    )}
+                                </div>
 
-                            <CardDescription className="text-md text-muted-foreground font-normal mb-4  text-inherit">
-                                {plan.description}
-                            </CardDescription>
-                            <Button
-                                className={`w-full py-2 text-base font-medium rounded-lg ${idx === 1 ? "bg-[#b48a5a] hover:bg-[#a07a4a] text-white" : ""}`}
-                                variant={plan.buttonVariant}
-                                disabled={plan.disabled}
-                                onClick={plan.onClick}
-                            >
-                                {plan.buttonLink ? (
-                                    <Link href={plan.buttonLink}>{plan.buttonText}</Link>
-                                ) : (
-                                    plan.buttonText
-                                )}
-                            </Button>
-                          
-                        </CardHeader>
-                        <CardContent className="px-6 pb-2">
-
-                            <div className="font-semibold mb-2">Features</div>
-                            <ul className="space-y-3">
-                                {plan.features.map((feature) => (
-                                    <li key={feature} className="flex items-start text-md">
-                                        <Check className={`h-5 w-5 mt-1 mr-2 ${idx === 1 ? "text-[#b48a5a]" : "text-green-400"}`} />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter className="px-6 pb-6 pt-4 mt-auto">
-
-                        </CardFooter>
-                    </Card>
-                ))}
+                                <CardDescription className="text-md text-muted-foreground font-normal mb-4 text-inherit">
+                                    {configuredPlan.description}
+                                </CardDescription>
+                                <Button
+                                    className={`w-full py-2 text-base font-medium rounded-lg ${idx === 1 ? "bg-[#b48a5a] hover:bg-[#a07a4a] text-white" : ""}`}
+                                    variant={configuredPlan.buttonVariant}
+                                    disabled={configuredPlan.name === currentPlan}
+                                    onClick={configuredPlan.onClick}
+                                >
+                                    {configuredPlan.buttonLink ? (
+                                        <Link href={configuredPlan.buttonLink}>{configuredPlan.buttonText}</Link>
+                                    ) : (
+                                        configuredPlan.buttonText
+                                    )}
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="px-6 pb-2">
+                                <div className="font-semibold mb-2">Features</div>
+                                <ul className="space-y-3">
+                                    {configuredPlan.features.map((feature) => (
+                                        <li key={feature} className="flex items-start text-md">
+                                            <Check className={`h-5 w-5 mt-1 mr-2 ${idx === 1 ? "text-[#b48a5a]" : "text-green-400"}`} />
+                                            <span>{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                            <CardFooter className="px-6 pb-6 pt-4 mt-auto">
+                            </CardFooter>
+                        </Card>
+                    );
+                })}
             </div>
         </div>
     );
-}
+} 

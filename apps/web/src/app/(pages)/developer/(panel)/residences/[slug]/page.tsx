@@ -69,7 +69,8 @@ export default function ResidencesSingle() {
     }
   }, [residenceSlug]);
 
-  const isPremiumPlan = userData?.company?.plan !== null;
+  const isPremiumPlan = userData?.company?.plan?.name === 'Premium';
+  const isFree = userData?.company?.plan?.name === 'Free' || !userData?.company?.plan?.name;
 
   if (loading) {
     return (
