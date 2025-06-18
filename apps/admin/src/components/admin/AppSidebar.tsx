@@ -50,10 +50,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/residences",
       icon: Building2,
       items: [
-        // {
-        //   title: "Claim Requests",
-        //   url: "/residences/claim-requests",
-        // },
+        {
+          title: "Claim Requests",
+          url: "/residences/claim-requests",
+        },
         // {
         //   title: "Units Management",
         //   url: "/residences/units",
