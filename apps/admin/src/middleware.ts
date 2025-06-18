@@ -65,6 +65,8 @@ export const config = {
     "/rankings/:path*",
     "/residences/:path*",
     "/user-management/:path*",
+    "/career/:path*",
+    "/bugs-and-features/:path*",
     // Auth routes
     "/auth/:path*",
     // Root
