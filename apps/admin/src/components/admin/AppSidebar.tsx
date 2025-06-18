@@ -10,6 +10,7 @@ import {
   Sparkle,
   Star,
   Contact,
+  Bug,
 } from "lucide-react"
 
 import { NavMain } from "@/components/admin/SidebarContent/NavMain"
@@ -127,6 +128,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "User Management",
       url: "/user-management",
       icon: UsersRound,
+    },
+    {
+      title: "Bugs and Features",
+      url: "/bugs-and-features",
+      icon: Bug,
     },
   ];
 
