@@ -69,7 +69,8 @@ export default function ResidencesSingle() {
     }
   }, [residenceSlug]);
 
-  const isPremiumPlan = userData?.company?.plan !== null;
+  const isPremiumPlan = userData?.company?.plan?.name === 'Premium';
+  const isFree = userData?.company?.plan?.name === 'Free' || !userData?.company?.plan?.name;
 
   if (loading) {
     return (
@@ -136,7 +137,7 @@ export default function ResidencesSingle() {
           </TabsContent>
           <TabsContent value="inventory" className="mt-6">
             {isPremiumPlan ? (
-              <ResidenceInventory residenceId={residence.id} />
+              <ResidenceInventory residenceId={residence.id} residenceSlug={residenceSlug} />
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">

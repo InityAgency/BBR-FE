@@ -36,7 +36,8 @@ export default function DeveloperMarketing() {
         fetchUserData();
     }, []);
 
-    const isPremiumPlan = userData?.company?.plan !== null;
+    const isPremiumPlan = userData?.company?.plan?.name === 'Premium';
+    const isFree = userData?.company?.plan?.name === 'Free' || !userData?.company?.plan?.name;
 
     return (
         <div className="flex flex-col gap-4 py-8">

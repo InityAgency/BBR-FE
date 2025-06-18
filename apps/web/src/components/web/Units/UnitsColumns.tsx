@@ -82,9 +82,9 @@ export const columns: ColumnDef<Unit>[] = [
     }
   },
   {
-    accessorKey: "price",
+    accessorKey: "regularPrice",
     header: "Price (USD)",
-    cell: ({ row }) => renderPriceCell(row.getValue("price")),
+    cell: ({ row }) => renderPriceCell(row.getValue("regularPrice")),
     meta: {
       width: "w-[150px]"
     }
