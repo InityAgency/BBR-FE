@@ -12,18 +12,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TablePagination } from "../../Table/TablePagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const ITEMS_PER_PAGE = 10;
 
 // Enhanced columns with actions
-const enhancedColumns = (fetchUnits: (page: number) => Promise<void>, currentPage: number, residenceId: string) => 
+const enhancedColumns = (fetchUnits: (page: number) => Promise<void>, currentPage: number, residenceId: string, residenceSlug: string) => 
   columns.map(column => {
     if (column.id === "actions") {
       return {
         ...column,
         cell: (props: CellContext<Unit, unknown>) => (
-          <span className="text-muted-foreground w-[80px]">Soon</span>
-          // <UnitsActions row={props.row} onDelete={fetchUnits} currentPage={currentPage} residenceId={residenceId} />
+          <UnitsActions 
+            row={props.row}
+            onDelete={fetchUnits}
+            currentPage={currentPage}
+            residenceId={residenceId}
+            residenceSlug={residenceSlug}
+          />
         )
       };
     }
@@ -93,6 +100,7 @@ interface UnitsTableProps {
   goToPage: (page: number) => void;
   fetchUnits: (page: number) => Promise<void>;
   residenceId: string; // Dodajemo residenceId
+  residenceSlug: string;
 }
 
 export function UnitsTable({
@@ -105,13 +113,14 @@ export function UnitsTable({
   goToPreviousPage,
   goToPage,
   fetchUnits,
-  residenceId
+  residenceId,
+  residenceSlug
 }: UnitsTableProps) {
 
   // Use generic table hook
   const { table } = useTable<Unit>({
     data: units,
-    columns: enhancedColumns(fetchUnits, currentPage, residenceId),
+    columns: enhancedColumns(fetchUnits, currentPage, residenceId, residenceSlug),
     initialPageSize: ITEMS_PER_PAGE,
     manualPagination: true,
     pageCount: totalPages,

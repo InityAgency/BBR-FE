@@ -137,7 +137,7 @@ export default function ResidencesSingle() {
           </TabsContent>
           <TabsContent value="inventory" className="mt-6">
             {isPremiumPlan ? (
-              <ResidenceInventory residenceId={residence.id} />
+              <ResidenceInventory residenceId={residence.id} residenceSlug={residenceSlug} />
             ) : (
               <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">

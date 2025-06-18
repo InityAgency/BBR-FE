@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row } from "@tanstack/react-table";
 import { Eye, Archive } from "lucide-react";
 import { TableActions, TableAction } from "@/components/web/Table/TableActions";
@@ -18,15 +18,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface UnitsActionsProps {
   row: Row<Unit>;
   onDelete: (page: number) => Promise<void>;
   currentPage: number;
   residenceId: string; // Dodajemo residenceId
+  residenceSlug: string;
 }
 
-export function UnitsActions({ row, onDelete, currentPage, residenceId }: UnitsActionsProps) {
+export function UnitsActions({ row, onDelete, currentPage, residenceId, residenceSlug }: UnitsActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
 
@@ -75,7 +78,7 @@ export function UnitsActions({ row, onDelete, currentPage, residenceId }: UnitsA
         row={row} 
         actions={actions}
         editAction={{
-          href: `/residences/${residenceId}/units/${row.original.id}/edit`,
+          href: `/developer/residences/${residenceSlug}/units/${row.original.id}/edit`,
         }}
       />
 
@@ -99,6 +102,10 @@ export function UnitsActions({ row, onDelete, currentPage, residenceId }: UnitsA
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+{/* 
+        <Link href={`/developer/residences/${residenceSlug}/units/${row.original.id}/edit`}>
+          <Button variant="outline" size="sm">Edit</Button>
+        </Link> */}
     </>
   );
 }

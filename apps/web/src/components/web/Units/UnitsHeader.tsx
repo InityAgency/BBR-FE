@@ -5,12 +5,13 @@ import { Badge } from "@/components/ui/badge";
 interface UnitsHeaderProps {
   totalUnits?: number;
   residenceId?: string;
+  residenceSlug?: string;
 }
 
-export function UnitsHeader({ totalUnits = 0, residenceId }: UnitsHeaderProps) {
+export function UnitsHeader({ totalUnits = 0, residenceId, residenceSlug }: UnitsHeaderProps) {
   const handleAddUnit = () => {
     if (residenceId) {
-      window.location.href = `/residences/${residenceId}/units/create`;
+      window.location.href = `/developer/residences/${residenceSlug}/units/create`;
     } else {
       // Fallback ako nema residenceId
       console.warn("No residenceId provided for unit creation");
@@ -28,7 +29,7 @@ export function UnitsHeader({ totalUnits = 0, residenceId }: UnitsHeaderProps) {
           {totalUnits} total
         </Badge>
       </div>
-      <Button onClick={handleAddUnit} disabled={true}>
+      <Button onClick={handleAddUnit} disabled={false}>
         <Plus className="h-4 w-4 mr-2" />
         Add Unit
       </Button>

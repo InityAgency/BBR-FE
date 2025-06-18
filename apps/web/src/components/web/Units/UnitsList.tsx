@@ -25,9 +25,10 @@ interface UnitsApiResponse {
 interface UnitsListProps {
   residenceId: string;
   onTotalUnitsChange?: (total: number) => void;
+  residenceSlug: string;
 }
 
-export function UnitsList({ residenceId, onTotalUnitsChange }: UnitsListProps) {
+export function UnitsList({ residenceId, onTotalUnitsChange, residenceSlug }: UnitsListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -142,6 +143,7 @@ export function UnitsList({ residenceId, onTotalUnitsChange }: UnitsListProps) {
       goToPage={goToPage}
       fetchUnits={fetchUnits}
       residenceId={residenceId}
+      residenceSlug={residenceSlug}
     />
   );
 }

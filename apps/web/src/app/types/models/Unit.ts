@@ -5,4 +5,6 @@ export interface Unit {
     status: "ACTIVE" | "INACTIVE";
     updatedAt: string;
     createdAt: string;
+    regularPrice: number;
+    exclusivePrice: number;
 } 
