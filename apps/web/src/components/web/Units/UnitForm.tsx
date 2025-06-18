@@ -97,7 +97,10 @@ const getStatusBadgeStyle = (status: string) => {
 };
 
 interface UnitFormProps {
-  initialData?: Partial<UnitFormValues> & { id?: string };
+  initialData?: Partial<UnitFormValues> & { 
+    id?: string;
+    featureImage?: { id: string; url?: string };
+  };
   isEditing?: boolean;
   initialImages?: any[]; // ✅ DODANO: initialImages prop
 }
@@ -353,10 +356,31 @@ const UnitForm: React.FC<UnitFormProps> = ({
 
       // 2. Pripremi galleryMediaIds i featureImageId
       const galleryMediaIds = uploadedImages.map(img => img.mediaId);
-      const featuredImage = uploadedImages.find(img => img.isFeatured) || uploadedImages[0];
-      const featureImageId = featuredImage ? featuredImage.mediaId : "";
+      
+      // 3. Logika za featureImageId - u edit modu čuvamo postojeći ako nema nove featured slike
+      let featureImageId = "";
+      if (isEditing && initialData?.featureImageId && !uploadedImages.find(img => img.isFeatured)) {
+        // Ako je edit mod i ima postojeći featureImageId, a nema nove featured slike
+        featureImageId = initialData.featureImageId;
+      } else {
+        // Inače koristi novu featured sliku ili prvu sliku
+        const featuredImage = uploadedImages.find(img => img.isFeatured) || uploadedImages[0];
+        featureImageId = featuredImage ? featuredImage.mediaId : "";
+      }
 
-      // 3. Pripremi payload
+      // 4. Validacija datuma - proveri da li su datumi važeći
+      let exclusiveOfferStartDate = data.exclusiveOfferStartDate;
+      let exclusiveOfferEndDate = data.exclusiveOfferEndDate;
+
+      // Proveri da li su datumi važeći stringovi
+      if (exclusiveOfferStartDate && !isValidDateString(exclusiveOfferStartDate)) {
+        exclusiveOfferStartDate = undefined;
+      }
+      if (exclusiveOfferEndDate && !isValidDateString(exclusiveOfferEndDate)) {
+        exclusiveOfferEndDate = undefined;
+      }
+
+      // 5. Pripremi payload
       const payload: any = {
         ...data,
         galleryMediaIds,
@@ -370,6 +394,8 @@ const UnitForm: React.FC<UnitFormProps> = ({
         surface: data.surface ? Number(data.surface) : undefined,
         regularPrice: Number(data.regularPrice),
         exclusivePrice: data.exclusivePrice ? Number(data.exclusivePrice) : undefined,
+        exclusiveOfferStartDate: exclusiveOfferStartDate || undefined,
+        exclusiveOfferEndDate: exclusiveOfferEndDate || undefined,
       };
 
       // OBRIŠI polja koja ne želiš da šalješ
@@ -433,6 +459,26 @@ const UnitForm: React.FC<UnitFormProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper funkcija za validaciju datuma
+  const isValidDateString = (dateString: string): boolean => {
+    if (!dateString || dateString.trim() === "") return false;
+    
+    // Proveri da li je ISO string format
+    if (dateString.includes('T')) {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
+    
+    // Proveri da li je date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (dateRegex.test(dateString)) {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
+    
+    return false;
   };
 
   const handleDiscard = () => {
