@@ -7,7 +7,7 @@ import AdminLayout from "../AdminLayout";
 import PageHeader from "@/components/admin/Headers/PageHeader";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { ClaimRequest } from "@/app/types/models/ClaimRequest";
-import ClaimRequestsTable from "@/components/admin/Requests/Table/ClaimRequestsTable";
+import ClaimRequestsTable from "@/components/admin/ClaimRequests/Table/ClaimRequestsTable";
 
 const ITEMS_PER_PAGE = 10; // Uskladjeno sa serverskom stranom
 
@@ -127,7 +127,7 @@ export default function ClaimRequestsPage() {
         goToNextPage={goToNextPage}
         goToPreviousPage={goToPreviousPage}
         goToPage={goToPage}
-        fetchRequests={fetchRequests}
+        fetchClaimRequests={fetchRequests}
       />
     </AdminLayout>
   );
