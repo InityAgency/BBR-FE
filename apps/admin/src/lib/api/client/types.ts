@@ -75,6 +75,12 @@ export interface ApiEndpoints {
     get: EndpointBuilder;
     update: EndpointBuilder;
   };
+  reviews: {
+    list: EndpointBuilder;
+    details: EndpointBuilder;
+    updateStatus: EndpointBuilder;
+    delete: EndpointBuilder;
+  };
 }
 
 export class ApiError extends Error {
