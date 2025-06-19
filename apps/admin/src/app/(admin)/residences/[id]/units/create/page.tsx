@@ -1,4 +1,3 @@
-
 "use client";
 import UnitForm from "@/components/admin/Residences/Units/UnitForm";
 import AdminLayout from "../../../../AdminLayout";
@@ -10,7 +9,10 @@ export default function CreateUnitPage() {
   
   return (
     <AdminLayout>
-      <UnitForm initialData={{ residenceId }} />
+      <UnitForm 
+        initialData={{ residenceId }} 
+        initialImages={[]}
+      />
     </AdminLayout>
   );
 }

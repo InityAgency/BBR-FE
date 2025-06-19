@@ -244,7 +244,7 @@ export function AddResidenceModal({ isOpen, onClose, category, onSuccess, rankin
       isLoadingRef.current = true;
       setLoading(true);
   
-      let queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams();
       const key = category.rankingCategoryType?.key;
       
       // Konstanta za Worldwide ID

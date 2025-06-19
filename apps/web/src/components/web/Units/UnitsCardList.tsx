@@ -87,7 +87,28 @@ export function UnitsCardList({ units, residenceId }: UnitsCardListProps) {
               <div>
                 <span className="text-muted-foreground">Price:</span>
                 <div className="font-medium">
-                  {unit.price ? `$${unit.price.toLocaleString()}` : "-"}
+                  {unit.exclusivePrice && unit.exclusiveOfferStartDate && unit.exclusiveOfferEndDate && (() => {
+                    const now = new Date();
+                    const start = new Date(unit.exclusiveOfferStartDate);
+                    const end = new Date(unit.exclusiveOfferEndDate);
+                    if (now >= start && now <= end) {
+                      return (
+                        <div>
+                          {unit.regularPrice && (
+                            <div className="line-through text-muted-foreground text-xs">
+                              ${unit.regularPrice.toLocaleString()}
+                            </div>
+                          )}
+                          <div className="text-foreground">
+                            ${unit.exclusivePrice.toLocaleString()}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return <div>${unit.regularPrice?.toLocaleString() || "-"}</div>;
+                  })() || (
+                    <div>${unit.regularPrice?.toLocaleString() || "-"}</div>
+                  )}
                 </div>
               </div>
               <div>
