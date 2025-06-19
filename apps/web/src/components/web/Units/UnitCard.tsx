@@ -47,12 +47,20 @@ export function UnitCard({ unit, onRequestInfo }: UnitCardProps) {
         <h3 className="text-xl text-white font-medium transition-all">{unit.name}</h3>
         <div className="flex flex-col gap-1">
           <p className="text-md text-muted-foreground">{unit.description}</p>
-          {unit.exclusivePrice ? (
-            <div className="flex flex-row items-center gap-2">
-            <p className="text-xl font-medium text-primary">${unit.exclusivePrice?.toLocaleString()}</p>
-            <p className="text-xl text-white line-through">${unit.regularPrice?.toLocaleString()}</p>
-            </div>
-          ) : (
+          {unit.exclusivePrice && unit.exclusiveOfferStartDate && unit.exclusiveOfferEndDate && (() => {
+            const now = new Date();
+            const start = new Date(unit.exclusiveOfferStartDate);
+            const end = new Date(unit.exclusiveOfferEndDate);
+            if (now >= start && now <= end) {
+              return (
+                <div className="flex flex-row flex-wrap gap-2">
+                  <p className="text-xl text-white line-through">${unit.regularPrice?.toLocaleString()}</p>
+                  <p className="text-xl font-medium text-primary">${unit.exclusivePrice?.toLocaleString()}</p>
+                </div>
+              );
+            }
+            return <p className="text-xl font-medium text-primary">${unit.regularPrice?.toLocaleString()}</p>;
+          })() || (
             <p className="text-xl font-medium text-primary">${unit.regularPrice?.toLocaleString()}</p>
           )}
           <div className="flex gap-4 text-md text-muted-foreground border-t pt-3 mt-2">

@@ -24,11 +24,45 @@ const renderNameCell = (name: string, id: string) => (
 );
 
 // Helper function for rendering price cell
-const renderPriceCell = (price: number | null | undefined) => {
-  if (price === null || price === undefined) {
-    return <div className="text-center">-</div>;
+const renderPriceCell = (
+  regularPrice: number | null | undefined,
+  exclusivePrice: number | null | undefined,
+  exclusiveOfferStartDate?: string,
+  exclusiveOfferEndDate?: string
+) => {
+  // Provera da li je danas u opsegu ekskluzivne ponude
+  let showExclusive = false;
+  if (exclusivePrice && exclusiveOfferStartDate && exclusiveOfferEndDate) {
+    const now = new Date();
+    const start = new Date(exclusiveOfferStartDate);
+    const end = new Date(exclusiveOfferEndDate);
+    showExclusive = now >= start && now <= end;
   }
-  return <div className="text-center">${price.toLocaleString()}</div>;
+
+  if (regularPrice === null && exclusivePrice === null) {
+    return <div className="text-left">-</div>;
+  }
+
+  return (
+    <div className="text-left">
+      {exclusivePrice && showExclusive ? (
+        <div>
+          {regularPrice && (
+            <div className="line-through text-muted-foreground text-sm">
+              ${regularPrice.toLocaleString()}
+            </div>
+          )}
+          <div className="text-foreground font-medium">
+            ${exclusivePrice.toLocaleString()}
+          </div>
+        </div>
+      ) : (
+        <div className="text-foreground">
+          ${regularPrice?.toLocaleString()}
+        </div>
+      )}
+    </div>
+  );
 };
 
 // Helper function for rendering date cell
@@ -82,9 +116,14 @@ export const columns: ColumnDef<Unit>[] = [
     }
   },
   {
-    accessorKey: "price",
+    accessorKey: "regularPrice",
     header: "Price (USD)",
-    cell: ({ row }) => renderPriceCell(row.getValue("price")),
+    cell: ({ row }) => renderPriceCell(
+      row.getValue("regularPrice"),
+      row.original.exclusivePrice,
+      row.original.exclusiveOfferStartDate,
+      row.original.exclusiveOfferEndDate
+    ),
     meta: {
       width: "w-[150px]"
     }

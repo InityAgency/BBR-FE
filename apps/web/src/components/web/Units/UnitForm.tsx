@@ -730,10 +730,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
                   name="description"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>Unit Title</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter unit description"
+                          placeholder="Enter unit title"
                           className="min-h-[100px]"
                           {...field}
                           value={field.value || ""}
