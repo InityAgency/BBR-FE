@@ -51,6 +51,7 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_CALLBACK_URL: ${{ vars.GOOGLE_CALLBACK_URL }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_STRIPE_PRICE_ID: ${{ secrets.NEXT_PUBLIC_STRIPE_PRICE_ID }}
         run: pnpm run build
 
       # 3) Package Both Builds + ecosystem.config.js
