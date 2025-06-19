@@ -25,7 +25,7 @@ const getStatusColor = (status: string) => {
 const renderStatusCell = (status: string) => {
   return (
     <Badge 
-      variant="secondary"
+      variant="outline"
       className={`${getStatusColor(status)} transition-colors`}
     >
       {status}

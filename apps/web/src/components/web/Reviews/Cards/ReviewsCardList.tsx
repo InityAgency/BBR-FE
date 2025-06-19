@@ -49,7 +49,7 @@ export function ReviewsCardList({ reviews }: ReviewsCardListProps) {
               <p className="text-sm text-muted-foreground">{review.user.fullName}</p>
             </div>
             <Badge 
-              variant="secondary"
+              variant="outline"
               className={`${getStatusColor(review.status)} transition-colors`}
             >
               {review.status}

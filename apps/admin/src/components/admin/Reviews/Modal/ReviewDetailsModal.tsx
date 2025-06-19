@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import {
     Dialog,
@@ -10,25 +10,37 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Review } from "@/types/review";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Review } from "@/app/types/models/Review";
 import { MapPin, Calendar, User, Home, Eye } from "lucide-react";
+import { reviewsService } from "@/lib/api/services/reviews.service";
+import { toast } from "sonner";
 
-interface ReviewModalProps {
+interface ReviewDetailsModalProps {
     review: Review | null;
     isOpen: boolean;
     onClose: () => void;
+    onStatusChange?: () => void;
 }
 
 const getStatusColor = (status: string) => {
     switch (status) {
         case "PENDING":
             return "bg-yellow-900/55 text-yellow-300";
-        case "ARCHIVED":
-            return "bg-gray-900/55 text-gray-300";
-        case "APPROVED":
+        case "ACTIVE":
             return "bg-green-900/55 text-green-300";
         case "REJECTED":
             return "bg-red-900/55 text-red-300";
+        case "FLAGGED":
+            return "bg-orange-900/55 text-orange-300";
+        case "ARCHIVED":
+            return "bg-gray-900/80 text-gray-300";
         default:
             return "bg-blue-900/55 text-blue-300";
     }
@@ -52,8 +64,76 @@ const RatingBar = ({ label, value }: { label: string; value: number }) => (
     </div>
 );
 
-export function ReviewModal({ review, isOpen, onClose }: ReviewModalProps) {
-    if (!review) return null;
+export function ReviewDetailsModal({ review, isOpen, onClose, onStatusChange }: ReviewDetailsModalProps) {
+  const [currentStatus, setCurrentStatus] = useState<Review["status"] | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // Inicijalizuj status kada se review promeni
+  React.useEffect(() => {
+    if (review) {
+      setCurrentStatus(review.status);
+    }
+  }, [review]);
+
+  if (!review) return null;
+
+  const allowedStatuses: Review["status"][] = ["PENDING", "ACTIVE", "REJECTED", "FLAGGED", "ARCHIVED"];
+
+  const handleStatusChange = async (newStatus: Review["status"]) => {
+    if (!review || newStatus === currentStatus) return;
+
+    try {
+      setIsUpdatingStatus(true);
+      
+      // Optimistično ažuriranje
+      setCurrentStatus(newStatus);
+      
+      await reviewsService.updateReviewStatus(review.id, newStatus);
+
+      toast.success("Review status updated successfully");
+      onStatusChange?.();
+    } catch (error) {
+      console.error("Error updating review status:", error);
+      
+      // Ako zahtev neuspešan, vrati stari status
+      setCurrentStatus(review.status);
+      toast.error("Failed to update review status");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const renderStatusBadge = () => {
+    return (
+      <div className="flex items-center gap-2">
+        <Select 
+          onValueChange={handleStatusChange}
+          value={currentStatus || review.status}
+          disabled={isUpdatingStatus}
+        >
+          <SelectTrigger className="w-auto border-0 p-0 h-auto hover:bg-transparent focus:ring-0">
+            <Badge 
+              variant="outline"
+              className={`${getStatusColor(currentStatus || review.status)} px-4 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer hover:opacity-80`}
+            >
+              {currentStatus || review.status}
+            </Badge>
+          </SelectTrigger>
+          <SelectContent>
+            {allowedStatuses.map((status) => (
+              <SelectItem 
+                key={status} 
+                value={status}
+                className="text-sm"
+              >
+                {status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -61,12 +141,7 @@ export function ReviewModal({ review, isOpen, onClose }: ReviewModalProps) {
                 <DialogHeader>
                     <div className="flex items-center gap-4 ">
                         <DialogTitle className="text-xl text-sans font-semibold">Review Details</DialogTitle>
-                        <Badge
-                            variant="outline"
-                            className={`${getStatusColor(review.status)} transition-colors px-2 py-1`}
-                        >
-                            {review.status}
-                        </Badge>
+                        {renderStatusBadge()}
                     </div>
                 </DialogHeader>
 
@@ -114,10 +189,6 @@ export function ReviewModal({ review, isOpen, onClose }: ReviewModalProps) {
                                 <Home className="h-4 w-4" />
                                 <h3 className="font-semibold text-sans">Residence</h3>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={onClose}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Review
-                            </Button>
                         </div>
                         <div className="space-y-2 text-sm">
                             <div><strong className="text-muted-foreground">Name:</strong> {review.residence.name}</div>

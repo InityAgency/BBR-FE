@@ -10,6 +10,8 @@ import {
   Sparkle,
   Star,
   Contact,
+  Bug,
+  Briefcase,
 } from "lucide-react"
 
 import { NavMain } from "@/components/admin/SidebarContent/NavMain"
@@ -50,10 +52,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "/residences",
       icon: Building2,
       items: [
-        // {
-        //   title: "Claim Requests",
-        //   url: "/residences/claim-requests",
-        // },
+        {
+          title: "Claim Requests",
+          url: "/residences/claim-requests",
+        },
         // {
         //   title: "Units Management",
         //   url: "/residences/units",
@@ -127,6 +129,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "User Management",
       url: "/user-management",
       icon: UsersRound,
+    },
+    {
+      title: "Bugs and Features",
+      url: "/bugs-and-features",
+      icon: Bug,
+    },
+    {
+      title: "Career",
+      url: "/career",
+      icon: Briefcase,
     },
   ];
 

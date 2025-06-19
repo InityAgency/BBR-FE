@@ -28,7 +28,7 @@ const renderPriceCell = (price: number | null | undefined) => {
   if (price === null || price === undefined) {
     return <div className="text-center">-</div>;
   }
-  return <div className="text-center">${price.toLocaleString()}</div>;
+  return <div className="text-left">$ {price.toLocaleString()}</div>;
 };
 
 // Helper function for rendering date cell
@@ -43,11 +43,11 @@ const renderStatusCell = (status: string) => {
   if (!status) {
     return <Badge variant="secondary">Unknown</Badge>;
   }
-  
+
   let badgeVariant: "default" | "secondary" | "destructive" | "outline" = "default";
   let badgeClass = "";
-  
-  switch(status) {
+
+  switch (status) {
     case "ACTIVE":
       badgeVariant = "default";
       badgeClass = "bg-green-900/55 text-green-300";
@@ -64,11 +64,16 @@ const renderStatusCell = (status: string) => {
       badgeVariant = "outline";
       badgeClass = "bg-yellow-900/55 text-yellow-300";
       break;
+
+    case "PENDING":
+      badgeVariant = "outline";
+      badgeClass = "bg-yellow-900/55 text-yellow-300";
+      break;
     default:
       badgeVariant = "secondary";
       badgeClass = "bg-gray-900/55 text-gray-300";
   }
-  
+
   return <Badge variant={badgeVariant} className={badgeClass}>{status}</Badge>;
 };
 
