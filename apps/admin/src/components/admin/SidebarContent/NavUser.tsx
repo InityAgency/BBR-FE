@@ -6,6 +6,7 @@ import {
   ChevronsUpDown,
   LogOut,
 } from "lucide-react"
+import { useState } from "react"
 
 import {
   Avatar,
@@ -28,6 +29,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
+import { toast } from "sonner"
 
 // Funkcija za dobijanje inicijala iz imena korisnika
 const getInitials = (name: string): string => {
@@ -56,10 +58,21 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    await logout();
-    // Redirect happens in the auth context
+    if (isLoggingOut) return; // Prevent multiple clicks
+    
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.success("Successfully logged out");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Error logging out. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
+    }
   }
   
   // Dobavljanje inicijala korisnika
@@ -115,9 +128,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className={isLoggingOut ? "opacity-50 cursor-not-allowed" : ""}
+            >
               <LogOut />
-              Log out
+              {isLoggingOut ? "Odjavljivanje..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

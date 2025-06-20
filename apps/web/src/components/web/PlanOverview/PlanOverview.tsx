@@ -210,7 +210,7 @@ const WhatItsForBespoke = () => {
 const FreeLink = () => {
   return (
     <Link
-      href="/#"
+      href="/developer/dashboard"
       className="text-[10px] lg:text-[14px] place-self-center flex justify-center lg:h-[40px] w-full text-center items-center text-black bg-[#F5F5F4] rounded-md p-2 text-black"
     >
       Get started for free
@@ -220,7 +220,7 @@ const FreeLink = () => {
 const PremiumLink = () => {
   return (
     <Link
-      href="/#"
+      href="/developer/billing/upgrade"
       className="text-[10px] lg:text-[14px] place-self-center flex justify-center lg:h-[40px] w-full text-center items-center text-white bg-primary rounded-md p-2 text-black"
     >
       Get started for free
@@ -230,7 +230,7 @@ const PremiumLink = () => {
 const BespokeLink = () => {
   return (
     <Link
-      href="/#"
+      href="/schedule-a-demo"
       className="text-[10px] lg:text-[14px] place-self-center flex justify-center lg:h-[40px] w-full text-center items-center text-black bg-[#F5F5F4] rounded-md p-2 text-black"
     >
       Schedule a call
