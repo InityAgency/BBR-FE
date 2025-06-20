@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ export function CareerTab() {
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    const fetchCareerForms = async (page: number = 1, search?: string) => {
+    const fetchCareerForms = useCallback(async (page: number, search?: string) => {
         try {
             setLoading(true);
             setError(null);
@@ -95,7 +95,15 @@ export function CareerTab() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearchTerm]);
+
+    useEffect(() => {
+        fetchCareerForms(currentPage, debouncedSearchTerm);
+    }, [currentPage, debouncedSearchTerm, fetchCareerForms]);
 
     const downloadFile = async (mediaId: string, fileName: string) => {
         try {
@@ -141,14 +149,6 @@ export function CareerTab() {
             });
         }
     };
-
-    useEffect(() => {
-        setCurrentPage(1); // Reset to first page when searching
-    }, [debouncedSearchTerm]);
-
-    useEffect(() => {
-        fetchCareerForms(currentPage, debouncedSearchTerm);
-    }, [currentPage, debouncedSearchTerm]);
 
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return '0 Bytes';
@@ -209,6 +209,24 @@ export function CareerTab() {
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedCareerId(null);
+    };
+
+    const handleStatusChange = (updatedCareerId: string, newStatus: string) => {
+        // Ažuriraj lokalno stanje bez pozivanja API-ja
+        setCareerForms(prevForms => 
+            prevForms.map(form => 
+                form.id === updatedCareerId 
+                    ? { ...form, status: newStatus }
+                    : form
+            )
+        );
+    };
+
+    const handleDelete = (deletedCareerId: string) => {
+        // Ukloni iz lokalnog stanja bez pozivanja API-ja
+        setCareerForms(prevForms => 
+            prevForms.filter(form => form.id !== deletedCareerId)
+        );
     };
 
     if (loading) {
@@ -377,11 +395,15 @@ export function CareerTab() {
             />
 
             {/* Details Modal */}
-            <CareerDetailsModal
-                isOpen={isModalOpen}
-                onClose={closeModal}
-                careerId={selectedCareerId}
-            />
+            {isModalOpen && (
+                <CareerDetailsModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    careerId={selectedCareerId}
+                    onStatusChange={handleStatusChange}
+                    onDelete={handleDelete}
+                />
+            )}
         </div>
     );
 } 
