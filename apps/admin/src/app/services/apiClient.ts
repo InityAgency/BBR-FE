@@ -5,6 +5,7 @@ const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
 
 export const apiClient = axios.create({
   baseURL: `${baseURL}/api/${apiVersion}`,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },

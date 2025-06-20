@@ -12,7 +12,7 @@ interface FormHeaderProps {
   isSubmitting?: boolean;
 }
 
-const FormHeader: React.FC<FormHeaderProps> = ({
+const UnitFormHeader: React.FC<FormHeaderProps> = ({
   title,
   titleContent,
   extraButtons,
@@ -41,4 +41,4 @@ const FormHeader: React.FC<FormHeaderProps> = ({
   );
 };
 
-export default FormHeader; 
+export default UnitFormHeader; 

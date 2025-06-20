@@ -8,6 +8,9 @@ import { residencesService } from "@/lib/api/services/residences";
 import { ResidenceHeader } from "@/components/admin/Residences/Headers/ResidenceHeader";
 import { ResidenceDetails } from "@/components/admin/Residences/Details/ResidenceDetails";
 import { ResidenceInventory } from "@/components/admin/Residences/Details/ResidenceInventory";
+import { ResidenceLeads } from "@/components/admin/Residences/Details/ResidenceLeads";
+import { ResidenceRanking } from "@/components/admin/Residences/Details/ResidenceRanking";
+import { ResidenceReviews } from "@/components/admin/Residences/Details/ResidenceReviews";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useBreadcrumb } from "@/components/admin/Breadcrumb";
@@ -93,7 +96,7 @@ export default function ResidencesSingle() {
         <TabsList className="bg-foreground/5">
           <TabsTrigger value="overview" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Overview</TabsTrigger>
           <TabsTrigger value="inventory" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Inventory</TabsTrigger>
-          <TabsTrigger value="leads" disabled className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Leads</TabsTrigger>
+          <TabsTrigger value="leads" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Leads</TabsTrigger>
           <TabsTrigger value="rankings" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Rankings</TabsTrigger>
           <TabsTrigger value="reviews" className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Reviews</TabsTrigger>
           <TabsTrigger value="billing" disabled className="data-[state=active]:text-white dark:data-[state=active]:bg-zinc-950 cursor-pointer border-transparent">Billing</TabsTrigger>
@@ -105,13 +108,13 @@ export default function ResidencesSingle() {
           <ResidenceInventory residenceId={residenceId} />
         </TabsContent>
         <TabsContent value="leads" className="mt-6">
-          <Card><CardContent className="py-8 text-center text-muted-foreground">Leads are currently locked.</CardContent></Card>
+          <ResidenceLeads residenceId={residenceId} />
         </TabsContent>
         <TabsContent value="rankings" className="mt-6">
-          <Card><CardContent className="py-8 text-center text-muted-foreground">Rankings content coming soon...</CardContent></Card>
+          <ResidenceRanking residenceId={residenceId} totalScores={residence.totalScores} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-6">
-          <Card><CardContent className="py-8 text-center text-muted-foreground">Reviews content coming soon...</CardContent></Card>
+          <ResidenceReviews residenceId={residenceId} />
         </TabsContent>
         <TabsContent value="billing" className="mt-6">
           <Card><CardContent className="py-8 text-center text-muted-foreground">Billing is currently locked.</CardContent></Card>

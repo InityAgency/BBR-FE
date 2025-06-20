@@ -27,7 +27,9 @@ const enhancedColumns = (fetchReviews: (page: number, statuses?: string[]) => Pr
         <ReviewsActions 
           row={props.row}
           onRefresh={() => fetchReviews(currentPage)}
-          onViewDetails={onViewDetails} currentPage={0}        />
+          onViewDetails={onViewDetails}
+          currentPage={currentPage}
+        />
       )
     }
   }
@@ -138,6 +140,11 @@ export default function ReviewsTable({
   }, [reviews]);
 
   function handleViewDetails(review: Review) {
+    // Ako je modal već otvoren za isti review, ne otvaraj ponovo
+    if (isModalOpen && selectedReview?.id === review.id) {
+      return;
+    }
+    
     setSelectedReview(review);
     setIsModalOpen(true);
   }
@@ -159,6 +166,8 @@ export default function ReviewsTable({
           <ReviewsCardList 
             reviews={reviews}
             onViewDetails={handleViewDetails}
+            onRefresh={async (page: number) => fetchReviews(page, selectedStatuses)}
+            currentPage={currentPage}
           />
         )}
       </div>
@@ -192,9 +201,9 @@ export default function ReviewsTable({
           setIsModalOpen(false);
           setSelectedReview(null);
         }}
-        onStatusChange={() => {
-          // Osveži tabelu nakon promene statusa
-          fetchReviews(currentPage, selectedStatuses);
+        onStatusChange={async () => {
+          // Osveži tabelu u pozadini bez zatvaranja modala
+          await fetchReviews(currentPage, selectedStatuses);
         }}
       />
     </div>
