@@ -331,8 +331,8 @@ const CorporateResponsibilityLegal = () => {
                 thing is always good business.
               </h1>
               <Link
-                href="/#"
-                className="place-self-center h-[50px] inline-flex place-self-center items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-4 has-[>svg]:px-3 w-full md:w-[200px]"
+                href="#content"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 w-full sm:w-auto lg:w-fit lg:mx-auto"
               >
                 Learn More
               </Link>
@@ -342,7 +342,7 @@ const CorporateResponsibilityLegal = () => {
       </div>
 
       {/* SECOND SECTION */}
-      <div className="bg-beigeVariant11">
+      <div className="bg-beigeVariant11" id="content">
         <SectionLayout>
           <div className="flex flex-col items-center rounded-b-xl max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 gap-4 xl:gap-8 mb-12 single-blog-content">
             <div className="w-full flex gap-4 mx-auto space-y-8 relative xl:max-w-[1600px] mx-auto">
