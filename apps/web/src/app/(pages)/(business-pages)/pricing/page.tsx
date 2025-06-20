@@ -80,7 +80,7 @@ const PricingPage = () => {
                 initial exposure and test the platform before upgrading.
               </p>
               <Link
-                href="/#"
+                href="/developer/dashboard"
                 className="w-full my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-[#F5F5F4] text-black hover:bg-white/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Get started for free
@@ -153,7 +153,7 @@ const PricingPage = () => {
                 manage a growing portfolio.
               </p>
               <Link
-                href="/#"
+                href="/developer/billing/upgrade"
                 className="w-full my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-white hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Get started
@@ -264,7 +264,7 @@ const PricingPage = () => {
                 flexible fee structure tied to performance.
               </p>
               <Link
-                href="/#"
+                href="/schedule-a-demo"
                 className="w-full my-4 z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-[#F5F5F4] text-black hover:bg-white/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Schedule a call
@@ -363,7 +363,7 @@ const PricingPage = () => {
                 </p>
               </div>
               <Link
-                href="/#"
+                href="/developer/ranking"
                 className="w-full lg:w-fit place-self-end my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-white hover:bg-primary/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Get started
