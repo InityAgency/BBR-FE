@@ -13,3 +13,7 @@ export const REVIEWS = {
 export const LEADS = {
   GET_ALL: "/leads",
 };
+
+export const B2B_FORM_SUBMISSIONS = {
+  GET_ALL: "/b2b-form-submissions",
+};

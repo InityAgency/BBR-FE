@@ -12,6 +12,7 @@ import {
   Contact,
   Bug,
   Briefcase,
+  FileText,
 } from "lucide-react"
 
 import { NavMain } from "@/components/admin/SidebarContent/NavMain"
@@ -104,6 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         }
       ]
     },
+  
     {
       title: "Reviews",
       url: "/reviews",
@@ -139,6 +141,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Career",
       url: "/career",
       icon: Briefcase,
+    },
+    {
+      title: "B2B Form Submissions",
+      url: "/b2b-form-submissions",
+      icon: FileText,
     },
   ];
 
