@@ -18,7 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 
 export default function MiniNav() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -43,6 +43,7 @@ export default function MiniNav() {
     try {
       await logout();
       setDropdownOpen(false);
+      sessionStorage.removeItem('bbr-session');
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -185,7 +186,6 @@ export default function MiniNav() {
                   <div className="border-t border-border py-1">
                     <button
                       onClick={handleLogout}
-                      disabled={isLoading}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-destructive hover:bg-white/5 w-full text-left transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
