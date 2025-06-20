@@ -11,6 +11,8 @@ import { ReviewsActions } from "../Table/ReviewsActions";
 interface ReviewsCardListProps {
   reviews: Review[];
   onViewDetails: (review: Review) => void;
+  onRefresh: (page: number) => Promise<void>;
+  currentPage: number;
 }
 
 const getStatusColor = (status: string) => {
@@ -30,7 +32,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export function ReviewsCardList({ reviews, onViewDetails }: ReviewsCardListProps) {
+export function ReviewsCardList({ reviews, onViewDetails, onRefresh, currentPage }: ReviewsCardListProps) {
   if (reviews.length === 0) {
     return (
       <div className="text-center py-8">
@@ -52,8 +54,10 @@ export function ReviewsCardList({ reviews, onViewDetails }: ReviewsCardListProps
             </Badge>
             <ReviewsActions 
               row={{ original: review } as any}
-              onRefresh={async () => { } }
-              onViewDetails={onViewDetails} currentPage={0}            />
+              onRefresh={onRefresh}
+              onViewDetails={onViewDetails}
+              currentPage={currentPage}
+            />
           </div>
           <div className="flex items-start justify-between mb-2 border-b border-border pb-2">
             <div className="flex-1 min-w-0">

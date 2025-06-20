@@ -3,7 +3,7 @@
 import React from "react";
 import { Row } from "@tanstack/react-table";
 import { TableActions } from "@/components/admin/Table/TableActions";
-import { Lead } from "@/app/types/models/Lead";
+import { Lead } from "@/types/models/Lead";
 import { Eye } from "lucide-react";
 
 interface LeadsActionsProps {

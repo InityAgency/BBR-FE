@@ -151,14 +151,12 @@ export default function EvaluationCriteriaClient() {
                 review.
               </p>
               <div className="flex gap-4">
-                <GetMatchedButton />  
-                <Button
-                  onClick={() => {}}
-                  variant="outline"
-                  className="place-self-start lg:place-self-center"
-                >
-                  Explore residences
-                </Button>
+                <GetMatchedButton />
+                <Link href="/residences">
+                  <Button variant="outline" className="place-self-start lg:place-self-center">
+                    Explore residences
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -173,13 +171,11 @@ export default function EvaluationCriteriaClient() {
         <div className="flex flex-col gap-[30px] lg:flex-row lg:gap-[200px] xl:max-w-[1600px] mx-auto">
           <div className="flex place-self-start gap-[12px] lg:place-self-end">
             <GetMatchedButton />
-            <Button
-              onClick={() => {}}
-              variant="outline"
-              className="place-self-start lg:place-self-center text-blackBlueVariant1 hover:text-blackBlueVariant1/50 !border-blackBlueVariant1"
-            >
-              Explore residences
-            </Button>
+            <Link href="/residences">
+              <Button variant="outline" className="lace-self-start lg:place-self-center text-blackBlueVariant1 hover:text-blackBlueVariant1/50 !border-blackBlueVariant1">
+                Explore residences
+              </Button>
+            </Link>
           </div>
           <p className="text-blackBlueVariant1 lg:w-[50%] text-justify">
             We don't just list properties—we evaluate them. Every ranked
@@ -380,13 +376,12 @@ export default function EvaluationCriteriaClient() {
           </p>
           <div className="flex gap-4">
             <GetMatchedButton />
-            <Button
-              onClick={() => {}}
-              variant="outline"
-              className="place-self-start lg:place-self-center text-blackBlueVariant1 hover:text-blackBlueVariant1/50 !border-blackBlueVariant1"
-            >
-              Explore residences
-            </Button>
+
+            <Link href="/residences">
+              <Button variant="outline" className="lace-self-start lg:place-self-center text-blackBlueVariant1 hover:text-blackBlueVariant1/50 !border-blackBlueVariant1">
+                Explore residences
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -478,7 +473,7 @@ export default function EvaluationCriteriaClient() {
                   investment, or an exclusive lifestyle experience, our
                   consultants are here to help.
                 </p>
-                <Button onClick={() => {}} className="place-self-start">
+                <Button onClick={() => { }} className="place-self-start">
                   Schedule a consultation
                 </Button>
                 <Image

@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Lead } from "@/app/types/models/Lead";
+import { Lead } from "@/types/models/Lead";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -58,34 +58,6 @@ const renderContactMethods = (methods: string[] | null) => {
 
 export const columns: ColumnDef<Lead>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex justify-center">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-[2px]"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-[2px]"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      width: "w-[40px]"
-    },
-  },
-  {
     accessorKey: "firstName",
     header: "First Name",
     cell: ({ row }) => {
@@ -125,12 +97,6 @@ export const columns: ColumnDef<Lead>[] = [
     accessorKey: "preferredContactMethod",
     header: "Preferred Contact",
     cell: ({ row }) => renderContactMethods(row.getValue("preferredContactMethod")),
-    enableSorting: false, // Disable client-side sorting
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => renderStatusCell(row.getValue("status")),
     enableSorting: false, // Disable client-side sorting
   },
   {

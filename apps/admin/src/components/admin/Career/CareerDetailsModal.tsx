@@ -7,6 +7,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -26,7 +37,8 @@ import {
   Briefcase, 
   FileText,
   User,
-  MessageSquare
+  MessageSquare,
+  Trash2
 } from "lucide-react";
 import { API_BASE_URL, API_VERSION } from "@/app/constants/api";
 import { toast } from "sonner";
@@ -50,14 +62,17 @@ interface CareerDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   careerId: string | null;
+  onStatusChange?: (id: string, status: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function CareerDetailsModal({ isOpen, onClose, careerId }: CareerDetailsModalProps) {
+export function CareerDetailsModal({ isOpen, onClose, careerId, onStatusChange, onDelete }: CareerDetailsModalProps) {
   const [careerForm, setCareerForm] = useState<CareerForm | null>(null);
   const [loading, setLoading] = useState(false);
   const [downloadingCV, setDownloadingCV] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>("");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchCareerDetails = async (id: string) => {
     try {
@@ -154,6 +169,7 @@ export function CareerDetailsModal({ isOpen, onClose, careerId }: CareerDetailsM
       // Update local state
       setCareerForm(prev => prev ? { ...prev, status: newStatus } : null);
       toast.success(`Status updated to ${newStatus}`);
+      onStatusChange?.(careerForm.id, newStatus); // Call the callback with parameters
     } catch (err: any) {
       console.error("Error updating status:", err);
       
@@ -162,6 +178,38 @@ export function CareerDetailsModal({ isOpen, onClose, careerId }: CareerDetailsM
       toast.error("Failed to update status");
     } finally {
       setIsUpdatingStatus(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!careerForm) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      const response = await fetch(
+        `${API_BASE_URL}/api/${API_VERSION}/career-contact-forms/${careerForm.id}`,
+        {
+          method: 'DELETE',
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast.success("Career application deleted successfully");
+      onDelete?.(careerForm.id);
+      onClose();
+    } catch (err: any) {
+      console.error("Error deleting career application:", err);
+      toast.error("Failed to delete career application");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -388,6 +436,52 @@ export function CareerDetailsModal({ isOpen, onClose, careerId }: CareerDetailsM
                 </div>
               </div>
             )}
+
+            {/* Action Buttons */}
+            <div className="flex justify-between pt-6 border-t border-border">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    className="flex items-center gap-2"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500 mr-2"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 " />
+                        Delete
+                      </>
+                    )}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Career Application</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this career application? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      className="bg-red-800 hover:bg-red-900 text-white transition-all duration-200"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="text-center py-12 text-muted-foreground">

@@ -5,17 +5,22 @@ interface GetReviewsParams {
   page?: number;
   limit?: number;
   statuses?: string;
+  residenceId?: string;
 }
 
 class ReviewsService {
   private baseUrl = `${API_BASE_URL}/api/${API_VERSION}`;
 
   async getReviews(params: GetReviewsParams = {}): Promise<ReviewsResponse> {
-    const { page = 1, limit = 10, statuses } = params;
+    const { page = 1, limit = 10, statuses, residenceId } = params;
     
     const searchParams = new URLSearchParams();
     searchParams.set('page', page.toString());
     searchParams.set('limit', limit.toString());
+    
+    if (residenceId) {
+      searchParams.set('residenceId', residenceId);
+    }
     
     if (statuses) {
       // Split comma-separated statuses and add each as separate parameter

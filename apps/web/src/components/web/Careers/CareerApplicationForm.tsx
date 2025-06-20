@@ -94,39 +94,53 @@ export function CareerApplicationForm({ position, pageUrl }: CareerApplicationFo
       const formData = new FormData();
       formData.append('file', data.resume);
       
+      console.log('Uploading CV...', data.resume);
+      
       const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media?type=CAREER_CONTACT_FORM`, {
         method: 'POST',
         body: formData,
       });
       
       if (!uploadResponse.ok) {
-        throw new Error('Failed to upload resume');
+        const errorText = await uploadResponse.text();
+        console.error('Upload failed:', uploadResponse.status, errorText);
+        throw new Error(`Failed to upload resume: ${uploadResponse.status}`);
       }
       
       const uploadResult = await uploadResponse.json();
-      const cvId = uploadResult.id;
+      const cvId = uploadResult.data.id;
+      
+      console.log('CV uploaded successfully, ID:', cvId);
       
       // Korak 2: Slanje podataka forme
+      const formDataToSend = {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        linkedin: data.linkedin || null,
+        message: data.message,
+        cvId: cvId,
+        position: position,
+        websiteURL: pageUrl
+      };
+      
+      console.log('Sending form data:', formDataToSend);
+      
       const formSubmitResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/career-contact-forms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          fullName: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          linkedin: data.linkedin || null,
-          message: data.message,
-          cvId: cvId,
-          position: position,
-          websiteURL: pageUrl
-        }),
+        body: JSON.stringify(formDataToSend),
       });
       
       if (!formSubmitResponse.ok) {
-        throw new Error('Failed to submit application');
+        const errorText = await formSubmitResponse.text();
+        console.error('Form submission failed:', formSubmitResponse.status, errorText);
+        throw new Error(`Failed to submit application: ${formSubmitResponse.status}`);
       }
+      
+      console.log('Form submitted successfully');
       
       // Uspešno podnošenje prijave
       toast.success("Application Submitted", {
