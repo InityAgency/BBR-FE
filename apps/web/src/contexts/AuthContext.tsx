@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { UnitType } from '@/types/unit';
+import { Lifestyle } from '@/types/lifestyle';
 interface Image {
   id: string;
   originalFileName: string;
@@ -44,6 +46,11 @@ interface User {
   fullName: string;
   email: string;
   company?: Company;
+  avatar?: Image;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
   buyer?: {
     image_id: string | null;
     budgetRangeFrom: number | null;
@@ -60,8 +67,15 @@ interface User {
       name: string | null;
       code: string | null;
     };
+    unitTypes: UnitType[];
+    lifestyles: Lifestyle[];
   } | null;
   role: Role;
+  emailVerified: boolean;
+  pushNotifications: boolean;
+  receiveLuxuryInsights: boolean;
+  notifyMarketTrends: boolean;
+  emailNotifications: boolean;
 }
 
 interface AuthContextType {

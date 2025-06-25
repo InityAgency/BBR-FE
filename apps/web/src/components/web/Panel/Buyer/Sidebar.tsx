@@ -25,7 +25,7 @@ export default function BuyerSidebar() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-15"
+          className="lg:hidden fixed inset-0 bg-black/50 z-10"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -36,7 +36,7 @@ export default function BuyerSidebar() {
         top-0 left-0
         w-[280px] lg:w-1/5
         h-full lg:h-auto
-        bg-secondary px-4 py-8 rounded-lg
+        bg-secondary px-4 py-8 rounded-lg min-h-[50svh]
         transform transition-transform duration-300 ease-in-out
         z-20
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}

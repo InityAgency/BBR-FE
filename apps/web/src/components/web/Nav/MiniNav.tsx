@@ -71,36 +71,38 @@ export default function MiniNav() {
   };
 
   return (
-    <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-2 justify-between items-center gap-6 hidden md:flex">
-      <div className="flex flex-row gap-6 ">
+    <div className="w-full xl:max-w-[1600px] mx-auto px-4 py-2 justify-between items-center gap-2 md:gap-4 lg:gap-6 hidden sm:flex">
+      <div className="flex flex-row gap-2 md:gap-4 lg:gap-6">
         <Link
           href="mailto:support@bestbrandedresidences.com"
-          className="flex gap-2 items-center hover:text-primary transition-all"
+          className="flex gap-1 md:gap-2 items-center hover:text-primary transition-all text-xs md:text-sm"
         >
-          <Mail width={16} height={16} color="#B3804C" />
-          support@bestbrandedresidences.com
+          <Mail width={14} height={14} className="md:w-4 md:h-4" color="#B3804C" />
+          <span className="hidden lg:inline">support@bestbrandedresidences.com</span>
+          <span className="lg:hidden">support@bbr.com</span>
         </Link>
         <Link
           href="tel:800-874-2458"
-          className="flex gap-2 items-center hover:text-primary transition-all"
+          className="flex gap-1 md:gap-2 items-center hover:text-primary transition-all text-xs md:text-sm"
         >
-          <Phone width={16} height={16} color="#B3804C" />
-          800-874-2458
+          <Phone width={14} height={14} className="md:w-4 md:h-4" color="#B3804C" />
+          <span className="hidden md:inline">800-874-2458</span>
+          <span className="md:hidden">800-874-2458</span>
         </Link>
       </div>
-      <div className="flex flex-row gap-6 items-center">
-        <Link href="/schedule-a-demo" className="hover:text-primary transition-all">
+      <div className="flex flex-row gap-2 md:gap-4 lg:gap-6 items-center">
+        <Link href="/schedule-a-demo" className="hover:text-primary transition-all text-xs md:text-sm hidden lg:inline">
           Schedule a demo
         </Link>
         <Link
           href="/developer-solutions"
-          className="hover:text-primary transition-all"
+          className="hover:text-primary transition-all text-xs md:text-sm hidden lg:inline"
         >
           Developer features
         </Link>
         <Link
           href="/marketing-solutions"
-          className="hover:text-primary transition-all"
+          className="hover:text-primary transition-all text-xs md:text-sm hidden lg:inline"
         >
           Marketing solutions
         </Link>
@@ -108,15 +110,15 @@ export default function MiniNav() {
           {user ? (
             <div className="relative">
               <div
-                className="flex items-center gap-2 cursor-pointer py-2 px-3 rounded-md hover:secondary dark:hover:bg-secondary transition-colors"
+                className="flex items-center gap-1 md:gap-2 cursor-pointer py-1 md:py-2 px-2 md:px-3 rounded-md hover:secondary dark:hover:bg-secondary transition-colors"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8">
                   <AvatarImage
                     src={
                       user.role?.name === 'developer'
-                        ? user.company?.image_id
-                          ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image_id}/content`
+                        ? user.company?.image?.id
+                          ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image?.id}/content`
                           : ""
                         : user.buyer?.image_id
                           ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.buyer?.image_id}/content`
@@ -124,16 +126,16 @@ export default function MiniNav() {
                     }
                     alt={user.fullName}
                   />
-                  <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                  <AvatarFallback className="text-xs md:text-sm">{getInitials(user.fullName)}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{user.fullName}</span>
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex flex-col hidden lg:flex">
+                  <span className="text-xs md:text-sm font-medium truncate max-w-[100px] lg:max-w-[120px]">{user.fullName}</span>
+                  <span className="text-xs text-muted-foreground truncate max-w-[100px] lg:max-w-[120px] capitalize">
                     {user.role?.name}
                   </span>
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                  className={`h-3 w-3 md:h-4 md:w-4 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
                 />
               </div>
 
@@ -141,10 +143,10 @@ export default function MiniNav() {
               {dropdownOpen && (
                 <div
                   ref={dropdownRef}
-                  className="absolute right-0 mt-2 w-56 bg-secondary rounded-md shadow-lg z-50 border border-border overflow-hidden"
+                  className="absolute right-0 mt-2 w-48 md:w-56 bg-secondary rounded-md shadow-lg z-50 border border-border overflow-hidden"
                 >
-                  <div className="p-4 border-b border-border">
-                    <p className="font-medium text-sm">{user.fullName}</p>
+                  <div className="p-3 md:p-4 border-b border-border">
+                    <p className="font-medium text-xs md:text-sm">{user.fullName}</p>
                     <p className="text-xs text-muted-foreground truncate">
                       {user.email}
                     </p>
@@ -152,10 +154,10 @@ export default function MiniNav() {
                   <div className="py-1">
                     <Link
                       href={getDashboardUrl()}
-                      className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 text-xs md:text-sm hover:bg-white/5 transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      <User className="h-4 w-4" />
+                      <User className="h-3 w-3 md:h-4 md:w-4" />
                       My Dashboard
                     </Link>
                     {/* <Link
@@ -166,14 +168,14 @@ export default function MiniNav() {
                       <BellRing className="h-4 w-4" />
                       Notifications
                     </Link> */}
-                    {/* <Link
-                      href="/account-settings"
-                      className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
+                    <Link
+                      href={user.role?.name === 'developer' ? '/developer/settings' : '/buyer/personal-information'}
+                      className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 text-xs md:text-sm hover:bg-white/5 transition-colors"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      <Settings className="h-4 w-4" />
+                      <Settings className="h-3 w-3 md:h-4 md:w-4" />
                       Account Settings
-                    </Link> */}
+                    </Link>
                     {/* <Link
                       href="/help-support"
                       className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 transition-colors"
@@ -186,9 +188,9 @@ export default function MiniNav() {
                   <div className="border-t border-border py-1">
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-destructive hover:bg-white/5 w-full text-left transition-colors"
+                      className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 text-xs md:text-sm text-destructive hover:bg-white/5 w-full text-left transition-colors"
                     >
-                      <LogOut className="h-4 w-4" />
+                      <LogOut className="h-3 w-3 md:h-4 md:w-4" />
                       <span>Logout</span>
                     </button>
                   </div>
@@ -197,16 +199,17 @@ export default function MiniNav() {
             </div>
           ) : (
             <>
-              <Button variant="secondary" asChild>
+              <Button variant="secondary" size="sm" className="text-xs md:text-sm h-8 md:h-10" asChild>
                 <Link href="/register">Join</Link>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center gap-1"
+                size="sm"
+                className="flex items-center gap-1 text-xs md:text-sm h-8 md:h-10"
                 asChild
               >
                 <Link href="/login">
-                  <User className="h-4 w-4" />
+                  <User className="h-3 w-3 md:h-4 md:w-4" />
                   <span>Login</span>
                 </Link>
               </Button>
