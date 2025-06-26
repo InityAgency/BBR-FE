@@ -2,7 +2,7 @@ import { getPostBySlug, getCategoryById, getAuthorById, getFeaturedMediaById, ge
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Clock, ChevronRight } from "lucide-react";
-import { calculateReadingTime } from "@/lib/utils";
+import { calculateReadingTime, formatDate } from "@/lib/utils";
 import Link from "next/link";
 import TableOfContents from "@/components/web/TableOfContents/TableOfContents";
 import { PostCard } from "@/components/web/Posts/PostCard";
@@ -114,11 +114,7 @@ export default async function BlogPostPage({ params, searchParams }: BlogPostPag
         })
     );
 
-    const date = new Date(post.date).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-    });
+    const date = formatDate(post.date);
 
     const readingTime = calculateReadingTime(post.content?.rendered || "");
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { navigationData } from "./navigation-data"
+import AuthAwareLink from "@/components/common/AuthAwareLink"
 
 type NavigationStep = "main" | "tabs" | "content"
 type NavigationData = typeof navigationData;
@@ -34,7 +35,7 @@ export function MobileMegaMenu({
   const [mounted, setMounted] = useState(false)
   
   // Auth context
-  const { user, isLoading, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
 
   // Kontrola animacije otvaranja/zatvaranja
   useEffect(() => {
@@ -241,8 +242,8 @@ export function MobileMegaMenu({
                             <AvatarImage
                               src={
                                 user.role?.name === 'developer'
-                                  ? user.company?.image_id
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image_id}/content`
+                                  ? user.company?.image?.id
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.company?.image?.id}/content`
                                     : ""
                                   : user.buyer?.image_id
                                     ? `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${user.buyer?.image_id}/content`
@@ -274,7 +275,7 @@ export function MobileMegaMenu({
                             variant="outline"
                             className="w-full justify-start text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
                             onClick={handleLogout}
-                            disabled={isLoading}
+                            disabled={loading}
                           >
                             <LogOut className="h-4 w-4 mr-2" />
                             Logout
@@ -284,7 +285,7 @@ export function MobileMegaMenu({
                     ) : (
                       <div className="flex flex-col gap-3">
                         <Button variant="secondary" className="w-full justify-center bg-[#1e2225]" asChild>
-                          <Link href="/register" onClick={onClose}>Join</Link>
+                          <AuthAwareLink href="/register" onClick={onClose}>Join</AuthAwareLink>
                         </Button>
                         <Button
                           variant="outline"

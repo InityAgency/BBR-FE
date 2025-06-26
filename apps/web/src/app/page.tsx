@@ -204,8 +204,8 @@ export default function Home() {
                 <div className="flex flex-row gap-4 items-center mb-4">
                   <div className="relative">
                     <span className="absolute -top-2 -left-2 rounded-full bg-white/10 w-8 lg:w-12 h-8 lg:h-12"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
-                      <path d="M38 38H11.6C8.23968 38 6.55953 38 5.27606 37.346C4.14708 36.7708 3.2292 35.8529 2.65396 34.7239C2 33.4405 2 31.7603 2 28.4V2M8 26L16 18L24 26L36 14M36 14V22M36 14H28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                      <path d="M24 28V34M24 28C19.1621 28 15.1266 24.5645 14.2 20M24 28C28.8379 28 32.8734 24.5645 33.8 20M34 10H39.5C39.9647 10 40.197 10 40.3902 10.0384C41.1836 10.1962 41.8038 10.8164 41.9616 11.6098C42 11.803 42 12.0353 42 12.5C42 13.894 42 14.5909 41.8847 15.1705C41.4113 17.5507 39.5507 19.4113 37.1705 19.8847C36.5909 20 35.894 20 34.5 20H34H33.8M14 10H8.5C8.03534 10 7.80302 10 7.60982 10.0384C6.81644 10.1962 6.19624 10.8164 6.03843 11.6098C6 11.803 6 12.0353 6 12.5C6 13.894 6 14.5909 6.11529 15.1705C6.58873 17.5507 8.44931 19.4113 10.8295 19.8847C11.4091 20 12.106 20 13.5 20H14H14.2M24 34C25.8599 34 26.7899 34 27.5529 34.2044C29.6235 34.7592 31.2408 36.3765 31.7956 38.4471C32 39.2101 32 40.1401 32 42H16C16 40.1401 16 39.2101 16.2044 38.4471C16.7592 36.3765 18.3765 34.7592 20.4471 34.2044C21.2101 34 22.1401 34 24 34ZM14.2 20C14.0689 19.3538 14 18.6849 14 18V9.14286C14 8.07663 14 7.54351 14.1981 7.13223C14.3946 6.72402 14.724 6.39465 15.1322 6.19806C15.5435 6 16.0766 6 17.1429 6H30.8571C31.9234 6 32.4565 6 32.8678 6.19806C33.276 6.39465 33.6054 6.72402 33.8019 7.13223C34 7.54351 34 8.07663 34 9.14286V18C34 18.6849 33.9311 19.3538 33.8 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <h3 className="text-xl lg:text-2xl font-bold">Industry-Leading Rankings & Ratings</h3>
@@ -364,7 +364,7 @@ export default function Home() {
               Is your luxury residence one of the finest in the world? Elevate its prestige by securing a spot on Best Branded Residences. Our expert-driven rankings and reviews showcase top-tier residences to discerning buyers, investors, and luxury connoisseurs.
             </p>
             <div className="w-full lg:w-fit m-auto items-center justify-center">
-              <ListResidenceButton />   
+              <ListResidenceButton />
             </div>
           </div>
         </SectionLayout>

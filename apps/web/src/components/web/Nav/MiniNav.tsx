@@ -16,6 +16,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 
 export default function MiniNav() {
   const { user, logout } = useAuth();
@@ -200,7 +201,7 @@ export default function MiniNav() {
           ) : (
             <>
               <Button variant="secondary" size="sm" className="text-xs md:text-sm h-8 md:h-10" asChild>
-                <Link href="/register">Join</Link>
+                <AuthAwareLink href="/register">Join</AuthAwareLink>
               </Button>
               <Button
                 variant="outline"

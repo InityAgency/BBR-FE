@@ -531,11 +531,15 @@ export default function DeveloperOnboarding() {
                                                 <FormItem>
                                                     <FormLabel>Budget Range (From)</FormLabel>
                                                     <FormControl>
-                                                        <Input 
-                                                            type="number" 
-                                                            placeholder="Minimum budget" 
-                                                            {...field} 
-                                                        />
+                                                        <div className="relative">
+                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                                            <Input 
+                                                                type="number" 
+                                                                placeholder="Minimum budget" 
+                                                                className="pl-6"
+                                                                {...field} 
+                                                            />
+                                                        </div>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -548,11 +552,15 @@ export default function DeveloperOnboarding() {
                                                 <FormItem>
                                                     <FormLabel>Budget Range (To)</FormLabel>
                                                     <FormControl>
-                                                        <Input 
-                                                            type="number" 
-                                                            placeholder="Maximum budget" 
-                                                            {...field}
-                                                        />
+                                                        <div className="relative">
+                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                                            <Input 
+                                                                type="number" 
+                                                                placeholder="Maximum budget" 
+                                                                className="pl-6"
+                                                                {...field}
+                                                            />
+                                                        </div>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>

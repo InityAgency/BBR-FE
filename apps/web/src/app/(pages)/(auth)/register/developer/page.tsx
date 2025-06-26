@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 import { ArrowLeft } from "lucide-react";
 import RegisterDeveloperForm from "@/components/web/Auth/Forms/RegisterDeveloper";
 
@@ -8,10 +9,10 @@ const RegisterDeveloper = () => {
             <div className="w-full py-6 lg:p-8">
                 <div className="flex flex-col gap-3 mb-1">
                     <div className="flex w-full flex-row items-center justify-between">
-                        <Link href="/register" className="text-balance cursor-pointer text-md font-medium text-primary-foreground flex items-center gap-1 hover:text-primary transition-all mb-3"> 
+                        <AuthAwareLink href="/register" className="text-balance cursor-pointer text-md font-medium text-primary-foreground flex items-center gap-1 hover:text-primary transition-all mb-3"> 
                         <ArrowLeft size={20} />
                         Return back
-                        </Link>
+                        </AuthAwareLink>
                         <span className="text-muted-foreground text-md font-medium">Developer account</span>
                     </div>
                     <h1 className="text-4xl font-bold text-left lg:text-left">Just a few clicks from creating your BBR account</h1>

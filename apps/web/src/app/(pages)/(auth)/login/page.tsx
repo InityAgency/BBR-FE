@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { PuffLoader } from 'react-spinners';
 import { FcGoogle } from 'react-icons/fc';
@@ -21,7 +22,7 @@ const LoginSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login, isLoading, user } = useAuth();
+  const { login, loading, user } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -93,7 +94,7 @@ export default function LoginPage() {
                     <Input 
                       placeholder="Enter email address" 
                       {...field} 
-                      disabled={isLoading}
+                      disabled={loading}
                       className="bg-transparent" 
                     />
                   </FormControl>
@@ -113,7 +114,7 @@ export default function LoginPage() {
                         type={showPassword ? "text" : "password"} 
                         placeholder="Enter password" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={loading}
                         className="bg-transparent pr-10" 
                       />
                       <button
@@ -131,8 +132,8 @@ export default function LoginPage() {
             />
             {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
             <Link href="/reset-password-request" className="text-sm text-primary hover:underline transition-all mb-2 inline-block">Forgot your password?</Link>
-            <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+            <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>
@@ -152,14 +153,14 @@ export default function LoginPage() {
             variant="outline"
             className="w-full mt-4"
             onClick={handleGoogleLogin}
-            disabled={isLoading}
+            disabled={loading}
           >
             <FcGoogle className="mr-2 h-4 w-4" />
             Continue with Google
           </Button>
         </div>
         <div className="mt-4 text-center text-md flex items-center gap-2 justify-center">
-          Don't have an account? <a href="/register" className="text-primary underline flex items-center gap-1 text-md">Sign up <ArrowRight width={16} height={16}/></a>
+          Don't have an account? <AuthAwareLink href="/register" className="text-primary underline flex items-center gap-1 text-md">Sign up <ArrowRight width={16} height={16}/></AuthAwareLink>
         </div>
       </div>
     </div>

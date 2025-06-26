@@ -1,4 +1,3 @@
-
 import { Form, FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -931,7 +930,10 @@ export default function GeneralInformation({ formData, updateFormData, residence
                         Budget start range <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" min="0" />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                          <Input {...field} type="number" min="0" className="pl-6" />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -949,7 +951,10 @@ export default function GeneralInformation({ formData, updateFormData, residence
                         Budget end range <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" min="0" />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                          <Input {...field} type="number" min="0" className="pl-6" />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import NewsletterBlock from "@/components/web/Newsletter/NewsletterBlock";
 import SectionLayout from "@/components/web/SectionLayout";
 import { CareerFormWrapper } from "@/components/web/Careers/CareerFormWrapper";
+import { formatDate } from "@/lib/utils";
 
 import { generatePageMetadata } from '@/lib/metadata'
 import type { Metadata } from 'next'
@@ -158,11 +159,7 @@ export default async function CareerPostPage({ params }: CareerPostPageProps) {
     }
   }
   
-  const date = new Date(data.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const date = formatDate(data.date);
 
   // Dohvatanje kategorije iz class_list (pouzdanije od API poziva)
   const careerCategory = getCategoryFromClassList(data.class_list);

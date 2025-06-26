@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, MapPin, Phone, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 import NewsletterForm from "../Forms/NewsletterForm";
 import { TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -145,7 +146,7 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <Link href="/register/buyer">Create an account</Link>
+                <AuthAwareLink href="/register/buyer">Create an account</AuthAwareLink>
               </li>
               <li>
                 <Link href="/request-consultation">Request A Consultation</Link>
@@ -247,7 +248,7 @@ export default function Footer() {
                 <Link href="/gdpr-compliance">GDPR Compliance</Link>
               </li>
               <li>
-                <Link href="/license-info">License Info</Link>
+                <Link href="/license-info">License Information</Link>
               </li>
               <li>
                 <Link href="/accessibility-statement">

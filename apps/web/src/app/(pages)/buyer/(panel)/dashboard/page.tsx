@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Bell, Settings, CheckCircle, AlertCircle, Shield, Heart, User, Phone, Mail, Calendar, DollarSign, MapPin, Home } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
 
 export default function BuyerDashboard() {
     const { user, refreshUser } = useAuth();
@@ -61,16 +62,6 @@ export default function BuyerDashboard() {
             maximumFractionDigits: 0
         }).format(amount);
     };
-
-    const formatDate = (dateString: string | null | undefined): string => {
-        if (!dateString) return 'Not available';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
 
     return (
         <div className="py-8 w-full">
@@ -194,7 +185,7 @@ export default function BuyerDashboard() {
                                 <Calendar className="w-5 h-5 text-primary" />
                                 <div>
                                     <p className="font-medium text-white">
-                                        {formatDate(user?.createdAt)}
+                                        {formatDate(user?.createdAt || "")}
                                     </p>
                                     <p className="text-sm text-muted-foreground">Member Since</p>
                                 </div>

@@ -929,7 +929,10 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
                             <FormItem>
                               <FormLabel>Budget Start Range <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
-                                <Input type="number" min="0" placeholder="Enter starting budget" {...field} />
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                  <Input type="number" min="0" placeholder="Enter starting budget" className="pl-6" {...field} />
+                                </div>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -943,7 +946,10 @@ export default function ResidenceForm({ initialData = {}, isEditing = false }: R
                             <FormItem>
                               <FormLabel>Budget End Range <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
-                                <Input type="number" min="0" placeholder="Enter ending budget" {...field} />
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                  <Input type="number" min="0" placeholder="Enter ending budget" className="pl-6" {...field} />
+                                </div>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
