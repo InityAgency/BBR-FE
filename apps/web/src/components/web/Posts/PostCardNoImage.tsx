@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 
 import { Post } from "@/lib/wordpress/wordpress.d";
-import { cn, calculateReadingTime } from "@/lib/utils";
+import { cn, calculateReadingTime, formatDate } from "@/lib/utils";
 
 import {
   getFeaturedMediaById,
@@ -17,11 +17,7 @@ export async function PostCardNoImage({ post }: { post: Post }) {
     ? await getFeaturedMediaById(post.featured_media)
     : null;
   const author = post.author ? await getAuthorById(post.author) : null;
-  const date = new Date(post.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const date = formatDate(post.date);
   const category = post.categories?.[0]
     ? await getCategoryById(post.categories[0])
     : null;

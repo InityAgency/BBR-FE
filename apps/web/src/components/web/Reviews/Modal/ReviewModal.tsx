@@ -114,10 +114,10 @@ export function ReviewModal({ review, isOpen, onClose }: ReviewModalProps) {
                                 <Home className="h-4 w-4" />
                                 <h3 className="font-semibold text-sans">Residence</h3>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={onClose}>
+                            {/* <Button variant="ghost" size="sm" onClick={onClose}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 View Review
-                            </Button>
+                            </Button> */}
                         </div>
                         <div className="space-y-2 text-sm">
                             <div><strong className="text-muted-foreground">Name:</strong> {review.residence.name}</div>

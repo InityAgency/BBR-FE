@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Clock, ArrowUpRight, MapPin, Banknote } from "lucide-react";
 
 import { Post } from "@/lib/wordpress/wordpress.d";
-import { cn, calculateReadingTime } from "@/lib/utils";
+import { cn, calculateReadingTime, formatDate } from "@/lib/utils";
 
 import {
   getFeaturedMediaById,
@@ -15,11 +15,7 @@ export async function CareerCard({ career }: { career: Post }) {
     ? await getFeaturedMediaById(career.featured_media)
     : null;
   
-  const date = new Date(career.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const date = formatDate(career.date);
   
   const careerCategory = career._embedded?.['wp:term']?.[0]?.[0]?.name || "Uncategorized";
   const location = career.acf?.location || "Remote";  

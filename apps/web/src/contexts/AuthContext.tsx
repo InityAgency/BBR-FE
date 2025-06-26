@@ -2,21 +2,39 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { UnitType } from '@/types/unit';
+import { Lifestyle } from '@/types/lifestyle';
+interface Image {
+  id: string;
+  originalFileName: string;
+  mimeType: string;
+  uploadStatus: string;
+  size: number;
+}
 
+interface Plan {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+}
 interface Company {
   id: string;
   name: string;
   address: string;
-  phone_number: string;
+  image: Image;
+  phoneNumber: string;
+  phoneNumberCountryCode: string;
   website: string;
-  image_id: string | null;
-  contact_person_avatar_id: string | null;
-  contact_person_full_name: string;
-  contact_person_job_title: string;
-  contact_person_email: string;
-  contact_person_phone_number: string;
-  contact_person_phone_number_country_code: string;
+  contactPersonAvatar: Image;
+  contactPersonFullName: string;
+  contactPersonJobTitle: string;
+  contactPersonEmail: string;
+  contactPersonPhoneNumber: string;
+  contactPersonPhoneNumberCountryCode: string;
+  plan: Plan;
 }
+
 
 interface Role {
   id: string;
@@ -28,6 +46,11 @@ interface User {
   fullName: string;
   email: string;
   company?: Company;
+  avatar?: Image;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
   buyer?: {
     image_id: string | null;
     budgetRangeFrom: number | null;
@@ -44,19 +67,26 @@ interface User {
       name: string | null;
       code: string | null;
     };
+    unitTypes: UnitType[];
+    lifestyles: Lifestyle[];
   } | null;
   role: Role;
+  emailVerified: boolean;
+  pushNotifications: boolean;
+  receiveLuxuryInsights: boolean;
+  notifyMarketTrends: boolean;
+  emailNotifications: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  setUser: (user: User | null) => void; 
+  setUser: (user: User | null) => void;
   loading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAccess: (path: string) => boolean;
-  loginWithToken: (token: string) => Promise<void>; 
+  loginWithToken: (token: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -101,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: 'GET',
         credentials: 'include',
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.data) {
@@ -137,20 +167,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || 'Login failed');
       }
-      
+
       await fetchUser();
-      
-      const targetPath = user?.role?.name === "developer" 
-        ? '/developer/dashboard' 
-        : user?.role?.name === "buyer" 
-          ? '/buyer/dashboard' 
+
+      const targetPath = user?.role?.name === "developer"
+        ? '/developer/dashboard'
+        : user?.role?.name === "buyer"
+          ? '/buyer/dashboard'
           : '/';
-          
+
       if (pathname !== targetPath) {
         router.replace(targetPath);
       }
@@ -167,25 +197,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/auth/me`, {
         method: 'GET',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to get user data with token');
       }
-      
+
       await fetchUser();
-      
-      const targetPath = user?.role?.name === "developer" 
-        ? '/developer/onboarding' 
-        : user?.role?.name === "buyer" 
-          ? '/buyer/onboarding' 
+
+      const targetPath = user?.role?.name === "developer"
+        ? '/developer/onboarding'
+        : user?.role?.name === "buyer"
+          ? '/buyer/onboarding'
           : '/';
-      
+
       if (pathname !== targetPath) {
         router.replace(targetPath);
       }
@@ -212,7 +242,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       sessionStorage.removeItem('user');
       deleteAllAuthCookies();
       setLoading(false);
-      
+
       if (pathname !== '/') {
         router.replace('/');
       }
@@ -221,15 +251,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAccess = (path: string) => {
     if (!user) return false;
-    
+
     if (path.startsWith('/developer') && user.role.name !== 'developer') {
       return false;
     }
-    
+
     if (path.startsWith('/buyer') && user.role.name !== 'buyer') {
       return false;
     }
-    
+
     return true;
   };
 
@@ -238,14 +268,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
+    <AuthContext.Provider value={{
+      user,
       setUser,
-      loading, 
+      loading,
       isAuthenticated: !!user,
-      login, 
-      logout, 
-      checkAccess, 
+      login,
+      logout,
+      checkAccess,
       loginWithToken,
       refreshUser
     }}>

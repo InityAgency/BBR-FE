@@ -823,7 +823,10 @@ function Step1Content({ form, brands }: Step1ContentProps) {
                 <FormItem>
                   <FormLabel>Budget start range <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                      <Input type="number" placeholder="0" className="pl-6" {...field} />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -837,7 +840,10 @@ function Step1Content({ form, brands }: Step1ContentProps) {
                 <FormItem>
                   <FormLabel>Budget end range <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                      <Input type="number" placeholder="0" className="pl-6" {...field} />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

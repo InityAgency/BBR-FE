@@ -3,8 +3,7 @@ import Link from "next/link"
 import type { Residence } from "@/types/residence"
 import { Card, CardContent } from "@/components/ui/card"
 import { Eye, Pencil } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+import { cn, formatDate } from "@/lib/utils"
 
 interface DeveloperResidenceCardProps {
   residence: Residence
@@ -16,15 +15,6 @@ const formatText = (text: string) => {
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-};
-
-const formatDate = (dateString: string) => {
-  try {
-    const date = new Date(dateString);
-    return format(date, 'dd.MM.yyyy HH:mm');
-  } catch (error) {
-    return dateString;
-  }
 };
 
 const getStatusColor = (status: string) => {
@@ -89,9 +79,9 @@ export function DeveloperResidenceCard({ residence }: DeveloperResidenceCardProp
       </div>
       <div className="flex flex-col gap-1 pb-4 border-b">
         <h3 className="text-md text-sans text-white font-medium transition-all ">{residence.name}</h3>
-        <p className="text-xs text-muted-foreground">
+        {/* <p className="text-xs text-muted-foreground">
           {residence.id}
-        </p>
+        </p> */}
       </div>
       <div>
         <p className="text-xs text-muted-foreground">{residence.address}</p>

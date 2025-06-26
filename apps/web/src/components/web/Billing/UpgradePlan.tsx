@@ -75,7 +75,7 @@ const plans: Plan[] = [
     },
     {
         name: "Premium",
-        price: "1,500$/month",
+        price: "$ 1,500/month",
         description: "Ideal for developers ready to invest in premium marketing strategies to actively generate leads, increase visibility, and manage a growing portfolio.",
         features: [
             "Includes all Basic Plan features",
