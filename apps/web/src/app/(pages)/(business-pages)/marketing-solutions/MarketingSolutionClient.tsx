@@ -544,7 +544,7 @@ const MarketingSolutionsClient = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => router.push('/register/developer')}>
+            <AlertDialogAction onClick={handleStartForFree}>
               Register as Developer
             </AlertDialogAction>
           </AlertDialogFooter>
