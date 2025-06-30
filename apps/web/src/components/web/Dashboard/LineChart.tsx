@@ -45,10 +45,11 @@ export function LineChart({ data, title }: LineChartProps) {
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: "white",
-                border: "1px solid #e2e8f0",
+                backgroundColor: "#09090b",
+                border: "1px solid #09090b",
                 borderRadius: "8px",
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                color: "#fff",
               }}
             />
             <Legend />

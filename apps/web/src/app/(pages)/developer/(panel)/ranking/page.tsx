@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { TablePagination } from "@/components/web/Table/TablePagination";
 import { RankingTable } from "@/components/web/Ranking/Table/RankingTable";
-import type { Residence } from "@/types/residence";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,23 +14,58 @@ interface RankingRow {
     score: number;
     residenceId: string;
     residenceSlug: string;
+    rankingCategorySlug: string;
+    previousPosition: number | null;
+    previousScore: number;
+}
+
+interface RankingCategoryResponse {
+    id: string;
+    name: string;
+    rankingType: string | null;
+    status: string;
+    hasRequest: boolean;
+    previousPosition: number | null;
+    previousTotalScore: number;
+    residence: {
+        id: string;
+        name: string;
+        slug: string;
+        position: number;
+        totalScore: number;
+    };
+    slug: string;
+}
+
+interface ApiResponse {
+    data: RankingCategoryResponse[];
+    statusCode: number;
+    message: string;
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        limit: number;
+    };
+    timestamp: string;
+    path: string;
 }
 
 export default function DeveloperRanking() {
-    const [residences, setResidences] = useState<Residence[]>([]);
+    const [rankingRows, setRankingRows] = useState<RankingRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [totalResidences, setTotalResidences] = useState(0);
+    const [totalItems, setTotalItems] = useState(0);
 
-    const fetchResidences = async (page: number) => {
+    const fetchRankingCategories = async (page: number) => {
         try {
             setLoading(true);
             setError(null);
             
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/residences/me?limit=${ITEMS_PER_PAGE}&page=${page}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/ranking-categories/me?limit=${ITEMS_PER_PAGE}&page=${page}`,
                 {
                     method: 'GET',
                     credentials: 'include',
@@ -42,25 +76,40 @@ export default function DeveloperRanking() {
             );
 
             if (!response.ok) {
-                throw new Error('Failed to fetch residences');
+                throw new Error('Failed to fetch ranking categories');
             }
 
-            const data = await response.json();
-            setResidences(data.data || []);
-            setTotalPages(data.pagination ? Math.ceil(data.pagination.total / ITEMS_PER_PAGE) : 1);
-            setTotalResidences(data.pagination?.total || 0);
+            const data: ApiResponse = await response.json();
+            console.log(data);
+            
+            // Transform data to RankingRow format
+            const transformedData: RankingRow[] = data.data.map(item => ({
+                residenceName: item.residence.name,
+                rankingCategory: item.name,
+                position: item.residence.position,
+                score: item.residence.totalScore,
+                residenceId: item.residence.id,
+                residenceSlug: item.residence.slug,
+                rankingCategorySlug: item.slug,
+                previousPosition: item.previousPosition,
+                previousScore: item.previousTotalScore
+            }));
+
+            setRankingRows(transformedData);
+            setTotalPages(data.pagination.totalPages);
+            setTotalItems(data.pagination.total);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
-            setResidences([]);
+            setRankingRows([]);
             setTotalPages(1);
-            setTotalResidences(0);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchResidences(currentPage);
+        fetchRankingCategories(currentPage);
     }, [currentPage]);
 
     const goToPage = (page: number) => {
@@ -79,18 +128,6 @@ export default function DeveloperRanking() {
         }
     };
 
-    // Transform residences data into ranking rows
-    const rankingRows: RankingRow[] = residences.flatMap(residence => 
-        residence.totalScores.map(score => ({
-            residenceName: residence.name,
-            rankingCategory: score.rankingCategory.title,
-            position: score.position,
-            score: score.totalScore,
-            residenceId: residence.id,
-            residenceSlug: residence.slug
-        }))
-    );
-
     return (
         <div className="flex flex-col gap-4 py-8">
             <div className="flex flex-col gap-4">
@@ -98,7 +135,7 @@ export default function DeveloperRanking() {
                     <div className="flex items-center gap-3">
                         <h1 className="text-xl font-bold sm:text-2xl text-sans">Rankings</h1>
                         <Badge variant="outline" className="self-start sm:self-auto px-2 py-1 text-sm">
-                            {totalResidences} {totalResidences === 1 ? 'residence' : 'residences'}
+                            {totalItems} {totalItems === 1 ? 'ranking' : 'rankings'}
                         </Badge>
                     </div>
                 </div>
@@ -113,7 +150,7 @@ export default function DeveloperRanking() {
             <RankingTable
                 rankings={rankingRows}
                 loading={loading}
-                totalItems={totalResidences}
+                totalItems={totalItems}
                 totalPages={totalPages}
                 currentPage={currentPage}
                 goToNextPage={goToNextPage}

@@ -1,5 +1,5 @@
 import querystring from "query-string";
-import { revalidateTag } from "next/cache";
+// import { revalidateTag } from "next/cache";
 
 import type {
   Post,
@@ -427,7 +427,7 @@ export async function searchAuthors(query: string): Promise<Author[]> {
 export async function revalidateWordPressData(tags: string[] = ["wordpress"]) {
   try {
     for (const tag of tags) {
-      revalidateTag(tag);
+        // revalidateTag(tag); 
     }
   } catch (error) {
     console.error("Failed to revalidate WordPress data:", error);

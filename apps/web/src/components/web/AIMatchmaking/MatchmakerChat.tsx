@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Mic, Send, Loader2, RefreshCw } from "lucide-react"
 import { useMatchmaking, AIResponse } from "@/hooks/useMatchmaking"
+import { useBrands } from "@/hooks/useBrands"
 import Image from "next/image"
+import { API_BASE_URL, API_VERSION } from "@/app/constants/api"
+import { useAmenities } from "@/hooks/useAmenities"
 
 // Define the message types
 type MessageType = "bot" | "user" | "options" | "loading" | "matches"
@@ -38,7 +41,7 @@ const CONVERSATION_FLOWS = {
   priority: {
     key: "priority",
     content: "Great, let's begin. I'll ask a few questions to help find the best branded residences for you. Feel free to ask any questions along the way.\n\nWhat is most important to you?\n(Select one below):",
-    options: ["Location", "Price", "Brand"],
+    options: ["Location", "Price", "Brand", "Amenities"],
     multiSelect: false,
   },
   location: {
@@ -65,27 +68,13 @@ const CONVERSATION_FLOWS = {
   amenities: {
     key: "amenities",
     content: "What amenities are important to you?",
-    options: [
-      "Private Pool",
-      "Spa",
-      "Golf Course",
-      "Private Chef",
-      "Helipad",
-      "Wine Cellar",
-    ],
+    options: [], // Will be populated dynamically from API
     multiSelect: true,
   },
   brands: {
     key: "brands",
     content: "What are your preferred brand options?",
-    options: [
-      "Ritz-Carlton",
-      "Aman",
-      "Yoo",
-      "Trump",
-      "Four Seasons",
-      "Mandarin Oriental",
-    ],
+    options: [], // Will be populated dynamically from API
     multiSelect: true,
   },
   followUp: {
@@ -124,6 +113,9 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
     messageError,
     resetSession 
   } = useMatchmaking()
+
+  const { amenities, loading: amenitiesLoading } = useAmenities()
+  const { brands, loading: brandsLoading } = useBrands()
 
   // Helper function to generate unique message ID
   const generateMessageId = (): string => {
@@ -187,24 +179,129 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
     setIsInitialFlow(true) // Resetujemo na inicijalni tok
   }
 
+  // Function to get options for a specific stage
+  const getOptionsForStage = (stage: string): string[] => {
+    const stageConfig = CONVERSATION_FLOWS[stage as keyof typeof CONVERSATION_FLOWS]
+    if (!stageConfig) return []
+
+    // For amenities, use API data if available, otherwise use fallback
+    if (stage === "amenities") {
+      if (amenities.length > 0) {
+        return amenities.map(amenity => amenity.name)
+      } else {
+        // Fallback amenities if API data is not available
+        return [
+          "Private Pool",
+          "Spa",
+          "Golf Course", 
+          "Private Chef",
+          "Helipad",
+          "Wine Cellar",
+          "Gym/Fitness Center",
+          "Concierge Service",
+          "Valet Parking",
+          "Rooftop Terrace"
+        ]
+      }
+    }
+
+    // For brands, use API data if available, otherwise use fallback
+    if (stage === "brands") {
+      if (brands.length > 0) {
+        return brands.map(brand => brand.name)
+      } else {
+        // Fallback brands if API data is not available
+        return [
+          "Ritz-Carlton",
+          "Aman",
+          "Yoo",
+          "Trump",
+          "Four Seasons",
+          "Mandarin Oriental",
+        ]
+      }
+    }
+
+    return stageConfig.options
+  }
+
   // Generate smart suggestions based on user's previous selections (from SmartSuggestions.tsx)
   const generateSmartSuggestions = (currentField: string, selections: any): string[] => {
     switch (currentField) {
       case "amenities":
+        // First try smart suggestions based on selections
         if (selections.budget?.includes("$5M+")) {
+          // For high budget, check if these amenities exist in our API data
+          if (amenities.length > 0) {
+            const luxuryAmenities = amenities
+              .filter(amenity => 
+                amenity.name.toLowerCase().includes('chef') || 
+                amenity.name.toLowerCase().includes('helipad') || 
+                amenity.name.toLowerCase().includes('wine') ||
+                amenity.name.toLowerCase().includes('private') ||
+                amenity.name.toLowerCase().includes('beach')
+              )
+              .map(amenity => amenity.name)
+            
+            // If we have luxury amenities, return them, otherwise return all amenities
+            return luxuryAmenities.length > 0 ? luxuryAmenities : []
+          }
+          // Fallback for high budget if no API data
           return ["Private Chef", "Helipad", "Wine Cellar", "Private Beach"]
         }
         if (selections.location?.includes("United Arab Emirates")) {
+          // For UAE, check if these amenities exist in our API data  
+          if (amenities.length > 0) {
+            const uaeAmenities = amenities
+              .filter(amenity => 
+                amenity.name.toLowerCase().includes('pool') || 
+                amenity.name.toLowerCase().includes('spa') || 
+                amenity.name.toLowerCase().includes('concierge') ||
+                amenity.name.toLowerCase().includes('desert')
+              )
+              .map(amenity => amenity.name)
+            
+            // If we have UAE-specific amenities, return them, otherwise return empty to use default
+            return uaeAmenities.length > 0 ? uaeAmenities : []
+          }
+          // Fallback for UAE if no API data
           return ["Desert Safari Access", "Private Pool", "Spa", "Concierge"]
         }
-        break
+        // Return empty array to use getOptionsForStage instead
+        return []
 
       case "brands":
-        if (selections.budget?.includes("$5M+")) {
-          return ["Aman", "Bulgari", "Mandarin Oriental"]
-        }
-        if (selections.lifestyle?.includes("Adventure")) {
-          return ["Aman", "Six Senses", "Alila"]
+        if (brands.length > 0) {
+          if (selections.budget?.includes("$5M+")) {
+            // Filter luxury brands for high budget
+            const luxuryBrands = brands
+              .filter(brand => 
+                brand.name.toLowerCase().includes('aman') || 
+                brand.name.toLowerCase().includes('bulgari') || 
+                brand.name.toLowerCase().includes('mandarin') ||
+                brand.name.toLowerCase().includes('ritz') ||
+                brand.name.toLowerCase().includes('four seasons')
+              )
+              .map(brand => brand.name)
+            
+            // If we have luxury brands, return them, otherwise return empty to use all brands
+            return luxuryBrands.length > 0 ? luxuryBrands : []
+          }
+          if (selections.lifestyle?.includes("Adventure")) {
+            // Filter adventure-oriented brands
+            const adventureBrands = brands
+              .filter(brand => 
+                brand.name.toLowerCase().includes('aman') || 
+                brand.name.toLowerCase().includes('six senses') || 
+                brand.name.toLowerCase().includes('alila')
+              )
+              .map(brand => brand.name)
+            
+            // If we have adventure brands, return them, otherwise return empty to use all brands
+            return adventureBrands.length > 0 ? adventureBrands : []
+          }
+          // Return empty array to use getOptionsForStage instead (all brands)
+          return []
         }
         break
 
@@ -238,7 +335,9 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
     const stageConfig = Object.values(CONVERSATION_FLOWS).find(flow => flow.key === nextStage)
     
     if (stageConfig) {
-      let options = stageConfig.options
+      let options = getOptionsForStage(nextStage)
+      
+      // Try to get smart suggestions, but fallback to default options
       const dynamicOptions = generateSmartSuggestions(nextStage, userSelections)
       if (dynamicOptions.length > 0) {
         options = dynamicOptions
@@ -409,6 +508,9 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
         case "brand":
           newFlowOrder = ["priority", "brands", "location", "budget", "amenities"]
           break
+        case "amenities":
+          newFlowOrder = ["priority", "amenities", "location", "budget", "brands"]
+          break
       }
       setFlowOrder(newFlowOrder)
       
@@ -426,6 +528,12 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
       const nextStage = newFlowOrder[1]
       const stageConfig = Object.values(CONVERSATION_FLOWS).find(flow => flow.key === nextStage)
       if (stageConfig) {
+        let options = getOptionsForStage(nextStage)
+        const dynamicOptions = generateSmartSuggestions(nextStage, { priority: option })
+        if (dynamicOptions.length > 0) {
+          options = dynamicOptions
+        }
+
         const nextBotMessage: Message = {
           id: generateMessageId(),
           type: "bot",
@@ -435,7 +543,7 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
           id: generateMessageId(),
           type: "options",
           content: "",
-          options: stageConfig.options,
+          options,
           multiSelect: stageConfig.multiSelect || false,
           field: nextStage,
         }
@@ -447,6 +555,8 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
 
     if (option === "Change my requirements") {
       const amenitiesConfig = CONVERSATION_FLOWS.amenities
+      const options = getOptionsForStage("amenities")
+      
       const nextBotMessage: Message = {
         id: generateMessageId(),
         type: "bot",
@@ -456,7 +566,7 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
         id: generateMessageId(),
         type: "options",
         content: "",
-        options: amenitiesConfig.options,
+        options,
         multiSelect: amenitiesConfig.multiSelect || false,
         field: "amenities",
       }
@@ -560,6 +670,9 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
           case "brand":
             newFlowOrder = ["priority", "brands", "location", "budget", "amenities"]
             break
+          case "amenities":
+            newFlowOrder = ["priority", "amenities", "location", "budget", "brands"]
+            break
           default:
             newFlowOrder = ["priority", "location", "budget", "amenities", "brands"]
         }
@@ -569,7 +682,7 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
         const nextStage = newFlowOrder[1] // Get the first question after priority
         const stageConfig = Object.values(CONVERSATION_FLOWS).find(flow => flow.key === nextStage)
         if (stageConfig) {
-          let options = stageConfig.options
+          let options = getOptionsForStage(nextStage)
           const dynamicOptions = generateSmartSuggestions(nextStage, { ...userSelections, [message.field || conversationStage]: option })
           if (dynamicOptions.length > 0) {
             options = dynamicOptions
@@ -605,7 +718,7 @@ export function MatchmakerChat({ onSelectionsChange, onMatchesReceived }: Matchm
           const nextStage = flowOrder[currentIndex + 1]
           const stageConfig = Object.values(CONVERSATION_FLOWS).find(flow => flow.key === nextStage)
           if (stageConfig) {
-            let options = stageConfig.options
+            let options = getOptionsForStage(nextStage)
             const dynamicOptions = generateSmartSuggestions(nextStage, userSelections)
             if (dynamicOptions.length > 0) {
               options = dynamicOptions

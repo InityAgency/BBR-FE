@@ -1,6 +1,12 @@
 import React, { useState, useRef, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, AlertCircle } from "lucide-react";
+
+interface ValidationError {
+  type: 'size' | 'format' | 'general' | 'required';
+  message: string;
+  fileName?: string;
+}
 
 interface FileUploadProps {
   label?: string;
@@ -24,7 +30,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   onValidation,
 }) => {
   const [fileName, setFileName] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<ValidationError[]>([]);
   const [touched, setTouched] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,16 +53,55 @@ const FileUpload: React.FC<FileUploadProps> = ({
   useEffect(() => {
     // If the field is required and there's no value
     if (required && !value && touched) {
-      setError("This field is required");
+      setErrors([{
+        type: 'required',
+        message: "This field is required"
+      }]);
       if (onValidation) onValidation(false);
-    } else {
-      setError(null);
+    } else if (errors.some(e => e.type === 'required')) {
+      setErrors(prev => prev.filter(e => e.type !== 'required'));
       if (onValidation) onValidation(true);
     }
   }, [value, required, touched, onValidation]);
 
+  // Enhanced file validation
+  const validateFile = (file: File): { isValid: boolean, errors: ValidationError[] } => {
+    const newErrors: ValidationError[] = [];
+
+    // Check file size
+    const fileSizeInMB = file.size / (1024 * 1024);
+    if (fileSizeInMB > maxSize) {
+      newErrors.push({
+        type: 'size',
+        fileName: file.name,
+        message: `File "${file.name}" (${fileSizeInMB.toFixed(1)}MB) exceeds the maximum allowed size of ${maxSize}MB.`
+      });
+    }
+
+    // Check file format
+    const fileExtension = file.name.split('.').pop()?.toUpperCase();
+    if (!fileExtension || !supportedFormats.includes(fileExtension)) {
+      newErrors.push({
+        type: 'format',
+        fileName: file.name,
+        message: `File format "${file.name}" is not supported. Allowed formats are: ${supportedFormats.join(', ')}.`
+      });
+    }
+
+    // Check if file is empty
+    if (file.size === 0) {
+      newErrors.push({
+        type: 'size',
+        fileName: file.name,
+        message: `File "${file.name}" is empty.`
+      });
+    }
+
+    return { isValid: newErrors.length === 0, errors: newErrors };
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setError(null);
+    setErrors([]);
     setTouched(true);
     const file = e.target.files?.[0];
     
@@ -64,32 +109,41 @@ const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
     
-    // Check file size
-    const fileSizeInMB = file.size / (1024 * 1024);
-    if (fileSizeInMB > maxSize) {
-      setError(`File size exceeds ${maxSize}MB limit`);
+    // Validate the file
+    const { isValid, errors: validationErrors } = validateFile(file);
+    
+    if (!isValid) {
+      setErrors(validationErrors);
       if (onChange) onChange(null);
       if (onValidation) onValidation(false);
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
     
-    // Check file format
-    const fileExtension = file.name.split('.').pop()?.toUpperCase();
-    if (fileExtension && !supportedFormats.includes(fileExtension)) {
-      setError(`Unsupported file format. Please use ${supportedFormats.join(', ')}`);
+    try {
+      // Set file name
+      setFileName(file.name);
+      
+      if (onChange) onChange(file);
+      if (onValidation) onValidation(true);
+    } catch (error) {
+      console.error('Error processing file:', file.name, error);
+      setErrors([{
+        type: 'general',
+        fileName: file.name,
+        message: `Error processing file "${file.name}".`
+      }]);
       if (onChange) onChange(null);
       if (onValidation) onValidation(false);
-      return;
     }
-    
-    // Set file name
-    setFileName(file.name);
-    
-    if (onChange) onChange(file);
-    if (onValidation) onValidation(true);
   };
 
   const handleClick = () => {
+    // Clear errors when clicking to upload
+    setErrors([]);
     fileInputRef.current?.click();
     setTouched(true);
   };
@@ -97,17 +151,27 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const handleRemove = () => {
     setFileName(null);
     setTouched(true);
+    setErrors([]);
     
     if (required) {
-      setError("This field is required");
+      setErrors([{
+        type: 'required',
+        message: "This field is required"
+      }]);
       if (onValidation) onValidation(false);
     } else {
-      setError(null);
+      if (onValidation) onValidation(true);
     }
     
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onChange) onChange(null);
   };
+
+  const clearErrors = () => {
+    setErrors([]);
+  };
+
+  const hasErrors = errors.length > 0;
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
@@ -120,7 +184,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       />
       
       {fileName ? (
-        <div className={`flex items-center justify-between p-3 border rounded-md ${error ? 'border-destructive' : 'border-border'}`}>
+        <div className={`flex items-center justify-between p-3 border rounded-md ${hasErrors ? 'border-destructive' : 'border-border'}`}>
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
             <span className="text-sm font-medium truncate max-w-[200px]">{fileName}</span>
@@ -146,9 +210,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
       ) : (
         <div 
           onClick={handleClick}
-          className={`flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 cursor-pointer hover:bg-secondary transition-colors ${error ? 'border-destructive bg-destructive/5' : ''}`}
+          className={`flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 cursor-pointer hover:bg-secondary transition-colors ${hasErrors ? 'border-destructive bg-destructive/5' : ''}`}
         >
-          <Upload className={`h-8 w-8 ${error ? 'text-destructive' : 'text-muted-foreground'}`} />
+          <Upload className={`h-8 w-8 ${hasErrors ? 'text-destructive' : 'text-muted-foreground'}`} />
           <div className="text-sm text-center">
             <p className="font-medium">Upload your files</p>
             <p className="text-xs text-muted-foreground">
@@ -158,7 +222,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               Max. upload size - {maxSize}MB
             </p>
             {required && (
-              <p className={`text-xs font-medium mt-1 ${error ? 'text-destructive' : 'text-muted-foreground'}`}>
+              <p className={`text-xs font-medium mt-1 ${hasErrors ? 'text-destructive' : 'text-muted-foreground'}`}>
                 This field is required
               </p>
             )}
@@ -166,8 +230,35 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
       )}
       
-      {error && (
-        <p className="text-destructive text-sm mt-1">{error}</p>
+      {/* Error Messages */}
+      {hasErrors && (
+        <div className="space-y-2">
+          {errors.map((error, index) => (
+            <div key={index} className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-destructive font-medium">
+                  {error.type === 'size' && 'File Size Error'}
+                  {error.type === 'format' && 'Unsupported Format'}
+                  {error.type === 'required' && 'Required Field'}
+                  {error.type === 'general' && 'Error'}
+                </p>
+                <p className="text-xs text-destructive/80 mt-1">
+                  {error.message}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                onClick={() => setErrors(prev => prev.filter((_, i) => i !== index))}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

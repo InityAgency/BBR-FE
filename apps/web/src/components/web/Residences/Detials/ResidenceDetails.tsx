@@ -124,9 +124,10 @@ export function ResidenceDetails({ residence }: ResidenceDetailsProps) {
               <h3 className="text-sm font-medium text-muted-foreground mb-1 text-sans">Website URL</h3>
               {residence.name ? (
                 <div className="flex items-center gap-2">
-                  <p className="text-md">{residence.websiteUrl}</p>
+                  {/* <p className="text-md">A{residence.websiteUrl}</p> */}
                   {residence.websiteUrl && (
-                    <Link href={residence.websiteUrl} target="_blank" className="text-md text-muted-foreground hover:text-primary transition-all">
+                    <Link href={residence.websiteUrl} target="_blank" className="text-md text-white flex items-center gap-2 hover:text-primary transition-all">
+                      Website URL
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   )}

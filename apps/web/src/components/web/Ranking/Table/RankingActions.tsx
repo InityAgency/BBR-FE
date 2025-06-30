@@ -13,6 +13,9 @@ interface RankingRow {
   score: number;
   residenceId: string;
   residenceSlug: string;
+  rankingCategorySlug: string;
+  previousPosition: number | null;
+  previousScore: number;
 }
 
 interface RankingActionsProps {
@@ -33,7 +36,7 @@ export function RankingActions({ row }: RankingActionsProps) {
         </Button>
       </Link>
       <Link 
-        href={`/best-residences/${ranking.rankingCategory.toLowerCase()}`} 
+        href={`/best-residences/${ranking.rankingCategorySlug}`} 
         target="_blank"
       >
         <Button variant="ghost" size="icon" className="h-8 w-8">

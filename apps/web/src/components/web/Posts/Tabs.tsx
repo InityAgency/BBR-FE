@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button"; 
+import { useEffect, useRef } from "react";
 
 interface Category {
     id: number;
@@ -17,6 +17,21 @@ export function Tabs({ categories }: TabsProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentCategorySlug = searchParams.get('category');
+    const tabsRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to tabs when category is selected
+    useEffect(() => {
+        if (currentCategorySlug && tabsRef.current) {
+            // Koristimo requestAnimationFrame da osiguramo da je DOM ažuriran
+            requestAnimationFrame(() => {
+                tabsRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            });
+        }
+    }, [currentCategorySlug]);
 
     const handleTabClick = (categorySlug: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -30,25 +45,30 @@ export function Tabs({ categories }: TabsProps) {
             params.set('category', categorySlug);
         }
         
-        router.push(`/blog${params.toString() ? `?${params.toString()}` : ''}`);
+        const newUrl = `/blog${params.toString() ? `?${params.toString()}` : ''}`;
+        
+        // Use replace with scroll: false to prevent automatic scroll to top
+        router.replace(newUrl, { scroll: false });
     };
 
     return (
-        <div className="flex gap-2 flex-wrap border-b border-border w-full">
-            <a
+        <div ref={tabsRef} className="flex gap-2 flex-wrap border-b border-border w-full">
+            <button
                 className={!currentCategorySlug ? "active-tab" : "classic-tab"}
                 onClick={() => handleTabClick("")}
+                type="button"
             >
                 All
-            </a>   
+            </button>   
             {categories.map((category) => (
-                <a
+                <button
                     key={category.id}
                     className={currentCategorySlug === category.slug ? "active-tab" : "classic-tab"}
                     onClick={() => handleTabClick(category.slug)}
+                    type="button"
                 >
                     {category.name}
-                </a>
+                </button>
             ))}
         </div>
     )

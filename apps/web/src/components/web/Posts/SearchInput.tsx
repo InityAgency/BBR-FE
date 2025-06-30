@@ -1,43 +1,48 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 
-export function SearchInput() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+interface SearchInputProps {
+    onSearch: (query: string) => void;
+}
 
-    // Use debounce to prevent too many API calls
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const params = new URLSearchParams(searchParams.toString());
-            
-            if (searchQuery.trim()) {
-                params.set('search', searchQuery.trim());
-                params.delete('page'); // Reset pagination when searching
-                params.delete('category'); // Remove category when searching
-            } else {
-                params.delete('search');
-            }
-            
-            router.push(`/blog${params.toString() ? `?${params.toString()}` : ''}`);
-        }, 300); // 300ms delay
+export function SearchInput({ onSearch }: SearchInputProps) {
+    const [searchQuery, setSearchQuery] = useState("");
 
-        return () => clearTimeout(timer);
-    }, [searchQuery, router, searchParams]);
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSearch(searchQuery);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+
+        // Real-time search sa debounce
+        if (value === "") {
+            onSearch("");
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            onSearch(searchQuery);
+        }
+    };
 
     return (
-        <div className="relative w-full max-w-md">
-            <Input
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-6 text-lg"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        </div>
+        <form onSubmit={handleSubmit} className="relative w-full lg:w-1/2">
+            <div className="relative">
+                <Input
+                    placeholder="Search articles..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-4 py-6 text-lg"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            </div>
+        </form>
     );
-} 
+}

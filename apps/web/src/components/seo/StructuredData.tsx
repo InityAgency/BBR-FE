@@ -10,6 +10,13 @@ function getMediaUrl(mediaId: string): string {
     return `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${mediaId}/content`;
 }
 
+// Helper funkcija za pravilno spajanje URL-ova
+function joinUrls(baseUrl: string, path: string): string {
+    const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBase}${cleanPath}`;
+}
+
 export function StructuredData({ type, data }: StructuredDataProps) {
     const generateSchema = () => {
         switch (type) {
@@ -44,12 +51,13 @@ export function StructuredData({ type, data }: StructuredDataProps) {
                 }
 
             case 'organization':
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbrandedresidences.com";
                 return {
                     "@context": "https://schema.org",
                     "@type": "Organization",
                     "name": "Best Branded Residences",
-                    "url": process.env.NEXT_PUBLIC_SITE_URL || "https://yoursite.com",
-                    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || "https://yoursite.com"}/logo.png`,
+                    "url": siteUrl,
+                    "logo": joinUrls(siteUrl, "/logo.png"),
                     "sameAs": [
                         "https://twitter.com/bestbrandedresidences",
                         "https://linkedin.com/company/best-branded-residences"

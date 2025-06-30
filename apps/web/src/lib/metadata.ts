@@ -6,6 +6,13 @@ export function getMediaUrl(mediaId: string): string {
   return `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/media/${mediaId}/content`;
 }
 
+// Helper funkcija za pravilno spajanje URL-ova
+function joinUrls(baseUrl: string, path: string): string {
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${cleanBase}${cleanPath}`;
+}
+
 // Base metadata konfiguracija
 const baseConfig = {
   siteName: 'Best Branded Residences',
@@ -170,7 +177,7 @@ function generateResidenceMetadata(residence: ResidenceMetadata['data']): Metada
     openGraph: {
       title: `${title} - Luxury Residence${residence.city?.name ? ` in ${residence.city.name}` : ''}`,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -190,7 +197,7 @@ function generateResidenceMetadata(residence: ResidenceMetadata['data']): Metada
       images: [image],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -217,7 +224,7 @@ function generateCategoryMetadata(category: CategoryMetadata['data']): Metadata 
     openGraph: {
       title,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -237,7 +244,7 @@ function generateCategoryMetadata(category: CategoryMetadata['data']): Metadata 
       images: [image],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -263,7 +270,7 @@ function generateBasicPageMetadata(page: PageMetadata['data']): Metadata {
     openGraph: {
       title,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -283,7 +290,7 @@ function generateBasicPageMetadata(page: PageMetadata['data']): Metadata {
       images: [image],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -335,7 +342,7 @@ function generateBlogMetadata(blog: BlogMetadata['data']): Metadata {
     openGraph: {
       title,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -355,7 +362,7 @@ function generateBlogMetadata(blog: BlogMetadata['data']): Metadata {
       images: [baseConfig.defaultImage],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -395,7 +402,7 @@ function generateBlogPostMetadata(post: BlogPostMetadata['data']): Metadata {
     openGraph: {
       title,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -419,7 +426,7 @@ function generateBlogPostMetadata(post: BlogPostMetadata['data']): Metadata {
       images: [featuredImage],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -465,7 +472,7 @@ function generateCareerMetadata(career: CareerMetadata['data']): Metadata {
     openGraph: {
       title,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -485,7 +492,7 @@ function generateCareerMetadata(career: CareerMetadata['data']): Metadata {
       images: [baseConfig.defaultImage],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -541,7 +548,7 @@ function generateCareerPostMetadata(post: CareerPostMetadata['data']): Metadata 
     openGraph: {
       title: `${title} - ${location}`,
       description,
-      url: `${baseConfig.siteUrl}${url}`,
+      url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
       images: [
         {
@@ -564,7 +571,7 @@ function generateCareerPostMetadata(post: CareerPostMetadata['data']): Metadata 
       images: [featuredImage],
     },
     alternates: {
-      canonical: `${baseConfig.siteUrl}${url}`,
+      canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
 }
@@ -608,7 +615,7 @@ export const generateStructuredData = (data: any) => {
     "@type": "BestBrandedResidences",
     "name": data.name,
     "description": data.description,
-    "url": `${baseConfig.siteUrl}${data.slug}`,
+    "url": joinUrls(baseConfig.siteUrl, data.slug),
     "image": data.featuredImage?.id ? getMediaUrl(data.featuredImage.id) : baseConfig.defaultImage,
     "address": {
       "@type": "PostalAddress",
