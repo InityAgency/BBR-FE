@@ -1,6 +1,13 @@
 // app/sitemap.xml/route.ts
 import { NextResponse } from 'next/server'
 
+// Helper funkcija za pravilno spajanje URL-ova
+function joinUrls(baseUrl: string, path: string): string {
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${cleanBase}${cleanPath}`;
+}
+
 async function getAllResidences() {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/public/residences?limit=1000`)
@@ -133,7 +140,7 @@ export async function GET() {
 ${allUrls
   .map(
     (item) => `<url>
-  <loc>${baseUrl}${item.url}</loc>
+  <loc>${joinUrls(baseUrl, item.url)}</loc>
   <lastmod>${new Date().toISOString()}</lastmod>
   <changefreq>${item.changefreq}</changefreq>
   <priority>${item.priority}</priority>
