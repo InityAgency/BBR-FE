@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Star } from "lucide-react";
+import { Upload, X, Star, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -48,6 +48,12 @@ function isUploadedImage(image: ImageType): image is UploadedImage {
 
 function isEditModeImage(image: ImageType): image is EditModeImage {
   return 'mediaId' in image;
+}
+
+interface ValidationError {
+  type: 'size' | 'format' | 'count' | 'general';
+  message: string;
+  fileName?: string;
 }
 
 interface MultipleImageUploadProps {
@@ -143,10 +149,10 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
   initialImages = [],
 }) => {
   const [images, setImages] = useState<ImageType[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<ValidationError[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Učitavanje inicijalnih slika
+  // Initial image loading
   useEffect(() => {
     if (initialImages.length > 0 && images.length === 0) {
       setImages(initialImages);
@@ -160,63 +166,139 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
     })
   );
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    
+  // Enhanced file validation
+  const validateFiles = (files: File[]): { validFiles: File[], errors: ValidationError[] } => {
+    const validFiles: File[] = [];
+    const newErrors: ValidationError[] = [];
+
+    // Check if adding files would exceed maximum image count
     if (images.length + files.length > maxImages) {
-      setError(`You can only upload up to ${maxImages} images`);
-      return;
+      newErrors.push({
+        type: 'count',
+        message: `You can upload a maximum of ${maxImages} images. You currently have ${images.length} images and are trying to add ${files.length} more.`
+      });
+      return { validFiles: [], errors: newErrors };
     }
 
-    const newImages: UploadedImage[] = [];
-    const errors: string[] = [];
-
     files.forEach((file) => {
+      let fileValid = true;
+
       // Check file size
       const fileSizeInMB = file.size / (1024 * 1024);
       if (fileSizeInMB > maxSizePerImage) {
-        errors.push(`${file.name} exceeds ${maxSizePerImage}MB limit`);
-        return;
+        newErrors.push({
+          type: 'size',
+          fileName: file.name,
+          message: `File "${file.name}" (${fileSizeInMB.toFixed(1)}MB) exceeds the maximum allowed size of ${maxSizePerImage}MB.`
+        });
+        fileValid = false;
       }
 
       // Check file format
       const fileExtension = file.name.split('.').pop()?.toUpperCase();
-      if (fileExtension && !supportedFormats.includes(fileExtension)) {
-        errors.push(`${file.name} format is not supported`);
-        return;
+      if (!fileExtension || !supportedFormats.includes(fileExtension)) {
+        newErrors.push({
+          type: 'format',
+          fileName: file.name,
+          message: `File format "${file.name}" is not supported. Allowed formats are: ${supportedFormats.join(', ')}.`
+        });
+        fileValid = false;
       }
 
-      // Create preview
-      const preview = URL.createObjectURL(file);
-      
-      newImages.push({
-        id: crypto.randomUUID(),
-        file,
-        preview,
-        isFeatured: images.length === 0 && newImages.length === 0, // First image is featured by default
-        order: images.length + newImages.length,
-      });
+      // Additional validation - check if file is actually an image
+      if (!file.type.startsWith('image/')) {
+        newErrors.push({
+          type: 'format',
+          fileName: file.name,
+          message: `File "${file.name}" is not a valid image.`
+        });
+        fileValid = false;
+      }
+
+      // Check if file is empty
+      if (file.size === 0) {
+        newErrors.push({
+          type: 'size',
+          fileName: file.name,
+          message: `File "${file.name}" is empty.`
+        });
+        fileValid = false;
+      }
+
+      if (fileValid) {
+        validFiles.push(file);
+      }
     });
 
-    if (errors.length > 0) {
-      setError(errors.join(", "));
+    return { validFiles, errors: newErrors };
+  };
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length === 0) {
       return;
     }
 
-    const updatedImages = [...images, ...newImages];
-    setImages(updatedImages);
-    setError(null);
+    // Očisti prethodne greške
+    setErrors([]);
 
-    if (onChange) {
-      onChange(updatedImages);
+    // Validiraj fajlove
+    const { validFiles, errors: validationErrors } = validateFiles(files);
+
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      
+      // Resetuj input čak i ako ima grešaka
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // Ako nema validnih fajlova, zaustavi proces
+      if (validFiles.length === 0) {
+        return;
+      }
     }
 
-    // If this is the first image, set it as featured
-    if (images.length === 0 && newImages.length > 0 && onFeaturedChange) {
-      onFeaturedChange(newImages[0]);
+    const newImages: UploadedImage[] = [];
+
+    validFiles.forEach((file, index) => {
+      try {
+        // Kreiranje preview-a
+        const preview = URL.createObjectURL(file);
+        
+        newImages.push({
+          id: crypto.randomUUID(),
+          file,
+          preview,
+          isFeatured: images.length === 0 && index === 0, // Prva slika je featured po defaultu
+          order: images.length + index,
+        });
+      } catch (error) {
+        console.error('Greška pri kreiranju preview-a za fajl:', file.name, error);
+        setErrors(prev => [...prev, {
+          type: 'general',
+          fileName: file.name,
+          message: `Greška pri obradi fajla "${file.name}".`
+        }]);
+      }
+    });
+
+    if (newImages.length > 0) {
+      const updatedImages = [...images, ...newImages];
+      setImages(updatedImages);
+
+      if (onChange) {
+        onChange(updatedImages);
+      }
+
+      // Ako je ovo prva slika, postavi je kao featured
+      if (images.length === 0 && onFeaturedChange) {
+        onFeaturedChange(newImages[0]);
+      }
     }
 
-    // Reset input
+    // Resetuj input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -224,14 +306,14 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
 
   const handleRemove = useCallback((id: string) => {
     const imageToRemove = images.find(img => isUploadedImage(img) ? img.id === id : img.mediaId === id);
-    const wasFeautured = imageToRemove?.isFeatured;
+    const wasFeatured = imageToRemove?.isFeatured;
 
-    // Ako je UploadedImage, treba revocati URL object za preview
+    // If it's an UploadedImage, we need to revoke the URL object for preview
     if (imageToRemove && isUploadedImage(imageToRemove)) {
       URL.revokeObjectURL(imageToRemove.preview);
     }
 
-    // Ažuriranje rednih brojeva kada se ukloni jedna slika
+    // Update order numbers when an image is removed
     const updatedImages = images
       .filter(img => isUploadedImage(img) ? img.id !== id : img.mediaId !== id)
       .map((img, index) => ({
@@ -241,12 +323,15 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
 
     setImages(updatedImages);
     
+    // Clear errors when an image is removed
+    setErrors([]);
+    
     if (onChange) {
       onChange(updatedImages);
     }
 
-    // Ako smo uklonili featured sliku, postavimo prvu preostalu sliku kao featured
-    if (wasFeautured && updatedImages.length > 0 && onFeaturedChange) {
+    // If we removed the featured image, set the first remaining image as featured
+    if (wasFeatured && updatedImages.length > 0 && onFeaturedChange) {
       const newFeatured = { ...updatedImages[0], isFeatured: true };
       onFeaturedChange(newFeatured);
       setImages(updatedImages.map(img => ({
@@ -255,7 +340,7 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
           ? isUploadedImage(newFeatured) && img.id === newFeatured.id
           : isEditModeImage(newFeatured) && img.mediaId === newFeatured.mediaId,
       })));
-    } else if (wasFeautured && updatedImages.length === 0 && onFeaturedChange) {
+    } else if (wasFeatured && updatedImages.length === 0 && onFeaturedChange) {
       onFeaturedChange(null);
     }
   }, [images, onChange, onFeaturedChange]);
@@ -309,6 +394,11 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
     }
   }, [images, onChange]);
 
+  // Function to clear all errors
+  const clearErrors = useCallback(() => {
+    setErrors([]);
+  }, []);
+
   return (
     <div className={className}>
       <input
@@ -328,15 +418,18 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
         <div className="space-y-4">
           {/* Upload Zone */}
           <div
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              clearErrors();
+              fileInputRef.current?.click();
+            }}
             className={cn(
               "flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors",
-              error && "border-destructive bg-destructive/5"
+              errors.length > 0 && "border-destructive bg-destructive/5"
             )}
           >
             <Upload className={cn(
               "h-8 w-8",
-              error ? "text-destructive" : "text-muted-foreground"
+              errors.length > 0 ? "text-destructive" : "text-muted-foreground"
             )} />
             <div className="text-sm text-center">
               <p className="font-medium">Upload images</p>
@@ -346,12 +439,41 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
               <p className="text-xs text-muted-foreground">
                 Max. {maxImages} images, up to {maxSizePerImage}MB each
               </p>
+              <p className="text-xs text-muted-foreground">
+                Currently: {images.length}/{maxImages} images
+              </p>
             </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
+          {/* Error Messages */}
+          {errors.length > 0 && (
+            <div className="space-y-2">
+              {errors.map((error, index) => (
+                <div key={index} className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-destructive font-medium">
+                      {error.type === 'size' && 'File Size Error'}
+                      {error.type === 'format' && 'Unsupported Format'}
+                      {error.type === 'count' && 'Too Many Images'}
+                      {error.type === 'general' && 'Error'}
+                    </p>
+                    <p className="text-xs text-destructive/80 mt-1">
+                      {error.message}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                    onClick={() => setErrors(prev => prev.filter((_, i) => i !== index))}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
           )}
 
           {/* Image Grid */}

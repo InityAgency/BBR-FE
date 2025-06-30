@@ -102,13 +102,13 @@ interface UnitFormProps {
     featureImage?: { id: string; url?: string };
   };
   isEditing?: boolean;
-  initialImages?: any[]; // ✅ DODANO: initialImages prop
+  initialImages?: any[];
 }
 
 const UnitForm: React.FC<UnitFormProps> = ({
   initialData = initialUnitValues,
   isEditing = false,
-  initialImages = [], // ✅ DODANO: initialImages prop
+  initialImages = [],
 }) => {
   const router = useRouter();
   const params = useParams();
@@ -124,6 +124,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
   const [characteristics, setCharacteristics] = useState<string[]>([]);
   const [newCharacteristic, setNewCharacteristic] = useState("");
   const [debugCounter, setDebugCounter] = useState(0);
+
+  // ✅ NOVO: State za praćenje promena slika
+  const [imagesChanged, setImagesChanged] = useState(false);
+  const [initialImagesState, setInitialImagesState] = useState<string>("");
 
   // Force re-render for debug purposes
   useEffect(() => {
@@ -190,8 +194,6 @@ const UnitForm: React.FC<UnitFormProps> = ({
     fetchUnitTypes();
   }, []);
 
-  // ✅ UKLONJEN STARI COMPLEX FETCH - sada koristimo jednostavne useEffect-e
-
   // Initialize characteristics from form data
   useEffect(() => {
     const formCharacteristics = form.watch("characteristics");
@@ -200,8 +202,61 @@ const UnitForm: React.FC<UnitFormProps> = ({
     }
   }, [form.watch("characteristics")]);
 
-  const hasUnsavedChanges = form.formState.isDirty;
+  // ✅ NOVO: Prati promene u slikama
+  useEffect(() => {
+    const currentImagesState = JSON.stringify(
+      images.map(img => ({
+        id: 'file' in img ? img.id : img.mediaId,
+        isFeatured: img.isFeatured,
+        order: img.order,
+        preview: img.preview
+      }))
+    );
 
+    // Postavi početno stanje slika samo jednom
+    if (initialImagesState === "" && images.length > 0) {
+      setInitialImagesState(currentImagesState);
+      setImagesChanged(false);
+      return;
+    }
+
+    // Ako je početno stanje prazno i trenutno je još uvek prazno, nema promene
+    if (initialImagesState === "" && images.length === 0) {
+      setImagesChanged(false);
+      return;
+    }
+
+    // Uporedi trenutno stanje sa početnim
+    const hasChanged = currentImagesState !== initialImagesState;
+    setImagesChanged(hasChanged);
+
+    console.log("Images state change detected:", {
+      hasChanged,
+      currentImagesCount: images.length,
+      initialImagesState: initialImagesState.length > 0 ? "has data" : "empty",
+      currentImagesState: currentImagesState.length > 0 ? "has data" : "empty"
+    });
+  }, [images, initialImagesState]);
+
+  // ✅ NOVO: Postavi početno stanje slika kada se učitaju initial images
+  useEffect(() => {
+    if (initialImages.length > 0 && images.length === 0) {
+      const initialState = JSON.stringify(
+        initialImages.map((img, index) => ({
+          id: img.mediaId || index,
+          isFeatured: img.isFeatured || false,
+          order: img.order || index,
+          preview: img.preview || ""
+        }))
+      );
+      setInitialImagesState(initialState);
+      setImagesChanged(false);
+    }
+  }, [initialImages, images.length]);
+
+  const hasUnsavedChanges = form.formState.isDirty || imagesChanged;
+
+  // ✅ IZMENJENO: isSaveEnabled funkcija koja uključuje promene slika
   const isSaveEnabled = useCallback(() => {
     const formValues = form.getValues();
     const formState = form.formState;
@@ -221,8 +276,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
     // Provera validnosti forme
     const isFormValid = Object.keys(formState.errors).length === 0;
 
-    // Provera da li ima promena u edit modu
-    const hasChanges = isEditing ? formState.isDirty : true;
+    // ✅ KLJUČNO: Provera da li ima promena - UKLJUČI I PROMENE SLIKA
+    const hasFormChanges = formState.isDirty;
+    const hasImageChanges = imagesChanged;
+    const hasAnyChanges = isEditing ? (hasFormChanges || hasImageChanges) : true;
 
     // Provera da li je forma u procesu slanja
     const isNotSubmitting = !isSubmitting;
@@ -231,7 +288,9 @@ const UnitForm: React.FC<UnitFormProps> = ({
       hasRequiredFields,
       allRequiredFieldsPresent,
       isFormValid,
-      hasChanges,
+      hasFormChanges,
+      hasImageChanges,
+      hasAnyChanges,
       isNotSubmitting,
       errors: formState.errors,
       formValues: {
@@ -243,11 +302,12 @@ const UnitForm: React.FC<UnitFormProps> = ({
         status: formValues.status
       },
       isDirty: formState.isDirty,
-      isSubmitting
+      isSubmitting,
+      imagesChanged
     });
 
-    return allRequiredFieldsPresent && isFormValid && hasChanges && isNotSubmitting;
-  }, [form, isSubmitting, isEditing]);
+    return allRequiredFieldsPresent && isFormValid && hasAnyChanges && isNotSubmitting;
+  }, [form, isSubmitting, isEditing, imagesChanged]);
 
   // Dodajem useEffect za praćenje promena forme
   useEffect(() => {
@@ -275,6 +335,31 @@ const UnitForm: React.FC<UnitFormProps> = ({
       // Additional actions on discard if needed
     },
   });
+
+  // ✅ NOVO: Handler funkcije za slike
+  const handleImagesChange = useCallback((newImages: (EditModeImage | UploadedImage)[]) => {
+    setImages(newImages);
+    console.log("Images manually changed:", newImages.length);
+  }, []);
+
+  const handleFeaturedImageChange = useCallback((newFeaturedImage: EditModeImage | UploadedImage | null) => {
+    setFeaturedImage(newFeaturedImage);
+    console.log("Featured image changed:", newFeaturedImage);
+  }, []);
+
+  // ✅ NOVO: Reset funkcija za slike
+  const resetImagesState = useCallback(() => {
+    const currentImagesState = JSON.stringify(
+      images.map(img => ({
+        id: 'file' in img ? img.id : img.mediaId,
+        isFeatured: img.isFeatured,
+        order: img.order,
+        preview: img.preview
+      }))
+    );
+    setInitialImagesState(currentImagesState);
+    setImagesChanged(false);
+  }, [images]);
 
   // Add characteristic
   const addCharacteristic = () => {
@@ -351,21 +436,52 @@ const UnitForm: React.FC<UnitFormProps> = ({
     try {
       setIsSubmitting(true);
 
-      // 1. Prvo uploaduj slike i dobij sve mediaId-jeve
-      const uploadedImages = await uploadUnitImages(images);
-
-      // 2. Pripremi galleryMediaIds i featureImageId
-      const galleryMediaIds = uploadedImages.map(img => img.mediaId);
-      
-      // 3. Logika za featureImageId - u edit modu čuvamo postojeći ako nema nove featured slike
+      let galleryMediaIds: string[] = [];
       let featureImageId = "";
-      if (isEditing && initialData?.featureImageId && !uploadedImages.find(img => img.isFeatured)) {
-        // Ako je edit mod i ima postojeći featureImageId, a nema nove featured slike
-        featureImageId = initialData.featureImageId;
-      } else {
-        // Inače koristi novu featured sliku ili prvu sliku
+      let shouldUpdateGallery = false;
+
+      // ✅ IZMENJENO: Samo uploaduj i ažuriraj slike ako su se promenile
+      if (imagesChanged) {
+        console.log("Images changed - uploading and updating gallery");
+        
+        // 1. Uploaduj slike i dobij sve mediaId-jeve
+        const uploadedImages = await uploadUnitImages(images);
+        
+        // 2. Pripremi galleryMediaIds
+        galleryMediaIds = uploadedImages.map(img => img.mediaId);
+        
+        // 3. Pripremi featureImageId iz novih slika
         const featuredImage = uploadedImages.find(img => img.isFeatured) || uploadedImages[0];
         featureImageId = featuredImage ? featuredImage.mediaId : "";
+        
+        shouldUpdateGallery = true;
+      } else {
+        console.log("Images not changed - preserving existing gallery");
+        
+        // ✅ NOVO: Ako slike nisu menjane
+        if (isEditing) {
+          // Zadrži postojeći featureImageId ako postoji
+          featureImageId = initialData?.featureImageId || "";
+          
+          // ✅ KLJUČNO: Izvuci postojeće mediaId-jeve iz trenutnih slika
+          // Ovo su slike koje su učitane iz baze ali nisu menjane
+          galleryMediaIds = images
+            .filter(img => 'mediaId' in img && img.mediaId)
+            .map(img => (img as EditModeImage).mediaId);
+          
+          // Ako imamo postojeće slike, ne updateujemo galeriju
+          // Ovo znači da nećemo poslati galleryMediaIds u payload
+          shouldUpdateGallery = false;
+          
+          console.log("Preserving existing gallery IDs:", galleryMediaIds);
+        } else {
+          // U create modu, uploaduj sve slike čak i ako tehnički nisu "menjane"
+          const uploadedImages = await uploadUnitImages(images);
+          galleryMediaIds = uploadedImages.map(img => img.mediaId);
+          const featuredImage = uploadedImages.find(img => img.isFeatured) || uploadedImages[0];
+          featureImageId = featuredImage ? featuredImage.mediaId : "";
+          shouldUpdateGallery = true;
+        }
       }
 
       // 4. Validacija datuma - proveri da li su datumi važeći
@@ -383,8 +499,6 @@ const UnitForm: React.FC<UnitFormProps> = ({
       // 5. Pripremi payload
       const payload: any = {
         ...data,
-        galleryMediaIds,
-        featureImageId,
         residenceId: data.residenceId,
         unitTypeId: data.unitTypeId,
         bedroom: data.bedroom !== undefined && data.bedroom !== null ? String(data.bedroom) : "",
@@ -397,6 +511,18 @@ const UnitForm: React.FC<UnitFormProps> = ({
         exclusiveOfferStartDate: exclusiveOfferStartDate || undefined,
         exclusiveOfferEndDate: exclusiveOfferEndDate || undefined,
       };
+
+      // ✅ IZMENJENO: Dodaj gallery podatke samo ako treba da updateujemo galeriju
+      if (shouldUpdateGallery) {
+        payload.galleryMediaIds = galleryMediaIds;
+        console.log("Updating gallery with IDs:", galleryMediaIds);
+      }
+      
+      // Uvek ažuriraj featureImageId ako postoji
+      if (featureImageId) {
+        payload.featureImageId = featureImageId;
+        console.log("Setting featureImageId:", featureImageId);
+      }
 
       // OBRIŠI polja koja ne želiš da šalješ
       delete payload.id;
@@ -443,6 +569,10 @@ const UnitForm: React.FC<UnitFormProps> = ({
       console.log("✅ Unit saved successfully:", unitResponse);
 
       toast.success(isEditing ? "Unit updated successfully!" : "Unit created successfully!");
+
+      // ✅ NOVO: Reset images state after successful save
+      resetImagesState();
+
       if (slug) {
         router.push(`/developer/residences/${slug}?tab=inventory`);
       } else {
@@ -612,8 +742,6 @@ const UnitForm: React.FC<UnitFormProps> = ({
 
     onSubmit(form.getValues());
   }, [form, onSubmit, isSaveEnabled]);
-
-  // Loading state se sada hendluje u EditUnitPage, ne ovde
 
   // Poboljšani useEffect za postavljanje residence ID iz slug-a u create modu
   useEffect(() => {
@@ -1104,8 +1232,8 @@ const UnitForm: React.FC<UnitFormProps> = ({
               <h2 className="text-lg font-bold sm:text-2xl text-sans mb-4">Gallery</h2>
               <div className="space-y-4">
                 <MultipleImageUpload
-                  onChange={setImages}
-                  onFeaturedChange={setFeaturedImage}
+                  onChange={handleImagesChange}
+                  onFeaturedChange={handleFeaturedImageChange}
                   maxImages={10}
                   maxSizePerImage={5}
                   initialImages={initialImages}
