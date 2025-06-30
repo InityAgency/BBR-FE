@@ -248,7 +248,7 @@ function buildApiUrl(endpoint: string, params?: Record<string, string | number>)
 
 // Fetch functions for different data types
 async function fetchContinents(): Promise<ContinentApiResponse> {
-  const url = buildApiUrl('continents');
+  const url = buildApiUrl('public/continents');
   return fetchFromAPI<ContinentApiResponse>(url, 'Error fetching continents');
 }
 

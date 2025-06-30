@@ -57,8 +57,13 @@ function RatingBar({ value, onChange, label }: { value: number, onChange: (v: nu
     );
 }
 
+// Helper funkcija za brojanje reči
+const countWords = (text: string): number => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+};
+
 export default function LeaveReviewClient() {
-    const { user, isLoading } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -93,14 +98,14 @@ export default function LeaveReviewClient() {
     const preselectedResidenceId = searchParams.get('residenceId');
 
     useEffect(() => {
-        if (!isLoading) {
+        if (!loading) {
             if (!user) {
                 router.replace('/login');
             } else if (user.role?.name !== 'buyer') {
                 router.replace('/'); // ili na neku drugu stranicu po želji
             }
         }
-    }, [user, isLoading, router]);
+    }, [user, loading, router]);
 
     // Fetch residences with infinite scroll
     useEffect(() => {
@@ -166,6 +171,7 @@ export default function LeaveReviewClient() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const newErrors: { [key: string]: string } = {};
+        
         if (!selectedResidence) newErrors.residenceId = 'Please select a residence.';
         if (!dateOfPurchase) newErrors.dateOfPurchase = 'Please select date of purchase.';
         if (!selectedUnitType) newErrors.unitTypeId = 'Please select unit type.';
@@ -176,8 +182,18 @@ export default function LeaveReviewClient() {
         if (ratings.neighbourhoodLocation === 0) newErrors.neighbourhoodLocation = 'Neighbourhood / Location rating is required.';
         if (ratings.valueForMoney === 0) newErrors.valueForMoney = 'Value for Money rating is required.';
         if (ratings.serviceQuality === 0) newErrors.serviceQuality = 'Service Quality rating is required.';
+        
+        // Validacija za feedback - minimalno 15 reči, maksimalno 200 reči
+        const wordCount = countWords(additionalFeedback);
+        if (additionalFeedback.trim() && wordCount < 15) {
+            newErrors.additionalFeedback = 'Feedback should be minimum 15 words.';
+        } else if (wordCount > 200) {
+            newErrors.additionalFeedback = 'Feedback should be maximum 200 words.';
+        }
+        
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
+        
         setSubmitting(true);
         try {
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -238,7 +254,7 @@ export default function LeaveReviewClient() {
         }
     }, [preselectedResidenceId, residences]);
 
-    if (isLoading || !user || user.role?.name !== 'buyer') {
+    if (loading || !user || user.role?.name !== 'buyer') {
         return null;
     }
 
@@ -370,11 +386,32 @@ export default function LeaveReviewClient() {
                     <div className='flex flex-col gap-2'>
                         <label className="text-md font-medium mt-4">Additional Feedback</label>
                         <Textarea
-                            placeholder="Share your experience..."
+                            placeholder="Share your experience... (minimum 15 words, maximum 200 words)"
                             value={additionalFeedback}
                             onChange={e => setAdditionalFeedback(e.target.value)}
                             className="w-full"
                         />
+                        <div className="flex justify-between text-xs">
+                            <span className={cn(
+                                "font-medium",
+                                countWords(additionalFeedback) < 15 && additionalFeedback.trim() ? "text-destructive" : 
+                                countWords(additionalFeedback) > 200 ? "text-destructive" : "text-muted-foreground"
+                            )}>
+                                {countWords(additionalFeedback)} words
+                            </span>
+                            <span className={cn(
+                                countWords(additionalFeedback) < 15 && additionalFeedback.trim() ? "text-destructive" : 
+                                countWords(additionalFeedback) > 200 ? "text-destructive" : "text-muted-foreground"
+                            )}>
+                                15-200 words required
+                            </span>
+                        </div>
+                        {errors.additionalFeedback && (
+                            <div className="flex items-center gap-2 text-destructive text-sm">
+                                <span className="text-destructive">⚠</span>
+                                <span>{errors.additionalFeedback}</span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Is this a primary residence */}
@@ -421,7 +458,7 @@ export default function LeaveReviewClient() {
                 {/* Dugme za submit - uvek na dnu forme, ispod obe kolone */}
                 <div className="col-span-1 lg:col-span-2 flex justify-end mt-1">
                     <Button type="submit" className="w-full lg:w-auto" disabled={submitting}>
-                        {submitting ? 'Submitting...' : 'Leave a review'}
+                        {submitting ? 'Submitting...' : 'Submit Review'}
                     </Button>
                 </div>
             </form>
