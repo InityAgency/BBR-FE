@@ -17,6 +17,9 @@ interface RankingRow {
   score: number;
   residenceId: string;
   residenceSlug: string;
+  rankingCategorySlug: string;
+  previousPosition: number | null;
+  previousScore: number;
 }
 
 // Table skeleton loader
