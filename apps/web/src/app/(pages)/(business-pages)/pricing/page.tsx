@@ -4,6 +4,7 @@ import PlanOverview from "@/components/web/PlanOverview/PlanOverview";
 import SectionLayout from "@/components/web/SectionLayout";
 import Image from "next/image";
 import Link from "next/link";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 
 import { generatePageMetadata } from '@/lib/metadata'
 import type { Metadata } from 'next'
@@ -79,12 +80,12 @@ const PricingPage = () => {
                 Perfect for developers with limited budgets who want to gain
                 initial exposure and test the platform before upgrading.
               </p>
-              <Link
-                href="/developer/dashboard"
+              <AuthAwareLink
+                href="/register/developer"
                 className="w-full my-4  z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-[#F5F5F4] text-black hover:bg-white/90 h-9 px-[40px] py-[20px] has-[>svg]:px-3"
               >
                 Get started for free
-              </Link>
+              </AuthAwareLink>
               <p className="!font-semibold text-[20px] text-[#171D22]">
                 Features
               </p>
@@ -357,7 +358,7 @@ const PricingPage = () => {
                   Increase your rankings
                 </h1>
                 <p className="text-[#4D4D4DCC] text-[20px] w-full lg:w-[70%]">
-                  Enhance your property’s reputation with strategic rankings,
+                  Enhance your property's reputation with strategic rankings,
                   giving your development the credibility needed to convert more
                   leads into buyers.
                 </p>
@@ -438,7 +439,7 @@ const PricingPage = () => {
               Property Verification
             </h2>
             <p className="text-md text-[#4D4D4DCC] lg:text-lg w-full lg:w-[70%] text-left lg:text-center mx-auto">
-              Gain higher visibility through our platform’s ranking system,
+              Gain higher visibility through our platform's ranking system,
               positioning your property at the top of searches and attracting
               more attention from potential buyers.
             </p>
@@ -471,7 +472,7 @@ const PricingPage = () => {
                 Featured Property Placements
               </h1>
               <p className="text-[#171D22]">
-                Gahigher visibility through our platform’s ranking system,
+                Gahigher visibility through our platform's ranking system,
                 positioning your property at the top of searches and attracting
                 more attention from potential buyers.
               </p>

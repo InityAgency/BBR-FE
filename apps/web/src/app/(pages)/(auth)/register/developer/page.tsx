@@ -2,6 +2,18 @@ import Link from "next/link";
 import AuthAwareLink from "@/components/common/AuthAwareLink";
 import { ArrowLeft } from "lucide-react";
 import RegisterDeveloperForm from "@/components/web/Auth/Forms/RegisterDeveloper";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+    type: 'page',
+    data: {
+        title: 'Developer Registration | Join Best Branded Residences ',
+        description: 'Register as a developer to access exclusive features and elevate your property experience.',
+        slug: 'register/developer',
+        keywords: ['register', 'developer', 'property', 'experience']
+    }
+})
 
 const RegisterDeveloper = () => {
     return (

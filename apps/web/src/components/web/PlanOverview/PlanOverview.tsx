@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthAwareLink from "@/components/common/AuthAwareLink";
 
 // #region Titles
 const FreeTitle = () => {
@@ -209,12 +210,12 @@ const WhatItsForBespoke = () => {
 // #region Buttons
 const FreeLink = () => {
   return (
-    <Link
-      href="/developer/dashboard"
+    <AuthAwareLink
+      href="/register/developer"
       className="text-[10px] lg:text-[14px] place-self-center flex justify-center lg:h-[40px] w-full text-center items-center text-black bg-[#F5F5F4] rounded-md p-2 text-black"
     >
       Get started for free
-    </Link>
+    </AuthAwareLink>
   );
 };
 const PremiumLink = () => {

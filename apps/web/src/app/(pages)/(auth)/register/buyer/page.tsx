@@ -2,6 +2,18 @@ import Link from "next/link";
 import AuthAwareLink from "@/components/common/AuthAwareLink";
 import { ArrowLeft } from "lucide-react";
 import RegisterBuyerForm from "@/components/web/Auth/Forms/RegisterBuyer";
+import { generatePageMetadata } from '@/lib/metadata'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generatePageMetadata({
+    type: 'page',
+    data: {
+        title: 'Buyer Registration | Join Best Branded Residences ',
+        description: 'Register as a buyer to access exclusive features and elevate your property experience.',
+        slug: 'register/buyer',
+        keywords: ['register', 'buyer', 'property', 'experience']
+    }
+})
 
 const RegisterBuyer = () => {
     return (
