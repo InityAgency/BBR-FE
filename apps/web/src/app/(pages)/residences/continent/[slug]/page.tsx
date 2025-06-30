@@ -48,6 +48,7 @@ export default function ContinentResidencesPage() {
   const [developmentStatus, setDevelopmentStatus] = useState<string>("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isWorldwide, setIsWorldwide] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -60,6 +61,20 @@ export default function ContinentResidencesPage() {
   // Nova funkcija za fetch svih kontinenata i pronalaženje ID-ja po slugu
   const fetchAndSetContinentId = async (slug: string) => {
     setContinentLoading(true);
+    
+    console.log("Current slug:", slug);
+    
+    // Proveri da li je wordwide slug
+    if (slug.toLowerCase() === "wordwide") {
+      setIsWorldwide(true);
+      setContinentId("");
+      setContinentName("Worldwide");
+      setContinentLoading(false);
+      return;
+    }
+
+    setIsWorldwide(false);
+    
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
       const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
@@ -127,10 +142,11 @@ export default function ContinentResidencesPage() {
     setDevelopmentStatus(status);
     setBrandId(brand);
 
-    if (continentId) {
+    // Za worldwide ili kada imamo continentId
+    if (isWorldwide || continentId) {
       fetchResidences(Number.parseInt(page), query, status, brand);
     }
-  }, [searchParams, continentId]);
+  }, [searchParams, continentId, isWorldwide]);
 
   // Handle search changes
   useEffect(() => {
@@ -152,7 +168,8 @@ export default function ContinentResidencesPage() {
   }, [hasActiveFilters]);
 
   const fetchResidences = async (page: number, query = "", status = "", brand = "") => {
-    if (!continentId) {
+    // Za worldwide ne treba continentId, za ostale je potreban
+    if (!isWorldwide && !continentId) {
       console.warn("Cannot fetch residences: continent ID is missing");
       setResidences([]);
       setLoading(false);
@@ -168,7 +185,11 @@ export default function ContinentResidencesPage() {
       // Add query parameters
       url.searchParams.set("page", page.toString());
       url.searchParams.set("limit", "12");
-      url.searchParams.set("continentId", continentId);
+      
+      // Samo za specifičan kontinent dodaj continentId
+      if (!isWorldwide && continentId) {
+        url.searchParams.set("continentId", continentId);
+      }
 
       if (query) {
         url.searchParams.set("query", query);
@@ -230,6 +251,9 @@ export default function ContinentResidencesPage() {
     if (value !== "ALL") {
       params.set("developmentStatus", value);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -270,6 +294,9 @@ export default function ContinentResidencesPage() {
     if (developmentStatus) {
       params.set("developmentStatus", developmentStatus);
     }
+    if (brandId) {
+      params.set("brandId", brandId);
+    }
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -283,6 +310,9 @@ export default function ContinentResidencesPage() {
     params.set("page", "1");
     if (debouncedSearch) {
       params.set("query", debouncedSearch);
+    }
+    if (brandId) {
+      params.set("brandId", brandId);
     }
     router.push(`?${params.toString()}`, { scroll: false });
   };
@@ -314,16 +344,39 @@ export default function ContinentResidencesPage() {
   const activeFiltersCount = [search, developmentStatus, brandId].filter(Boolean).length;
   const displayContinentName = continentName || formatContinentName(continentSlug);
 
+  // Različit sadržaj za worldwide
+  const getPageContent = () => {
+    if (isWorldwide) {
+      return {
+        subtitle: "PROPERTIES WORLDWIDE",
+        title: "Discover Elite Residence Properties Around the World",
+        description: "Explore the finest luxury branded residences globally — where exceptional design meets unparalleled lifestyle across all continents.",
+        searchPlaceholder: "Search residences worldwide...",
+        noResultsTitle: "No residences found worldwide",
+      };
+    }
+    
+    return {
+      subtitle: `PROPERTIES IN ${displayContinentName.toUpperCase()}`,
+      title: `Meet the Elite Residence Properties in ${displayContinentName}`,
+      description: `Discover the finest luxury branded residences across ${displayContinentName} — where exceptional design meets unparalleled lifestyle.`,
+      searchPlaceholder: `Search residences in ${displayContinentName}...`,
+      noResultsTitle: `No residences found in ${displayContinentName}`,
+    };
+  };
+
+  const pageContent = getPageContent();
+
   return (
     <>
       <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
         <div className="page-header flex flex-col gap-6 w-full">
-          <p className="text-md uppercase text-left lg:text-center text-primary">PROPERTIES IN {displayContinentName.toUpperCase()}</p>
+          <p className="text-md uppercase text-left lg:text-center text-primary">{pageContent.subtitle}</p>
           <h1 className="text-4xl font-bold text-left lg:text-center xl:max-w-[50svw] xl:m-auto">
-            Meet the Elite Residence Properties in {displayContinentName}
+            {pageContent.title}
           </h1>
           <p className="text-lg text-left lg:text-center text-muted-foreground max-w-3xl mx-auto">
-            Discover the finest luxury branded residences across {displayContinentName} — where exceptional design meets unparalleled lifestyle.
+            {pageContent.description}
           </p>
         </div>
       </div>
@@ -337,7 +390,7 @@ export default function ContinentResidencesPage() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 w-5 h-5" />
                     <Input
-                      placeholder={`Search residences in ${displayContinentName}...`}
+                      placeholder={pageContent.searchPlaceholder}
                       value={search}
                       onChange={handleSearch}
                       className="pl-10 w-full"
@@ -532,7 +585,7 @@ export default function ContinentResidencesPage() {
               <div className="flex justify-center items-center h-40">
                 <p className="text-xl text-muted-foreground">Loading continent information...</p>
               </div>
-            ) : !continentId ? (
+            ) : (!isWorldwide && !continentId) ? (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
                 <p className="text-xl font-medium mb-2">Continent not found</p>
                 <p className="text-muted-foreground mb-6">The requested continent does not exist.</p>
@@ -554,7 +607,7 @@ export default function ContinentResidencesPage() {
               </>
             ) : (
               <div className="min-h-24 w-full border rounded-lg bg-secondary flex items-center justify-center flex-col py-12 mt-8">
-                <p className="text-xl font-medium mb-2">No residences found in {displayContinentName}</p>
+                <p className="text-xl font-medium mb-2">{pageContent.noResultsTitle}</p>
                 <p className="text-muted-foreground mb-6">Try adjusting your filters or search criteria</p>
                 <Button onClick={clearFilters}>Clear all filters</Button>
               </div>
