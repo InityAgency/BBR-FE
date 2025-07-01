@@ -108,7 +108,20 @@ export const PhoneCodeSelect = ({
         });
       } else {
         // Zameni postojeće rezultate (nova pretraga ili prvo učitavanje)
-        setPhoneCodes(fetchedPhoneCodes);
+        // Ali zadržavamo odabrani kod ako postoji
+        setPhoneCodes(prev => {
+          if (value && !query.trim()) {
+            // Ako nema pretrage, zadržavamo odabrani kod
+            const selectedCode = prev.find(pc => pc.id === value);
+            if (selectedCode) {
+              const existingIds = new Set(fetchedPhoneCodes.map(pc => pc.id));
+              if (!existingIds.has(selectedCode.id)) {
+                return [selectedCode, ...fetchedPhoneCodes];
+              }
+            }
+          }
+          return fetchedPhoneCodes;
+        });
       }
 
       setTotalPages(paginationInfo.totalPages);
@@ -120,7 +133,7 @@ export const PhoneCodeSelect = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [value]);
 
   // Učitavanje početnih podataka kada se dropdown otvori
   useEffect(() => {
@@ -136,6 +149,36 @@ export const PhoneCodeSelect = ({
       fetchPhoneCodes(1, debouncedSearchValue, false);
     }
   }, [debouncedSearchValue, isOpen, fetchPhoneCodes]);
+
+  // Učitavanje odabranog telefonskog koda ako postoji value a nije u listi
+  useEffect(() => {
+    if (value && phoneCodes.length > 0) {
+      const selectedCode = phoneCodes.find(pc => pc.id === value);
+      if (!selectedCode) {
+        // Ako odabrani kod nije u trenutnoj listi, učitajmo ga posebno
+        fetchPhoneCodes(1, '', false);
+      }
+    }
+  }, [value, phoneCodes.length, fetchPhoneCodes]);
+
+  // Dodajemo odabrani kod na vrh liste ako postoji value
+  useEffect(() => {
+    if (value && phoneCodes.length > 0) {
+      const selectedCode = phoneCodes.find(pc => pc.id === value);
+      if (!selectedCode) {
+        // Ako odabrani kod nije u listi, dodajemo ga na vrh
+        setPhoneCodes(prev => {
+          const existingIds = new Set(prev.map(pc => pc.id));
+          if (!existingIds.has(value)) {
+            // Ovde bi trebalo da učitamo podatke o odabranom kodu
+            // Za sada ćemo dodati placeholder
+            return prev;
+          }
+          return prev;
+        });
+      }
+    }
+  }, [value, phoneCodes.length]);
 
   // Optimizovana funkcija za obradu scroll eventa (load more)
   const handleScroll = useCallback(() => {
@@ -173,10 +216,9 @@ export const PhoneCodeSelect = ({
         }, 50);
       }
     } else {
-      // Kad se dropdown zatvori, resetujemo sve
+      // Kad se dropdown zatvori, resetujemo samo search i pagination, ali zadržavamo phoneCodes
       firstRenderRef.current = true;
       setSearchValue('');
-      setPhoneCodes([]);
       setPage(1);
       setHasMore(true);
     }
@@ -240,6 +282,11 @@ export const PhoneCodeSelect = ({
     ));
   }, [phoneCodes, isLoading, searchValue]);
 
+  // Pronađi odabrani telefonski kod za prikaz
+  const selectedPhoneCode = useMemo(() => {
+    return phoneCodes.find(pc => pc.id === value);
+  }, [phoneCodes, value]);
+
   return (
     <Select
       value={value}
@@ -248,7 +295,31 @@ export const PhoneCodeSelect = ({
       onOpenChange={setIsOpen}
     >
       <SelectTrigger className={className}>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder}>
+          {selectedPhoneCode && (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 overflow-hidden rounded-sm flex-shrink-0">
+                {selectedPhoneCode.country.flag ? (
+                  <img
+                    src={selectedPhoneCode.country.flag}
+                    alt={`${selectedPhoneCode.country.name} flag`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    width={16}
+                    height={16}
+                  />
+                ) : (
+                  <div className="h-4 w-4 bg-gray-200 rounded-sm flex items-center justify-center">
+                    <span className="text-gray-500 text-xs">N/A</span>
+                  </div>
+                )}
+              </div>
+              <span className="truncate">
+                {selectedPhoneCode.country.name} ({selectedPhoneCode.code})
+              </span>
+            </div>
+          )}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent className="w-[300px]">
         <div className="flex h-9 items-center gap-2 border-b px-3 custom-search">

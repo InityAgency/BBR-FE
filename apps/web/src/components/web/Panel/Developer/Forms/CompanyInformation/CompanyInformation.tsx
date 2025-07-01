@@ -150,16 +150,15 @@ export default function CompanyInformation() {
             }
 
             // Pripremi podatke u formatu koji očekuje API
-            const companyData = {
+            const companyData: any = {
                 address: data.address,
                 phoneNumber: data.phoneNumber, // Koristimo phoneNumber umesto phone_number
                 website: data.website || undefined,
             };
             
-            // Dodaj image_id samo ako je nova slika postavljena
+            // Dodaj imageId samo ako je nova slika postavljena
             if (imageId) {
-                // Server očekuje image: { id: 'image_id' } format
-                (companyData as any).image = { id: imageId };
+                companyData.imageId = imageId;
             }
 
             await apiRequest('companies/me', 'PUT', companyData);

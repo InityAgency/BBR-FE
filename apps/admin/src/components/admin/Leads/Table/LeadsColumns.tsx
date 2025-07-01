@@ -106,6 +106,12 @@ export const columns: ColumnDef<Lead>[] = [
     enableSorting: false, // Disable client-side sorting
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => renderStatusCell(row.getValue("status") as string),
+    enableSorting: false,
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => <LeadsActions row={row} />,
