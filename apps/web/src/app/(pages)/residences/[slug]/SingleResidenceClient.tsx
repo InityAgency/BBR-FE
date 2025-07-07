@@ -7,7 +7,7 @@ import SectionLayout from "@/components/web/SectionLayout";
 import GalleryModal from "@/components/web/GalleryModal";
 import { StickyScrollTabs } from "@/components/web/Residences/StickyScrollTabs";
 import Image from "next/image";
-import { ArrowRight, Lock } from "lucide-react";
+import { ArrowRight, HeartIcon, Lock, Share2Icon } from "lucide-react";
 import { ResidenceCard } from "@/components/web/Residences/ResidenceCard";
 import { UnitCard } from "@/components/web/Units/UnitCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -16,6 +16,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ClaimRequestModal } from "@/components/web/Modals/ClaimRequestModal";
 import type { Unit } from "@/types/unit";
 import RankingBadges from "@/components/web/Residences/RankingBadges";
+import { Button } from "@/components/ui/button";
+import { FavoriteButton } from "@/components/web/Residences/FavoriteButton";
+import { ShareButton } from "@/components/web/ShareButton";
+import { useFavorites } from "@/hooks/useFavorites";
+import { generatePageMetadata } from "@/lib/metadata";
 
 interface MediaImage {
     id: string;
@@ -154,6 +159,19 @@ export default function SingleResidenceClient() {
     const searchParams = useSearchParams();
     const { user } = useAuth();
     const residenceSlug = params.slug as string;
+    
+    // Koristimo hook za proveru favorites statusa
+    const { isFavorite, loading: favoriteLoading } = useFavorites(
+        residence?.id || '', 
+        'residences'
+    );
+
+    // Ažuriramo favorites status kada se učita rezidencija
+    useEffect(() => {
+        if (residence?.id) {
+            // Hook će se automatski ažurirati kada se promeni residence.id
+        }
+    }, [residence?.id]);
 
     useEffect(() => {
         // Ako je korisnik preusmeren sa login stranice i postoji "fromClaim" parametar
@@ -332,6 +350,7 @@ export default function SingleResidenceClient() {
                             </div>
                         )}
                     </div>
+
                     <div className="w-full lg:w-fit flex gap-2 mb-4 lg:mb-0">
                         <button
                             onClick={() => setIsRequestInfoModalOpen(true)}
@@ -339,6 +358,24 @@ export default function SingleResidenceClient() {
                         >
                             Request Information
                         </button>
+                    </div>
+                    <div className="w-full lg:w-fit flex gap-2 mb-4 lg:mb-0">
+                        <ShareButton
+                            url={typeof window !== 'undefined' ? window.location.href : ''}
+                            title={residence?.name || 'Residence'}
+                            description={residence?.description || ''}
+                            imageUrl={galleryImages.length > 0 ? getMediaUrl(galleryImages[0].id) : ''}
+                            location={`${residence?.city?.name || ''}${residence?.city?.name && residence?.country?.name ? ', ' : ''}${residence?.country?.name || ''}`}
+                            price={residence?.avgPricePerUnit ? `$${Number(residence.avgPricePerUnit).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : ''}
+                            brand={residence?.brand?.name || ''}
+                            className="w-[36px] h-[36px]"
+                        />
+                        <FavoriteButton
+                            entityId={residence?.id || ''}
+                            entityType="residences"
+                            isFavorite={isFavorite}
+                            className="w-[36px] h-[36px]"
+                        />
                     </div>
                 </div>
 

@@ -6,8 +6,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
-interface FavoriteHeartProps {
+interface FavoriteButtonProps {
     entityId: string;
     entityType: string;
     isFavorite?: boolean;
@@ -21,21 +22,17 @@ interface ApiError {
     error?: string;
 }
 
-export function FavoriteHeart({ entityId, entityType, isFavorite = false, className, onFavoriteRemoved }: FavoriteHeartProps) {
+export function FavoriteButton({ entityId, entityType, isFavorite = false, className, onFavoriteRemoved }: FavoriteButtonProps) {
     const [isFavorited, setIsFavorited] = useState(isFavorite);
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useAuth();
     const router = useRouter();
 
-    // Sinhronizujemo lokalno stanje sa prop-om
     useEffect(() => {
         setIsFavorited(isFavorite);
     }, [isFavorite]);
 
-    const handleFavoriteClick = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
+    const handleFavoriteClick = async () => {
         if (!user) {
             toast.error("You need to be logged in to add to favorites");
             router.push('/login');
@@ -45,7 +42,6 @@ export function FavoriteHeart({ entityId, entityType, isFavorite = false, classN
         try {
             setIsLoading(true);
             if (isFavorited) {
-                // Uklanjamo iz favorita
                 const response = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/favorites/${entityType}/${entityId}`,
                     {
@@ -56,17 +52,13 @@ export function FavoriteHeart({ entityId, entityType, isFavorite = false, classN
                         },
                     }
                 );
-
                 const data = await response.json();
-
                 if (!response.ok) {
                     throw new Error(data.message || 'Failed to remove from favorites');
                 }
-
                 toast.success("Successfully removed from favorites");
                 onFavoriteRemoved?.();
             } else {
-                // Dodajemo u favorite
                 const response = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/api/${process.env.NEXT_PUBLIC_API_VERSION}/favorites`,
                     {
@@ -81,16 +73,12 @@ export function FavoriteHeart({ entityId, entityType, isFavorite = false, classN
                         }),
                     }
                 );
-
                 const data = await response.json();
-
                 if (!response.ok) {
                     throw new Error(data.message || 'Failed to add to favorites');
                 }
-
                 toast.success("Successfully added to favorites");
             }
-
             setIsFavorited(!isFavorited);
         } catch (error) {
             console.error('Error toggling favorite:', error);
@@ -118,26 +106,19 @@ export function FavoriteHeart({ entityId, entityType, isFavorite = false, classN
     };
 
     return (
-        <button
+        <Button
             onClick={handleFavoriteClick}
             disabled={isLoading}
-            id="favorite-heart"
-            className={cn(
-                "absolute top-3 right-3 z-10 p-2 rounded-full transition-all z-10",
-                (isFavorited || isFavorite) 
-                    ? "bg-secondary/80 hover:bg-secondary" 
-                    : "bg-secondary/80 hover:bg-secondary",
-                className
-            )}
+            variant="outline"
+            className={cn("w-[36px] h-[36px] transition-all", className)}
+            title={isFavorited ? "Remove from favorites" : "Add to favorites"}
         >
             <Heart
                 className={cn(
-                    "w-5 h-5 transition-all",
-                    (isFavorited || isFavorite) 
-                        ? "fill-primary text-primary" 
-                        : "text-white"
+                    "w-4 h-4 transition-all",
+                    isFavorited ? "fill-primary text-primary" : "text-foreground"
                 )}
             />
-        </button>
+        </Button>
     );
 } 

@@ -17,7 +17,7 @@ function joinUrls(baseUrl: string, path: string): string {
 const baseConfig = {
   siteName: 'Best Branded Residences',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://bestbrandedresidences.com',
-  defaultImage: '/bbr-cover.png',
+  defaultImage: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bestbrandedresidences.com'}/bbr-cover.png`,
   twitterHandle: '@bbr_residences',
 }
 
@@ -58,6 +58,29 @@ export interface PageMetadata {
     slug?: string
     image?: string
     keywords?: string[]
+    // Dodali smo opcione Open Graph i Twitter opcije
+    openGraph?: {
+      title?: string
+      description?: string
+      url?: string
+      siteName?: string
+      images?: Array<{
+        url: string
+        width?: number
+        height?: number
+        alt?: string
+      }>
+      locale?: string
+      type?: 'website' | 'article' | 'book' | 'profile' | 'music.song' | 'music.album' | 'music.playlist' | 'music.radio_station' | 'video.movie' | 'video.episode' | 'video.tv_show' | 'video.other'
+    }
+    twitter?: {
+      card?: 'summary' | 'summary_large_image' | 'player' | 'app'
+      title?: string
+      description?: string
+      images?: string[]
+      creator?: string
+    }
+    other?: Record<string, string>
   }
 }
 
@@ -175,7 +198,7 @@ function generateResidenceMetadata(residence: ResidenceMetadata['data']): Metada
     description,
     keywords,
     openGraph: {
-      title: `${title} - Luxury Residence${residence.city?.name ? ` in ${residence.city.name}` : ''}`,
+      title: `${title} - Luxury Residence ${residence.city?.name ? ` in ${residence.city.name}` : ''}`,
       description,
       url: joinUrls(baseConfig.siteUrl, url),
       siteName: baseConfig.siteName,
@@ -249,7 +272,7 @@ function generateCategoryMetadata(category: CategoryMetadata['data']): Metadata 
   }
 }
 
-// Basic page metadata
+// Basic page metadata - sada podržava dodatne Open Graph opcije
 function generateBasicPageMetadata(page: PageMetadata['data']): Metadata {
   const title = `${page.title} | ${baseConfig.siteName}`
   const description = page.description || `${page.title} - Discover luxury branded residences worldwide`
@@ -263,16 +286,17 @@ function generateBasicPageMetadata(page: PageMetadata['data']): Metadata {
     'luxury real estate'
   ]
 
-  return {
+  // Kreiraj base metadata
+  const metadata: Metadata = {
     title,
     description,
     keywords,
     openGraph: {
-      title,
-      description,
-      url: joinUrls(baseConfig.siteUrl, url),
-      siteName: baseConfig.siteName,
-      images: [
+      title: page.openGraph?.title || title,
+      description: page.openGraph?.description || description,
+      url: page.openGraph?.url || joinUrls(baseConfig.siteUrl, url),
+      siteName: page.openGraph?.siteName || baseConfig.siteName,
+      images: page.openGraph?.images || [
         {
           url: image,
           width: 1200,
@@ -280,28 +304,35 @@ function generateBasicPageMetadata(page: PageMetadata['data']): Metadata {
           alt: title,
         },
       ],
-      type: 'website',
+      type: (page.openGraph?.type as 'website' | 'article' | 'book' | 'profile' | 'music.song' | 'music.album' | 'music.playlist' | 'music.radio_station' | 'video.movie' | 'video.episode' | 'video.tv_show' | 'video.other') || 'website',
+      locale: page.openGraph?.locale || 'en_US',
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      creator: baseConfig.twitterHandle,
-      images: [image],
+      card: (page.twitter?.card as 'summary' | 'summary_large_image' | 'player' | 'app') || 'summary_large_image',
+      title: page.twitter?.title || title,
+      description: page.twitter?.description || description,
+      creator: page.twitter?.creator || baseConfig.twitterHandle,
+      images: page.twitter?.images || [image],
     },
     alternates: {
       canonical: joinUrls(baseConfig.siteUrl, url),
     },
   }
+
+  // Dodaj dodatne meta tagove ako postoje
+  if (page.other) {
+    metadata.other = page.other
+  }
+
+  return metadata
 }
 
-// Blog listing metadata
+// Ostatak funkcija ostaje isti...
 function generateBlogMetadata(blog: BlogMetadata['data']): Metadata {
   let title = 'Luxury Insights - Latest Articles'
   let description = 'Discover exclusive insights and trends in the luxury real estate market. Expert analysis, market trends, and industry news.'
   let url = '/blog'
   
-  // Customize based on filters
   if (blog.category) {
     title = `${blog.category} Articles - Luxury Insights`
     description = `Latest articles about ${blog.category} in luxury real estate. Expert insights and market analysis.`
@@ -367,7 +398,6 @@ function generateBlogMetadata(blog: BlogMetadata['data']): Metadata {
   }
 }
 
-// Blog post metadata
 function generateBlogPostMetadata(post: BlogPostMetadata['data']): Metadata {
   const title = post.title?.rendered?.replace(/<[^>]*>/g, '') || 'Blog Post'
   const description = post.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || 
@@ -378,10 +408,7 @@ function generateBlogPostMetadata(post: BlogPostMetadata['data']): Metadata {
   const publishedDate = new Date(post.date).toISOString()
   const modifiedDate = post.modified ? new Date(post.modified).toISOString() : publishedDate
   
-  // Get featured image
   const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || baseConfig.defaultImage
-  
-  // Get category and author
   const category = post._embedded?.['wp:term']?.[0]?.[0]?.name
   const author = post._embedded?.author?.[0]?.name
   
@@ -431,13 +458,11 @@ function generateBlogPostMetadata(post: BlogPostMetadata['data']): Metadata {
   }
 }
 
-// Career listing metadata
 function generateCareerMetadata(career: CareerMetadata['data']): Metadata {
   let title = 'Career Opportunities - Join Our Team'
   let description = 'Explore exciting career opportunities at Best Branded Residences. Join our team and help shape the future of luxury real estate.'
   let url = '/careers'
   
-  // Customize based on filters
   if (career.category) {
     title = `${career.category} Jobs - Career Opportunities`
     description = `Find ${career.category} positions at Best Branded Residences. Exciting opportunities in luxury real estate.`
@@ -497,7 +522,6 @@ function generateCareerMetadata(career: CareerMetadata['data']): Metadata {
   }
 }
 
-// Helper funkcija za dohvatanje kategorije iz class_list-a
 function getCategoryFromClassList(classList?: string[]): string {
   if (!Array.isArray(classList)) return "General";
   
@@ -510,7 +534,6 @@ function getCategoryFromClassList(classList?: string[]): string {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Career post metadata
 function generateCareerPostMetadata(post: CareerPostMetadata['data']): Metadata {
   const title = post.title?.rendered?.replace(/<[^>]*>/g, '') || 'Career Opportunity'
   const category = getCategoryFromClassList(post.class_list)
@@ -528,7 +551,6 @@ function generateCareerPostMetadata(post: CareerPostMetadata['data']): Metadata 
   const publishedDate = new Date(post.date).toISOString()
   const modifiedDate = post.modified ? new Date(post.modified).toISOString() : publishedDate
   
-  // Get featured image
   const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || baseConfig.defaultImage
   
   const keywords = [
@@ -576,7 +598,6 @@ function generateCareerPostMetadata(post: CareerPostMetadata['data']): Metadata 
   }
 }
 
-// Default fallback metadata
 function getDefaultMetadata(): Metadata {
   return {
     title: baseConfig.siteName,
@@ -585,7 +606,6 @@ function getDefaultMetadata(): Metadata {
   }
 }
 
-// Async verzija za API pozive
 export async function generateAsyncMetadata(
   fetchFunction: () => Promise<any>,
   config: Omit<MetadataConfig, 'data'> & { slug?: string }
@@ -608,7 +628,6 @@ export async function generateAsyncMetadata(
   }
 }
 
-// Dodati strukturnu data za bolje razumevanje sadržaja od strane pretraživača
 export const generateStructuredData = (data: any) => {
   return {
     "@context": "https://schema.org",
@@ -625,7 +644,6 @@ export const generateStructuredData = (data: any) => {
   }
 }
 
-// Dodati dinamički robots.txt generator
 export async function generateRobotsTxt() {
   return {
     rules: {
