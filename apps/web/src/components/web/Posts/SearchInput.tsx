@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 
 interface SearchInputProps {
     onSearch: (query: string) => void;
+    isWhite?: boolean;
 }
 
-export function SearchInput({ onSearch }: SearchInputProps) {
+export function SearchInput({ onSearch, isWhite }: SearchInputProps) {
     const [searchQuery, setSearchQuery] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -39,7 +40,7 @@ export function SearchInput({ onSearch }: SearchInputProps) {
                     placeholder="Search articles..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-6 text-lg"
+                    className={`pl-10 pr-4 py-6 text-lg ${isWhite ? "bg-white text-black border border-[#E0E0E0]" : ""}`}
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             </div>

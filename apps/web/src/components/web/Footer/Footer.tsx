@@ -221,6 +221,9 @@ export default function Footer() {
                 <Link href="/about-us">About Us</Link>
               </li>
               <li>
+                <Link href="/newsroom">Newsroom</Link>
+              </li>
+              <li>
                 <Link href="/careers">Careers</Link>
               </li>
               {/* <li><Link href="/#">Newsroom</Link></li> */}

@@ -53,6 +53,7 @@ interface WPEntity {
   
   // Content types
   export interface Post extends WPEntity {
+    newsroom_categories: number[];
     about_the_role: any;
     acf: any;
     _embedded: any;

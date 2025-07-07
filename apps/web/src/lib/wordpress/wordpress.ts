@@ -493,6 +493,271 @@ export async function getCareerCategoryById(id: number): Promise<Category> {
 
   return response;
 }
+
+// Newsroom Functions
+
+export async function getAllNewsroomPosts(filterParams?: {
+  author?: string;
+  tag?: string;
+  category?: string;
+  search?: string;
+}): Promise<Post[]> {
+  const query: Record<string, any> = {
+    _embed: true,
+    per_page: 100,
+  };
+
+  if (filterParams?.search) {
+    // Search in post content and title
+    query.search = filterParams.search;
+
+    // If we have additional filters with search, use them
+    if (filterParams?.author) {
+      query.author = filterParams.author;
+    }
+    if (filterParams?.tag) {
+      query.tags = filterParams.tag;
+    }
+    if (filterParams?.category) {
+      query.categories = filterParams.category;
+    }
+  } else {
+    // If no search term, just apply filters
+    if (filterParams?.author) {
+      query.author = filterParams.author;
+    }
+    if (filterParams?.tag) {
+      query.tags = filterParams.tag;
+    }
+    if (filterParams?.category) {
+      query.categories = filterParams.category;
+    }
+  }
+
+  const url = getUrl("/wp-json/wp/v2/newsroom", query);
+  return wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", "newsroom"],
+    },
+  });
+}
+
+export async function getNewsroomPostById(id: number): Promise<Post> {
+  const url = getUrl(`/wp-json/wp/v2/newsroom/${id}`);
+  const response = await wordpressFetch<Post>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-${id}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomPostBySlug(slug: string): Promise<Post> {
+  const url = getUrl("/wp-json/wp/v2/newsroom", { slug });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-${slug}`],
+    },
+  });
+
+  return response[0];
+}
+
+export async function getNewsroomCategories(): Promise<Category[]> {
+  const url = getUrl("/wp-json/wp/v2/newsroom_categories");
+  const response = await wordpressFetch<Category[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", "newsroom-categories"],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomCategoryById(id: number): Promise<Category> {
+  const url = getUrl(`/wp-json/wp/v2/newsroom_categories/${id}`);
+  const response = await wordpressFetch<Category>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-category-${id}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomCategoryBySlug(slug: string): Promise<Category> {
+  const url = getUrl("/wp-json/wp/v2/newsroom_categories", { slug });
+  const response = await wordpressFetch<Category[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-category-${slug}`],
+    },
+  });
+
+  return response[0];
+}
+
+export async function getNewsroomPostsByCategory(categoryId: number): Promise<Post[]> {
+  const url = getUrl("/wp-json/wp/v2/newsroom", { categories: categoryId });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-category-${categoryId}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomPostsByTag(tagId: number): Promise<Post[]> {
+  const url = getUrl("/wp-json/wp/v2/newsroom", { tags: tagId });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-tag-${tagId}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomTagsByPost(postId: number): Promise<Tag[]> {
+  const url = getUrl("/wp-json/wp/v2/tags", { post: postId });
+  const response = await wordpressFetch<Tag[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-post-${postId}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getAllNewsroomTags(): Promise<Tag[]> {
+  const url = getUrl("/wp-json/wp/v2/tags");
+  const response = await wordpressFetch<Tag[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", "newsroom-tags"],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomTagById(id: number): Promise<Tag> {
+  const url = getUrl(`/wp-json/wp/v2/tags/${id}`);
+  const response = await wordpressFetch<Tag>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-tag-${id}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomTagBySlug(slug: string): Promise<Tag> {
+  const url = getUrl("/wp-json/wp/v2/tags", { slug });
+  const response = await wordpressFetch<Tag[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-tag-${slug}`],
+    },
+  });
+
+  return response[0];
+}
+
+export async function getNewsroomPostsByAuthor(authorId: number): Promise<Post[]> {
+  const url = getUrl("/wp-json/wp/v2/newsroom", { author: authorId });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-author-${authorId}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomPostsByAuthorSlug(
+  authorSlug: string
+): Promise<Post[]> {
+  const author = await getAuthorBySlug(authorSlug);
+  const url = getUrl("/wp-json/wp/v2/newsroom", { author: author.id });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-author-${authorSlug}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomPostsByCategorySlug(
+  categorySlug: string
+): Promise<Post[]> {
+  const category = await getNewsroomCategoryBySlug(categorySlug);
+  const url = getUrl("/wp-json/wp/v2/newsroom", { categories: category.id });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-category-${categorySlug}`],
+    },
+  });
+
+  return response;
+}
+
+export async function getNewsroomPostsByTagSlug(tagSlug: string): Promise<Post[]> {
+  const tag = await getNewsroomTagBySlug(tagSlug);
+  const url = getUrl("/wp-json/wp/v2/newsroom", { tags: tag.id });
+  const response = await wordpressFetch<Post[]>(url, {
+    next: {
+      ...defaultFetchOptions.next,
+      tags: ["wordpress", `newsroom-tag-${tagSlug}`],
+    },
+  });
+
+  return response;
+}
+
+// Helper function to search across newsroom categories
+export async function searchNewsroomCategories(query: string): Promise<Category[]> {
+  const url = getUrl("/wp-json/wp/v2/newsroom_categories", {
+    search: query,
+    per_page: 100,
+  });
+  return wordpressFetch<Category[]>(url);
+}
+
+// Helper function to search across newsroom tags
+export async function searchNewsroomTags(query: string): Promise<Tag[]> {
+  const url = getUrl("/wp-json/wp/v2/tags", {
+    search: query,
+    per_page: 100,
+  });
+  return wordpressFetch<Tag[]>(url);
+}
+
+// Helper function to search across newsroom authors
+export async function searchNewsroomAuthors(query: string): Promise<Author[]> {
+  const url = getUrl("/wp-json/wp/v2/users", {
+    search: query,
+    per_page: 100,
+  });
+  return wordpressFetch<Author[]>(url);
+}
+
 // Export error class for error handling
-export { WordPressAPIError };
+// Export error class for error handling
+export { WordPressAPIError, type Post };
 

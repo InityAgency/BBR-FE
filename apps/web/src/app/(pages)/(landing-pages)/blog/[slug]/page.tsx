@@ -125,22 +125,30 @@ export default async function BlogPostPage({ params, searchParams }: BlogPostPag
             <div className="single-blog-hero">
                 <div className="flex flex-col items-center rounded-b-xl bg-secondary max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 lg:px-12 py-6 lg:py-12 gap-4 xl:gap-8 mb-3 lg:mb-12">
                     <div className="w-full xl:max-w-[1600px] mx-auto flex flex-col justify-center">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto px-4 py-4 ">
+                        <div className="flex w-full lg:w-[70%] items-center gap-2 text-sm text-muted-foreground max-w-[calc(100svw-1.5rem)] 2xl:max-w-[calc(100svw-4rem)] mx-auto lg:px-4 py-4 ">
                             <Link href="/blog" className="hover:text-primary transition-colors">
                                 Luxury Insights
                             </Link>
                             <ChevronRight className="w-4 h-4" />
-                            <span className="text-foreground line-clamp-1" dangerouslySetInnerHTML={{ __html: post.title?.rendered || "" }} />
+                            <span 
+                                className="text-foreground line-clamp-1" 
+                                title={post.title?.rendered?.replace(/<[^>]*>/g, '') || ""}
+                                dangerouslySetInnerHTML={{ 
+                                    __html: post.title?.rendered?.replace(/<[^>]*>/g, '').length > 40 
+                                        ? post.title?.rendered?.replace(/<[^>]*>/g, '').substring(0, 40) + '...' 
+                                        : post.title?.rendered || "" 
+                                }} 
+                            />
                         </div>
-                        <div className="w-full mx-auto items-center flex flex-col gap-6 px-12 mb-12">
-                            <div className="uppercase text-primary">
-                                {category?.name || "HOME DESIGN & DECOR"}
+                        <div className="w-full mx-auto items-center flex flex-col gap-6 lg:px-12 mb-12">
+                            <div className="uppercase text-primary w-full lg:w-[70%] text-left lg:text-center">
+                                {category?.name || "NEWS & UPDATES"}
                             </div>
                             <h1
-                                className="text-4xl font-medium w-[70%] text-center"
+                                className="text-3xl lg:text-4xl font-medium w-full xl:w-[70%] text-left lg:text-center"
                                 dangerouslySetInnerHTML={{ __html: post.title?.rendered || "" }}
                             />
-                            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex w-full lg:w-[70%] items-start lg:items-center justify-start lg:justify-center gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                     <Clock className="w-4 h-4" />
                                     <span>{readingTime} min read</span>
