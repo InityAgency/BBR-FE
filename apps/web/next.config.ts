@@ -57,7 +57,19 @@ const nextConfig = {
       'bbr-bucket.s3.amazonaws.com', 
       'bbr-bucket.s3.eu-west-2.amazonaws.com', 
       'backend.bestbrandedresidences.com',
-      'localhost'
+      'localhost',
+      // Dodaj WordPress domen ako se koristi
+      'bbrcontent.inity.space',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
     formats: ['image/webp', 'image/avif'], // SEO optimizacija slika
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
