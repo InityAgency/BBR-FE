@@ -51,32 +51,16 @@ const nextConfig = {
       'images.unsplash.com', 
       'bbrapi.inity.space', 
       'bbrcontent.inity.space',
-      'bestbrandedresidences.com',
       'flagcdn.com', 
       'upload.wikimedia.org',  
       'bbr-bucket.s3.amazonaws.com', 
       'bbr-bucket.s3.eu-west-2.amazonaws.com', 
-      'backend.bestbrandedresidences.com',
-      'localhost',
-      // Dodaj WordPress domen ako se koristi
-      'bbrcontent.inity.space',
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
-      },
+      'localhost'
     ],
     formats: ['image/webp', 'image/avif'], // SEO optimizacija slika
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     unoptimized: false, // Omogući optimizaciju slika za SEO
-    loader: 'custom',
-    loaderFile: './src/lib/imageLoader.ts',
   },
   // Kompresija za bolje performanse
   compress: true,
